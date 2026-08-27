@@ -1,0 +1,134 @@
+{
+  "common": {
+    "siteName": "Santamore",
+    "tagline": "Djeda Mraz sa mora",
+    "skipToContent": "Preskoči na sadržaj",
+    "languageSwitcher": "Izbor jezika"
+  },
+  "nav": {
+    "events": "Događaji",
+    "fundraisers": "Prikupljači",
+    "ledger": "Transparentnost",
+    "about": "O nama",
+    "donate": "Podrži",
+    "menu": "Meni"
+  },
+  "home": {
+    "eyebrow": "Crnogorska neprofitna organizacija · Tivat",
+    "title": "Trčimo, plivamo i pomažemo — a svaki euro javno objavimo.",
+    "sub": "Organizujemo Santa Run, zimska kupanja i regate u Boki. Novac ide lokalnim porodicama, djeci i malim biznisima — i svaka uplata i isplata stoji u javnom registru.",
+    "ctaDonate": "Podrži",
+    "ctaLedger": "Pogledaj registar",
+    "buildNote": "Stranica je u izradi. Prvi događaj: decembar.",
+    "typeCheck": "Provjera pisma: č ć š ž đ · Č Ć Š Ž Đ"
+  },
+  "footer": {
+    "orgHeading": "Organizacija",
+    "siteHeading": "Sajt",
+    "legalHeading": "Pravila i uslovi",
+    "orgName": "[[PLACEHOLDER: puno registrovano ime organizacije]]",
+    "orgAddress": "[[PLACEHOLDER: registrovana adresa, Tivat]]",
+    "orgId": "Registarski broj: [[PLACEHOLDER: registarski broj]] · PIB: [[PLACEHOLDER: PIB]]",
+    "iban": "IBAN: [[PLACEHOLDER: IBAN]]",
+    "email": "[[PLACEHOLDER: kontakt e-mail]]",
+    "legal": {
+      "privacy": "Pravila privatnosti",
+      "cookies": "Kolačići",
+      "terms": "Uslovi korišćenja",
+      "donations": "Pravila donacija",
+      "eventTerms": "Uslovi učešća",
+      "safeguarding": "Zaštita djece",
+      "codeOfConduct": "Kodeks ponašanja",
+      "impressum": "Informacije o organizaciji"
+    },
+    "site": {
+      "about": "O nama",
+      "events": "Događaji",
+      "gallery": "Galerija",
+      "ledger": "Transparentnost",
+      "donate": "Podrži",
+      "fundraisers": "Prikupljači",
+      "partners": "Partneri",
+      "news": "Vijesti",
+      "faq": "Česta pitanja",
+      "contact": "Kontakt"
+    },
+    "cards": "[[PLACEHOLDER: logotipi prihvaćenih kartica]]",
+    "note": "Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori."
+  },
+  "legalStub": {
+    "title": "Stranica u pripremi",
+    "body": "Ovaj dokument je u izradi i biće objavljen prije početka prikupljanja donacija. Svaki nacrt pregleda advokat u Crnoj Gori prije objave.",
+    "back": "Nazad na početnu"
+  },
+  "notFound": {
+    "title": "Stranica nije pronađena",
+    "body": "Stranica koju tražiš ne postoji ili je premještena.",
+    "back": "Nazad na početnu"
+  },
+  "donate": {
+    "payVerb": "Doniraj",
+    "perMonth": " /mj.",
+    "impact10": "jedan topli obrok",
+    "impact25": "nedjelja školskih užina",
+    "impact50": "lijekovi za mjesec",
+    "customAmount": "Drugi iznos",
+    "monthlyTitle": "Učini ovo mjesečnim",
+    "monthlyDesc": "10 € mjesečno je 120 € godišnje — više od većine jednokratnih donacija.",
+    "feeTitle": "Pokrij troškove obrade",
+    "feeDesc": "Tako cijeli tvoj iznos stiže do korisnika. Naše troškove plaćaju sponzori.",
+    "anonTitle": "Doniraj anonimno",
+    "anonDesc": "Iznos se prikazuje u javnom registru, ime ne.",
+    "paymentMethod": "Način plaćanja",
+    "railCard": "Kartica",
+    "railCardSub": "Visa · Mastercard · Apple Pay",
+    "railSepa": "Bankovni prenos",
+    "railSepaSub": "SEPA · bez provizije",
+    "sepaIban": "IBAN",
+    "sepaReference": "Poziv na broj — obavezno",
+    "sepaNote": "Ovaj broj automatski pripisuje uplatu stranici koju podržavaš.",
+    "totalToday": "Ukupno danas",
+    "secureNote": "Plaćanje obrađuje licencirana banka u Crnoj Gori. Santamore ne vidi podatke kartice."
+  },
+  "runner": {
+    "team": "Tim",
+    "of": "od",
+    "donors": "donatora",
+    "quickDonate": "Doniraj 25 €",
+    "share": "Podijeli stranicu",
+    "donorWall": "Zid donatora",
+    "anonymous": "Anonimno",
+    "nudgeTitle": "Tvoj sljedeći korak",
+    "nudgeDesc": "Pitaj još 5 ljudi. Trkači koji pošalju 15+ poruka prikupe 76% više. Poruka je već napisana — samo dodirni ime."
+  },
+  "leaderboard": {
+    "title": "Rang lista",
+    "registered": "prijavljenih",
+    "activeFundraisers": "aktivnih trkača koji prikupljaju",
+    "individuals": "Pojedinci",
+    "teams": "Timovi",
+    "cta": "Napravi svoju stranicu"
+  },
+  "ledger": {
+    "eyebrow": "Javni registar · ažurirano automatski",
+    "title": "Svaki euro, oba smjera",
+    "received": "Donacije primljene",
+    "disbursed": "Isplaćeno korisnicima",
+    "approvedPending": "Odobreno, isplata u toku",
+    "unallocated": "Neraspoređeno",
+    "twoFunds": "Dva odvojena fonda",
+    "impactFund": "Fond za pomoć — od donacija",
+    "impactFundValue": "100% korisnicima",
+    "operationsFund": "Operativni fond — od sponzora, prijava i grantova",
+    "fundsNote": "Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori.",
+    "moneyIn": "Uplate",
+    "moneyOut": "Isplate",
+    "national": "NACIONALNO",
+    "anonymous": "Anonimno",
+    "railCard": "KARTICA",
+    "railSepa": "SEPA",
+    "railCash": "KEŠ · 2 potpisa",
+    "railMixed": "MJEŠOVITO",
+    "footNote": "Objavljeno je ime samo ako je donator tako izabrao. Identitet korisnika je zaštićen; dokumentacija je dostupna revizoru."
+  }
+}

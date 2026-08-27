@@ -1,0 +1,134 @@
+{
+  "common": {
+    "siteName": "Santamore",
+    "tagline": "Santa of the water",
+    "skipToContent": "Skip to content",
+    "languageSwitcher": "Language"
+  },
+  "nav": {
+    "events": "Events",
+    "fundraisers": "Fundraisers",
+    "ledger": "Transparency",
+    "about": "About us",
+    "donate": "Donate",
+    "menu": "Menu"
+  },
+  "home": {
+    "eyebrow": "Montenegrin non-profit · Tivat",
+    "title": "We run, we swim, we help — and we publish every euro.",
+    "sub": "We organise the Santa Run, winter sea swims and regattas in the Bay of Kotor. The money goes to local families, children and small businesses — and every payment in and out sits in a public ledger.",
+    "ctaDonate": "Donate",
+    "ctaLedger": "See the ledger",
+    "buildNote": "This site is under construction. First event: December.",
+    "typeCheck": "Diacritics check: č ć š ž đ · Č Ć Š Ž Đ"
+  },
+  "footer": {
+    "orgHeading": "Organisation",
+    "siteHeading": "Site",
+    "legalHeading": "Policies and terms",
+    "orgName": "[[PLACEHOLDER: full registered organisation name]]",
+    "orgAddress": "[[PLACEHOLDER: registered address, Tivat]]",
+    "orgId": "Registration number: [[PLACEHOLDER: registration number]] · PIB: [[PLACEHOLDER: PIB]]",
+    "iban": "IBAN: [[PLACEHOLDER: IBAN]]",
+    "email": "[[PLACEHOLDER: contact email]]",
+    "legal": {
+      "privacy": "Privacy policy",
+      "cookies": "Cookies",
+      "terms": "Terms of use",
+      "donations": "Donation policy",
+      "eventTerms": "Event terms",
+      "safeguarding": "Child safeguarding",
+      "codeOfConduct": "Code of conduct",
+      "impressum": "Organisation details"
+    },
+    "site": {
+      "about": "About us",
+      "events": "Events",
+      "gallery": "Gallery",
+      "ledger": "Transparency",
+      "donate": "Donate",
+      "fundraisers": "Fundraisers",
+      "partners": "Partners",
+      "news": "News",
+      "faq": "FAQ",
+      "contact": "Contact"
+    },
+    "cards": "[[PLACEHOLDER: accepted card brand logos]]",
+    "note": "Not one cent of donations goes to salaries or overhead. Sponsors pay for those."
+  },
+  "legalStub": {
+    "title": "Page in preparation",
+    "body": "This document is being drafted and will be published before we start collecting donations. Every draft is reviewed by a lawyer in Montenegro before it goes live.",
+    "back": "Back to home"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you are looking for does not exist or has moved.",
+    "back": "Back to home"
+  },
+  "donate": {
+    "payVerb": "Donate",
+    "perMonth": " /mo",
+    "impact10": "one warm meal",
+    "impact25": "a week of school meals",
+    "impact50": "a month of medication",
+    "customAmount": "Other amount",
+    "monthlyTitle": "Make this monthly",
+    "monthlyDesc": "€10 a month is €120 a year — more than most one-off gifts.",
+    "feeTitle": "Cover the processing fee",
+    "feeDesc": "So your full amount reaches the cause. Our costs are paid by sponsors.",
+    "anonTitle": "Give anonymously",
+    "anonDesc": "The amount appears in the public ledger. Your name does not.",
+    "paymentMethod": "Payment method",
+    "railCard": "Card",
+    "railCardSub": "Visa · Mastercard · Apple Pay",
+    "railSepa": "Bank transfer",
+    "railSepaSub": "SEPA · no fees",
+    "sepaIban": "IBAN",
+    "sepaReference": "Reference — required",
+    "sepaNote": "This reference credits your gift to the page you are supporting automatically.",
+    "totalToday": "Total today",
+    "secureNote": "Payments are processed by a licensed Montenegrin bank. Santamore never sees your card details."
+  },
+  "runner": {
+    "team": "Team",
+    "of": "of",
+    "donors": "donors",
+    "quickDonate": "Donate €25",
+    "share": "Share this page",
+    "donorWall": "Donor wall",
+    "anonymous": "Anonymous",
+    "nudgeTitle": "Your next move",
+    "nudgeDesc": "Ask 5 more people. Runners who send 15+ messages raise 76% more. The message is already written — just tap a name."
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "registered": "registered",
+    "activeFundraisers": "runners actively fundraising",
+    "individuals": "Individuals",
+    "teams": "Teams",
+    "cta": "Start your own page"
+  },
+  "ledger": {
+    "eyebrow": "Public ledger · updates automatically",
+    "title": "Every euro, both directions",
+    "received": "Donations received",
+    "disbursed": "Paid to beneficiaries",
+    "approvedPending": "Approved, payment pending",
+    "unallocated": "Unallocated",
+    "twoFunds": "Two separate funds",
+    "impactFund": "Impact Fund — from donations",
+    "impactFundValue": "100% to beneficiaries",
+    "operationsFund": "Operations Fund — from sponsors, entries and grants",
+    "fundsNote": "Not one cent of donations goes to salaries or overhead. Sponsors pay for those.",
+    "moneyIn": "Money in",
+    "moneyOut": "Money out",
+    "national": "NATIONAL",
+    "anonymous": "Anonymous",
+    "railCard": "CARD",
+    "railSepa": "SEPA",
+    "railCash": "CASH · 2 signatures",
+    "railMixed": "MIXED",
+    "footNote": "Names appear only when the donor chose to show them. Beneficiary identities are protected; documentation is available to an auditor."
+  }
+}
