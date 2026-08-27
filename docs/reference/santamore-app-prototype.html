@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Santamore — app prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=Figtree:wght@300..900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#F35353;
+  --red-deep:#D93B3B;
+  --ink:#0B0B0C;
+  --paper:#FFFFFF;
+  --sea:#0E3A46;
+  --sea-2:#15505F;
+  --mist:#EAF1F2;
+  --line:rgba(11,11,12,.12);
+  --line-soft:rgba(11,11,12,.07);
+  --display:'Fraunces',Georgia,serif;
+  --body:'Figtree',system-ui,-apple-system,sans-serif;
+  --mono:'DM Mono',ui-monospace,monospace;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  font-family:var(--body);
+  color:var(--ink);
+  background:
+    radial-gradient(1100px 620px at 88% -8%, rgba(243,83,83,.10), transparent 62%),
+    linear-gradient(180deg,#F7FAFA 0%, #EFF4F5 100%);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+:focus-visible{outline:2.5px solid var(--sea);outline-offset:2px;border-radius:6px}
+
+/* ============ page shell ============ */
+.wrap{max-width:1240px;margin:0 auto;padding:34px 22px 90px}
+
+.masthead{display:flex;align-items:flex-end;justify-content:space-between;gap:26px;flex-wrap:wrap;
+  padding-bottom:22px;border-bottom:1.5px solid var(--ink)}
+.mast-l{display:flex;align-items:center;gap:18px}
+.mast-logo{height:46px;width:auto;display:block}
+.mast-kicker{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--sea);opacity:.75}
+.mast-title{font-family:var(--display);font-variation-settings:'SOFT' 40,'WONK' 1;font-weight:600;
+  font-size:clamp(20px,2.4vw,27px);line-height:1.05;margin:3px 0 0;letter-spacing:-.015em}
+.mast-r{font-family:var(--mono);font-size:11px;line-height:1.7;color:rgba(11,11,12,.6);text-align:right}
+.mast-r b{color:var(--ink);font-weight:500}
+
+/* ============ layout ============ */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,356px);gap:46px;margin-top:38px;align-items:start}
+@media(max-width:940px){.stage{grid-template-columns:minmax(0,1fr);gap:34px}}
+
+/* ============ tabs ============ */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+.tab{padding:9px 15px;border-radius:999px;font-size:13.5px;font-weight:600;
+  border:1.5px solid var(--line);background:rgba(255,255,255,.6);transition:.16s ease}
+.tab:hover{border-color:var(--sea);color:var(--sea)}
+.tab[aria-selected="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.tab .n{font-family:var(--mono);font-size:10px;opacity:.5;margin-right:6px}
+
+/* ============ phone ============ */
+.phone-row{display:flex;justify-content:center}
+.phone{
+  width:100%;max-width:392px;min-width:0;
+  background:var(--paper);
+  border:1.5px solid var(--ink);
+  border-radius:34px;
+  box-shadow:0 34px 70px -34px rgba(14,58,70,.5), 0 3px 0 var(--ink);
+  overflow:hidden;
+  position:relative;
+}
+.phone-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:11px 18px 10px;background:var(--ink);color:#fff}
+.phone-bar img{height:19px;width:auto;display:block}
+.phone-bar .url{font-family:var(--mono);font-size:10px;opacity:.62;letter-spacing:.02em}
+.langs{display:flex;gap:3px}
+.lang{font-family:var(--mono);font-size:9.5px;padding:3px 6px;border-radius:5px;
+  border:1px solid rgba(255,255,255,.28);color:rgba(255,255,255,.7);letter-spacing:.06em}
+.lang[aria-pressed="true"]{background:var(--red);border-color:var(--red);color:#fff}
+.phone::after{content:"";position:absolute;left:1px;right:1px;bottom:1px;height:34px;pointer-events:none;
+  border-radius:0 0 32px 32px;z-index:5;
+  background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.92))}
+.screen{display:none;max-height:712px;overflow-y:auto;overscroll-behavior:contain}
+.screen.on{display:block}
+.pad{padding:20px 20px 26px}
+
+/* ============ shared ui ============ */
+.eyebrow{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--sea);opacity:.72}
+.h1{font-family:var(--display);font-variation-settings:'SOFT' 40,'WONK' 1;font-weight:600;
+  font-size:26px;line-height:1.1;letter-spacing:-.02em;margin:7px 0 0}
+.h2{font-family:var(--display);font-variation-settings:'SOFT' 30,'WONK' 1;font-weight:600;
+  font-size:18px;line-height:1.16;margin:0}
+.sub{font-size:13.5px;line-height:1.5;color:rgba(11,11,12,.66);margin:9px 0 0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.btn{display:block;width:100%;padding:15px 16px;border-radius:12px;background:var(--red);color:#fff;
+  font-weight:700;font-size:15.5px;text-align:center;letter-spacing:.005em;
+  box-shadow:0 2px 0 var(--red-deep);transition:.14s ease}
+.btn:hover{background:var(--red-deep);box-shadow:0 2px 0 #B32E2E}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn-ghost{display:block;width:100%;padding:13px 16px;border-radius:12px;border:1.5px solid var(--line);
+  font-weight:600;font-size:14px;text-align:center;transition:.14s}
+.btn-ghost:hover{border-color:var(--sea);color:var(--sea)}
+
+.card{border:1.5px solid var(--line);border-radius:var(--r);padding:15px}
+.divide{height:1px;background:var(--line-soft);margin:20px 0}
+
+/* ============ SIGNATURE: the waterline ============ */
+.waterline{
+  position:relative;height:176px;border-radius:var(--r);overflow:hidden;
+  background:var(--mist);border:1.5px solid var(--ink);
+}
+.wl-fill{position:absolute;left:0;right:0;bottom:0;height:0%;
+  background:linear-gradient(180deg,var(--sea-2),var(--sea));
+  transition:height 1.1s cubic-bezier(.22,.9,.24,1)}
+.wl-wave{position:absolute;left:0;bottom:0;width:200%;height:26px;
+  transition:bottom 1.1s cubic-bezier(.22,.9,.24,1)}
+.wl-wave svg{display:block;width:50%;height:26px;float:left}
+.wl-wave.a{animation:drift 9s linear infinite;opacity:.95}
+.wl-wave.b{animation:drift 14s linear infinite reverse;opacity:.45}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.wl-copy{position:absolute;inset:0;padding:15px 16px;display:flex;flex-direction:column;
+  justify-content:space-between;z-index:2}
+.wl-plate{align-self:flex-start;background:rgba(255,255,255,.9);border:1px solid var(--line);
+  border-radius:11px;padding:9px 13px 10px;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
+.wl-raised{font-family:var(--display);font-variation-settings:'SOFT' 30,'WONK' 1;font-weight:700;
+  font-size:36px;line-height:1;letter-spacing:-.03em;color:var(--ink);
+  font-variant-numeric:tabular-nums}
+.wl-of{font-size:12.5px;color:rgba(11,11,12,.62);margin-top:4px}
+.wl-pct{align-self:flex-start;font-family:var(--mono);font-size:11px;padding:4px 8px;border-radius:999px;
+  background:rgba(255,255,255,.82);border:1px solid var(--line);transition:color .7s}
+.waterline.deep .wl-pct{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.34);color:#fff}
+
+/* ============ amount chips ============ */
+.chips{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+.chip{padding:13px 6px;border-radius:11px;border:1.5px solid var(--line);text-align:center;transition:.14s}
+.chip .a{font-family:var(--mono);font-size:16px;font-weight:500;display:block}
+.chip .w{font-size:9.5px;line-height:1.25;color:rgba(11,11,12,.55);display:block;margin-top:4px}
+.chip:hover{border-color:var(--sea)}
+.chip[aria-pressed="true"]{border-color:var(--red);border-width:2px;background:rgba(243,83,83,.07)}
+.chip[aria-pressed="true"] .w{color:rgba(11,11,12,.75)}
+.custom{display:flex;align-items:center;gap:9px;margin-top:8px;padding:0 13px;
+  border:1.5px solid var(--line);border-radius:11px}
+.custom span{font-family:var(--mono);font-size:15px;opacity:.45}
+.custom input{flex:1;border:0;outline:0;padding:13px 0;font-family:var(--mono);font-size:15px;background:none;min-width:0}
+
+/* ============ switch rows ============ */
+.srow{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-top:1px solid var(--line-soft)}
+.srow-txt{flex:1;min-width:0;display:block}
+.srow-t{display:block;font-size:13.5px;font-weight:650;line-height:1.35}
+.srow-d{display:block;font-size:11.5px;color:rgba(11,11,12,.6);margin-top:3px;line-height:1.4}
+.srow-t .num{font-weight:500;opacity:.7}
+.sw{flex:0 0 auto;width:46px;height:27px;border-radius:999px;background:rgba(11,11,12,.16);
+  position:relative;transition:.18s;margin-top:2px}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:.18s}
+.srow[aria-pressed="true"] .sw{background:var(--sea)}
+.srow[aria-pressed="true"] .sw::after{left:22px}
+
+/* ============ rails ============ */
+.rails{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin-top:6px}
+.rail{padding:11px 10px;border-radius:11px;border:1.5px solid var(--line);text-align:center;
+  font-size:12.5px;font-weight:650;transition:.14s}
+.rail .f{display:block;font-family:var(--mono);font-size:9.5px;font-weight:400;
+  color:rgba(11,11,12,.55);margin-top:3px}
+.rail[aria-pressed="true"]{border-color:var(--ink);border-width:2px;background:var(--ink);color:#fff}
+.rail[aria-pressed="true"] .f{color:rgba(255,255,255,.6)}
+
+.sepa{margin-top:12px;border:1.5px dashed var(--sea);border-radius:12px;padding:14px;background:var(--mist)}
+.sepa-k{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--sea);opacity:.8}
+.sepa-v{font-family:var(--mono);font-size:13.5px;margin-top:3px;word-break:break-all}
+.sepa-grid{display:flex;gap:14px;align-items:flex-start;margin-top:12px}
+.qr{flex:0 0 auto;width:74px;height:74px;border:1.5px solid var(--sea);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;text-align:center;background:#fff;
+  font-family:var(--mono);font-size:8px;line-height:1.3;color:var(--sea);padding:5px}
+.total-line{display:flex;justify-content:space-between;align-items:baseline;margin-top:16px;
+  padding-top:14px;border-top:1.5px solid var(--ink)}
+.total-line .l{font-size:13px;font-weight:650}
+.total-line .v{font-family:var(--mono);font-size:21px;font-weight:500}
+
+/* ============ runner page ============ */
+.runner-head{display:flex;gap:13px;align-items:center}
+.avatar{flex:0 0 auto;width:52px;height:52px;border-radius:50%;background:var(--red);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-family:var(--display);font-weight:700;
+  font-size:21px;border:1.5px solid var(--ink)}
+.donor{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--line-soft);align-items:flex-start}
+.donor:last-child{border-bottom:0}
+.d-dot{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--red);margin-top:7px}
+.d-name{display:block;font-size:13px;font-weight:650}
+.d-msg{display:block;font-size:12px;color:rgba(11,11,12,.62);line-height:1.45;margin-top:2px}
+.d-amt{flex:0 0 auto;font-family:var(--mono);font-size:13px;font-weight:500}
+.d-new{animation:pop .5s ease}
+@keyframes pop{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:none}}
+.nudge{margin-top:16px;border-radius:12px;padding:14px;background:var(--ink);color:#fff}
+.nudge-t{font-size:13px;font-weight:700}
+.nudge-d{font-size:12px;color:rgba(255,255,255,.7);margin-top:4px;line-height:1.45}
+.asks{display:flex;gap:6px;margin-top:11px;flex-wrap:wrap}
+.ask{font-size:11.5px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.28);
+  color:rgba(255,255,255,.85)}
+.ask.gave{background:var(--red);border-color:var(--red);color:#fff}
+
+/* ============ leaderboard ============ */
+.seg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0;border:1.5px solid var(--ink);border-radius:11px;
+  overflow:hidden;margin-top:15px}
+.seg button{padding:10px;font-size:13px;font-weight:650;transition:.14s}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.lb{margin-top:6px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.lb-rank{flex:0 0 26px;font-family:var(--mono);font-size:13px;color:rgba(11,11,12,.42);text-align:right}
+.lb-row.top1 .lb-rank,.lb-row.top2 .lb-rank,.lb-row.top3 .lb-rank{color:var(--red);font-weight:500}
+.lb-mid{flex:1;min-width:0;display:block}
+.lb-name{display:block;font-size:13.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-bar{display:block;height:5px;border-radius:3px;background:var(--line-soft);margin-top:6px;overflow:hidden}
+.lb-bar i{display:block;height:100%;border-radius:3px;background:var(--sea)}
+.lb-row.top1 .lb-bar i{background:var(--red)}
+.lb-amt{flex:0 0 auto;font-family:var(--mono);font-size:13.5px;font-weight:500}
+
+/* ============ ledger ============ */
+.ledger-hero{background:var(--sea);color:#fff;padding:20px;border-radius:var(--r)}
+.lh-row{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;
+  border-bottom:1px solid rgba(255,255,255,.15);font-size:12.5px}
+.lh-row:last-child{border-bottom:0;padding-top:11px;margin-top:5px;border-top:1.5px solid rgba(255,255,255,.4)}
+.lh-row .v{font-family:var(--mono);font-size:15px;font-variant-numeric:tabular-nums;
+  white-space:nowrap;flex:0 0 auto}
+.lh-row{gap:12px}
+.card .lh-row{font-size:12px}
+.lh-row.big .v{font-size:19px;font-weight:500}
+.led{padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.led-top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.led-w{font-size:13px;font-weight:650;line-height:1.35}
+.led-a{font-family:var(--mono);font-size:13.5px;font-weight:500;flex:0 0 auto}
+.led-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px;align-items:center}
+.pill{font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;padding:3px 7px;border-radius:5px;
+  border:1px solid var(--line);color:rgba(11,11,12,.6)}
+.pill.doc{border-color:var(--sea);color:var(--sea);background:var(--mist)}
+.pill.date{border:0;padding-left:0;opacity:.55}
+
+/* ============ annotations ============ */
+.notes{position:sticky;top:28px}
+@media(max-width:940px){.notes{position:static}}
+.note{border-left:2.5px solid var(--red);padding:2px 0 2px 15px;margin-bottom:24px}
+.note h3{font-family:var(--display);font-variation-settings:'SOFT' 30,'WONK' 1;font-weight:600;
+  font-size:15.5px;margin:0 0 6px;letter-spacing:-.01em}
+.note p{font-size:13px;line-height:1.55;color:rgba(11,11,12,.72);margin:0 0 8px}
+.note p:last-child{margin-bottom:0}
+.note code{font-family:var(--mono);font-size:11.5px;background:var(--mist);padding:1px 5px;border-radius:4px}
+.notes-h{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--sea);opacity:.75;padding-bottom:11px;margin-bottom:22px;border-bottom:1.5px solid var(--ink)}
+.noteset{display:none}
+.noteset.on{display:block}
+.foot{margin-top:64px;padding-top:22px;border-top:1.5px solid var(--ink);
+  font-family:var(--mono);font-size:11px;line-height:1.75;color:rgba(11,11,12,.55)}
+
+@media(max-width:620px){
+  .wrap{padding:22px 14px 60px}
+  .mast-l{gap:13px}
+  .mast-logo{height:38px}
+  .mast-r{text-align:left;width:100%}
+  .masthead{gap:14px}
+  .phone{border-radius:26px}
+  .phone::after{border-radius:0 0 24px 24px}
+  .pad{padding:18px 16px 24px}
+  .chip .w{font-size:9px}
+  .sepa-grid{flex-direction:column;gap:11px}
+  .stage{margin-top:26px}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="mast-l">
+      <img class="mast-logo" src="data:image/png;base64,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" alt="Santamore">
+      <div>
+        <div class="mast-kicker">Web app · working prototype</div>
+        <h1 class="mast-title">Four screens that carry the money</h1>
+      </div>
+    </div>
+    <div class="mast-r">
+      <b>Live where it counts.</b><br>
+      Amounts, toggles and donations respond.<br>
+      Tap <b>Donate €25</b> on the runner page.
+    </div>
+  </header>
+
+  <div class="stage">
+    <div>
+      <div class="tabs" role="tablist" aria-label="Prototype screens">
+        <button class="tab" role="tab" aria-selected="true" data-screen="donate"><span class="n">01</span>Donate</button>
+        <button class="tab" role="tab" aria-selected="false" data-screen="runner"><span class="n">02</span>Runner page</button>
+        <button class="tab" role="tab" aria-selected="false" data-screen="board"><span class="n">03</span>Leaderboard</button>
+        <button class="tab" role="tab" aria-selected="false" data-screen="ledger"><span class="n">04</span>Public ledger</button>
+      </div>
+
+      <div class="phone-row">
+      <div class="phone">
+        <div class="phone-bar">
+          <img src="data:image/png;base64,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" alt="Santamore">
+          <span class="url">santamore.me</span>
+          <div class="langs">
+            <button class="lang" data-lang="me" aria-pressed="true">ME</button>
+            <button class="lang" data-lang="en" aria-pressed="false">EN</button>
+          </div>
+        </div>
+
+        <!-- ============ 01 DONATE ============ -->
+        <section class="screen on" id="s-donate">
+          <div class="pad">
+            <div class="eyebrow" data-i="ev">Santa Run · Tivat · 20.12.</div>
+            <h2 class="h1" data-i="dTitle">Podrži Anu</h2>
+            <p class="sub" data-i="dSub">Ana trči 5 km za porodicu iz Tivta koja pokriva troškove lječenja. Cilj: 300 €.</p>
+
+            <div class="chips" role="group" aria-label="Amount">
+              <button class="chip" data-amt="10"><span class="a">10 €</span><span class="w" data-i="w10">jedan topli obrok</span></button>
+              <button class="chip" aria-pressed="true" data-amt="25"><span class="a">25 €</span><span class="w" data-i="w25">nedjelja školskih užina</span></button>
+              <button class="chip" data-amt="50"><span class="a">50 €</span><span class="w" data-i="w50">lijekovi za mjesec</span></button>
+            </div>
+            <label class="custom">
+              <span>€</span>
+              <input id="customAmt" type="number" min="1" placeholder="Drugi iznos" data-ip="other" aria-label="Custom amount">
+            </label>
+
+            <div style="margin-top:18px">
+              <button class="srow" id="swMonthly" aria-pressed="false" style="width:100%;text-align:left;border-top:1.5px solid var(--ink)">
+                <span class="srow-txt">
+                  <span class="srow-t" data-i="mT">Učini ovo mjesečnim</span>
+                  <span class="srow-d" data-i="mD">10 € mjesečno je 120 € godišnje — više od većine jednokratnih donacija.</span>
+                </span>
+                <span class="sw" aria-hidden="true"></span>
+              </button>
+              <button class="srow" id="swFee" aria-pressed="true" style="width:100%;text-align:left">
+                <span class="srow-txt">
+                  <span class="srow-t"><span data-i="fT">Pokrij troškove obrade</span> <span class="num" id="feeAmt">(+0,75 €)</span></span>
+                  <span class="srow-d" data-i="fD">Tako cijeli tvoj iznos stiže do korisnika. Naše troškove plaćaju sponzori.</span>
+                </span>
+                <span class="sw" aria-hidden="true"></span>
+              </button>
+              <button class="srow" id="swAnon" aria-pressed="false" style="width:100%;text-align:left">
+                <span class="srow-txt">
+                  <span class="srow-t" data-i="aT">Doniraj anonimno</span>
+                  <span class="srow-d" data-i="aD">Iznos se prikazuje u javnom registru, ime ne.</span>
+                </span>
+                <span class="sw" aria-hidden="true"></span>
+              </button>
+            </div>
+
+            <div class="divide"></div>
+            <div class="eyebrow" data-i="payT">Način plaćanja</div>
+            <div class="rails" role="group" aria-label="Payment rail">
+              <button class="rail" id="railCard" aria-pressed="true" data-i="rc">Kartica<span class="f">Visa · Mastercard · Apple Pay</span></button>
+              <button class="rail" id="railSepa" aria-pressed="false" data-i="rs">Bankovni prenos<span class="f">SEPA · bez provizije</span></button>
+            </div>
+
+            <div class="sepa" id="sepaBox" hidden>
+              <div class="sepa-k" data-i="sIban">IBAN</div>
+              <div class="sepa-v">ME25 5050 0000 0012 3456 78</div>
+              <div class="sepa-grid">
+                <div class="qr" data-i="qr">EPC QR<br>placeholder</div>
+                <div style="min-width:0">
+                  <div class="sepa-k" data-i="sRef">Poziv na broj — obavezno</div>
+                  <div class="sepa-v" style="font-size:15px;font-weight:500">SM-2612-0473</div>
+                  <div class="srow-d" style="margin-top:7px" data-i="sNote">Ovaj broj automatski pripisuje uplatu Aninoj stranici.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="total-line">
+              <span class="l" data-i="tot">Ukupno danas</span>
+              <span class="v num" id="grand">25,75 €</span>
+            </div>
+            <div style="margin-top:14px">
+              <button class="btn" id="payBtn">Doniraj 25,75 €</button>
+            </div>
+            <p class="srow-d" style="margin-top:11px;text-align:center" data-i="secure">Plaćanje obrađuje licencirana banka u Crnoj Gori. Santamore ne vidi podatke kartice.</p>
+          </div>
+        </section>
+
+        <!-- ============ 02 RUNNER ============ -->
+        <section class="screen" id="s-runner">
+          <div class="pad">
+            <div class="runner-head">
+              <div class="avatar">A</div>
+              <div style="min-width:0">
+                <h2 class="h2" data-i="rName">Ana Vuković</h2>
+                <div class="srow-d" style="margin-top:3px"><span data-i="rTeam">Tim</span> · Porto Runners · <span class="num">5 km</span></div>
+              </div>
+            </div>
+
+            <div class="waterline" id="wl" style="margin-top:16px">
+              <div class="wl-fill" id="wlFill"></div>
+              <div class="wl-wave a" id="wlWaveA">
+                <svg viewBox="0 0 200 26" preserveAspectRatio="none" aria-hidden="true"><path d="M0 14 Q25 3 50 14 T100 14 T150 14 T200 14 V26 H0Z" fill="#15505F"/></svg>
+                <svg viewBox="0 0 200 26" preserveAspectRatio="none" aria-hidden="true"><path d="M0 14 Q25 3 50 14 T100 14 T150 14 T200 14 V26 H0Z" fill="#15505F"/></svg>
+              </div>
+              <div class="wl-wave b" id="wlWaveB">
+                <svg viewBox="0 0 200 26" preserveAspectRatio="none" aria-hidden="true"><path d="M0 17 Q25 26 50 17 T100 17 T150 17 T200 17 V26 H0Z" fill="#0E3A46"/></svg>
+                <svg viewBox="0 0 200 26" preserveAspectRatio="none" aria-hidden="true"><path d="M0 17 Q25 26 50 17 T100 17 T150 17 T200 17 V26 H0Z" fill="#0E3A46"/></svg>
+              </div>
+              <div class="wl-copy">
+                <div class="wl-plate">
+                  <div class="wl-raised" id="wlAmt">184 €</div>
+                  <div class="wl-of"><span data-i="of">od</span> <span class="num">300 €</span> · <span class="num" id="wlDonors">9</span> <span data-i="donors">donatora</span></div>
+                </div>
+                <div class="wl-pct num" id="wlPct">61%</div>
+              </div>
+            </div>
+
+            <p class="sub" data-i="rStory">„Nisam trkač. Ali porodica koju podržavamo živi dvije ulice od mene, a njihov račun za lječenje ne čeka. Trčim 5 km u kostimu Djeda Mraza. Pomozi mi da stignem do 300 €.“</p>
+
+            <div style="margin-top:16px">
+              <button class="btn" id="quickDonate" data-i="qd">Doniraj 25 €</button>
+              <div style="margin-top:8px"><button class="btn-ghost" data-i="share">Podijeli Aninu stranicu</button></div>
+            </div>
+
+            <div class="divide"></div>
+            <div class="eyebrow" data-i="wall">Zid donatora</div>
+            <div id="donors" style="margin-top:8px">
+              <div class="donor"><span class="d-dot"></span><span class="srow-txt"><span class="d-name">Marko P.</span><span class="d-msg" data-i="m1">Bravo Ana! Vidimo se na startu.</span></span><span class="d-amt">30 €</span></div>
+              <div class="donor"><span class="d-dot"></span><span class="srow-txt"><span class="d-name">Jelena i Nikola</span><span class="d-msg" data-i="m2">Za našu Tivatsku porodicu. ❤</span></span><span class="d-amt">50 €</span></div>
+              <div class="donor"><span class="d-dot"></span><span class="srow-txt"><span class="d-name" data-i="anon">Anonimno</span><span class="d-msg" data-i="m3">Srećno.</span></span><span class="d-amt">20 €</span></div>
+              <div class="donor"><span class="d-dot"></span><span class="srow-txt"><span class="d-name">Kafana „Sidro“</span><span class="d-msg" data-i="m4">Kafa je na nas poslije trke.</span></span><span class="d-amt">40 €</span></div>
+            </div>
+
+            <div class="nudge">
+              <div class="nudge-t" data-i="nT">Tvoj sljedeći korak</div>
+              <div class="nudge-d" data-i="nD">Pitaj još 5 ljudi. Trkači koji pošalju 15+ poruka prikupe 76% više. Poruka je već napisana — samo dodirni ime.</div>
+              <div class="asks">
+                <span class="ask gave">Marko ✓</span>
+                <span class="ask gave">Jelena ✓</span>
+                <span class="ask">Tetka Vera</span>
+                <span class="ask">Kolege — Viber</span>
+                <span class="ask">Razred 2012</span>
+                <span class="ask">Stefan</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ 03 LEADERBOARD ============ -->
+        <section class="screen" id="s-board">
+          <div class="pad">
+            <div class="eyebrow" data-i="ev2">Santa Run 2026 · Tivat</div>
+            <h2 class="h1" data-i="bTitle">Rang lista</h2>
+            <p class="sub"><span class="num">412</span> <span data-i="bSub1">prijavljenih</span> · <span class="num">118</span> <span data-i="bSub2">aktivnih trkača koji prikupljaju</span> · <span class="num">14.680 €</span></p>
+
+            <div class="seg" role="group" aria-label="Leaderboard view">
+              <button id="segInd" aria-pressed="true" data-i="segI">Pojedinci</button>
+              <button id="segTeam" aria-pressed="false" data-i="segT">Timovi</button>
+            </div>
+
+            <div class="lb" id="lbInd">
+              <div class="lb-row top1"><span class="lb-rank">1</span><span class="lb-mid"><span class="lb-name">Milena Đurović</span><span class="lb-bar"><i style="width:100%"></i></span></span><span class="lb-amt">640 €</span></div>
+              <div class="lb-row top2"><span class="lb-rank">2</span><span class="lb-mid"><span class="lb-name">Stefan Radulović</span><span class="lb-bar"><i style="width:73%"></i></span></span><span class="lb-amt">465 €</span></div>
+              <div class="lb-row top3"><span class="lb-rank">3</span><span class="lb-mid"><span class="lb-name">Ivana Kovačević</span><span class="lb-bar"><i style="width:66%"></i></span></span><span class="lb-amt">420 €</span></div>
+              <div class="lb-row"><span class="lb-rank">4</span><span class="lb-mid"><span class="lb-name">Nikola Perović</span><span class="lb-bar"><i style="width:48%"></i></span></span><span class="lb-amt">305 €</span></div>
+              <div class="lb-row"><span class="lb-rank">5</span><span class="lb-mid"><span class="lb-name">Ana Vuković</span><span class="lb-bar"><i style="width:29%"></i></span></span><span class="lb-amt" id="lbAna">184 €</span></div>
+              <div class="lb-row"><span class="lb-rank">6</span><span class="lb-mid"><span class="lb-name">Petar Bulatović</span><span class="lb-bar"><i style="width:26%"></i></span></span><span class="lb-amt">165 €</span></div>
+              <div class="lb-row"><span class="lb-rank">7</span><span class="lb-mid"><span class="lb-name">Sara Nikolić</span><span class="lb-bar"><i style="width:22%"></i></span></span><span class="lb-amt">140 €</span></div>
+            </div>
+
+            <div class="lb" id="lbTeam" hidden>
+              <div class="lb-row top1"><span class="lb-rank">1</span><span class="lb-mid"><span class="lb-name">Porto Runners <span class="num" style="opacity:.5">· 12</span></span><span class="lb-bar"><i style="width:100%"></i></span></span><span class="lb-amt">2.140 €</span></div>
+              <div class="lb-row top2"><span class="lb-rank">2</span><span class="lb-mid"><span class="lb-name">Tim CKB <span class="num" style="opacity:.5">· 18</span></span><span class="lb-bar"><i style="width:81%"></i></span></span><span class="lb-amt">1.735 €</span></div>
+              <div class="lb-row top3"><span class="lb-rank">3</span><span class="lb-mid"><span class="lb-name">Gimnazija Tivat <span class="num" style="opacity:.5">· 26</span></span><span class="lb-bar"><i style="width:59%"></i></span></span><span class="lb-amt">1.260 €</span></div>
+              <div class="lb-row"><span class="lb-rank">4</span><span class="lb-mid"><span class="lb-name">Boka Trail Klub <span class="num" style="opacity:.5">· 9</span></span><span class="lb-bar"><i style="width:40%"></i></span></span><span class="lb-amt">860 €</span></div>
+              <div class="lb-row"><span class="lb-rank">5</span><span class="lb-mid"><span class="lb-name">Familija Marković <span class="num" style="opacity:.5">· 6</span></span><span class="lb-bar"><i style="width:28%"></i></span></span><span class="lb-amt">590 €</span></div>
+            </div>
+
+            <div style="margin-top:18px"><button class="btn" data-i="bCta">Napravi svoju stranicu</button></div>
+          </div>
+        </section>
+
+        <!-- ============ 04 LEDGER ============ -->
+        <section class="screen" id="s-ledger">
+          <div class="pad">
+            <div class="eyebrow" data-i="lEy">Javni registar · ažurirano automatski</div>
+            <h2 class="h1" data-i="lTitle">Svaki euro, oba smjera</h2>
+
+            <div class="ledger-hero" style="margin-top:16px">
+              <div class="lh-row"><span data-i="l1">Donacije primljene</span><span class="v">38.412 €</span></div>
+              <div class="lh-row"><span data-i="l2">Isplaćeno korisnicima</span><span class="v">31.900 €</span></div>
+              <div class="lh-row"><span data-i="l3">Odobreno, isplata u toku</span><span class="v">4.200 €</span></div>
+              <div class="lh-row big"><span data-i="l4">Neraspoređeno</span><span class="v">2.312 €</span></div>
+            </div>
+
+            <div class="card" style="margin-top:12px;border-color:var(--ink)">
+              <div class="eyebrow" data-i="l5">Dva odvojena fonda</div>
+              <div class="lh-row" style="border-color:var(--line-soft);color:var(--ink)"><span data-i="l6">Fond za pomoć — od donacija</span><span class="v" style="color:var(--red)">100% korisnicima</span></div>
+              <div class="lh-row" style="border:0;color:var(--ink)"><span data-i="l7">Operativni fond — od sponzora, prijava i grantova</span><span class="v">21.400 €</span></div>
+              <p class="srow-d" style="margin-top:8px" data-i="l8">Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori.</p>
+            </div>
+
+            <div class="seg" role="group" aria-label="Ledger direction">
+              <button id="segIn" aria-pressed="false" data-i="segIn">Uplate</button>
+              <button id="segOut" aria-pressed="true" data-i="segOut">Isplate</button>
+            </div>
+
+            <div id="ledOut" style="margin-top:6px">
+              <div class="led">
+                <div class="led-top"><span class="led-w" data-i="o1">Porodica u Tivtu — troškovi lječenja</span><span class="led-a">12.400 €</span></div>
+                <div class="led-meta"><span class="pill date">18.02.2027</span><span class="pill">BOKA</span><span class="pill doc" data-i="doc">račun + potpis ✓</span></div>
+              </div>
+              <div class="led">
+                <div class="led-top"><span class="led-w" data-i="o2">Fudbalski klub mladih — zimska oprema</span><span class="led-a">6.800 €</span></div>
+                <div class="led-meta"><span class="pill date">18.02.2027</span><span class="pill">BOKA</span><span class="pill doc" data-i="doc2">faktura + foto ✓</span></div>
+              </div>
+              <div class="led">
+                <div class="led-top"><span class="led-w" data-i="o3">Pekara nakon požara — obnova opreme</span><span class="led-a">7.500 €</span></div>
+                <div class="led-meta"><span class="pill date">02.03.2027</span><span class="pill">BOKA</span><span class="pill doc" data-i="doc3">ugovor + račun ✓</span></div>
+              </div>
+              <div class="led">
+                <div class="led-top"><span class="led-w" data-i="o4">Fond solidarnosti — sjever Crne Gore</span><span class="led-a">5.200 €</span></div>
+                <div class="led-meta"><span class="pill date">02.03.2027</span><span class="pill" data-i="natl">NACIONALNO</span><span class="pill doc" data-i="doc4">odluka odbora ✓</span></div>
+              </div>
+            </div>
+
+            <div id="ledIn" hidden style="margin-top:6px">
+              <div class="led">
+                <div class="led-top"><span class="led-w">Jelena i Nikola</span><span class="led-a">50 €</span></div>
+                <div class="led-meta"><span class="pill date">14.12.2026</span><span class="pill">ANA V.</span><span class="pill" data-i="rail1">KARTICA</span></div>
+              </div>
+              <div class="led">
+                <div class="led-top"><span class="led-w" data-i="anon2">Anonimno</span><span class="led-a">500 €</span></div>
+                <div class="led-meta"><span class="pill date">14.12.2026</span><span class="pill">SM-2612-0088</span><span class="pill" data-i="rail2">SEPA</span></div>
+              </div>
+              <div class="led">
+                <div class="led-top"><span class="led-w">Kafana „Sidro“</span><span class="led-a">40 €</span></div>
+                <div class="led-meta"><span class="pill date">13.12.2026</span><span class="pill">ANA V.</span><span class="pill" data-i="rail3">KARTICA</span></div>
+              </div>
+              <div class="led">
+                <div class="led-top"><span class="led-w" data-i="in4">Kutija za donacije — Porto Montenegro</span><span class="led-a">312 €</span></div>
+                <div class="led-meta"><span class="pill date">13.12.2026</span><span class="pill">BOKA</span><span class="pill" data-i="rail4">KEŠ · 2 potpisa</span></div>
+              </div>
+              <div class="led">
+                <div class="led-top"><span class="led-w">Milena Đurović <span class="num" style="opacity:.5">×12</span></span><span class="led-a">640 €</span></div>
+                <div class="led-meta"><span class="pill date">01–14.12.2026</span><span class="pill" data-i="rail5">MJEŠOVITO</span></div>
+              </div>
+            </div>
+
+            <p class="srow-d" style="margin-top:14px" data-i="lFoot">Objavljeno je ime samo ako je donator tako izabrao. Identitet korisnika je zaštićen; dokumentacija je dostupna revizoru.</p>
+          </div>
+        </section>
+
+      </div>
+      </div>
+    </div>
+
+    <!-- ============ annotations ============ -->
+    <aside class="notes">
+      <div class="notes-h">Why it's built this way</div>
+
+      <div class="noteset on" data-notes="donate">
+        <div class="note">
+          <h3>Amount before identity</h3>
+          <p>The commitment is made in the first three seconds, before a single form field appears. Middle amount pre-selected. Every chip carries an impact line, because <code>25 €</code> means nothing and "a week of school meals" means something.</p>
+        </div>
+        <div class="note">
+          <h3>The fee toggle is the whole business model</h3>
+          <p>Pre-checked, with live arithmetic. This is what lets you keep saying <em>100% of donations reach the cause</em> while paying a team — the donor covers the card fee, sponsors cover the salaries.</p>
+        </div>
+        <div class="note">
+          <h3>Two payment rails, not one</h3>
+          <p>Stripe doesn't serve Montenegrin merchants and PayPal can't receive here, so cards go through a local acquirer. Tap <strong>Bankovni prenos</strong>: Montenegro joined SEPA in October 2025, so a unique reference per fundraiser plus an EPC QR code gives you a near-zero-fee rail that auto-credits the right page.</p>
+        </div>
+        <div class="note">
+          <h3>Monthly framed as arithmetic</h3>
+          <p>"€10 a month is €120 a year" converts better than a bare toggle. Recurring revenue is what makes an employment contract signable.</p>
+        </div>
+      </div>
+
+      <div class="noteset" data-notes="runner">
+        <div class="note">
+          <h3>The waterline</h3>
+          <p>Santa of the water, made literal. Progress isn't a bar — the page floods. Tap <strong>Doniraj 25 €</strong> and watch the level rise and the donor land on the wall. This is the one flourish in the design; everything else stays quiet.</p>
+        </div>
+        <div class="note">
+          <h3>The story is the product</h3>
+          <p>Personalised pages raise several times more than default ones, so onboarding should refuse to publish a page without a photo, a target and three sentences in the runner's own voice.</p>
+        </div>
+        <div class="note">
+          <h3>The ask list</h3>
+          <p>Fundraisers who send 15+ messages raise about 76% more. So the app doesn't just host a page, it hands over a named list, a written message and a Viber button. Viber, not just WhatsApp — this is the Balkans.</p>
+        </div>
+        <div class="note">
+          <h3>Donor messages, deliberately public</h3>
+          <p>They're the persuasion engine. Each one is social proof, and each one gives the runner something to share that isn't another ask.</p>
+        </div>
+      </div>
+
+      <div class="noteset" data-notes="board">
+        <div class="note">
+          <h3>Teams beat individuals</h3>
+          <p>A company sponsorship that includes a team slot turns 18 employees into fundraisers instead of one logo on a banner. Schools are the same trick with a trophy instead of a budget.</p>
+        </div>
+        <div class="note">
+          <h3>Watch activation, not sign-ups</h3>
+          <p><code>412 registered · 118 fundraising</code> is the honest pair of numbers. The sector-wide trend is more participants raising less each — chase activated fundraisers, not registration counts.</p>
+        </div>
+        <div class="note">
+          <h3>Cash gets logged too</h3>
+          <p>In a cash economy, a runner who collects €120 at the office must be able to record it. Otherwise the leaderboard lies, and a leaderboard that lies stops motivating anyone.</p>
+        </div>
+      </div>
+
+      <div class="noteset" data-notes="ledger">
+        <div class="note">
+          <h3>This page is your moat</h3>
+          <p>Money in and money out on one screen, no login, generated from the database rather than typed into a PDF. Nearly nobody in the region does this. It answers "where does the money go?" before anyone asks, and it converts sceptics into sponsors.</p>
+        </div>
+        <div class="note">
+          <h3>The two funds, side by side</h3>
+          <p>Donations to beneficiaries. Sponsorship, entry fees and grants to salaries. Publishing the split is what makes a paid team compatible with the promise you made last year.</p>
+        </div>
+        <div class="note">
+          <h3>Documentation chips</h3>
+          <p>Every disbursement carries proof — receipt, invoice, signed handover, board decision. Beneficiary names stay private by default; the evidence stays available to an auditor.</p>
+        </div>
+        <div class="note">
+          <h3>Append-only</h3>
+          <p>Nothing is editable once published. Corrections are new, dated, visible rows. A ledger that can be quietly rewritten isn't a ledger.</p>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="foot">
+    Prototype only — placeholder names, amounts and beneficiaries. No live payment connection.<br>
+    Brand: #F35353 · #0B0B0C · #FFFFFF. Water tones #0E3A46 / #EAF1F2 added from the "Santa of the water" thesis.<br>
+    Type: Fraunces (display) · Figtree (body) · DM Mono (money and references).
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- screens ---------- */
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  tabs.forEach(function(t){
+    t.addEventListener('click', function(){
+      tabs.forEach(function(x){ x.setAttribute('aria-selected','false'); });
+      t.setAttribute('aria-selected','true');
+      var id = t.dataset.screen;
+      document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('on'); });
+      document.getElementById('s-'+id).classList.add('on');
+      document.querySelectorAll('.noteset').forEach(function(n){ n.classList.remove('on'); });
+      document.querySelector('.noteset[data-notes="'+id+'"]').classList.add('on');
+      if(id==='runner') paint();
+    });
+  });
+
+  /* ---------- money helpers ---------- */
+  function eur(n){
+    var s = (Math.round(n*100)/100).toFixed(2).replace('.',',');
+    s = s.replace(/,00$/,'');
+    return s.replace(/\B(?=(\d{3})+(?!\d))/g,'.') + ' €';
+  }
+  function eur0(n){ return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.') + ' €'; }
+
+  /* ---------- donate screen ---------- */
+  var amount = 25, monthly = false, feeOn = true;
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip'));
+  var custom = document.getElementById('customAmt');
+  var swMonthly = document.getElementById('swMonthly');
+  var swFee = document.getElementById('swFee');
+  var swAnon = document.getElementById('swAnon');
+  var grand = document.getElementById('grand');
+  var feeAmt = document.getElementById('feeAmt');
+  var payBtn = document.getElementById('payBtn');
+  var railCard = document.getElementById('railCard');
+  var railSepa = document.getElementById('railSepa');
+  var sepaBox = document.getElementById('sepaBox');
+
+  function fee(){ return feeOn ? Math.round((amount*0.021 + 0.20)*100)/100 : 0; }
+
+  function renderDonate(){
+    var f = fee(), total = amount + f;
+    feeAmt.textContent = '(+' + eur(Math.round((amount*0.021+0.20)*100)/100) + ')';
+    grand.textContent = eur(total);
+    var verb = T().payv, per = monthly ? T().permo : '';
+    payBtn.textContent = verb + ' ' + eur(total) + per;
+  }
+
+  chips.forEach(function(c){
+    c.addEventListener('click', function(){
+      chips.forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      c.setAttribute('aria-pressed','true');
+      custom.value = '';
+      amount = parseFloat(c.dataset.amt);
+      renderDonate();
+    });
+  });
+  custom.addEventListener('input', function(){
+    var v = parseFloat(custom.value);
+    if(!isNaN(v) && v > 0){
+      chips.forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      amount = v;
+      renderDonate();
+    }
+  });
+  function toggle(btn, cb){
+    btn.addEventListener('click', function(){
+      var on = btn.getAttribute('aria-pressed') === 'true';
+      btn.setAttribute('aria-pressed', on ? 'false' : 'true');
+      cb(!on);
+    });
+  }
+  toggle(swMonthly, function(v){ monthly = v; renderDonate(); });
+  toggle(swFee, function(v){ feeOn = v; renderDonate(); });
+  toggle(swAnon, function(){});
+
+  function setRail(sepa){
+    railSepa.setAttribute('aria-pressed', sepa ? 'true':'false');
+    railCard.setAttribute('aria-pressed', sepa ? 'false':'true');
+    sepaBox.hidden = !sepa;
+  }
+  railCard.addEventListener('click', function(){ setRail(false); });
+  railSepa.addEventListener('click', function(){ setRail(true); });
+
+  /* ---------- runner: the waterline ---------- */
+  var raised = 184, goal = 300, donorCount = 9;
+  var wl = document.getElementById('wl');
+  var wlFill = document.getElementById('wlFill');
+  var wlWaveA = document.getElementById('wlWaveA');
+  var wlWaveB = document.getElementById('wlWaveB');
+  var wlAmt = document.getElementById('wlAmt');
+  var wlPct = document.getElementById('wlPct');
+  var wlDonors = document.getElementById('wlDonors');
+  var lbAna = document.getElementById('lbAna');
+
+  function paint(){
+    var pct = Math.min(100, Math.round(raised / goal * 100));
+    wlFill.style.height = pct + '%';
+    wlWaveA.style.bottom = 'calc(' + pct + '% - 13px)';
+    wlWaveB.style.bottom = 'calc(' + pct + '% - 15px)';
+    wlAmt.textContent = eur0(raised);
+    wlPct.textContent = pct + '%';
+    wlDonors.textContent = donorCount;
+    if(pct > 55) wl.classList.add('deep'); else wl.classList.remove('deep');
+    if(lbAna) lbAna.textContent = eur0(raised);
+  }
+
+  var names = ['Vera M.','Stefan I.','Kolege iz kancelarije','Tetka Vera','Dragan Ć.','Razred 2012','Sanja B.'];
+  var msgs = {
+    me:['Za Anu i za našu Tivatsku porodicu.','Svaka čast! Trči i za mene.','Ovo je najmanje što možemo.','Sretno, dijete moje.','Bravo, javi kad stigneš do cilja.'],
+    en:['For Ana and for the family in Tivat.','Respect! Run one for me too.','This is the least we can do.','Good luck out there.','Well done — tell us when you finish.']
+  };
+  var i = 0;
+  document.getElementById('quickDonate').addEventListener('click', function(){
+    raised += 25; donorCount += 1;
+    var row = document.createElement('div');
+    row.className = 'donor d-new';
+    var nm = names[i % names.length];
+    var ms = msgs[lang][i % msgs[lang].length];
+    i++;
+    row.innerHTML = '<span class="d-dot"></span><span class="srow-txt"><span class="d-name"></span>'
+                  + '<span class="d-msg"></span></span><span class="d-amt">25 €</span>';
+    row.querySelector('.d-name').textContent = nm;
+    row.querySelector('.d-msg').textContent = ms;
+    var list = document.getElementById('donors');
+    list.insertBefore(row, list.firstChild);
+    paint();
+  });
+
+  /* ---------- segmented controls ---------- */
+  function seg(a, b, showA, showB){
+    a.addEventListener('click', function(){
+      a.setAttribute('aria-pressed','true'); b.setAttribute('aria-pressed','false');
+      showA.hidden = false; showB.hidden = true;
+    });
+    b.addEventListener('click', function(){
+      b.setAttribute('aria-pressed','true'); a.setAttribute('aria-pressed','false');
+      showB.hidden = false; showA.hidden = true;
+    });
+  }
+  seg(document.getElementById('segInd'), document.getElementById('segTeam'),
+      document.getElementById('lbInd'), document.getElementById('lbTeam'));
+  seg(document.getElementById('segOut'), document.getElementById('segIn'),
+      document.getElementById('ledOut'), document.getElementById('ledIn'));
+
+  /* ---------- language ---------- */
+  var DICT = {
+    me:{
+      payv:'Doniraj', permo:' /mj.',
+      ev:'Santa Run · Tivat · 20.12.', ev2:'Santa Run 2026 · Tivat',
+      dTitle:'Podrži Anu',
+      dSub:'Ana trči 5 km za porodicu iz Tivta koja pokriva troškove lječenja. Cilj: 300 €.',
+      w10:'jedan topli obrok', w25:'nedjelja školskih užina', w50:'lijekovi za mjesec',
+      mT:'Učini ovo mjesečnim', mD:'10 € mjesečno je 120 € godišnje — više od većine jednokratnih donacija.',
+      fT:'Pokrij troškove obrade', fD:'Tako cijeli tvoj iznos stiže do korisnika. Naše troškove plaćaju sponzori.',
+      aT:'Doniraj anonimno', aD:'Iznos se prikazuje u javnom registru, ime ne.',
+      payT:'Način plaćanja', rc:'Kartica', rs:'Bankovni prenos',
+      sIban:'IBAN', sRef:'Poziv na broj — obavezno', qr:'EPC QR<br>placeholder',
+      sNote:'Ovaj broj automatski pripisuje uplatu Aninoj stranici.',
+      tot:'Ukupno danas',
+      secure:'Plaćanje obrađuje licencirana banka u Crnoj Gori. Santamore ne vidi podatke kartice.',
+      rName:'Ana Vuković', rTeam:'Tim', of:'od', donors:'donatora',
+      rStory:'„Nisam trkač. Ali porodica koju podržavamo živi dvije ulice od mene, a njihov račun za lječenje ne čeka. Trčim 5 km u kostimu Djeda Mraza. Pomozi mi da stignem do 300 €.“',
+      qd:'Doniraj 25 €', share:'Podijeli Aninu stranicu', wall:'Zid donatora',
+      m1:'Bravo Ana! Vidimo se na startu.', m2:'Za našu Tivatsku porodicu. ❤',
+      m3:'Srećno.', m4:'Kafa je na nas poslije trke.', anon:'Anonimno',
+      nT:'Tvoj sljedeći korak',
+      nD:'Pitaj još 5 ljudi. Trkači koji pošalju 15+ poruka prikupe 76% više. Poruka je već napisana — samo dodirni ime.',
+      bTitle:'Rang lista', bSub1:'prijavljenih', bSub2:'aktivnih trkača koji prikupljaju',
+      segI:'Pojedinci', segT:'Timovi', bCta:'Napravi svoju stranicu',
+      lEy:'Javni registar · ažurirano automatski', lTitle:'Svaki euro, oba smjera',
+      l1:'Donacije primljene', l2:'Isplaćeno korisnicima', l3:'Odobreno, isplata u toku',
+      l4:'Neraspoređeno', l5:'Dva odvojena fonda', l6:'Fond za pomoć — od donacija',
+      l7:'Operativni fond — od sponzora, prijava i grantova',
+      l8:'Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori.',
+      segIn:'Uplate', segOut:'Isplate',
+      o1:'Porodica u Tivtu — troškovi lječenja', o2:'Fudbalski klub mladih — zimska oprema',
+      o3:'Pekara nakon požara — obnova opreme', o4:'Fond solidarnosti — sjever Crne Gore',
+      doc:'račun + potpis ✓', doc2:'faktura + foto ✓', doc3:'ugovor + račun ✓', doc4:'odluka odbora ✓',
+      natl:'NACIONALNO', anon2:'Anonimno',
+      rail1:'KARTICA', rail2:'SEPA', rail3:'KARTICA', rail4:'KEŠ · 2 potpisa', rail5:'MJEŠOVITO',
+      in4:'Kutija za donacije — Porto Montenegro',
+      lFoot:'Objavljeno je ime samo ako je donator tako izabrao. Identitet korisnika je zaštićen; dokumentacija je dostupna revizoru.',
+      other:'Drugi iznos'
+    },
+    en:{
+      payv:'Donate', permo:' /mo',
+      ev:'Santa Run · Tivat · 20 Dec', ev2:'Santa Run 2026 · Tivat',
+      dTitle:'Back Ana',
+      dSub:'Ana is running 5 km for a family in Tivat facing medical bills. Her goal: €300.',
+      w10:'one warm meal', w25:'a week of school meals', w50:'a month of medication',
+      mT:'Make this monthly', mD:'€10 a month is €120 a year — more than most one-off gifts.',
+      fT:'Cover the processing fee', fD:'So your full amount reaches the cause. Our costs are paid by sponsors.',
+      aT:'Give anonymously', aD:'The amount appears in the public ledger. Your name does not.',
+      payT:'Payment method', rc:'Card', rs:'Bank transfer',
+      sIban:'IBAN', sRef:'Reference — required', qr:'EPC QR<br>placeholder',
+      sNote:'This reference credits your gift to Ana\u2019s page automatically.',
+      tot:'Total today',
+      secure:'Payments are processed by a licensed Montenegrin bank. Santamore never sees your card details.',
+      rName:'Ana Vuković', rTeam:'Team', of:'of', donors:'donors',
+      rStory:'\u201cI\u2019m not a runner. But the family we\u2019re supporting lives two streets away, and their medical bill isn\u2019t waiting. I\u2019m running 5 km dressed as Santa. Help me reach €300.\u201d',
+      qd:'Donate €25', share:'Share Ana\u2019s page', wall:'Donor wall',
+      m1:'Go Ana! See you at the start line.', m2:'For our family in Tivat. ❤',
+      m3:'Good luck.', m4:'Coffee\u2019s on us after the race.', anon:'Anonymous',
+      nT:'Your next move',
+      nD:'Ask 5 more people. Runners who send 15+ messages raise 76% more. The message is already written — just tap a name.',
+      bTitle:'Leaderboard', bSub1:'registered', bSub2:'runners actively fundraising',
+      segI:'Individuals', segT:'Teams', bCta:'Start your own page',
+      lEy:'Public ledger · updates automatically', lTitle:'Every euro, both directions',
+      l1:'Donations received', l2:'Paid to beneficiaries', l3:'Approved, payment pending',
+      l4:'Unallocated', l5:'Two separate funds', l6:'Impact Fund — from donations',
+      l7:'Operations Fund — from sponsors, entries and grants',
+      l8:'Not one cent of donations goes to salaries or overhead. Sponsors pay for those.',
+      segIn:'Money in', segOut:'Money out',
+      o1:'Family in Tivat — medical costs', o2:'Youth football club — winter equipment',
+      o3:'Bakery after a fire — equipment replacement', o4:'Solidarity Fund — northern Montenegro',
+      doc:'receipt + signature ✓', doc2:'invoice + photo ✓', doc3:'contract + receipt ✓', doc4:'board decision ✓',
+      natl:'NATIONAL', anon2:'Anonymous',
+      rail1:'CARD', rail2:'SEPA', rail3:'CARD', rail4:'CASH · 2 signatures', rail5:'MIXED',
+      in4:'Collection box — Porto Montenegro',
+      lFoot:'Names appear only when the donor chose to show them. Beneficiary identities are protected; documentation is available to an auditor.',
+      other:'Other amount'
+    }
+  };
+  var lang = 'me';
+  function T(){ return DICT[lang]; }
+
+  function applyLang(){
+    var d = T();
+    document.querySelectorAll('[data-i]').forEach(function(el){
+      var k = el.getAttribute('data-i');
+      if(d[k] === undefined) return;
+      if(d[k].indexOf('<br>') > -1) el.innerHTML = d[k]; else el.textContent = d[k];
+    });
+    document.querySelectorAll('[data-ip]').forEach(function(el){
+      var k = el.getAttribute('data-ip');
+      if(d[k] !== undefined) el.setAttribute('placeholder', d[k]);
+    });
+    document.documentElement.lang = (lang === 'me') ? 'sr-Latn-ME' : 'en';
+    renderDonate();
+  }
+  Array.prototype.slice.call(document.querySelectorAll('.lang')).forEach(function(b){
+    b.addEventListener('click', function(){
+      lang = b.dataset.lang;
+      document.querySelectorAll('.lang').forEach(function(x){
+        x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+      });
+      applyLang();
+    });
+  });
+
+  /* ---------- init ---------- */
+  renderDonate();
+  applyLang();
+  setTimeout(paint, 260);
+})();
+</script>
+</body>
+</html>
