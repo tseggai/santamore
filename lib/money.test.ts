@@ -4,6 +4,7 @@ import {
   addCents,
   assertCents,
   formatCents,
+  formatSignedCents,
   isCents,
   parseEurosToCents,
 } from "./money";
@@ -74,6 +75,26 @@ describe("formatCents", () => {
 
   it("rejects float input instead of rounding it", () => {
     expect(() => formatCents(25.75 as never, "me")).toThrow(TypeError);
+  });
+});
+
+describe("formatSignedCents", () => {
+  it("formats negative corrections with a leading minus", () => {
+    expect(formatSignedCents(-500, "me")).toBe("-5,00 €");
+    expect(formatSignedCents(-500, "en")).toBe("-€5.00");
+    expect(formatSignedCents(-123_456, "me", { trimWholeCents: true })).toBe(
+      "-1.234,56 €",
+    );
+  });
+
+  it("passes non-negative values through unchanged", () => {
+    expect(formatSignedCents(2575, "me")).toBe("25,75 €");
+    expect(formatSignedCents(0, "en")).toBe("€0.00");
+  });
+
+  it("rejects floats and out-of-range magnitudes", () => {
+    expect(() => formatSignedCents(-0.5, "me")).toThrow(TypeError);
+    expect(() => formatSignedCents(-(MAX_CENTS + 1), "me")).toThrow(TypeError);
   });
 });
 

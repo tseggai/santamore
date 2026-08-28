@@ -42,7 +42,8 @@ export function generateStaticParams() {
   );
 }
 
-export const dynamicParams = false;
+// dynamicParams stays enabled so unknown slugs reach the notFound() call
+// below and render the localized not-found page inside the locale layout.
 
 export default function StubPage({
   params,

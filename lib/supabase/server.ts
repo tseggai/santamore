@@ -22,8 +22,10 @@ export async function createClient() {
               cookieStore.set(name, value, options),
             );
           } catch {
-            // Called from a Server Component: cookie writes are not possible
-            // there. Safe to ignore when middleware refreshes sessions.
+            // Called from a Server Component, where cookie writes throw.
+            // NOTE: middleware.ts does not yet run Supabase's updateSession —
+            // it MUST be added when auth ships (fundraiser dashboards), or
+            // refreshed tokens will be silently dropped after expiry.
           }
         },
       },

@@ -3,10 +3,11 @@ import path from "path";
 
 export default defineConfig({
   resolve: {
-    alias: { "@": path.resolve(__dirname, ".") },
+    alias: { "@": path.resolve(import.meta.dirname, ".") },
   },
   test: {
-    include: ["lib/**/*.test.ts"],
+    include: ["**/*.test.{ts,tsx}"],
+    exclude: ["node_modules/**", ".next/**"],
     environment: "node",
   },
 });

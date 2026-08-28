@@ -74,6 +74,27 @@ export function formatCents(
 }
 
 /**
+ * Format a signed cent amount for display, e.g. ledger_adjustments rows.
+ * Design decision: money AMOUNTS (donations, disbursements) are always
+ * non-negative Cents; corrections carry direction separately, and only the
+ * display layer renders a sign. This is the one helper that accepts
+ * negatives.
+ */
+export function formatSignedCents(
+  cents: number,
+  locale: Locale,
+  options: FormatCentsOptions = {},
+): string {
+  if (!Number.isSafeInteger(cents) || Math.abs(cents) > MAX_CENTS) {
+    throw new TypeError(
+      `Expected signed integer cents within ±${MAX_CENTS}, got: ${String(cents)}`,
+    );
+  }
+  const formatted = formatCents(Math.abs(cents), locale, options);
+  return cents < 0 ? `-${formatted}` : formatted;
+}
+
+/**
  * Parse user-entered euros into cents. Accepts "25", "25,75", "25.75".
  * At most two decimals; no thousands separators; no negatives.
  * Returns null on anything else — never guesses.
