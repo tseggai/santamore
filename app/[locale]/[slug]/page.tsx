@@ -16,7 +16,6 @@ const SITE_STUBS: Record<string, string> = {
   dogadjaji: "events",
   galerija: "gallery",
   transparentnost: "ledger",
-  podrzi: "donate",
   prikupljaci: "fundraisers",
   partneri: "partners",
   vijesti: "news",
