@@ -76,9 +76,8 @@ export function formatCents(
 /**
  * Format a signed cent amount for display, e.g. ledger_adjustments rows.
  * Design decision: money AMOUNTS (donations, disbursements) are always
- * non-negative Cents; corrections carry direction separately, and only the
- * display layer renders a sign. This is the one helper that accepts
- * negatives.
+ * non-negative Cents; only ledger_adjustments.amount_cents is a signed
+ * integer, and this is the one helper that formats it.
  */
 export function formatSignedCents(
   cents: number,
