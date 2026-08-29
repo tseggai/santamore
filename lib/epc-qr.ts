@@ -1,36 +1,41 @@
 import { assertCents, MAX_CENTS, type Cents } from "@/lib/money";
 
-// EPC069-12 SEPA Credit Transfer QR payload ("EPC QR"), per brief §8.
+// EPC069-12 SEPA Credit Transfer QR payload ("EPC QR"). Verified against
+// the spec text saved in docs/vendor/epc-qr.md (EPC069-12 v3.1, §2).
 //
-// IMPORTANT DEVIATION FROM THE BRIEF, flagged per "tell me when this brief
-// is wrong": the brief places our SM-XXXX-XXXX reference in the STRUCTURED
-// remittance line, but EPC069-12 requires that line to be an ISO 11649
-// creditor reference ("RF.."), which ours is not — banking apps validate
-// this and would reject the payload. The reference therefore goes in the
-// UNSTRUCTURED remittance line (max 140 chars); the two lines are mutually
-// exclusive.
+// DEVIATION FROM THE BRIEF, flagged per "tell me when this brief is
+// wrong": the brief places our SM-XXXX-XXXX reference in the STRUCTURED
+// remittance element, but per §2.2 that element is a Creditor Reference
+// (ISO 11649 "RF.." may be used) and banking apps commonly validate the RF
+// format there. The reference therefore goes in the UNSTRUCTURED
+// remittance element (max 140 chars); only one of the two may be
+// populated. Still pending: scan test with ≥2 real EU banking apps.
 //
-// docs/vendor/epc-qr.md is not in the repo and this environment cannot
-// reach the EPC site, so this builder is written from the brief's inline
-// block plus the published EPC069-12 rules. Before shipping to production:
-// save the spec to docs/vendor/epc-qr.md, verify, and test the QR with at
-// least two real EU banking apps (docs/PLACEHOLDERS.md).
-//
-// Version 002 is used: BIC is optional for SEPA-zone payments. Character
-// set 1 = UTF-8. Recommended error-correction level is M (set where the QR
-// is rendered, not in the payload). Max payload: 331 bytes.
+// Version 002 is used, where BIC is conditional: §2.2 keeps it MANDATORY
+// for SCT participants from non-EEA countries — which includes Montenegro
+// — so the builder requires a BIC whenever the IBAN is non-EEA. Character
+// set 1 = UTF-8. Error-correction level M (set where the QR is rendered,
+// not in the payload). Max payload: 331 bytes, no trailing separator.
 
 export const EPC_MAX_PAYLOAD_BYTES = 331;
 
 const IBAN_PATTERN = /^[A-Z]{2}[0-9]{2}[A-Z0-9]{1,30}$/;
 const BIC_PATTERN = /^[A-Z]{6}[A-Z0-9]{2}(?:[A-Z0-9]{3})?$/;
 
+// EU member states plus Iceland, Liechtenstein and Norway. SEPA countries
+// outside this set (Montenegro among them) need the BIC in the payload.
+const EEA_COUNTRIES = new Set([
+  "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR",
+  "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK",
+  "SI", "ES", "SE", "IS", "LI", "NO",
+]);
+
 export interface EpcQrInput {
   /** Account holder's registered name, max 70 chars. */
   beneficiaryName: string;
   /** IBAN; spaces allowed, normalised internally. */
   iban: string;
-  /** Optional with payload version 002. */
+  /** Required when the IBAN's country is outside the EEA (Montenegro is). */
   bic?: string;
   /** Optional: banks pre-fill the amount when present. 1 cent .. €999,999,999.99. */
   amountCents?: Cents;
@@ -77,6 +82,11 @@ export function buildEpcQrPayload(input: EpcQrInput): string {
   const bic = input.bic ? input.bic.replace(/\s+/g, "").toUpperCase() : "";
   if (bic && !BIC_PATTERN.test(bic)) {
     throw new RangeError("not a plausible BIC");
+  }
+  if (!bic && !EEA_COUNTRIES.has(iban.slice(0, 2))) {
+    throw new RangeError(
+      "BIC is required for a non-EEA beneficiary PSP (EPC069-12 §2.2)",
+    );
   }
 
   const reference = input.reference.trim();
