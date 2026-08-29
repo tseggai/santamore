@@ -14,3 +14,5 @@ text are never invented — see CLAUDE.md.
 | Accepted card brand logos | `messages/*.json` → `footer.cards` | Acquirer requirement (Task 6 footer) |
 | Russian copy — native review | all of `messages/ru.json` (see its `_review` key) | Launch decision per brief §15.8 |
 | SVG logo + icon | `public/brand/` has PNG only; header/footer/favicon use PNG for now | Crisp rendering; brief says ask, don't trace |
+| Santa Run 2026 facts: date (seeded 20.12. 11:00), venue, capacity (seeded 500), registration window, price tiers, campaign goal (seeded €30.000), beneficiary summary | `supabase/seed.sql` | Real event details per brief §15.5 |
+| `[[SAMPLE]]` donation + disbursement rows (fixed UUIDs `4000…0001` / `5000…0001`) | `supabase/seed.sql` — exist only for RLS tests | **Delete before launch** with `supabase/cleanup_samples.sql` |
