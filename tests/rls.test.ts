@@ -128,6 +128,18 @@ describe.skipIf(!hasEnv)("RLS: anonymous client", () => {
     expect(error).not.toBeNull();
   });
 
+  it("v_public_ledger_adjustments is readable and shows no private references", async () => {
+    const { data, error } = await anon()
+      .from("v_public_ledger_adjustments")
+      .select("*");
+    expect(error).toBeNull();
+    if (data!.length > 0) {
+      const keys = Object.keys(data![0]);
+      expect(keys).not.toContain("beneficiary_private_note");
+      expect(keys).not.toContain("created_by");
+    }
+  });
+
   it("v_chapter_totals and v_leaderboard are readable", async () => {
     const totals = await anon().from("v_chapter_totals").select("*");
     expect(totals.error).toBeNull();
