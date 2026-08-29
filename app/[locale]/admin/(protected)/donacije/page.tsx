@@ -58,6 +58,7 @@ export default async function AdminDonationsPage({
       amountCents: row.amount_cents,
       reference: page?.payment_reference ?? "",
       donorName: row.donor_name,
+      donorEmail: row.donor_email,
       isRecurring: row.is_recurring,
       createdAt: row.created_at,
       pageTitle: page?.title ?? "—",

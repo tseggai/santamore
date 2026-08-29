@@ -208,6 +208,7 @@
     "propose": "Predloži uparivanja",
     "statementRows": "{count} redova izvoda",
     "matchFound": "Upareno sa najavom",
+    "ambiguousMatch": "Više najava dijeli ovaj poziv na broj — uporedi sa izvodom i izaberi pravu.",
     "noReference": "U ovom redu nema poziva na broj",
     "refWithoutPledge": "Poziv na broj {reference} nema najavu",
     "createRow": "Zabilježi kao donaciju",

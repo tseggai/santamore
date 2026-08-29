@@ -21,6 +21,7 @@ export interface PendingPledge {
   amountCents: Cents;
   reference: string;
   donorName: string | null;
+  donorEmail: string | null;
   isRecurring: boolean;
   createdAt: string;
   pageTitle: string;
@@ -28,6 +29,7 @@ export interface PendingPledge {
 
 export type MatchProposal =
   | { kind: "matched"; row: StatementRow; pledge: PendingPledge; amountMatches: boolean }
+  | { kind: "ambiguous"; row: StatementRow; candidates: PendingPledge[] }
   | { kind: "unmatched-reference"; row: StatementRow; reference: string }
   | { kind: "no-reference"; row: StatementRow };
 
@@ -112,8 +114,13 @@ export function buildStatementRows(
 }
 
 /**
- * Reference first, then exact amount, then oldest pledge. Each pledge is
- * proposed at most once; the admin confirms every match by hand.
+ * A row is proposed as "matched" only when exactly one pending pledge
+ * carries its reference. References are page-level and public, so anyone
+ * can plant a pending pledge with an arbitrary name at a common amount —
+ * silently auto-picking among collisions would let that pledge claim a
+ * stranger's transfer (wrong name in the public ledger, receipt to the
+ * wrong inbox). Collisions come back as "ambiguous" with every candidate,
+ * oldest first, for the admin to resolve against the statement text.
  */
 export function proposeMatches(
   rows: StatementRow[],
@@ -130,10 +137,16 @@ export function proposeMatches(
     if (candidates.length === 0) {
       return { kind: "unmatched-reference", row, reference: row.references[0] };
     }
-    const exact = candidates.find((pledge) => pledge.amountCents === row.amountCents);
-    const pledge =
-      exact ??
-      [...candidates].sort((a, b) => a.createdAt.localeCompare(b.createdAt))[0];
+    if (candidates.length > 1) {
+      return {
+        kind: "ambiguous",
+        row,
+        candidates: [...candidates].sort((a, b) =>
+          a.createdAt.localeCompare(b.createdAt),
+        ),
+      };
+    }
+    const pledge = candidates[0];
     used.add(pledge.id);
     return {
       kind: "matched",

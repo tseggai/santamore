@@ -208,6 +208,7 @@
     "propose": "Propose matches",
     "statementRows": "{count} statement rows",
     "matchFound": "Matched pledge",
+    "ambiguousMatch": "Several pending pledges share this reference — compare with the statement and choose the right one.",
     "noReference": "No payment reference found in this row",
     "refWithoutPledge": "Reference {reference} has no matching pledge",
     "createRow": "Record as donation",

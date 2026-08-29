@@ -13,6 +13,7 @@ const pledge = (overrides: Partial<PendingPledge>): PendingPledge => ({
   amountCents: 2500,
   reference: "SM-1226-0473",
   donorName: "Ana",
+  donorEmail: "ana@example.invalid",
   isRecurring: false,
   createdAt: "2026-12-01T10:00:00Z",
   pageTitle: "Santa Run 2026",
@@ -81,28 +82,52 @@ describe("buildStatementRows + proposeMatches", () => {
     expect(proposals[2]).toMatchObject({ kind: "no-reference" });
   });
 
-  it("prefers the exact-amount pledge, then the oldest, never reusing one", () => {
+  it("never silently picks among colliding pledges — collisions are ambiguous", () => {
+    // References are page-level and public: an attacker can plant a pending
+    // pledge under their own name at a common amount, hoping to claim a
+    // stranger's transfer. Multiple candidates must go to the admin.
     const pledges = [
-      pledge({ id: "newer", amountCents: 3000, createdAt: "2026-12-02T10:00:00Z" }),
+      pledge({ id: "newer", amountCents: 2500, createdAt: "2026-12-02T10:00:00Z" }),
       pledge({ id: "older", amountCents: 2500, createdAt: "2026-12-01T10:00:00Z" }),
     ];
+    const oneRow = buildStatementRows(
+      [["20.12.2026", "25,00", "SM-1226-0473"]],
+      { dateColumn: 0, amountColumn: 1, descriptionColumns: [2] },
+    );
+    const proposals = proposeMatches(oneRow, pledges);
+    expect(proposals[0].kind).toBe("ambiguous");
+    if (proposals[0].kind === "ambiguous") {
+      expect(proposals[0].candidates.map((candidate) => candidate.id)).toEqual([
+        "older",
+        "newer",
+      ]);
+    }
+  });
+
+  it("flags a single match with a differing amount instead of hiding it", () => {
+    const proposals = proposeMatches(
+      buildStatementRows(
+        [["20.12.2026", "30,00", "SM-1226-0473"]],
+        { dateColumn: 0, amountColumn: 1, descriptionColumns: [2] },
+      ),
+      [pledge({})],
+    );
+    expect(proposals[0]).toMatchObject({ kind: "matched", amountMatches: false });
+  });
+
+  it("does not reuse a pledge already matched to an earlier row", () => {
     const twoRows = buildStatementRows(
       [
-        ["20.12.2026", "30,00", "SM-1226-0473"],
         ["20.12.2026", "25,00", "SM-1226-0473"],
+        ["21.12.2026", "25,00", "SM-1226-0473"],
       ],
       { dateColumn: 0, amountColumn: 1, descriptionColumns: [2] },
     );
-    const proposals = proposeMatches(twoRows, pledges);
-    expect(proposals[0]).toMatchObject({
-      kind: "matched",
-      pledge: { id: "newer" },
-      amountMatches: true,
-    });
+    const proposals = proposeMatches(twoRows, [pledge({})]);
+    expect(proposals[0].kind).toBe("matched");
     expect(proposals[1]).toMatchObject({
-      kind: "matched",
-      pledge: { id: "older" },
-      amountMatches: true,
+      kind: "unmatched-reference",
+      reference: "SM-1226-0473",
     });
   });
 });

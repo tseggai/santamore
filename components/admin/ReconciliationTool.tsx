@@ -257,6 +257,57 @@ export function ReconciliationTool({
                   </div>
                 ) : null}
 
+                {proposal.kind === "ambiguous" ? (
+                  <div className="mt-2">
+                    <p className="font-semibold text-red-dark">{t("ambiguousMatch")}</p>
+                    <ul className="mt-2 space-y-2">
+                      {proposal.candidates.map((candidate) => (
+                        <li
+                          key={candidate.id}
+                          className="flex flex-wrap items-center gap-3 rounded-[9px] bg-mist px-3 py-2"
+                        >
+                          <span>
+                            {candidate.donorName ?? "—"}
+                            {candidate.donorEmail ? (
+                              <span className="text-ink/50"> · {candidate.donorEmail}</span>
+                            ) : null}
+                          </span>
+                          <span className="font-mono tabular-nums">
+                            {money(candidate.amountCents)}
+                          </span>
+                          <span className="font-mono text-[12px] tabular-nums text-ink/50">
+                            {candidate.createdAt.slice(0, 10)}
+                          </span>
+                          {state === "done" ? null : (
+                            <button
+                              type="button"
+                              disabled={state === "busy"}
+                              onClick={() =>
+                                run(index, () =>
+                                  approvePledge({
+                                    donationId: candidate.id,
+                                    approvedAtIso,
+                                    ...(row.amountCents === null ||
+                                    row.amountCents === candidate.amountCents
+                                      ? {}
+                                      : { amountCents: row.amountCents }),
+                                  }),
+                                )
+                              }
+                              className="rounded-lg border-[1.5px] border-line px-3 py-1 text-[12px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
+                            >
+                              {t("approve")}
+                            </button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                    {state === "done" ? (
+                      <p className="mt-2 font-semibold text-sea">{t("approvedOk")}</p>
+                    ) : null}
+                  </div>
+                ) : null}
+
                 {proposal.kind === "unmatched-reference" ? (
                   <div className="mt-2 flex flex-wrap items-center gap-3">
                     <span>
