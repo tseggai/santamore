@@ -18,7 +18,8 @@ values
 
 insert into public.campaigns
   (id, chapter_id, title, slug, description, goal_cents,
-   starts_at, ends_at, beneficiary_summary, is_public, suggested_amounts)
+   starts_at, ends_at, beneficiary_summary, is_public, payment_reference,
+   suggested_amounts)
 values
   ('20000000-0000-4000-8000-000000000001',
    '10000000-0000-4000-8000-000000000001',
@@ -28,11 +29,18 @@ values
    '2026-11-01T00:00:00+01', '2026-12-31T23:59:59+01',
    '[[PLACEHOLDER: beneficiary summary]]',
    true,
+   'SM-0826-4127', -- SEPA matching key, generated at campaign creation
    -- Amounts and impact-line i18n keys from the prototype; copy lives in
-   -- messages/*.json (donate.impact10/25/50).
-   '[{"amount_cents": 1000, "impact_key": "impact10"},
-     {"amount_cents": 2500, "impact_key": "impact25", "default": true},
-     {"amount_cents": 5000, "impact_key": "impact50"}]'::jsonb);
+   -- messages/*.json (donate.impact10/25/50). The monthly set is the brief's
+   -- own €5/€10/€20 suggestion set (§9.2).
+   '{"oneoff": [
+       {"amount_cents": 1000, "impact_key": "impact10"},
+       {"amount_cents": 2500, "impact_key": "impact25", "default": true},
+       {"amount_cents": 5000, "impact_key": "impact50"}],
+     "monthly": [
+       {"amount_cents": 500},
+       {"amount_cents": 1000, "default": true},
+       {"amount_cents": 2000}]}'::jsonb);
 
 insert into public.events
   (id, campaign_id, chapter_id, name, slug, starts_at, venue, capacity,
