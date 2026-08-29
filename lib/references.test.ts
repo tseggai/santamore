@@ -70,6 +70,14 @@ describe("extractPaymentReferences", () => {
     ]);
   });
 
+  it("refuses references embedded in longer tokens", () => {
+    expect(extractPaymentReferences("PRISM-1226-0473")).toEqual([]);
+    expect(extractPaymentReferences("SM-1226-04735")).toEqual([]);
+    expect(extractPaymentReferences("1SM-1226-0473")).toEqual([]);
+    // Punctuation around a real reference is fine.
+    expect(extractPaymentReferences("ref:SM-1226-0473;")).toEqual(["SM-1226-0473"]);
+  });
+
   it("returns empty for no matches", () => {
     expect(extractPaymentReferences("regular transfer, no reference")).toEqual([]);
   });

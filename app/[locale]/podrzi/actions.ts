@@ -2,6 +2,7 @@
 
 import { buildInstructionsEmail } from "@/lib/email/donation";
 import { sendEmail } from "@/lib/email/send";
+import { getOrgBankDetails, hasBankDetails } from "@/lib/org";
 import { donationPledgeSchema } from "@/lib/schemas/donation";
 import { createServiceClient } from "@/lib/supabase/admin";
 
@@ -23,6 +24,12 @@ export async function createSepaPledge(input: unknown): Promise<PledgeResult> {
     return { ok: false, error: "invalid" };
   }
   const pledge = parsed.data;
+
+  // No bank details, no pledge: a pending row the donor cannot pay (and an
+  // instructions email full of [[PLACEHOLDER]]s) is worse than an error.
+  if (!hasBankDetails(getOrgBankDetails())) {
+    return { ok: false, error: "server" };
+  }
 
   try {
     // Service role: the donations table deliberately has no anon grants.

@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { createSepaPledge } from "@/app/[locale]/podrzi/actions";
 import { SepaPanel } from "@/components/donate/SepaPanel";
 import { formatCents, parseEurosToCents, type Cents } from "@/lib/money";
-import type { OrgBankDetails } from "@/lib/org";
+import { hasBankDetails, type OrgBankDetails } from "@/lib/org";
 import {
   donationFormSchema,
   type DonationFormValues,
@@ -418,9 +418,11 @@ export function DonateForm({
           {t("errServer")}
         </p>
       ) : null}
+      {/* No pledges before the real bank details exist — the panel above
+          explains why (bankDetailsPending). */}
       <button
         type="submit"
-        disabled={isSubmitting}
+        disabled={isSubmitting || !hasBankDetails(bank)}
         className="mt-4 w-full rounded-xl bg-red px-6 py-4 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
       >
         {isSubmitting

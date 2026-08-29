@@ -20,6 +20,8 @@ export function SignInForm({ locale }: { locale: Locale }) {
         email,
         options: {
           emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/${locale}/admin/donacije`,
+          // Closed staff login: never an open account-creation endpoint.
+          shouldCreateUser: false,
         },
       });
       setState(error ? "error" : "sent");

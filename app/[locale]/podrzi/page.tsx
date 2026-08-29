@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { DonateForm, type SuggestedSets } from "@/components/donate/DonateForm";
 import { getOrgBankDetails } from "@/lib/org";
-import { createServiceClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 import { routing, type Locale } from "@/i18n/routing";
 
 // Reads live campaign data on every request; never prerendered at build.
@@ -59,12 +59,13 @@ function normalizeSuggested(value: unknown): SuggestedSets {
 
 async function fetchCampaign(): Promise<CampaignRow | null> {
   try {
-    const supabase = createServiceClient();
+    // Anonymous read through the public view (CLAUDE.md: public data only
+    // via v_public_*); the service role is confined to the pledge insert.
+    const supabase = await createClient();
     const { data, error } = await supabase
-      .from("campaigns")
+      .from("v_public_campaigns")
       .select("slug, title, description, goal_cents, payment_reference, suggested_amounts")
       .eq("slug", DEFAULT_CAMPAIGN_SLUG)
-      .eq("is_public", true)
       .single();
     if (error) {
       console.error("[donate] campaign fetch failed:", error.code);

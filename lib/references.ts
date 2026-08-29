@@ -30,8 +30,14 @@ export function generatePaymentReference(
   return `SM-${referenceMonth(date)}-${serial}`;
 }
 
-/** Find every payment reference mentioned in free text (bank statement rows). */
+/**
+ * Find every payment reference mentioned in free text (bank statement
+ * rows). Boundary guards keep a longer token ("PRISM-…", "SM-1226-04735")
+ * from being misread as a valid reference and matched to the wrong pledge.
+ */
 export function extractPaymentReferences(text: string): string[] {
-  const matches = text.toUpperCase().match(/SM-(0[1-9]|1[0-2])[0-9]{2}-[0-9]{4}/g);
+  const matches = text
+    .toUpperCase()
+    .match(/(?<![A-Z0-9])SM-(0[1-9]|1[0-2])[0-9]{2}-[0-9]{4}(?![0-9])/g);
   return [...new Set(matches ?? [])];
 }

@@ -16,6 +16,8 @@ const LOGIN_PATH = new RegExp(`^/(${locales})/admin/prijava(/|$)`);
  */
 export default async function middleware(request: NextRequest) {
   const response = intlMiddleware(request);
+  const { pathname } = request.nextUrl;
+  const isAdminPath = ADMIN_PATH.test(pathname);
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -23,10 +25,23 @@ export default async function middleware(request: NextRequest) {
     return response;
   }
 
+  // Anonymous visitors on public pages never need the auth round-trip.
+  const hasAuthCookies = request.cookies
+    .getAll()
+    .some(({ name }) => name.startsWith("sb-"));
+  if (!isAdminPath && !hasAuthCookies) {
+    return response;
+  }
+
   const supabase = createServerClient(url, anonKey, {
     cookies: {
       getAll: () => request.cookies.getAll(),
       setAll: (cookiesToSet) => {
+        // Rotated tokens must reach BOTH sides: the request, so server
+        // components in this same render read the fresh session instead of
+        // re-consuming the spent refresh token, and the response, so the
+        // browser stores it.
+        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         cookiesToSet.forEach(({ name, value, options }) =>
           response.cookies.set(name, value, options),
         );
@@ -34,13 +49,12 @@ export default async function middleware(request: NextRequest) {
     },
   });
 
-  // Refreshes expiring auth cookies onto the response for every route.
+  // Refreshes expiring auth cookies for signed-in users on every route.
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
-  if (ADMIN_PATH.test(pathname) && !LOGIN_PATH.test(pathname) && !user) {
+  if (isAdminPath && !LOGIN_PATH.test(pathname) && !user) {
     const locale = pathname.split("/")[1];
     return NextResponse.redirect(new URL(`/${locale}/admin/prijava`, request.url));
   }

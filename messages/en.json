@@ -189,6 +189,7 @@
     "sendLink": "Send sign-in link",
     "linkSent": "Check your inbox — we've sent you a sign-in link.",
     "linkError": "Could not send the link. Try again.",
+    "linkFailed": "That sign-in link is invalid or has expired. Request a new one.",
     "noAccess": "This account has no staff access.",
     "signOut": "Sign out",
     "adminTitle": "Administration",

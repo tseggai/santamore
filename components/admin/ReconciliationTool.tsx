@@ -55,6 +55,8 @@ export function ReconciliationTool({
 
   const onFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    // Reset so re-selecting a fixed export with the same name re-triggers.
+    event.target.value = "";
     if (!file) return;
     const rows = parseCsv(await file.text());
     if (rows.length === 0) return;

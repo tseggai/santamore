@@ -189,6 +189,7 @@
     "sendLink": "Pošalji link za prijavu",
     "linkSent": "Provjeri poštu — poslali smo ti link za prijavu.",
     "linkError": "Slanje nije uspjelo. Pokušaj ponovo.",
+    "linkFailed": "Link za prijavu je nevažeći ili je istekao. Zatraži novi.",
     "noAccess": "Ovaj nalog nema pristup za tim.",
     "signOut": "Odjava",
     "adminTitle": "Administracija",

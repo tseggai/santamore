@@ -93,6 +93,23 @@ update public.campaigns
    }'::jsonb
  where slug = 'santa-run-2026';
 
+-- 2b ─ the donate page reads campaign data anonymously, and public data is
+-- exposed only through v_public_* views (CLAUDE.md): the service role
+-- stays confined to the pledge INSERT.
+create view public.v_public_campaigns
+  with (security_invoker = off, security_barrier = on) as
+select
+  c.slug,
+  c.title,
+  c.description,
+  c.goal_cents,
+  c.payment_reference,
+  c.suggested_amounts
+from public.campaigns c
+where c.is_public;
+
+grant select on public.v_public_campaigns to anon, authenticated;
+
 -- 3 ─ staff access for the reconciliation queue. Grants were fully revoked in
 -- 0001, so re-grant to authenticated and gate every row behind is_staff();
 -- anon keeps zero grants and zero policies on all base tables.

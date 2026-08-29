@@ -127,20 +127,30 @@ export async function createDonationFromStatement(
     .select("id, chapter_id")
     .eq("payment_reference", reference)
     .maybeSingle();
-  const { data: fundraiser } = campaign
+  const { data: fundraiserRaw } = campaign
     ? { data: null }
     : await supabase
         .from("fundraisers")
-        .select("id")
+        .select("id, event:events(chapter_id)")
         .eq("payment_reference", reference)
         .maybeSingle();
+  const fundraiser = fundraiserRaw as {
+    id: string;
+    event: { chapter_id: string | null } | { chapter_id: string | null }[] | null;
+  } | null;
   if (!campaign && !fundraiser) return { ok: false };
 
+  // The chapter comes from the campaign, or from the fundraiser's event —
+  // v_chapter_totals sums by donations.chapter_id, so leaving it null
+  // would silently drop the gift from the public chapter totals.
+  const fundraiserEvent = Array.isArray(fundraiser?.event)
+    ? fundraiser?.event[0]
+    : fundraiser?.event;
   const { error } = await supabase.from("donations").insert({
     amount_cents: amountCents,
     fee_covered_cents: 0,
     campaign_id: campaign?.id ?? null,
-    chapter_id: campaign?.chapter_id ?? null,
+    chapter_id: campaign?.chapter_id ?? fundraiserEvent?.chapter_id ?? null,
     fundraiser_id: fundraiser?.id ?? null,
     is_anonymous: true,
     rail: "sepa",
