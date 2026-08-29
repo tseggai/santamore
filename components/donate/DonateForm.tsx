@@ -345,11 +345,14 @@ export function DonateForm({
         />
       </div>
 
-      {/* 6 — identity last, 7 — optional public message */}
-      <p className="mt-7 font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
-        {t("identityTitle")}
-      </p>
-      <div className="mt-3 space-y-3">
+      {/* 6 — identity last, 7 — optional public message. Kept on the same
+          screen (§9: no wizard) but grouped as its own lighter section so
+          the payment half and the who-are-you half read separately. */}
+      <div className="mt-7 rounded-brand bg-sand px-4 py-4">
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+          {t("identityTitle")}
+        </p>
+        <div className="mt-3 space-y-3">
         <div>
           <label htmlFor="donorName" className="text-[13px] font-semibold">
             {t("nameLabel")}
@@ -360,7 +363,7 @@ export function DonateForm({
             autoComplete="name"
             aria-invalid={errors.name ? true : undefined}
             {...register("name")}
-            className="mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[15px] outline-none focus:border-sea"
+            className="mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[15px] outline-none focus:border-sea"
           />
           {errors.name ? (
             <p role="alert" className="mt-1 text-[12.5px] font-semibold text-red-dark">
@@ -378,7 +381,7 @@ export function DonateForm({
             autoComplete="email"
             aria-invalid={errors.email ? true : undefined}
             {...register("email")}
-            className="mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[15px] outline-none focus:border-sea"
+            className="mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[15px] outline-none focus:border-sea"
           />
           {errors.email ? (
             <p role="alert" className="mt-1 text-[12.5px] font-semibold text-red-dark">
@@ -395,13 +398,14 @@ export function DonateForm({
             rows={3}
             aria-invalid={errors.message ? true : undefined}
             {...register("message")}
-            className="mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[15px] outline-none focus:border-sea"
+            className="mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[15px] outline-none focus:border-sea"
           />
           {errors.message ? (
             <p role="alert" className="mt-1 text-[12.5px] font-semibold text-red-dark">
               {t("errMessage")}
             </p>
           ) : null}
+        </div>
         </div>
       </div>
 
