@@ -12,20 +12,26 @@ export function ShareToolkit({
   title,
   pagePath,
   imagePath,
+  siteOrigin,
 }: {
   title: string;
   /** Locale-prefixed public page path, e.g. "/me/f/ana". */
   pagePath: string;
   /** The opengraph-image path for the page. */
   imagePath: string;
+  /** Server-derived origin so links are absolute from the first paint. */
+  siteOrigin: string;
 }) {
   const t = useTranslations("dashboard");
   const [copied, setCopied] = useState<"" | "text" | "link">("");
-  // Set after mount: reading window during render would mismatch hydration.
-  const [origin, setOrigin] = useState("");
-  useEffect(() => setOrigin(window.location.origin), []);
+  // Browser fallback when NEXT_PUBLIC_SITE_URL is unset; effect-only so
+  // server and first client render agree.
+  const [fallbackOrigin, setFallbackOrigin] = useState("");
+  useEffect(() => {
+    if (!siteOrigin) setFallbackOrigin(window.location.origin);
+  }, [siteOrigin]);
 
-  const url = `${origin}${pagePath}`;
+  const url = `${siteOrigin || fallbackOrigin}${pagePath}`;
   const message = t("shareMessage", { title, url });
 
   const copy = async (value: string, kind: "text" | "link") => {

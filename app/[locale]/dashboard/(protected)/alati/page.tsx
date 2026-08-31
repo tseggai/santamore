@@ -37,6 +37,7 @@ export default async function ShareToolsPage({
           title={mine.title}
           pagePath={`/${locale}/f/${mine.slug}`}
           imagePath={`/${locale}/f/${mine.slug}/opengraph-image`}
+          siteOrigin={(process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "")}
         />
       </div>
     </div>

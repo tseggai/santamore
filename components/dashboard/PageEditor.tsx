@@ -70,7 +70,7 @@ export function PageEditor({
   const [story, setStory] = useState(fundraiser.story);
   const [goalText, setGoalText] = useState(
     fundraiser.goalCents && fundraiser.goalCents > 0
-      ? String(Math.round(fundraiser.goalCents / 100))
+      ? String(fundraiser.goalCents / 100) // cent-exact round-trip: "50.5" parses back to 5050
       : "",
   );
   const [teamId, setTeamId] = useState(fundraiser.teamId ?? "");
@@ -78,51 +78,79 @@ export function PageEditor({
   const [photoPath, setPhotoPath] = useState(fundraiser.photoPath);
   const [isActive, setIsActive] = useState(fundraiser.status === "active");
   const [busy, setBusy] = useState<"" | "save" | "publish" | "photo" | "team">("");
-  const [notice, setNotice] = useState<"" | "saved" | "error" | "incomplete">("");
+  const [notice, setNotice] = useState<
+    "" | "saved" | "error" | "incomplete" | "goal"
+  >("");
 
   const goalCents = goalText.trim() === "" ? null : parseEurosToCents(goalText);
+  // Non-empty text that doesn't parse must never silently wipe the goal.
+  const goalInvalid = goalText.trim() !== "" && goalCents === null;
   const photoUrl = fundraiserPhotoUrl(photoPath);
 
   const inputClass =
     "mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[15px] outline-none focus:border-sea";
   const labelClass = "text-[13px] font-semibold";
 
-  const save = async () => {
-    setBusy("save");
-    setNotice("");
-    const result = await updateFundraiserPage({
+  const persist = () =>
+    updateFundraiserPage({
       title,
       story,
       goalCents,
       teamId: teamId === "" ? null : teamId,
       photoPath,
-    }).catch(() => ({ ok: false }));
+    }).catch(() => ({ ok: false as const, error: "server" as const }));
+
+  const save = async () => {
+    if (goalInvalid) {
+      setNotice("goal");
+      return;
+    }
+    setBusy("save");
+    setNotice("");
+    const result = await persist();
     setBusy("");
-    setNotice(result.ok ? "saved" : "error");
+    if (result.ok) setNotice("saved");
+    else setNotice("error" in result && result.error === "incomplete" ? "incomplete" : "error");
   };
 
   const togglePublish = async () => {
-    setBusy("publish");
-    setNotice("");
-    // Publishing judges the saved row — persist the edits first.
-    const saved = await updateFundraiserPage({
-      title,
-      story,
-      goalCents,
-      teamId: teamId === "" ? null : teamId,
-      photoPath,
-    }).catch(() => ({ ok: false as const }));
-    if (!saved.ok) {
-      setBusy("");
-      setNotice("error");
+    if (goalInvalid) {
+      setNotice("goal");
       return;
     }
-    const result = await setFundraiserStatus(!isActive).catch(
+    setBusy("publish");
+    setNotice("");
+    // Unpublish FIRST when active: the integrity trigger judges edits to an
+    // active row, so saving reduced content before leaving 'active' would
+    // dead-end. Publishing judges the saved row, so save first there.
+    if (isActive) {
+      const dropped = await setFundraiserStatus(false).catch(
+        () => ({ ok: false as const, error: "server" as const }),
+      );
+      if (!dropped.ok) {
+        setBusy("");
+        setNotice("error");
+        return;
+      }
+      setIsActive(false);
+      const saved = await persist();
+      setBusy("");
+      setNotice(saved.ok ? "saved" : "error");
+      router.refresh();
+      return;
+    }
+    const saved = await persist();
+    if (!saved.ok) {
+      setBusy("");
+      setNotice("error" in saved && saved.error === "incomplete" ? "incomplete" : "error");
+      return;
+    }
+    const result = await setFundraiserStatus(true).catch(
       () => ({ ok: false as const, error: "server" as const }),
     );
     setBusy("");
     if (result.ok) {
-      setIsActive(!isActive);
+      setIsActive(true);
       setNotice("saved");
       router.refresh();
     } else {
@@ -276,6 +304,11 @@ export function PageEditor({
         {notice === "incomplete" ? (
           <p role="alert" className="text-[13px] font-semibold text-red-dark">
             {t("publishBlocked")}
+          </p>
+        ) : null}
+        {notice === "goal" ? (
+          <p role="alert" className="text-[13px] font-semibold text-red-dark">
+            {t("goalInvalid")}
           </p>
         ) : null}
 

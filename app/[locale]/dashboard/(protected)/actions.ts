@@ -30,7 +30,12 @@ const updatePageSchema = z.object({
   story: z.string().trim().max(2000),
   goalCents: z.number().int().min(0).max(MAX_CENTS).nullable(),
   teamId: z.string().uuid().nullable(),
-  photoPath: z.string().trim().max(300).nullable(),
+  // "<uploader-folder>/<file>" as written by the editor's upload; ownership
+  // is re-checked against the session below — never trust client input.
+  photoPath: z
+    .string()
+    .regex(/^[0-9a-f-]{36}\/[A-Za-z0-9._-]{1,100}$/i)
+    .nullable(),
 });
 
 const createTeamSchema = z.object({
@@ -73,13 +78,25 @@ export async function createFundraiserPage(
 
   try {
     const service = createServiceClient();
-    const { data: event } = await service
+    // The next upcoming published event; if none is scheduled yet, the most
+    // recent one (never a long-finished event ahead of a current one).
+    const { data: upcoming } = await service
       .from("events")
       .select("id")
       .eq("is_published", true)
+      .gte("starts_at", new Date().toISOString())
       .order("starts_at", { ascending: true })
       .limit(1)
       .maybeSingle();
+    const { data: event } = upcoming
+      ? { data: upcoming }
+      : await service
+          .from("events")
+          .select("id")
+          .eq("is_published", true)
+          .order("starts_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
     if (!event) return { ok: false, error: "server" };
 
     const base = slugify(parsed.data.title, "trkac");
@@ -120,6 +137,15 @@ export async function updateFundraiserPage(
   const { supabase, user } = await currentUser();
   if (!user) return { ok: false, error: "server" };
 
+  // The photo must live in THIS runner's storage folder — the same rule
+  // the bucket policies enforced at upload time.
+  if (
+    parsed.data.photoPath !== null &&
+    !parsed.data.photoPath.startsWith(`${user.id}/`)
+  ) {
+    return { ok: false, error: "invalid" };
+  }
+
   const { error } = await supabase
     .from("fundraisers")
     .update({
@@ -133,6 +159,9 @@ export async function updateFundraiserPage(
     .select("id")
     .single();
   if (error) {
+    // P0001: the integrity trigger — an ACTIVE page cannot lose its photo,
+    // goal or story; unpublish first.
+    if (error.code === "P0001") return { ok: false, error: "incomplete" };
     console.error("[dashboard] page update failed:", error.code);
     return { ok: false, error: "server" };
   }

@@ -171,7 +171,7 @@
     "actionError": "Nije uspjelo — pokušaj ponovo.",
     "statusDraft": "Nacrt — još nije objavljena",
     "statusActive": "Objavljena",
-    "daysLeft": "{count} dana do trke",
+    "daysLeft": "{count, plural, one {# dan} other {# dana}} do trke",
     "nextHeading": "Tvoj sljedeći korak",
     "nextActionPublish": "Dovrši stranicu i objavi je — fotografija, cilj i tri rečenice priče.",
     "nextActionSelf": "Započni stranicu svojih 20 €. Stranice koje krenu od nule ostanu na nuli.",
@@ -205,7 +205,8 @@
     "cashAmountLabel": "Iznos (€)",
     "cashSubmit": "Zabilježi",
     "cashAwaiting": "Čeka potvrdu primopredaje",
-    "cashConfirmed": "Potvrđeno"
+    "cashConfirmed": "Potvrđeno",
+    "goalInvalid": "Upiši cilj kao broj, npr. 300"
   },
   "email": {
     "instructions": {

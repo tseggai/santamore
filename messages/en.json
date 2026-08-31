@@ -171,7 +171,7 @@
     "actionError": "Something failed — try again.",
     "statusDraft": "Draft — not published yet",
     "statusActive": "Published",
-    "daysLeft": "{count} days to race day",
+    "daysLeft": "{count, plural, one {# day} other {# days}} to race day",
     "nextHeading": "Your next move",
     "nextActionPublish": "Finish your page and publish it — a photo, a goal and three sentences of story.",
     "nextActionSelf": "Start your page with your own €20. Pages that open at €0 stay at €0.",
@@ -205,7 +205,8 @@
     "cashAmountLabel": "Amount (€)",
     "cashSubmit": "Log it",
     "cashAwaiting": "Awaiting hand-in confirmation",
-    "cashConfirmed": "Confirmed"
+    "cashConfirmed": "Confirmed",
+    "goalInvalid": "Enter the goal as a number, e.g. 300"
   },
   "email": {
     "instructions": {

@@ -31,16 +31,25 @@ interface EventRow {
 async function fetchBoard() {
   try {
     const supabase = await createClient();
-    // One December event for now; the event page (Task 6) will scope by slug.
-    const { data: events } = await supabase
+    // The next upcoming published event (falling back to the latest past
+    // one); the event page (Task 6) will scope by slug.
+    const { data: upcoming } = await supabase
       .from("v_public_events")
       .select("id, name")
+      .gte("starts_at", new Date().toISOString())
       .order("starts_at", { ascending: true })
       .limit(1);
-    const event = (events?.[0] ?? null) as EventRow | null;
+    const { data: fallback } = upcoming?.length
+      ? { data: upcoming }
+      : await supabase
+          .from("v_public_events")
+          .select("id, name")
+          .order("starts_at", { ascending: false })
+          .limit(1);
+    const event = (fallback?.[0] ?? null) as EventRow | null;
     if (!event) return null;
 
-    const [{ data: individuals }, { data: teams }] = await Promise.all([
+    const [{ data: individuals }, { data: teams }, { data: allTotals }] = await Promise.all([
       supabase
         .from("v_leaderboard")
         .select("slug, title, raised_cents, event_id")
@@ -53,11 +62,19 @@ async function fetchBoard() {
         .eq("event_id", event.id)
         .order("rank", { ascending: true })
         .limit(50),
+      // Header aggregates over EVERY active page, not just the displayed 50.
+      supabase
+        .from("v_fundraiser_totals")
+        .select("raised_cents")
+        .eq("event_id", event.id),
     ]);
+    const totalsRows = (allTotals ?? []) as { raised_cents: number }[];
     return {
       event,
       individuals: (individuals ?? []) as IndividualRow[],
       teams: (teams ?? []) as TeamRow[],
+      activeCount: totalsRows.length,
+      totalRaised: totalsRows.reduce((sum, row) => sum + row.raised_cents, 0),
     };
   } catch {
     return null;
@@ -85,8 +102,7 @@ export default async function FundraisersDirectoryPage({
   const t = await getTranslations("leaderboard");
 
   const board = await fetchBoard();
-  const totalRaised =
-    board?.individuals.reduce((sum, row) => sum + row.raised_cents, 0) ?? 0;
+  const totalRaised = board?.totalRaised ?? 0;
 
   return (
     <div className="mx-auto max-w-xl px-5 py-12">
@@ -95,7 +111,7 @@ export default async function FundraisersDirectoryPage({
       </p>
       <h1 className="type-display mt-2 text-3xl">{t("title")}</h1>
       <p className="mt-2 text-[13.5px] text-ink/65">
-        <span className="font-mono tabular-nums">{board?.individuals.length ?? 0}</span>{" "}
+        <span className="font-mono tabular-nums">{board?.activeCount ?? 0}</span>{" "}
         {t("activeFundraisers")} ·{" "}
         <span className="font-mono tabular-nums">
           {formatCents(totalRaised, locale as Locale, { trimWholeCents: true })}

@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { CreatePageForm } from "@/components/dashboard/CreatePageForm";
@@ -30,11 +31,12 @@ export default async function DashboardPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  if (!user) notFound();
 
   const { data: mineData } = await supabase
     .from("fundraisers")
     .select("id, slug, title, status, goal_cents, event_id")
-    .eq("user_id", user?.id ?? "")
+    .eq("user_id", user.id)
     .limit(1)
     .maybeSingle();
   const mine = mineData as MyFundraiser | null;

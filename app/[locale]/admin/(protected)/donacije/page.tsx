@@ -53,19 +53,23 @@ export default async function AdminDonationsPage({
   const pending = (pendingData ?? []) as unknown as DonationRow[];
   const approved = (approvedData ?? []) as unknown as DonationRow[];
 
-  const pledges: PendingPledge[] = pending.map((row) => {
-    const page = row.campaign ?? row.fundraiser;
-    return {
-      id: row.id,
-      amountCents: row.amount_cents,
-      reference: page?.payment_reference ?? "",
-      donorName: row.donor_name,
-      donorEmail: row.donor_email,
-      isRecurring: row.is_recurring,
-      createdAt: row.created_at,
-      pageTitle: page?.title ?? "—",
-    };
-  });
+  // Statement matching is for SEPA pledges only: a pending cash row shares
+  // its page's reference and would otherwise claim a real bank credit.
+  const pledges: PendingPledge[] = pending
+    .filter((row) => row.rail === "sepa")
+    .map((row) => {
+      const page = row.campaign ?? row.fundraiser;
+      return {
+        id: row.id,
+        amountCents: row.amount_cents,
+        reference: page?.payment_reference ?? "",
+        donorName: row.donor_name,
+        donorEmail: row.donor_email,
+        isRecurring: row.is_recurring,
+        createdAt: row.created_at,
+        pageTitle: page?.title ?? "—",
+      };
+    });
 
   const money = (cents: number) => formatCents(cents, locale as Locale);
   const day = (iso: string | null) => (iso ? iso.slice(0, 10) : "—");
