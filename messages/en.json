@@ -134,6 +134,8 @@
     "activeFundraisers": "runners actively fundraising",
     "individuals": "Individuals",
     "teams": "Teams",
+    "teamMembers": "team members",
+    "shareTeam": "Share this team page",
     "cta": "Start your own page"
   },
   "ledger": {
@@ -157,6 +159,54 @@
     "railCash": "CASH · 2 signatures",
     "railMixed": "MIXED",
     "footNote": "Names appear only when the donor chose to show them. Beneficiary identities are protected; documentation is available to an auditor."
+  },
+  "dashboard": {
+    "title": "My page",
+    "signInTitle": "Sign in",
+    "signInSub": "Create your fundraising page, or pick up where you left off.",
+    "createHeading": "Start your page",
+    "createSub": "Give your page a name — you'll add the photo, story and goal next. It stays a draft until you publish it.",
+    "pageTitleLabel": "Page title",
+    "createSubmit": "Create my page",
+    "actionError": "Something failed — try again.",
+    "statusDraft": "Draft — not published yet",
+    "statusActive": "Published",
+    "daysLeft": "{count, plural, one {# day} other {# days}} to race day",
+    "nextHeading": "Your next move",
+    "nextActionPublish": "Finish your page and publish it — a photo, a goal and three sentences of story.",
+    "nextActionSelf": "Start your page with your own €20. Pages that open at €0 stay at €0.",
+    "nudgeShare": "Ask five more people. The share toolkit has the message ready.",
+    "editPage": "Edit my page",
+    "shareTools": "Share toolkit",
+    "logCash": "Log cash I collected",
+    "viewPublic": "View my public page",
+    "editorTitle": "Edit my page",
+    "titleLabel": "Title",
+    "storyLabel": "Story (at least three sentences)",
+    "goalLabel": "Goal (€)",
+    "photoLabel": "Photo",
+    "photoUploading": "Uploading…",
+    "teamLabel": "Team (optional)",
+    "noTeam": "No team",
+    "newTeamLabel": "New team name",
+    "newTeamSubmit": "Create team",
+    "save": "Save",
+    "saved": "Saved",
+    "publish": "Publish page",
+    "unpublish": "Back to draft",
+    "publishBlocked": "Publishing needs a photo, a goal and a story of at least three sentences.",
+    "previewHeading": "Live preview",
+    "shareMessage": "I'm fundraising for Santamore — {title}. Every euro in and out is published in a public ledger. Support me here: {url}",
+    "copyMessage": "Copy the message",
+    "copyLink": "Copy the link",
+    "shareImage": "Share image",
+    "igNote": "For Instagram Stories: open the share image, save it, and add your link with the link sticker.",
+    "cashSub": "Record cash you collected by hand. It counts on your page and the leaderboard once we confirm the hand-in.",
+    "cashAmountLabel": "Amount (€)",
+    "cashSubmit": "Log it",
+    "cashAwaiting": "Awaiting hand-in confirmation",
+    "cashConfirmed": "Confirmed",
+    "goalInvalid": "Enter the goal as a number, e.g. 300"
   },
   "email": {
     "instructions": {
@@ -229,6 +279,8 @@
       "reference": "Reference",
       "monthly": "monthly",
       "status": "Status"
-    }
+    },
+    "confirmCash": "Confirm hand-in",
+    "railCash": "cash"
   }
 }

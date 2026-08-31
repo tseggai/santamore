@@ -27,7 +27,8 @@ export interface SuggestedSets {
   monthly: SuggestedAmount[];
 }
 
-export interface DonateCampaign {
+export interface DonateTarget {
+  kind: "campaign" | "fundraiser";
   slug: string;
   title: string;
   description: string | null;
@@ -52,7 +53,7 @@ export function DonateForm({
   cardRailEnabled,
 }: {
   locale: Locale;
-  campaign: DonateCampaign;
+  campaign: DonateTarget;
   suggested: SuggestedSets;
   bank: OrgBankDetails;
   cardRailEnabled: boolean;
@@ -126,7 +127,9 @@ export function DonateForm({
     setServerError(false);
     const result = await createSepaPledge({
       ...values,
-      campaignSlug: campaign.slug,
+      ...(campaign.kind === "fundraiser"
+        ? { fundraiserSlug: campaign.slug }
+        : { campaignSlug: campaign.slug }),
       locale,
       rail: "sepa",
     });

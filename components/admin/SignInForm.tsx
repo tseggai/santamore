@@ -13,7 +13,17 @@ import type { Locale } from "@/i18n/routing";
  * has neither problem. The Supabase "Magic Link" email template must
  * include {{ .Token }} for the code to reach the inbox.
  */
-export function SignInForm({ locale }: { locale: Locale }) {
+export function SignInForm({
+  locale,
+  nextPath,
+  allowSignup = false,
+}: {
+  locale: Locale;
+  /** Locale-prefixed path to land on after the code/link, e.g. "/me/dashboard". */
+  nextPath?: string;
+  /** Runners may create accounts; the staff login stays closed. */
+  allowSignup?: boolean;
+}) {
   const t = useTranslations("admin");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -29,12 +39,12 @@ export function SignInForm({ locale }: { locale: Locale }) {
     setState("sending");
     try {
       const supabase = createClient();
+      const target = nextPath ?? `/${locale}/admin/donacije`;
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=/${locale}/admin/donacije`,
-          // Closed staff login: never an open account-creation endpoint.
-          shouldCreateUser: false,
+          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(target)}`,
+          shouldCreateUser: allowSignup,
         },
       });
       setState(error ? "error" : "sent");
@@ -57,7 +67,7 @@ export function SignInForm({ locale }: { locale: Locale }) {
         setState("codeError");
         return;
       }
-      window.location.href = `/${locale}/admin/donacije`;
+      window.location.href = nextPath ?? `/${locale}/admin/donacije`;
     } catch {
       setState("codeError");
     }

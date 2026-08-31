@@ -134,6 +134,8 @@
     "activeFundraisers": "aktivnih trkača koji prikupljaju",
     "individuals": "Pojedinci",
     "teams": "Timovi",
+    "teamMembers": "članova tima",
+    "shareTeam": "Podijeli stranicu tima",
     "cta": "Napravi svoju stranicu"
   },
   "ledger": {
@@ -157,6 +159,54 @@
     "railCash": "KEŠ · 2 potpisa",
     "railMixed": "MJEŠOVITO",
     "footNote": "Objavljeno je ime samo ako je donator tako izabrao. Identitet korisnika je zaštićen; dokumentacija je dostupna revizoru."
+  },
+  "dashboard": {
+    "title": "Moja stranica",
+    "signInTitle": "Prijavi se",
+    "signInSub": "Napravi svoju stranicu za prikupljanje ili nastavi gdje si stao.",
+    "createHeading": "Napravi svoju stranicu",
+    "createSub": "Daj stranici ime — fotografiju, priču i cilj dodaješ odmah zatim. Ostaje nacrt dok je ne objaviš.",
+    "pageTitleLabel": "Naziv stranice",
+    "createSubmit": "Napravi stranicu",
+    "actionError": "Nije uspjelo — pokušaj ponovo.",
+    "statusDraft": "Nacrt — još nije objavljena",
+    "statusActive": "Objavljena",
+    "daysLeft": "{count, plural, one {# dan} other {# dana}} do trke",
+    "nextHeading": "Tvoj sljedeći korak",
+    "nextActionPublish": "Dovrši stranicu i objavi je — fotografija, cilj i tri rečenice priče.",
+    "nextActionSelf": "Započni stranicu svojih 20 €. Stranice koje krenu od nule ostanu na nuli.",
+    "nudgeShare": "Pitaj još pet ljudi. Poruka te čeka u alatima za dijeljenje.",
+    "editPage": "Uredi stranicu",
+    "shareTools": "Alati za dijeljenje",
+    "logCash": "Zabilježi prikupljeni keš",
+    "viewPublic": "Pogledaj javnu stranicu",
+    "editorTitle": "Uredi stranicu",
+    "titleLabel": "Naslov",
+    "storyLabel": "Priča (najmanje tri rečenice)",
+    "goalLabel": "Cilj (€)",
+    "photoLabel": "Fotografija",
+    "photoUploading": "Otpremamo…",
+    "teamLabel": "Tim (opciono)",
+    "noTeam": "Bez tima",
+    "newTeamLabel": "Ime novog tima",
+    "newTeamSubmit": "Napravi tim",
+    "save": "Sačuvaj",
+    "saved": "Sačuvano",
+    "publish": "Objavi stranicu",
+    "unpublish": "Vrati u nacrt",
+    "publishBlocked": "Za objavu trebaju fotografija, cilj i priča od bar tri rečenice.",
+    "previewHeading": "Pregled uživo",
+    "shareMessage": "Prikupljam za Santamore — {title}. Svaki euro, uplata i isplata, javno je objavljen. Podrži me ovdje: {url}",
+    "copyMessage": "Kopiraj poruku",
+    "copyLink": "Kopiraj link",
+    "shareImage": "Slika za objavu",
+    "igNote": "Za Instagram priče: otvori sliku za objavu, sačuvaj je i dodaj link pomoću stikera.",
+    "cashSub": "Zabilježi novac prikupljen na ruke. Računa se na tvojoj stranici i rang listi kad potvrdimo primopredaju.",
+    "cashAmountLabel": "Iznos (€)",
+    "cashSubmit": "Zabilježi",
+    "cashAwaiting": "Čeka potvrdu primopredaje",
+    "cashConfirmed": "Potvrđeno",
+    "goalInvalid": "Upiši cilj kao broj, npr. 300"
   },
   "email": {
     "instructions": {
@@ -229,6 +279,8 @@
       "reference": "Poziv na broj",
       "monthly": "mjesečno",
       "status": "Status"
-    }
+    },
+    "confirmCash": "Potvrdi primopredaju",
+    "railCash": "keš"
   }
 }

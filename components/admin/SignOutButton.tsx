@@ -5,14 +5,20 @@ import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import type { Locale } from "@/i18n/routing";
 
-export function SignOutButton({ locale }: { locale: Locale }) {
+export function SignOutButton({
+  locale,
+  redirectTo,
+}: {
+  locale: Locale;
+  redirectTo?: string;
+}) {
   const t = useTranslations("admin");
 
   const signOut = async () => {
     try {
       await createClient().auth.signOut();
     } finally {
-      window.location.href = `/${locale}/admin/prijava`;
+      window.location.href = redirectTo ?? `/${locale}/admin/prijava`;
     }
   };
 
