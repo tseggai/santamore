@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { routing, htmlLang } from "@/i18n/routing";
-import { fraunces, figtree, dmMono } from "@/lib/fonts";
+import { bodyFont, displayFont, dmMono } from "@/lib/fonts";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import "../globals.css";
@@ -37,7 +37,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={htmlLang(locale)}
-      className={`${fraunces.variable} ${figtree.variable} ${dmMono.variable}`}
+      className={`${displayFont.variable} ${bodyFont.variable} ${dmMono.variable}`}
     >
       <body className="flex min-h-screen flex-col bg-paper text-ink">
         <NextIntlClientProvider>

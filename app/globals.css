@@ -11,36 +11,34 @@
 
   --color-red: #f35353;
   --color-red-dark: #d93b3b;
-  --color-ink: #0b0b0c;
+  --color-ink: #36434b; /* slate; softened from #0b0b0c by owner request */
   --color-paper: #ffffff;
   --color-sea: #0e3a46;
   --color-sea-2: #15505f;
   --color-mist: #eaf1f2;
   --color-sand: #f6f3ee;
 
-  --color-line: rgba(11, 11, 12, 0.12);
-  --color-line-soft: rgba(11, 11, 12, 0.07);
+  --color-line: rgba(54, 67, 75, 0.16);
+  --color-line-soft: rgba(54, 67, 75, 0.09);
 
   --color-white: #ffffff;
   --color-black: #000000;
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-body: var(--font-figtree), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-display-face), Georgia, serif;
+  --font-body: var(--font-body-face), "Helvetica Neue", Helvetica, system-ui, sans-serif;
   --font-mono: var(--font-dm-mono), ui-monospace, monospace;
 
   --radius-brand: 14px;
 }
 
-/* Fraunces display settings from the prototype: SOFT + WONK variation axes. */
+/* Display type: big, light and elegant (Cormorant Garamond) — weight comes
+   from the face, not from bolding. */
 @utility type-display {
   font-family: var(--font-display);
-  font-variation-settings:
-    "SOFT" 40,
-    "WONK" 1;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 400;
+  letter-spacing: 0.005em;
 }
 
 @layer base {
