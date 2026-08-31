@@ -62,6 +62,7 @@ describe.skipIf(!hasEnv)("RLS: anonymous client", () => {
     "ledger_adjustments",
     "registrations",
     "fundraisers",
+    "teams",
   ];
 
   for (const table of lockedTables) {
@@ -146,6 +147,35 @@ describe.skipIf(!hasEnv)("RLS: anonymous client", () => {
     expect(totals.data!.length).toBeGreaterThanOrEqual(1);
     const board = await anon().from("v_leaderboard").select("*");
     expect(board.error).toBeNull();
+  });
+
+  it("Task 5 views are readable: donor wall, team totals, team leaderboard, events", async () => {
+    for (const view of [
+      "v_public_donor_wall",
+      "v_team_totals",
+      "v_leaderboard_teams",
+      "v_public_events",
+    ]) {
+      const { error } = await anon().from(view).select("*");
+      expect(error, `${view} must be anonymously readable`).toBeNull();
+    }
+    const events = await anon().from("v_public_events").select("slug");
+    expect(events.data!.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("v_public_donor_wall exposes neither donor identity nor the moderation flag", async () => {
+    for (const col of ["donor_email", "donor_name", "is_message_hidden"]) {
+      const { error } = await anon().from("v_public_donor_wall").select(col);
+      expect(error, `donor wall must not expose ${col}`).not.toBeNull();
+    }
+  });
+
+  it("cannot UPDATE a fundraiser's payment_reference", async () => {
+    const { error } = await anon()
+      .from("fundraisers")
+      .update({ payment_reference: "SM-0126-0001" })
+      .eq("slug", "nonexistent");
+    expectDenied(error);
   });
 });
 

@@ -16,7 +16,7 @@ declare
   locked text[] := array[
     'donations', 'profiles', 'subscriptions', 'disbursements',
     'beneficiary_applications', 'webhook_events', 'ledger_adjustments',
-    'registrations', 'fundraisers', 'sponsors', 'ask_list_items'
+    'registrations', 'fundraisers', 'sponsors', 'ask_list_items', 'teams'
   ];
 begin
   foreach t in array locked loop
@@ -63,6 +63,72 @@ select 'no sensitive columns in v_public_* / v_* views',
                           'pan_token', 'created_by', 'message')
   ) then 'FAIL — sensitive column projected' else 'PASS' end;
 
+-- 3b. Task 5 views: the donor wall deliberately projects `message` (public
+-- and moderatable, brief §9.7) but must never project identity, moderation
+-- or ownership internals
+insert into _results (test, result)
+select 'no sensitive columns in Task 5 views',
+  case when exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public'
+      and table_name in ('v_public_donor_wall', 'v_team_totals',
+                         'v_leaderboard_teams', 'v_public_events')
+      and column_name in ('donor_email', 'donor_name', 'is_message_hidden',
+                          'is_anonymous', 'user_id', 'captain_id',
+                          'provider_order_number', 'provider_transaction_id',
+                          'pan_token')
+  ) then 'FAIL — sensitive column projected' else 'PASS' end;
+
+-- 3c. The SEPA matching key is immutable to clients: the column-level update
+-- grant on fundraisers excludes payment_reference (and slug/user_id/
+-- event_id), and there is no insert grant at all — references are minted
+-- server-side only (Task 3 security review). Privilege checks trip before
+-- row matching, so these probes need no fixture rows.
+do $$
+begin
+  begin
+    set local role authenticated;
+    update public.fundraisers set payment_reference = 'SM-0126-0001' where false;
+    reset role;
+    insert into _results (test, result)
+      values ('authenticated UPDATE fundraisers.payment_reference', 'FAIL — allowed');
+  exception when insufficient_privilege then
+    insert into _results (test, result)
+      values ('authenticated UPDATE fundraisers.payment_reference', 'PASS — permission denied');
+  end;
+  begin
+    set local role authenticated;
+    update public.fundraisers set user_id = gen_random_uuid() where false;
+    reset role;
+    insert into _results (test, result)
+      values ('authenticated UPDATE fundraisers.user_id', 'FAIL — allowed');
+  exception when insufficient_privilege then
+    insert into _results (test, result)
+      values ('authenticated UPDATE fundraisers.user_id', 'PASS — permission denied');
+  end;
+  begin
+    set local role authenticated;
+    insert into public.fundraisers (user_id, event_id, slug, title, payment_reference)
+    values (gen_random_uuid(), gen_random_uuid(), 'x', 'x', 'SM-0126-0002');
+    reset role;
+    insert into _results (test, result)
+      values ('authenticated INSERT fundraisers', 'FAIL — allowed');
+  exception when insufficient_privilege then
+    insert into _results (test, result)
+      values ('authenticated INSERT fundraisers', 'PASS — permission denied');
+  end;
+  begin
+    set local role authenticated;
+    update public.teams set slug = 'x' where false;
+    reset role;
+    insert into _results (test, result)
+      values ('authenticated UPDATE teams.slug', 'FAIL — allowed');
+  exception when insufficient_privilege then
+    insert into _results (test, result)
+      values ('authenticated UPDATE teams.slug', 'PASS — permission denied');
+  end;
+end $$;
+
 -- 4. Anonymous reads of the public views must work and show expected data
 do $$
 declare
@@ -103,6 +169,24 @@ begin
   reset role;
   insert into _results (test, result)
     values ('anon SELECT v_leaderboard', 'PASS — ' || n || ' row(s)');
+
+  set local role anon;
+  select count(*) into n from public.v_public_donor_wall;
+  reset role;
+  insert into _results (test, result)
+    values ('anon SELECT v_public_donor_wall', 'PASS — ' || n || ' row(s)');
+
+  set local role anon;
+  select count(*) into n from public.v_leaderboard_teams;
+  reset role;
+  insert into _results (test, result)
+    values ('anon SELECT v_leaderboard_teams', 'PASS — ' || n || ' row(s)');
+
+  set local role anon;
+  select count(*) into n from public.v_public_events;
+  reset role;
+  insert into _results (test, result) values ('anon SELECT v_public_events',
+    case when n >= 1 then 'PASS — ' || n || ' row(s)' else 'FAIL — empty' end);
 end $$;
 
 -- 5. Immutability spot-checks (expected to be denied by triggers)
