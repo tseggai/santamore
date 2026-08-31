@@ -2,7 +2,11 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { DonateForm, type SuggestedSets } from "@/components/donate/DonateForm";
+import {
+  DonateForm,
+  type DonateTarget,
+  type SuggestedSets,
+} from "@/components/donate/DonateForm";
 import { getOrgBankDetails } from "@/lib/org";
 import { createClient } from "@/lib/supabase/server";
 import { routing, type Locale } from "@/i18n/routing";
@@ -88,15 +92,66 @@ export async function generateMetadata({
   return { title: `${t("donate")} — Santamore` };
 }
 
+interface FundraiserRow {
+  slug: string;
+  title: string;
+  story: string | null;
+  goal_cents: number;
+  payment_reference: string;
+}
+
+/** ?za=<slug> targets an active fundraiser page (anon view, Task 5). */
+async function fetchFundraiser(slug: string): Promise<FundraiserRow | null> {
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("v_fundraiser_totals")
+      .select("slug, title, story, goal_cents, payment_reference")
+      .eq("slug", slug)
+      .single();
+    if (error) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 export default async function DonatePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ za?: string }>;
 }) {
   const { locale } = await params;
+  const { za } = await searchParams;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("donate");
+
+  if (za) {
+    const fundraiser = await fetchFundraiser(za);
+    if (!fundraiser) notFound();
+    const campaignForAmounts = await fetchCampaign();
+    return (
+      <DonateForm
+        locale={locale as Locale}
+        campaign={
+          {
+            kind: "fundraiser",
+            slug: fundraiser.slug,
+            title: fundraiser.title,
+            description: fundraiser.story,
+            goalCents: fundraiser.goal_cents,
+            paymentReference: fundraiser.payment_reference,
+          } satisfies DonateTarget
+        }
+        suggested={normalizeSuggested(campaignForAmounts?.suggested_amounts)}
+        bank={getOrgBankDetails()}
+        cardRailEnabled={process.env.NEXT_PUBLIC_CARD_RAIL_ENABLED === "true"}
+      />
+    );
+  }
 
   const campaign = await fetchCampaign();
   if (!campaign) {
@@ -114,6 +169,7 @@ export default async function DonatePage({
     <DonateForm
       locale={locale as Locale}
       campaign={{
+        kind: "campaign",
         slug: campaign.slug,
         title: campaign.title,
         description: campaign.description,

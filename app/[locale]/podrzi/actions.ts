@@ -35,12 +35,50 @@ export async function createSepaPledge(input: unknown): Promise<PledgeResult> {
     // Service role: the donations table deliberately has no anon grants.
     const supabase = createServiceClient();
 
-    const { data: campaign, error: campaignError } = await supabase
-      .from("campaigns")
-      .select("id, title, chapter_id, payment_reference, is_public")
-      .eq("slug", pledge.campaignSlug)
-      .single();
-    if (campaignError || !campaign || !campaign.is_public) {
+    // Resolve the target: a public campaign, or an ACTIVE fundraiser page
+    // (its chapter comes via the event, for v_chapter_totals).
+    let target:
+      | {
+          title: string;
+          reference: string;
+          chapterId: string | null;
+          campaignId?: string;
+          fundraiserId?: string;
+        }
+      | null = null;
+    if (pledge.fundraiserSlug !== undefined) {
+      const { data: fundraiser } = await supabase
+        .from("fundraisers")
+        .select("id, title, status, payment_reference, event:events(chapter_id)")
+        .eq("slug", pledge.fundraiserSlug)
+        .single();
+      if (fundraiser && fundraiser.status === "active") {
+        const event = Array.isArray(fundraiser.event)
+          ? fundraiser.event[0]
+          : fundraiser.event;
+        target = {
+          title: fundraiser.title,
+          reference: fundraiser.payment_reference,
+          chapterId: event?.chapter_id ?? null,
+          fundraiserId: fundraiser.id,
+        };
+      }
+    } else {
+      const { data: campaign } = await supabase
+        .from("campaigns")
+        .select("id, title, chapter_id, payment_reference, is_public")
+        .eq("slug", pledge.campaignSlug)
+        .single();
+      if (campaign?.is_public) {
+        target = {
+          title: campaign.title,
+          reference: campaign.payment_reference,
+          chapterId: campaign.chapter_id,
+          campaignId: campaign.id,
+        };
+      }
+    }
+    if (!target) {
       return { ok: false, error: "server" };
     }
 
@@ -49,8 +87,9 @@ export async function createSepaPledge(input: unknown): Promise<PledgeResult> {
     const { error: insertError } = await supabase.from("donations").insert({
       amount_cents: pledge.amountCents,
       fee_covered_cents: 0,
-      campaign_id: campaign.id,
-      chapter_id: campaign.chapter_id,
+      campaign_id: target.campaignId ?? null,
+      fundraiser_id: target.fundraiserId ?? null,
+      chapter_id: target.chapterId,
       donor_name: pledge.name,
       donor_email: pledge.email,
       display_name: pledge.anonymous ? null : pledge.name,
@@ -73,8 +112,8 @@ export async function createSepaPledge(input: unknown): Promise<PledgeResult> {
           locale: pledge.locale,
           donorName: pledge.name,
           donorEmail: pledge.email,
-          campaignTitle: campaign.title,
-          reference: campaign.payment_reference,
+          campaignTitle: target.title,
+          reference: target.reference,
           amountCents: pledge.amountCents,
           isRecurring: pledge.monthly,
         }),
@@ -83,7 +122,7 @@ export async function createSepaPledge(input: unknown): Promise<PledgeResult> {
       console.error("[donate] instructions email failed:", emailError);
     }
 
-    return { ok: true, reference: campaign.payment_reference };
+    return { ok: true, reference: target.reference };
   } catch (error) {
     console.error("[donate] pledge failed:", error);
     return { ok: false, error: "server" };
