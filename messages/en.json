@@ -115,7 +115,8 @@
     "confEmailNote": "We've emailed you these transfer details.",
     "confLedgerNote": "Once we match your transfer, your gift appears in the public ledger.",
     "confShare": "Share this campaign",
-    "confStartOwn": "Or start your own fundraising page"
+    "confStartOwn": "Or start your own fundraising page",
+    "backToPage": "Back to the page"
   },
   "runner": {
     "team": "Team",

@@ -79,7 +79,7 @@ export default async function DashboardPage({
   const nextAction = isDraft
     ? { text: t("nextActionPublish"), href: "/dashboard/stranica" }
     : raised === 0
-      ? { text: t("nextActionSelf"), href: `/podrzi?za=${mine.slug}` }
+      ? { text: t("nextActionSelf"), href: `/f/${mine.slug}/podrzi` }
       : { text: t("nudgeShare"), href: "/dashboard/alati" };
 
   return (

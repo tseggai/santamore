@@ -115,7 +115,8 @@
     "confEmailNote": "Poslali smo ti ove podatke i na e-mail.",
     "confLedgerNote": "Kad uparimo uplatu, tvoja donacija se pojavljuje u javnom registru.",
     "confShare": "Podijeli kampanju",
-    "confStartOwn": "Ili napravi svoju stranicu za prikupljanje"
+    "confStartOwn": "Ili napravi svoju stranicu za prikupljanje",
+    "backToPage": "Nazad na stranicu"
   },
   "runner": {
     "team": "Tim",

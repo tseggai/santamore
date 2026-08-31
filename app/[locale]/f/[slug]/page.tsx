@@ -109,12 +109,24 @@ export default async function FundraiserPage({
         <div className="min-w-0">
           <h1 className="type-display text-lg leading-tight">{fundraiser.title}</h1>
           <p className="mt-0.5 text-[12px] text-ink/60">
-            {fundraiser.team_name ? (
+            {fundraiser.team_name && fundraiser.team_slug ? (
               <>
-                {t("team")} · {fundraiser.team_name} ·{" "}
+                {t("team")} ·{" "}
+                <Link
+                  href={`/t/${fundraiser.team_slug}`}
+                  className="underline decoration-line underline-offset-2 transition-colors hover:text-sea"
+                >
+                  {fundraiser.team_name}
+                </Link>{" "}
+                ·{" "}
               </>
             ) : null}
-            {fundraiser.event_name}
+            <Link
+              href="/prikupljaci"
+              className="underline decoration-line underline-offset-2 transition-colors hover:text-sea"
+            >
+              {fundraiser.event_name}
+            </Link>
           </p>
         </div>
       </div>
@@ -136,7 +148,7 @@ export default async function FundraiserPage({
 
       <div className="mt-4 space-y-2">
         <Link
-          href={{ pathname: "/podrzi", query: { za: fundraiser.slug } }}
+          href={`/f/${fundraiser.slug}/podrzi`}
           className="block w-full rounded-xl bg-red px-6 py-3.5 text-center text-[15.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
         >
           {tDonate("payVerb")}

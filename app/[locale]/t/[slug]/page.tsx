@@ -7,6 +7,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
 import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
+import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
@@ -81,9 +82,12 @@ export default async function TeamPage({
 
   return (
     <div className="mx-auto max-w-xl px-5 py-12">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+      <Link
+        href="/prikupljaci"
+        className="inline-block font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80 transition-colors hover:text-sea"
+      >
         {team.event_name}
-      </p>
+      </Link>
       <h1 className="type-display mt-2 text-3xl">{team.name}</h1>
       <p className="mt-2 text-[13.5px] text-ink/65">
         <span className="font-mono tabular-nums">{team.member_count}</span>{" "}

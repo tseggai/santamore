@@ -1,6 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
@@ -51,12 +52,17 @@ export function DonateForm({
   suggested,
   bank,
   cardRailEnabled,
+  backPath,
+  photoUrl,
 }: {
   locale: Locale;
   campaign: DonateTarget;
   suggested: SuggestedSets;
   bank: OrgBankDetails;
   cardRailEnabled: boolean;
+  /** Unlocalized path of the page this checkout belongs to, e.g. "/f/ana". */
+  backPath?: string;
+  photoUrl?: string | null;
 }) {
   const t = useTranslations("donate");
   const tNav = useTranslations("nav");
@@ -142,7 +148,10 @@ export function DonateForm({
   });
 
   const share = async () => {
-    const url = window.location.href;
+    // Share the PAGE, never the checkout URL.
+    const url = backPath
+      ? `${window.location.origin}/${locale}${backPath}`
+      : window.location.href;
     try {
       if (navigator.share) {
         await navigator.share({ title: campaign.title, url });
@@ -153,6 +162,47 @@ export function DonateForm({
       // Dismissed the share sheet — nothing to do.
     }
   };
+
+  const avatar =
+    campaign.kind === "fundraiser" ? (
+      photoUrl ? (
+        <Image
+          src={photoUrl}
+          alt=""
+          width={44}
+          height={44}
+          className="h-[44px] w-[44px] shrink-0 rounded-full border-[1.5px] border-ink object-cover"
+        />
+      ) : (
+        <span
+          aria-hidden
+          className="type-display flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-ink bg-red text-[18px] font-bold text-paper"
+        >
+          {campaign.title.trim().charAt(0).toUpperCase() || "S"}
+        </span>
+      )
+    ) : null;
+
+  const header = (
+    <>
+      {backPath ? (
+        <Link
+          href={backPath}
+          className="inline-block text-[12.5px] font-semibold text-sea transition-colors hover:text-sea-2"
+        >
+          ← {t("backToPage")}
+        </Link>
+      ) : (
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+          {tNav("donate")}
+        </p>
+      )}
+      <div className="mt-3 flex items-center gap-3">
+        {avatar}
+        <h1 className="type-display min-w-0 text-3xl sm:text-4xl">{campaign.title}</h1>
+      </div>
+    </>
+  );
 
   const money = (cents: Cents) => formatCents(cents, locale, { trimWholeCents: true });
 
@@ -199,9 +249,18 @@ export function DonateForm({
   if (confirmed) {
     return (
       <div className="mx-auto max-w-xl px-5 py-14">
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
-          {campaign.title}
-        </p>
+        {backPath ? (
+          <Link
+            href={backPath}
+            className="inline-block text-[12.5px] font-semibold text-sea transition-colors hover:text-sea-2"
+          >
+            ← {t("backToPage")}
+          </Link>
+        ) : (
+          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+            {campaign.title}
+          </p>
+        )}
         <h1 className="type-display mt-3 text-3xl sm:text-4xl">
           {t("confTitle", { name: donorName })}
         </h1>
@@ -226,6 +285,14 @@ export function DonateForm({
           >
             {t("confShare")}
           </button>
+          {backPath ? (
+            <Link
+              href={backPath}
+              className="rounded-xl border-[1.5px] border-line px-5 py-3 text-[14px] font-semibold transition-colors hover:border-sea hover:text-sea"
+            >
+              {t("backToPage")}
+            </Link>
+          ) : null}
           <Link
             href="/prikupljaci"
             className="rounded-xl border-[1.5px] border-line px-5 py-3 text-[14px] font-semibold transition-colors hover:border-sea hover:text-sea"
@@ -239,10 +306,7 @@ export function DonateForm({
 
   return (
     <form onSubmit={onSubmit} noValidate className="mx-auto max-w-xl px-5 py-14">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
-        {tNav("donate")}
-      </p>
-      <h1 className="type-display mt-3 text-3xl sm:text-4xl">{campaign.title}</h1>
+      {header}
       <p className="mt-3 text-[14.5px] leading-relaxed text-ink/70">
         {campaign.description} {t("goal", { amount: money(campaign.goalCents) })}
       </p>
