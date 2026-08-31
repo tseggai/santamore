@@ -28,12 +28,14 @@ or legal text. Use `[[PLACEHOLDER: description]]` and log every one in `docs/PLA
 ## Brand
 
 ```
-red #F35353 · red-dark #D93B3B · ink #0B0B0C · paper #FFFFFF
+red #F35353 · red-dark #D93B3B · ink #36434B · paper #FFFFFF
 sea #0E3A46 · sea-2 #15505F · mist #EAF1F2 · sand #F6F3EE
 ```
 
-Fraunces (display, SOFT + WONK axes) · Figtree (body) · DM Mono (money, references, ledger).
-All three must render Montenegrin diacritics: č ć š ž đ.
+Cormorant Garamond (display: big, light, elegant — never bolded) · DM Sans (body,
+Helvetica Neue in the fallback stack) · DM Mono (money, references, ledger).
+All faces must render Montenegrin diacritics: č ć š ž đ.
+(Ink and type softened from the original prototype values by owner decision, 2026-09.)
 
 ## Reference files
 

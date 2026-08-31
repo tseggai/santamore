@@ -42,7 +42,7 @@ function bankLines() {
 }
 
 const shellStyle =
-  "margin:0 auto;max-width:560px;padding:28px 20px;font-family:Georgia,serif;color:#0b0b0c;";
+  "margin:0 auto;max-width:560px;padding:28px 20px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#36434b;";
 const monoStyle =
   "font-family:'DM Mono',Menlo,Consolas,monospace;font-size:15px;letter-spacing:0.02em;";
 const boxStyle =
