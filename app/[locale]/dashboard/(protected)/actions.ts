@@ -37,6 +37,10 @@ const createTeamSchema = z.object({
   name: z.string().trim().min(2).max(60),
 });
 
+const cashSchema = z.object({
+  amountCents: z.number().int().min(100).max(MAX_CENTS),
+});
+
 async function currentUser() {
   const supabase = await createClient();
   const {
@@ -155,6 +159,51 @@ export async function setFundraiserStatus(
   }
   revalidatePath("/[locale]/dashboard", "layout");
   return { ok: true };
+}
+
+/**
+ * Log cash collected by hand (brief §10): a pending 'cash' donation that
+ * hits the leaderboard only once an admin confirms the hand-in. Insert is
+ * service-role (donations take no client writes) after verifying the
+ * session owns a page; anonymous — hand collections have no single donor.
+ */
+export async function logCash(input: unknown): Promise<DashboardActionResult> {
+  const parsed = cashSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  const { user } = await currentUser();
+  if (!user) return { ok: false, error: "server" };
+
+  try {
+    const service = createServiceClient();
+    const { data: mine } = await service
+      .from("fundraisers")
+      .select("id, event:events(chapter_id)")
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle();
+    if (!mine) return { ok: false, error: "server" };
+    const event = Array.isArray(mine.event) ? mine.event[0] : mine.event;
+
+    const { error } = await service.from("donations").insert({
+      amount_cents: parsed.data.amountCents,
+      fee_covered_cents: 0,
+      fundraiser_id: mine.id,
+      chapter_id: event?.chapter_id ?? null,
+      is_anonymous: true,
+      rail: "cash",
+      status: "pending",
+    });
+    if (error) {
+      console.error("[dashboard] cash log failed:", error.code);
+      return { ok: false, error: "server" };
+    }
+    revalidatePath("/[locale]/dashboard/gotovina", "page");
+    return { ok: true };
+  } catch (error) {
+    console.error("[dashboard] cash log failed:", error);
+    return { ok: false, error: "server" };
+  }
 }
 
 /** Create a team on the runner's event and join it as captain. */

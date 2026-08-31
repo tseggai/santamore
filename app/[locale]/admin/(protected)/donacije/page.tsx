@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
+import { ConfirmCashButton } from "@/components/admin/ConfirmCashButton";
 import { ReconciliationTool } from "@/components/admin/ReconciliationTool";
 import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
@@ -14,6 +15,7 @@ interface DonationRow {
   donor_name: string | null;
   donor_email: string | null;
   is_recurring: boolean;
+  rail: "sepa" | "cash";
   created_at: string;
   approved_at: string | null;
   campaign: { title: string; payment_reference: string } | null;
@@ -21,7 +23,7 @@ interface DonationRow {
 }
 
 const SELECT =
-  "id, amount_cents, donor_name, donor_email, is_recurring, created_at, approved_at, campaign:campaigns(title, payment_reference), fundraiser:fundraisers(title, payment_reference)";
+  "id, amount_cents, donor_name, donor_email, is_recurring, rail, created_at, approved_at, campaign:campaigns(title, payment_reference), fundraiser:fundraisers(title, payment_reference)";
 
 export default async function AdminDonationsPage({
   params,
@@ -36,13 +38,13 @@ export default async function AdminDonationsPage({
     supabase
       .from("donations")
       .select(SELECT)
-      .eq("rail", "sepa")
+      .in("rail", ["sepa", "cash"])
       .eq("status", "pending")
       .order("created_at", { ascending: true }),
     supabase
       .from("donations")
       .select(SELECT)
-      .eq("rail", "sepa")
+      .in("rail", ["sepa", "cash"])
       .eq("status", "approved")
       .order("approved_at", { ascending: false })
       .limit(10),
@@ -95,6 +97,9 @@ export default async function AdminDonationsPage({
                       {t("table.monthly")}
                     </span>
                   ) : null}
+                  {row.rail === "cash" ? (
+                    <span className="ml-1 text-[11px] text-ink/50">{t("railCash")}</span>
+                  ) : null}
                 </td>
                 <td className="py-2.5 pr-3">
                   {row.donor_name ?? "—"}
@@ -103,7 +108,14 @@ export default async function AdminDonationsPage({
                   ) : null}
                 </td>
                 <td className="py-2.5 pr-3">{page?.title ?? "—"}</td>
-                <td className="py-2.5 font-mono">{page?.payment_reference ?? "—"}</td>
+                <td className="py-2.5 font-mono">
+                  {page?.payment_reference ?? "—"}
+                  {!showApproved && row.rail === "cash" ? (
+                    <span className="mt-1 block font-sans">
+                      <ConfirmCashButton donationId={row.id} />
+                    </span>
+                  ) : null}
+                </td>
               </tr>
             );
           })}

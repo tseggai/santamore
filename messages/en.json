@@ -195,7 +195,17 @@
     "publish": "Publish page",
     "unpublish": "Back to draft",
     "publishBlocked": "Publishing needs a photo, a goal and a story of at least three sentences.",
-    "previewHeading": "Live preview"
+    "previewHeading": "Live preview",
+    "shareMessage": "I'm fundraising for Santamore — {title}. Every euro in and out is published in a public ledger. Support me here: {url}",
+    "copyMessage": "Copy the message",
+    "copyLink": "Copy the link",
+    "shareImage": "Share image",
+    "igNote": "For Instagram Stories: open the share image, save it, and add your link with the link sticker.",
+    "cashSub": "Record cash you collected by hand. It counts on your page and the leaderboard once we confirm the hand-in.",
+    "cashAmountLabel": "Amount (€)",
+    "cashSubmit": "Log it",
+    "cashAwaiting": "Awaiting hand-in confirmation",
+    "cashConfirmed": "Confirmed"
   },
   "email": {
     "instructions": {
@@ -268,6 +278,8 @@
       "reference": "Reference",
       "monthly": "monthly",
       "status": "Status"
-    }
+    },
+    "confirmCash": "Confirm hand-in",
+    "railCash": "cash"
   }
 }

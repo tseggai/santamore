@@ -195,7 +195,17 @@
     "publish": "Objavi stranicu",
     "unpublish": "Vrati u nacrt",
     "publishBlocked": "Za objavu trebaju fotografija, cilj i priča od bar tri rečenice.",
-    "previewHeading": "Pregled uživo"
+    "previewHeading": "Pregled uživo",
+    "shareMessage": "Prikupljam za Santamore — {title}. Svaki euro, uplata i isplata, javno je objavljen. Podrži me ovdje: {url}",
+    "copyMessage": "Kopiraj poruku",
+    "copyLink": "Kopiraj link",
+    "shareImage": "Slika za objavu",
+    "igNote": "Za Instagram priče: otvori sliku za objavu, sačuvaj je i dodaj link pomoću stikera.",
+    "cashSub": "Zabilježi novac prikupljen na ruke. Računa se na tvojoj stranici i rang listi kad potvrdimo primopredaju.",
+    "cashAmountLabel": "Iznos (€)",
+    "cashSubmit": "Zabilježi",
+    "cashAwaiting": "Čeka potvrdu primopredaje",
+    "cashConfirmed": "Potvrđeno"
   },
   "email": {
     "instructions": {
@@ -268,6 +278,8 @@
       "reference": "Poziv na broj",
       "monthly": "mjesečno",
       "status": "Status"
-    }
+    },
+    "confirmCash": "Potvrdi primopredaju",
+    "railCash": "keš"
   }
 }
