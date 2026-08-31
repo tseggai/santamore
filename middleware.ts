@@ -7,7 +7,8 @@ const intlMiddleware = createMiddleware(routing);
 
 const locales = routing.locales.join("|");
 const ADMIN_PATH = new RegExp(`^/(${locales})/admin(/|$)`);
-const LOGIN_PATH = new RegExp(`^/(${locales})/admin/prijava(/|$)`);
+const DASHBOARD_PATH = new RegExp(`^/(${locales})/dashboard(/|$)`);
+const LOGIN_PATH = new RegExp(`^/(${locales})/(admin|dashboard)/prijava(/|$)`);
 
 /**
  * i18n routing plus Supabase session refresh, and a first gate on /admin —
@@ -17,7 +18,7 @@ const LOGIN_PATH = new RegExp(`^/(${locales})/admin/prijava(/|$)`);
 export default async function middleware(request: NextRequest) {
   const response = intlMiddleware(request);
   const { pathname } = request.nextUrl;
-  const isAdminPath = ADMIN_PATH.test(pathname);
+  const isAdminPath = ADMIN_PATH.test(pathname) || DASHBOARD_PATH.test(pathname);
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -56,7 +57,10 @@ export default async function middleware(request: NextRequest) {
 
   if (isAdminPath && !LOGIN_PATH.test(pathname) && !user) {
     const locale = pathname.split("/")[1];
-    return NextResponse.redirect(new URL(`/${locale}/admin/prijava`, request.url));
+    const login = DASHBOARD_PATH.test(pathname)
+      ? `/${locale}/dashboard/prijava`
+      : `/${locale}/admin/prijava`;
+    return NextResponse.redirect(new URL(login, request.url));
   }
 
   return response;

@@ -1,0 +1,125 @@
+/* The signature waterline, ported 1:1 from docs/reference/app-prototype.html
+   (lines 116–140). Numbers are the prototype's decisions — don't tune them
+   here without updating the reference. The frosted plate keeps the amount
+   readable at any fill level (swapping text colour instead fails on the
+   upper half of the number). */
+
+.waterline {
+  position: relative;
+  height: 176px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--color-mist);
+  border: 1.5px solid var(--color-ink);
+}
+
+.fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0%;
+  background: linear-gradient(180deg, var(--color-sea-2), var(--color-sea));
+  transition: height 1.1s cubic-bezier(0.22, 0.9, 0.24, 1);
+}
+
+/* 200% wide with two identical 50% SVGs so translateX(-50%) loops seamlessly */
+.wave {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200%;
+  height: 26px;
+  transition: bottom 1.1s cubic-bezier(0.22, 0.9, 0.24, 1);
+}
+.wave svg {
+  display: block;
+  width: 50%;
+  height: 26px;
+  float: left;
+}
+.waveA {
+  composes: wave;
+  animation: drift 9s linear infinite;
+  opacity: 0.95;
+}
+.waveB {
+  composes: wave;
+  animation: drift 14s linear infinite reverse;
+  opacity: 0.45;
+}
+@keyframes drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.copy {
+  position: absolute;
+  inset: 0;
+  padding: 15px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 2;
+}
+
+.plate {
+  align-self: flex-start;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--color-line);
+  border-radius: 11px;
+  padding: 9px 13px 10px;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.raised {
+  font-family: var(--font-display);
+  font-variation-settings: "SOFT" 30, "WONK" 1;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.of {
+  font-size: 12.5px;
+  color: rgba(11, 11, 12, 0.62);
+  margin-top: 4px;
+}
+
+.pct {
+  align-self: flex-start;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--color-line);
+  transition: color 0.7s;
+}
+
+/* past 55% the pct pill is submerged — invert it */
+.deep .pct {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.34);
+  color: #fff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .waveA,
+  .waveB {
+    animation: none;
+  }
+  .fill,
+  .wave {
+    transition: none;
+  }
+}
