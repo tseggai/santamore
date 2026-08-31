@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * The share toolkit (brief §10): pre-written message with the page link,
@@ -21,8 +21,10 @@ export function ShareToolkit({
 }) {
   const t = useTranslations("dashboard");
   const [copied, setCopied] = useState<"" | "text" | "link">("");
+  // Set after mount: reading window during render would mismatch hydration.
+  const [origin, setOrigin] = useState("");
+  useEffect(() => setOrigin(window.location.origin), []);
 
-  const origin = typeof window === "undefined" ? "" : window.location.origin;
   const url = `${origin}${pagePath}`;
   const message = t("shareMessage", { title, url });
 
