@@ -5,10 +5,11 @@ import {
   parseStatementAmount,
   parseStatementDate,
   proposeMatches,
-  type PendingPledge,
+  type PendingTarget,
 } from "@/lib/reconcile";
 
-const pledge = (overrides: Partial<PendingPledge>): PendingPledge => ({
+const pledge = (overrides: Partial<PendingTarget>): PendingTarget => ({
+  target: "pledge",
   id: "p1",
   amountCents: 2500,
   reference: "SM-1226-0473",
@@ -129,5 +130,36 @@ describe("buildStatementRows + proposeMatches", () => {
       kind: "unmatched-reference",
       reference: "SM-1226-0473",
     });
+  });
+
+  it("matches registration entry fees by their own reference", () => {
+    // Registrations join the queue as their own target kind — the entry fee
+    // lands in registrations (Operations Fund), never in donations.
+    const registration = pledge({
+      target: "registration",
+      id: "r1",
+      reference: "SM-1226-7001",
+      amountCents: 1500,
+      pageTitle: "Santa Run 2026 (kotizacija)",
+    });
+    const proposals = proposeMatches(
+      buildStatementRows(
+        [
+          ["20.12.2026", "15,00", "kotizacija SM-1226-7001"],
+          ["20.12.2026", "25,00", "UPLATA SM-1226-0473 Ana"],
+        ],
+        { dateColumn: 0, amountColumn: 1, descriptionColumns: [2] },
+      ),
+      [pledge({}), registration],
+    );
+    expect(proposals[0]).toMatchObject({ kind: "matched", amountMatches: true });
+    if (proposals[0].kind === "matched") {
+      expect(proposals[0].pledge.target).toBe("registration");
+      expect(proposals[0].pledge.id).toBe("r1");
+    }
+    expect(proposals[1]).toMatchObject({ kind: "matched" });
+    if (proposals[1].kind === "matched") {
+      expect(proposals[1].pledge.target).toBe("pledge");
+    }
   });
 });

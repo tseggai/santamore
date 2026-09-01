@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { ActivityLog, type ActivityEntry } from "@/components/dashboard/ActivityLog";
 import { CreatePageForm } from "@/components/dashboard/CreatePageForm";
 import { Waterline } from "@/components/Waterline";
 import { createClient } from "@/lib/supabase/server";
@@ -41,6 +42,51 @@ export default async function DashboardPage({
     .maybeSingle();
   const mine = mineData as MyFundraiser | null;
 
+  // Event registrations belong to the person, with or without a page.
+  const { data: regRows } = await supabase
+    .from("registrations")
+    .select("id, event_id, status, amount_due_cents, payment_reference")
+    .eq("user_id", user.id);
+  const regEventIds = (regRows ?? []).map((row) => row.event_id);
+  const { data: regEvents } = regEventIds.length
+    ? await supabase
+        .from("v_public_events")
+        .select("id, slug, name")
+        .in("id", regEventIds)
+    : { data: [] };
+  const registrationsCard =
+    (regRows ?? []).length > 0 ? (
+      <ul className="mt-6 space-y-2">
+        {(regRows ?? []).map((registration) => {
+          const regEvent = (regEvents ?? []).find(
+            (candidate) => candidate.id === registration.event_id,
+          );
+          if (!regEvent) return null;
+          return (
+            <li key={registration.id}>
+              <Link
+                href={`/dogadjaji/${regEvent.slug}/prijava`}
+                className="flex items-baseline justify-between gap-3 rounded-[11px] border-[1.5px] border-line px-4 py-3 text-[13.5px] transition-colors hover:border-sea"
+              >
+                <span className="font-semibold">{regEvent.name}</span>
+                <span
+                  className={
+                    registration.status === "confirmed" ? "text-sea" : "text-ink/55"
+                  }
+                >
+                  {registration.status === "confirmed"
+                    ? t("regConfirmed")
+                    : (registration.amount_due_cents ?? 0) > 0
+                      ? t("regAwaitingFee")
+                      : t("regPending")}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    ) : null;
+
   if (!mine) {
     return (
       <div className="py-8">
@@ -49,23 +95,31 @@ export default async function DashboardPage({
         <div className="mt-5">
           <CreatePageForm />
         </div>
+        {registrationsCard}
       </div>
     );
   }
 
   // Public totals exist once the page is active; drafts are simply at zero.
-  const [{ data: totals }, { data: event }] = await Promise.all([
-    supabase
-      .from("v_fundraiser_totals")
-      .select("raised_cents, donor_count")
-      .eq("slug", mine.slug)
-      .maybeSingle(),
-    supabase
-      .from("v_public_events")
-      .select("starts_at")
-      .eq("id", mine.event_id)
-      .maybeSingle(),
-  ]);
+  const [{ data: totals }, { data: event }, { data: activityRows }] =
+    await Promise.all([
+      supabase
+        .from("v_fundraiser_totals")
+        .select("raised_cents, donor_count")
+        .eq("slug", mine.slug)
+        .maybeSingle(),
+      supabase
+        .from("v_public_events")
+        .select("starts_at, kind, challenge_metric")
+        .eq("id", mine.event_id)
+        .maybeSingle(),
+      supabase
+        .from("activities")
+        .select("id, started_at, distance_m, moving_time_s, source")
+        .eq("fundraiser_id", mine.id)
+        .order("started_at", { ascending: false })
+        .limit(100),
+    ]);
   const raised = totals?.raised_cents ?? 0;
   const donors = totals?.donor_count ?? 0;
   const daysLeft = event?.starts_at
@@ -98,6 +152,13 @@ export default async function DashboardPage({
           locale={locale as Locale}
         />
       </div>
+
+      {event?.kind === "challenge" && event.challenge_metric ? (
+        <ActivityLog
+          metric={event.challenge_metric}
+          activities={(activityRows ?? []) as ActivityEntry[]}
+        />
+      ) : null}
 
       {/* the one next action, prototype's nudge treatment */}
       <Link

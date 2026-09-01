@@ -4,17 +4,36 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { routing, htmlLang } from "@/i18n/routing";
 import { bodyFont, displayFont, dmMono } from "@/lib/fonts";
+import { siteOrigin } from "@/lib/site";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { CookieConsent } from "@/components/CookieConsent";
 import "../globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteOrigin()),
   title: {
     default: "Santamore",
     template: "%s · Santamore",
   },
   description:
     "Peer-to-peer fundraising for a Montenegrin charitable non-profit in Tivat.",
+  openGraph: {
+    siteName: "Santamore",
+    type: "website",
+  },
+};
+
+// schema.org Organization — only facts that exist; registry details join the
+// impressum once real (docs/PLACEHOLDERS.md).
+const ORGANIZATION_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "NGO",
+  name: "Santamore",
+  url: siteOrigin(),
+  logo: `${siteOrigin()}/brand/SantamoreLogo-Color.png`,
+  areaServed: "Montenegro",
+  nonprofitStatus: "Nonprofit",
 };
 
 export function generateStaticParams() {
@@ -46,7 +65,14 @@ export default async function LocaleLayout({
             {children}
           </main>
           <Footer />
+          <CookieConsent domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? null} />
         </NextIntlClientProvider>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(ORGANIZATION_JSONLD).replace(/</g, "\\u003c"),
+          }}
+        />
       </body>
     </html>
   );

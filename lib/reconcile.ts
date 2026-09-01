@@ -2,10 +2,13 @@ import { extractPaymentReferences } from "@/lib/references";
 import type { Cents } from "@/lib/money";
 
 // Pure matching logic for the admin SEPA reconciliation queue (brief §8):
-// statement rows are matched to pending pledges by payment reference, with
-// the amount as a tie-breaker. Runs client-side over the parsed CSV so the
-// bank statement itself never leaves the admin's browser — only confirmed
-// rows reach the server.
+// statement rows are matched to pending targets by payment reference, with
+// the amount as a tie-breaker. Targets are donation pledges AND event
+// registrations awaiting their entry fee — each carries its own unique
+// reference, so one queue serves both, while approval routes to different
+// tables (fees land in registrations/Operations Fund, never in donations).
+// Runs client-side over the parsed CSV so the bank statement itself never
+// leaves the admin's browser — only confirmed rows reach the server.
 
 export interface StatementRow {
   index: number;
@@ -16,7 +19,8 @@ export interface StatementRow {
   references: string[];
 }
 
-export interface PendingPledge {
+export interface PendingTarget {
+  target: "pledge" | "registration";
   id: string;
   amountCents: Cents;
   reference: string;
@@ -28,8 +32,8 @@ export interface PendingPledge {
 }
 
 export type MatchProposal =
-  | { kind: "matched"; row: StatementRow; pledge: PendingPledge; amountMatches: boolean }
-  | { kind: "ambiguous"; row: StatementRow; candidates: PendingPledge[] }
+  | { kind: "matched"; row: StatementRow; pledge: PendingTarget; amountMatches: boolean }
+  | { kind: "ambiguous"; row: StatementRow; candidates: PendingTarget[] }
   | { kind: "unmatched-reference"; row: StatementRow; reference: string }
   | { kind: "no-reference"; row: StatementRow };
 
@@ -124,7 +128,7 @@ export function buildStatementRows(
  */
 export function proposeMatches(
   rows: StatementRow[],
-  pledges: PendingPledge[],
+  pledges: PendingTarget[],
 ): MatchProposal[] {
   const used = new Set<string>();
   return rows.map((row) => {

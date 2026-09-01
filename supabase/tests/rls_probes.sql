@@ -217,4 +217,71 @@ begin
   end;
 end $$;
 
+-- 6. Tasks 6+7 (migration 0006): challenges, inbound, content, ledger views
+do $$
+declare
+  t text;
+  n bigint;
+  s record;
+begin
+  -- 6a. new base tables stay unreadable anonymously
+  foreach t in array array['activities', 'inbound_messages'] loop
+    begin
+      set local role anon;
+      execute format('select * from public.%I limit 1', t);
+      reset role;
+      insert into _results (test, result)
+        values ('anon SELECT ' || t, 'FAIL — table is readable');
+    exception when insufficient_privilege then
+      insert into _results (test, result)
+        values ('anon SELECT ' || t, 'PASS — permission denied');
+    end;
+  end loop;
+
+  -- 6b. anon INSERT into inbound_messages must be denied (service role only)
+  begin
+    set local role anon;
+    insert into public.inbound_messages (kind, email) values ('contact', 'x@x.invalid');
+    reset role;
+    insert into _results (test, result)
+      values ('anon INSERT inbound_messages', 'FAIL — insert succeeded');
+  exception when insufficient_privilege then
+    insert into _results (test, result)
+      values ('anon INSERT inbound_messages', 'PASS — permission denied');
+  end;
+
+  -- 6c. new public views are anon-readable
+  foreach t in array array['v_activity_totals', 'v_public_posts',
+                           'v_public_gallery', 'v_public_ledger_summary',
+                           'v_public_ops_total'] loop
+    begin
+      set local role anon;
+      execute format('select count(*) from public.%I', t) into n;
+      reset role;
+      insert into _results (test, result)
+        values ('anon SELECT ' || t, 'PASS — ' || n || ' row(s)');
+    exception when insufficient_privilege then
+      reset role;
+      insert into _results (test, result)
+        values ('anon SELECT ' || t, 'FAIL — permission denied');
+    end;
+  end loop;
+
+  -- 6d. summary arithmetic holds: unallocated = received − disbursed − pending
+  select * into s from public.v_public_ledger_summary;
+  insert into _results (test, result) values ('ledger summary arithmetic',
+    case when s.unallocated_cents
+              = s.received_cents - s.disbursed_cents - s.approved_pending_cents
+         then 'PASS' else 'FAIL — inconsistent totals' end);
+
+  -- 6e. the reference-uniqueness trigger now guards registrations too
+  insert into _results (test, result) values ('registrations reference trigger',
+    case when exists (
+      select 1 from pg_trigger
+      where tgname = 'trg_registrations_reference_globally_unique'
+    ) and position('registrations' in pg_get_functiondef(
+          'public.enforce_payment_reference_global_uniqueness'::regproc)) > 0
+    then 'PASS' else 'FAIL — trigger or function coverage missing' end);
+end $$;
+
 select test, result from _results order by n;

@@ -10,7 +10,10 @@ import type { Locale } from "@/i18n/routing";
 export interface LeaderboardEntry {
   slug: string;
   title: string;
+  /** Ranking value — money, or a challenge metric via `display`. */
   raisedCents: Cents;
+  /** Preformatted value shown instead of money (challenge leaderboards). */
+  display?: string;
   /** Trailing muted annotation, e.g. a team's member count. */
   meta?: string;
   href: string;
@@ -64,7 +67,8 @@ export function LeaderboardList({
                 </span>
               </span>
               <span className="shrink-0 font-mono text-[13.5px] font-medium tabular-nums">
-                {formatCents(entry.raisedCents, locale, { trimWholeCents: true })}
+                {entry.display ??
+                  formatCents(entry.raisedCents, locale, { trimWholeCents: true })}
               </span>
             </Link>
           </li>

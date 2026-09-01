@@ -108,6 +108,94 @@ export async function approvePledge(input: unknown): Promise<ActionResult> {
   return { ok: true };
 }
 
+const refundSchema = z.object({
+  donationId: z.string().uuid(),
+  reason: z.string().trim().min(3).max(500),
+});
+
+/**
+ * Refund = one logical operation: approved → refunded plus the negative
+ * ledger_adjustments row, atomically via the refund_donation RPC
+ * (migration 0007). The original row stays visible in the public ledger;
+ * the adjustment is the correction (append-only, brief §11).
+ */
+export async function refundDonation(input: unknown): Promise<ActionResult> {
+  const parsed = refundSchema.safeParse(input);
+  if (!parsed.success) return { ok: false };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("refund_donation", {
+    p_donation_id: parsed.data.donationId,
+    p_reason: parsed.data.reason,
+  });
+  if (error) return { ok: false };
+
+  revalidatePath("/[locale]/admin/donacije", "page");
+  return { ok: true };
+}
+
+const resendSchema = z.object({ donationId: z.string().uuid() });
+
+/** Re-send the receipt email for an approved donation (donor asked again). */
+export async function resendReceipt(input: unknown): Promise<ActionResult> {
+  const parsed = resendSchema.safeParse(input);
+  if (!parsed.success) return { ok: false };
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("donations")
+    .select("id, status")
+    .eq("id", parsed.data.donationId)
+    .eq("status", "approved")
+    .maybeSingle();
+  if (!data) return { ok: false };
+
+  await sendReceiptFor(data.id);
+  return { ok: true };
+}
+
+const feeSchema = z.object({
+  registrationId: z.string().uuid(),
+  /** Statement amount when it differs from the fee due (the bank is the truth). */
+  amountCents: z.number().int().positive().max(MAX_CENTS).optional(),
+});
+
+/**
+ * Approve a matched entry-fee transfer: pending → confirmed with the paid
+ * amount recorded on the REGISTRATION (Operations Fund). Never touches
+ * donations — the two funds stay unmixed.
+ */
+export async function approveRegistrationFee(input: unknown): Promise<ActionResult> {
+  const parsed = feeSchema.safeParse(input);
+  if (!parsed.success) return { ok: false };
+  const { registrationId, amountCents } = parsed.data;
+
+  const supabase = await createClient();
+  const { data: registration } = await supabase
+    .from("registrations")
+    .select("amount_due_cents")
+    .eq("id", registrationId)
+    .eq("status", "pending")
+    .maybeSingle();
+  if (!registration) return { ok: false };
+
+  const { error } = await supabase
+    .from("registrations")
+    .update({
+      status: "confirmed",
+      amount_paid_cents: amountCents ?? registration.amount_due_cents,
+    })
+    .eq("id", registrationId)
+    .eq("status", "pending")
+    .select("id")
+    .single();
+  if (error) return { ok: false };
+
+  revalidatePath("/[locale]/admin/donacije", "page");
+  revalidatePath("/[locale]/admin/prijave", "page");
+  return { ok: true };
+}
+
 /**
  * Record a transfer that arrived with a valid reference but no pledge
  * (donor paid without submitting the form — the page-level reference still
