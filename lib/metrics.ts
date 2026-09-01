@@ -42,8 +42,10 @@ export function formatMetricValue(
         : `${whole}${decimal(locale)}${rest} km`;
     }
     case "moving_time_s": {
-      const hours = Math.floor(value / 3600);
-      const minutes = Math.round((value % 3600) / 60);
+      // Round to whole minutes FIRST so 3570 s is "1 h", never "60 min".
+      const totalMinutes = Math.round(value / 60);
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
       return hours > 0 ? `${hours} h ${minutes} min` : `${minutes} min`;
     }
     case "activity_count":

@@ -56,6 +56,12 @@ describe("toCsv", () => {
     );
   });
 
+  it("defuses spreadsheet formula injection but keeps negative amounts", () => {
+    expect(
+      toCsv([['=HYPERLINK("http://evil","x")', "+2+3", "@cmd", "-25.75", "-2+3"]]),
+    ).toBe(`"'=HYPERLINK(""http://evil"",""x"")",'+2+3,'@cmd,-25.75,'-2+3\r\n`);
+  });
+
   it("round-trips through parseCsv", () => {
     const rows = [
       ["date", "amount", "who"],

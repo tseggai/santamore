@@ -33,7 +33,9 @@ export function RegistrationForm({
   const [shirtSize, setShirtSize] = useState<(typeof SIZES)[number]>("M");
   const [tierLabel, setTierLabel] = useState(tiers[0]?.label ?? "");
   const [waiverAccepted, setWaiverAccepted] = useState(false);
-  const [state, setState] = useState<"idle" | "busy" | "error" | "closed">("idle");
+  const [state, setState] = useState<"idle" | "busy" | "error" | "closed" | "full">(
+    "idle",
+  );
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -50,7 +52,11 @@ export function RegistrationForm({
     if (result.ok) {
       router.refresh(); // the server page now renders the confirmation branch
     } else {
-      setState("error" in result && result.error === "closed" ? "closed" : "error");
+      setState(
+        "error" in result && (result.error === "closed" || result.error === "full")
+          ? result.error
+          : "error",
+      );
     }
   };
 
@@ -80,24 +86,26 @@ export function RegistrationForm({
         </div>
       ) : null}
 
-      <div>
-        <label htmlFor="regTier" className={labelClass}>
-          {t("tierLabel")}
-        </label>
-        <select
-          id="regTier"
-          value={tierLabel}
-          onChange={(event) => setTierLabel(event.target.value)}
-          className={selectClass}
-        >
-          {tiers.map((tier) => (
-            <option key={tier.label} value={tier.label}>
-              {tier.label} —{" "}
-              {formatCents(tier.amountCents, locale, { trimWholeCents: true })}
-            </option>
-          ))}
-        </select>
-      </div>
+      {tiers.length > 0 ? (
+        <div>
+          <label htmlFor="regTier" className={labelClass}>
+            {t("tierLabel")}
+          </label>
+          <select
+            id="regTier"
+            value={tierLabel}
+            onChange={(event) => setTierLabel(event.target.value)}
+            className={selectClass}
+          >
+            {tiers.map((tier) => (
+              <option key={tier.label} value={tier.label}>
+                {tier.label} —{" "}
+                {formatCents(tier.amountCents, locale, { trimWholeCents: true })}
+              </option>
+            ))}
+          </select>
+        </div>
+      ) : null}
 
       <div>
         <label htmlFor="regSize" className={labelClass}>
@@ -154,6 +162,11 @@ export function RegistrationForm({
       {state === "closed" ? (
         <p role="alert" className="text-[13px] font-semibold text-red-dark">
           {t("registrationClosed")}
+        </p>
+      ) : null}
+      {state === "full" ? (
+        <p role="alert" className="text-[13px] font-semibold text-red-dark">
+          {t("registrationFull")}
         </p>
       ) : null}
 

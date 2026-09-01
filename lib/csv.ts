@@ -74,7 +74,13 @@ export function parseCsv(text: string, delimiter?: string): CsvRow[] {
 /** RFC 4180 serialisation for the ledger CSV exports. */
 export function toCsv(rows: (string | number | null)[][]): string {
   const escape = (value: string | number | null): string => {
-    const text = value === null ? "" : String(value);
+    let text = value === null ? "" : String(value);
+    // Donor/user-controlled strings reach these exports; a leading = + - @
+    // (or tab) would execute as a formula when staff open the file in a
+    // spreadsheet. Plain numbers (incl. negative corrections) stay intact.
+    if (/^[=+\-@\t\r]/.test(text) && !/^-?\d+(?:[.,]\d+)?$/.test(text)) {
+      text = `'${text}`;
+    }
     return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
   };
   return rows.map((row) => row.map(escape).join(",")).join("\r\n") + "\r\n";

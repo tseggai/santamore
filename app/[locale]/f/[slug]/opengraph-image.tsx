@@ -3,6 +3,7 @@ import { hasLocale } from "next-intl";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 import { formatCents } from "@/lib/money";
+import { OG_FONT_FAMILY, ogFonts } from "@/lib/og-fonts";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { routing, type Locale } from "@/i18n/routing";
 
@@ -64,7 +65,7 @@ export default async function OpengraphImage({
           background: "#0E3A46",
           color: "#FFFFFF",
           padding: "72px 80px",
-          fontFamily: "Georgia, serif",
+          fontFamily: OG_FONT_FAMILY,
         }}
       >
         <div style={{ display: "flex", flexDirection: "column", flex: 1, minWidth: 0 }}>
@@ -154,6 +155,6 @@ export default async function OpengraphImage({
         ) : null}
       </div>
     ),
-    size,
+    { ...size, fonts: await ogFonts() },
   );
 }

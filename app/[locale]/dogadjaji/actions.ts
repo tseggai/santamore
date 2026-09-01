@@ -14,7 +14,8 @@ const registerSchema = z.object({
   eventSlug: z.string().trim().min(1).max(100),
   distance: z.string().trim().min(1).max(60).nullable(),
   shirtSize: z.enum(["XS", "S", "M", "L", "XL", "XXL"]).nullable(),
-  tierLabel: z.string().trim().min(1).max(100),
+  /** Empty when the event is free (no price tiers). */
+  tierLabel: z.string().trim().max(100),
   waiverAccepted: z.literal(true),
   locale: z.enum(["me", "en", "ru"]),
 });
@@ -38,7 +39,7 @@ function parseTiers(value: unknown): Tier[] {
 
 export interface RegisterResult {
   ok: boolean;
-  error?: "invalid" | "closed" | "server";
+  error?: "invalid" | "closed" | "full" | "server";
 }
 
 /**
@@ -62,7 +63,7 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     const { data: event } = await service
       .from("events")
       .select(
-        "id, name, is_published, distances, price_tiers, registration_opens_at, registration_closes_at",
+        "id, name, is_published, distances, price_tiers, capacity, registration_opens_at, registration_closes_at",
       )
       .eq("slug", data.eventSlug)
       .maybeSingle();
@@ -84,10 +85,13 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     if (data.distance !== null && !distances.includes(data.distance)) {
       return { ok: false, error: "invalid" };
     }
-    const tier = parseTiers(event.price_tiers).find(
-      (candidate) => candidate.label === data.tierLabel,
-    );
-    if (!tier) return { ok: false, error: "invalid" };
+    // Free events (no tiers) register at zero; priced events need a valid tier.
+    const tiers = parseTiers(event.price_tiers);
+    const tier =
+      tiers.length === 0
+        ? null
+        : tiers.find((candidate) => candidate.label === data.tierLabel);
+    if (tiers.length > 0 && !tier) return { ok: false, error: "invalid" };
 
     const { data: existing } = await service
       .from("registrations")
@@ -96,6 +100,17 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
       .eq("user_id", user.id)
       .maybeSingle();
     if (existing) return { ok: true };
+
+    // Capacity gate (best effort — the tiny race window can only ever
+    // oversell by concurrent submissions, not without bound).
+    if (typeof event.capacity === "number" && event.capacity > 0) {
+      const { count } = await service
+        .from("registrations")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", event.id)
+        .neq("status", "cancelled");
+      if ((count ?? 0) >= event.capacity) return { ok: false, error: "full" };
+    }
 
     let inserted = false;
     let reference = "";
@@ -106,15 +121,22 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
         user_id: user.id,
         distance: data.distance,
         shirt_size: data.shirtSize,
-        tier_label: tier.label,
-        amount_due_cents: tier.amount_cents,
+        tier_label: tier?.label ?? null,
+        amount_due_cents: tier?.amount_cents ?? 0,
         payment_reference: reference,
         waiver_signed_at: new Date().toISOString(),
         waiver_version: WAIVER_VERSION,
         status: "pending",
       });
       if (!error) inserted = true;
-      else if (error.code !== "23505" && error.code !== "P0001") {
+      else if (
+        error.code === "23505" &&
+        `${error.message} ${error.details ?? ""}`.includes("event_id")
+      ) {
+        // Double-submit race: the other request won unique(event_id, user_id).
+        // The user IS registered — idempotent success, not a reference retry.
+        return { ok: true };
+      } else if (error.code !== "23505" && error.code !== "P0001") {
         console.error("[events] registration failed:", error.code);
         return { ok: false, error: "server" };
       }
@@ -124,16 +146,21 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     // Best effort — a failed email must never lose the registration.
     if (user.email) {
       try {
+        const { data: profile } = await service
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .maybeSingle();
         await sendEmail(
           await buildRegistrationEmail({
             locale: data.locale,
-            name: user.email,
+            name: profile?.full_name?.trim() || user.email,
             email: user.email,
             eventName: event.name,
             distance: data.distance,
-            tierLabel: tier.label,
+            tierLabel: tier?.label ?? null,
             reference,
-            amountDueCents: tier.amount_cents,
+            amountDueCents: tier?.amount_cents ?? 0,
           }),
         );
       } catch (emailError) {

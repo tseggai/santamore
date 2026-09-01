@@ -3,7 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { LedgerTabs, type LedgerRow } from "@/components/ledger/LedgerTabs";
-import { formatCents } from "@/lib/money";
+import { formatCents, formatSignedCents } from "@/lib/money";
 import { disbursementDocUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import { routing, type Locale } from "@/i18n/routing";
@@ -101,8 +101,13 @@ export default async function LedgerPage({
   const t = await getTranslations("ledger");
 
   const { summary, opsCents, inRows, outRows, adjustments } = await fetchLedger();
+  // unallocated_cents can transiently go negative (a disbursement published
+  // while its matching credits are still pending approval) — the flagship
+  // page must show the honest signed figure, never crash.
   const money = (cents: number) =>
-    formatCents(cents, locale as Locale, { trimWholeCents: true });
+    cents < 0
+      ? formatSignedCents(cents, locale as Locale, { trimWholeCents: true })
+      : formatCents(cents, locale as Locale, { trimWholeCents: true });
 
   const moneyIn: LedgerRow[] = inRows.map((row) => ({
     id: row.id,

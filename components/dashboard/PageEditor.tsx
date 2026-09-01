@@ -170,10 +170,12 @@ export function PageEditor({
     setBusy("team");
     setNotice("");
     const result = await createTeamAndJoin({ name: newTeamName }).catch(() => ({
-      ok: false,
+      ok: false as const,
     }));
     setBusy("");
     if (result.ok) {
+      // Keep local state in sync or the next Save would drop the membership.
+      if ("teamId" in result && result.teamId) setTeamId(result.teamId);
       setNewTeamName("");
       router.refresh();
     } else {

@@ -519,7 +519,8 @@
     "payInstructions": "Još jedan korak: uplati kotizaciju sa pozivom na broj ispod i potvrdićemo tvoje mjesto, obično u roku od jednog radnog dana.",
     "opsNote": "Kotizacije finansiraju događaj i naš tim (Operativni fond) — donacije i dalje idu 100% korisnicima.",
     "paidNote": "Kotizacija primljena. Vidimo se na startu.",
-    "noFeeNote": "Nema kotizacije. Vidimo se na startu."
+    "noFeeNote": "Nema kotizacije. Vidimo se na startu.",
+    "registrationFull": "Događaj je popunjen."
   },
   "gallery": {
     "eyebrow": "Galerija",

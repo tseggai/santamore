@@ -18,6 +18,11 @@ describe("formatMetricValue", () => {
     expect(formatMetricValue(0, "moving_time_s", "me")).toBe("0 min");
   });
 
+  it("never renders 60 minutes — rounding carries into hours", () => {
+    expect(formatMetricValue(3570, "moving_time_s", "me")).toBe("1 h 0 min");
+    expect(formatMetricValue(7170, "moving_time_s", "me")).toBe("2 h 0 min");
+  });
+
   it("formats count and elevation", () => {
     expect(formatMetricValue(18, "activity_count", "me")).toBe("18×");
     expect(formatMetricValue(1240, "elevation_m", "me")).toBe("1240 m");

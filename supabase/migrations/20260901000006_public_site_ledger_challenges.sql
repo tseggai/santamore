@@ -284,7 +284,16 @@ with received as (
   from public.disbursements db
   where db.published_at is not null and db.paid_at is not null
 ), approved_pending as (
-  select coalesce(sum(db.amount_cents), 0) as cents
+  -- Adjustments on published-but-unpaid rows are publicly visible
+  -- (v_public_ledger_adjustments), so they must count here too or the
+  -- rendered rows stop summing to these headline totals.
+  select coalesce(sum(db.amount_cents), 0)
+       + coalesce((select sum(la.amount_cents)
+                   from public.ledger_adjustments la
+                   join public.disbursements dbb
+                     on dbb.id = la.references_disbursement_id
+                   where dbb.published_at is not null
+                     and dbb.paid_at is null), 0) as cents
   from public.disbursements db
   where db.published_at is not null and db.paid_at is null
 )

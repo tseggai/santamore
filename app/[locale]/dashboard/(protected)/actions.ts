@@ -312,7 +312,7 @@ export async function logCash(input: unknown): Promise<DashboardActionResult> {
 /** Create a team on the runner's event and join it as captain. */
 export async function createTeamAndJoin(
   input: unknown,
-): Promise<DashboardActionResult> {
+): Promise<DashboardActionResult & { teamId?: string }> {
   const parsed = createTeamSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "invalid" };
 
@@ -360,7 +360,9 @@ export async function createTeamAndJoin(
     if (joinError) return { ok: false, error: "server" };
 
     revalidatePath("/[locale]/dashboard", "layout");
-    return { ok: true };
+    // The editor keeps team membership in local state; return the id so a
+    // following Save doesn't write the stale (pre-create) value back.
+    return { ok: true, teamId };
   } catch (error) {
     console.error("[dashboard] team create failed:", error);
     return { ok: false, error: "server" };

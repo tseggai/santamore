@@ -519,7 +519,8 @@
     "payInstructions": "One step left: transfer your entry fee with the reference below and we'll confirm your place, usually within one working day.",
     "opsNote": "Entry fees fund the event and our team (Operations Fund) — donations still go 100% to beneficiaries.",
     "paidNote": "Entry fee received. See you at the start line.",
-    "noFeeNote": "No entry fee due. See you at the start line."
+    "noFeeNote": "No entry fee due. See you at the start line.",
+    "registrationFull": "The event is full."
   },
   "gallery": {
     "eyebrow": "Gallery",
