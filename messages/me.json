@@ -213,7 +213,17 @@
     "cashSubmit": "Zabilježi",
     "cashAwaiting": "Čeka potvrdu primopredaje",
     "cashConfirmed": "Potvrđeno",
-    "goalInvalid": "Upiši cilj kao broj, npr. 300"
+    "goalInvalid": "Upiši cilj kao broj, npr. 300",
+    "activityHeading": "Dnevnik izazova",
+    "activitySub": "Zabilježi šta si uradio/la — računa se u poretku izazova. Strava sinhronizacija stiže; ručni unosi rade već danas.",
+    "activityKm": "km",
+    "activityMinutes": "min",
+    "activityDate": "Datum",
+    "activitySubmit": "Zabilježi",
+    "activityDelete": "ukloni",
+    "regConfirmed": "Potvrđeno",
+    "regAwaitingFee": "Čeka kotizaciju",
+    "regPending": "Prijavljeno"
   },
   "email": {
     "instructions": {
@@ -238,6 +248,19 @@
       "body": "Primili smo tvoju uplatu od {amount} za {campaign}. Hvala — svaki euro javno objavljujemo.",
       "reference": "Poziv na broj: {reference}",
       "ledgerCta": "Pogledaj u javnom registru"
+    },
+    "registration": {
+      "subject": "Tvoja prijava — {event}",
+      "greeting": "Zdravo {name},",
+      "intro": "Prijavljen/a si za {event}. Uplati kotizaciju po podacima ispod i potvrdićemo tvoje mjesto.",
+      "event": "Događaj",
+      "distance": "Distanca",
+      "beneficiary": "Primalac",
+      "iban": "IBAN",
+      "amount": "Iznos",
+      "reference": "Poziv na broj — obavezno",
+      "whatNext": "Uplate uparujemo obično u roku od jednog radnog dana; mjesto je potvrđeno čim to uradimo.",
+      "opsNote": "Kotizacije finansiraju događaj i naš tim (Operativni fond) — donacije i dalje idu 100% korisnicima."
     }
   },
   "admin": {
@@ -338,5 +361,36 @@
     "submit": "Pošalji prijavu",
     "success": "Primljeno. Odbor razmatra prijave po objavljenim kriterijumima; javićemo se u svakom slučaju.",
     "error": "Nešto nije u redu — pokušaj ponovo."
+  },
+  "events": {
+    "title": "Događaji",
+    "sub": "Radosni, fizički, javni — a svaki prikupljeni euro završi u registru.",
+    "kindRace": "Trka",
+    "kindChallenge": "Izazov",
+    "tiersHeading": "Kotizacija",
+    "registerCta": "Prijavi se",
+    "registrationOpens": "Prijave se otvaraju {date}.",
+    "registrationClosed": "Prijave su zatvorene.",
+    "challengeBoard": "Poredak izazova",
+    "moneyBoardLink": "Rang lista prikupljanja",
+    "termsLink": "Uslovi učešća",
+    "signInTitle": "Prijavi se da se registruješ",
+    "signInSub": "Jedan e-mail — isti nalog vodi i tvoju stranicu za prikupljanje.",
+    "distanceLabel": "Distanca",
+    "tierLabel": "Kategorija kotizacije",
+    "sizeLabel": "Veličina majice",
+    "waiver1": "Učestvujem na sopstvenu odgovornost i potvrđujem da sam zdravstveno sposoban/na za aktivnost koju sam izabrao/la.",
+    "waiver2": "Razumijem da maloljetni učestvuju uz saglasnost staratelja i da fotografije i snimci sa događaja mogu biti objavljeni — mogu se izuzeti na info punktu.",
+    "waiver3": "Pravila o odustajanju, prenosu prijave i lošem vremenu dio su uslova učešća.",
+    "waiverFull": "Pročitaj pune uslove učešća i izjavu",
+    "waiverAccept": "Pročitao/la sam i prihvatam uslove učešća i izjavu",
+    "error": "Nešto nije u redu — pokušaj ponovo.",
+    "submit": "Završi prijavu",
+    "registeredTitle": "Prijavljen/a si!",
+    "confirmedTitle": "Upisano — prijava potvrđena",
+    "payInstructions": "Još jedan korak: uplati kotizaciju sa pozivom na broj ispod i potvrdićemo tvoje mjesto, obično u roku od jednog radnog dana.",
+    "opsNote": "Kotizacije finansiraju događaj i naš tim (Operativni fond) — donacije i dalje idu 100% korisnicima.",
+    "paidNote": "Kotizacija primljena. Vidimo se na startu.",
+    "noFeeNote": "Nema kotizacije. Vidimo se na startu."
   }
 }

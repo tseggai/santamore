@@ -190,6 +190,80 @@ export async function setFundraiserStatus(
   return { ok: true };
 }
 
+const activitySchema = z
+  .object({
+    km: z.string().trim().max(10),
+    minutes: z.string().trim().max(10),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  })
+  .refine((data) => data.km !== "" || data.minutes !== "", {
+    message: "distance or time required",
+  });
+
+/**
+ * Manual challenge activity (owner decision: challenges rank by distance,
+ * time or frequency). Runs under the RUNNER'S session — the
+ * activities_owner_insert policy is the barrier, and only 'manual' rows
+ * can be created or deleted by owners (Strava rows arrive later, synced).
+ */
+export async function logActivity(input: unknown): Promise<DashboardActionResult> {
+  const parsed = activitySchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  const { supabase, user } = await currentUser();
+  if (!user) return { ok: false, error: "server" };
+
+  const km = parsed.data.km === "" ? 0 : Number(parsed.data.km.replace(",", "."));
+  const minutes = parsed.data.minutes === "" ? 0 : Number(parsed.data.minutes);
+  if (
+    !Number.isFinite(km) ||
+    km < 0 ||
+    km > 1000 ||
+    !Number.isInteger(minutes) ||
+    minutes < 0 ||
+    minutes > 24 * 60
+  ) {
+    return { ok: false, error: "invalid" };
+  }
+
+  const { data: mine } = await supabase
+    .from("fundraisers")
+    .select("id")
+    .eq("user_id", user.id)
+    .limit(1)
+    .maybeSingle();
+  if (!mine) return { ok: false, error: "server" };
+
+  const { error } = await supabase.from("activities").insert({
+    fundraiser_id: mine.id,
+    source: "manual",
+    started_at: `${parsed.data.date}T12:00:00Z`,
+    distance_m: Math.round(km * 1000),
+    moving_time_s: minutes * 60,
+  });
+  if (error) {
+    console.error("[dashboard] activity log failed:", error.code);
+    return { ok: false, error: "server" };
+  }
+  revalidatePath("/[locale]/dashboard", "page");
+  return { ok: true };
+}
+
+export async function deleteActivity(input: unknown): Promise<DashboardActionResult> {
+  const parsed = z.object({ id: z.string().uuid() }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const { supabase, user } = await currentUser();
+  if (!user) return { ok: false, error: "server" };
+  // RLS: owners can delete only their own manual entries.
+  const { error } = await supabase
+    .from("activities")
+    .delete()
+    .eq("id", parsed.data.id);
+  if (error) return { ok: false, error: "server" };
+  revalidatePath("/[locale]/dashboard", "page");
+  return { ok: true };
+}
+
 /**
  * Log cash collected by hand (brief §10): a pending 'cash' donation that
  * hits the leaderboard only once an admin confirms the hand-in. Insert is

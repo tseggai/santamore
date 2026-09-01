@@ -213,7 +213,17 @@
     "cashSubmit": "Log it",
     "cashAwaiting": "Awaiting hand-in confirmation",
     "cashConfirmed": "Confirmed",
-    "goalInvalid": "Enter the goal as a number, e.g. 300"
+    "goalInvalid": "Enter the goal as a number, e.g. 300",
+    "activityHeading": "Challenge log",
+    "activitySub": "Log what you did — it counts on the challenge standings. Strava sync is coming; manual entries work today.",
+    "activityKm": "km",
+    "activityMinutes": "min",
+    "activityDate": "Date",
+    "activitySubmit": "Log",
+    "activityDelete": "remove",
+    "regConfirmed": "Confirmed",
+    "regAwaitingFee": "Awaiting entry fee",
+    "regPending": "Registered"
   },
   "email": {
     "instructions": {
@@ -238,6 +248,19 @@
       "body": "We've received your transfer of {amount} for {campaign}. Thank you — every euro is published.",
       "reference": "Reference: {reference}",
       "ledgerCta": "See it in the public ledger"
+    },
+    "registration": {
+      "subject": "Your entry — {event}",
+      "greeting": "Hi {name},",
+      "intro": "You're registered for {event}. Transfer your entry fee with the details below and we'll confirm your place.",
+      "event": "Event",
+      "distance": "Distance",
+      "beneficiary": "Beneficiary",
+      "iban": "IBAN",
+      "amount": "Amount",
+      "reference": "Reference — required",
+      "whatNext": "We match transfers usually within one working day; your place is confirmed the moment we do.",
+      "opsNote": "Entry fees fund the event and our team (Operations Fund) — donations still go 100% to beneficiaries."
     }
   },
   "admin": {
@@ -338,5 +361,36 @@
     "submit": "Send application",
     "success": "Received. The committee reviews applications against published criteria; we will contact you either way.",
     "error": "Something went wrong — try again."
+  },
+  "events": {
+    "title": "Events",
+    "sub": "Joyful, physical, public — and every euro they raise lands in the ledger.",
+    "kindRace": "Race",
+    "kindChallenge": "Challenge",
+    "tiersHeading": "Entry",
+    "registerCta": "Register",
+    "registrationOpens": "Registration opens {date}.",
+    "registrationClosed": "Registration is closed.",
+    "challengeBoard": "Challenge standings",
+    "moneyBoardLink": "Fundraising leaderboard",
+    "termsLink": "Event terms",
+    "signInTitle": "Sign in to register",
+    "signInSub": "One email — the same account runs your fundraising page.",
+    "distanceLabel": "Distance",
+    "tierLabel": "Entry tier",
+    "sizeLabel": "Shirt size",
+    "waiver1": "I take part at my own risk and confirm I am medically fit for the activity I chose.",
+    "waiver2": "I understand minors take part with guardian consent, and that photos and video from the event may be published — I can opt out at the info point.",
+    "waiver3": "Withdrawal, transfer and bad-weather rules are part of the event terms.",
+    "waiverFull": "Read the full event terms and waiver",
+    "waiverAccept": "I have read and accept the event terms and waiver",
+    "error": "Something went wrong — try again.",
+    "submit": "Complete registration",
+    "registeredTitle": "You're registered!",
+    "confirmedTitle": "You're in — entry confirmed",
+    "payInstructions": "One step left: transfer your entry fee with the reference below and we'll confirm your place, usually within one working day.",
+    "opsNote": "Entry fees fund the event and our team (Operations Fund) — donations still go 100% to beneficiaries.",
+    "paidNote": "Entry fee received. See you at the start line.",
+    "noFeeNote": "No entry fee due. See you at the start line."
   }
 }

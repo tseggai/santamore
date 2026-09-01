@@ -32,8 +32,8 @@ function siteUrl(): string {
 
 // Real bank facts are never invented: until the env vars are set the email
 // carries the same visible [[PLACEHOLDER]] markers as the site (pre-launch
-// state only; docs/PLACEHOLDERS.md).
-function bankLines() {
+// state only; docs/PLACEHOLDERS.md). Shared with the registration email.
+export function bankLines() {
   const org = getOrgBankDetails();
   return {
     name: org.name.trim() || "[[PLACEHOLDER: registered organisation name]]",

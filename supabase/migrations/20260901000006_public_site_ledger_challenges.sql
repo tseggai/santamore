@@ -101,10 +101,35 @@ group by f.id;
 
 grant select on public.v_activity_totals to anon, authenticated;
 
+-- The public events view gains the event-page fields and challenge shape.
+create or replace view public.v_public_events
+  with (security_invoker = off, security_barrier = on) as
+select
+  e.id,
+  e.slug,
+  e.name,
+  e.starts_at,
+  e.venue,
+  e.registration_opens_at,
+  e.registration_closes_at,
+  e.distances,
+  c.slug as campaign_slug,
+  e.kind,
+  e.challenge_metric,
+  e.ends_at,
+  e.price_tiers,
+  e.capacity
+from public.events e
+left join public.campaigns c on c.id = e.campaign_id and c.is_public
+where e.is_published;
+
 -- 2 ─ payable registrations --------------------------------------------------
 alter table public.registrations
   add column payment_reference text unique
-    check (payment_reference ~ '^SM-(0[1-9]|1[0-2])[0-9]{2}-[0-9]{4}$');
+    check (payment_reference ~ '^SM-(0[1-9]|1[0-2])[0-9]{2}-[0-9]{4}$'),
+  add column tier_label text,
+  add column amount_due_cents bigint not null default 0
+    check (amount_due_cents >= 0);
 
 -- References are the SEPA matching key across ALL three carriers now.
 create or replace function public.enforce_payment_reference_global_uniqueness()
