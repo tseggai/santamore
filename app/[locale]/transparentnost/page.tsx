@@ -215,7 +215,6 @@ export default async function LedgerPage({
       {/* CSV downloads are attachment responses, not navigations — plain
           anchors on purpose. */}
       <div className="mt-6 flex flex-wrap gap-3 text-[12.5px] font-semibold">
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
           href="/api/ledger/in"
           download
@@ -223,7 +222,6 @@ export default async function LedgerPage({
         >
           {t("downloadIn")}
         </a>
-        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a
           href="/api/ledger/out"
           download
