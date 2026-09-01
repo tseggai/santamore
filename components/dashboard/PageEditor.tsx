@@ -11,6 +11,7 @@ import {
   updateFundraiserPage,
 } from "@/app/[locale]/dashboard/(protected)/actions";
 import { Waterline } from "@/components/Waterline";
+import { downscaleToJpeg } from "@/lib/images";
 import { formatCents, parseEurosToCents, type Cents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -24,25 +25,6 @@ interface EditorFundraiser {
   photoPath: string | null;
   status: "draft" | "active" | "hidden";
   teamId: string | null;
-}
-
-/** Downscale before upload — never ship 4MB phone photos (brief §12). */
-async function downscaleToJpeg(file: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-  canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-  const context = canvas.getContext("2d");
-  if (!context) throw new Error("canvas unavailable");
-  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error("encode failed"))),
-      "image/jpeg",
-      0.85,
-    );
-  });
 }
 
 /**
