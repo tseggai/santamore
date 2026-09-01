@@ -133,8 +133,28 @@ export default async function EventPage({
     }
   }
 
+  // schema.org Event — only fields with real values; the venue joins once
+  // the placeholder is replaced (docs/PLACEHOLDERS.md).
+  const eventJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Event" as const,
+    name: event.name,
+    startDate: event.starts_at,
+    ...(event.ends_at ? { endDate: event.ends_at } : {}),
+    ...(event.venue && !event.venue.includes("[[")
+      ? { location: { "@type": "Place", name: event.venue } }
+      : {}),
+    organizer: { "@type": "Organization", name: "Santamore" },
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(eventJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
         {event.kind === "challenge" ? t("kindChallenge") : t("kindRace")}
       </p>

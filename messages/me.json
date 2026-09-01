@@ -424,5 +424,12 @@
     "sub": "Najave događaja, rezultati i izvještaji — iste činjenice kao u registru, u rečenicama.",
     "empty": "Još nema objava. Prva stiže sa sljedećim događajem.",
     "backToIndex": "Sve vijesti"
+  },
+  "consent": {
+    "label": "Obavještenje o kolačićima",
+    "text": "Analitiku naklonjenu privatnosti (Plausible) koristimo samo uz vašu saglasnost. Reklamskih pratilaca nema, nikad.",
+    "accept": "Dozvoli analitiku",
+    "reject": "Odbij",
+    "policy": "Pravila o kolačićima"
   }
 }

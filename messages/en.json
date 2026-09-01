@@ -424,5 +424,12 @@
     "sub": "Event announcements, results and reports — the same facts as the ledger, in sentences.",
     "empty": "No posts yet. The first one lands with our next event.",
     "backToIndex": "All news"
+  },
+  "consent": {
+    "label": "Cookie notice",
+    "text": "We use privacy-friendly analytics (Plausible) only if you agree. No ad trackers, ever.",
+    "accept": "Allow analytics",
+    "reject": "Decline",
+    "policy": "Cookie policy"
   }
 }
