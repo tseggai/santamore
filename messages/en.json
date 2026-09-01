@@ -283,5 +283,54 @@
     },
     "confirmCash": "Confirm hand-in",
     "railCash": "cash"
+  },
+  "forms": {
+    "nameLabel": "Full name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "messageLabel": "Message",
+    "submit": "Send",
+    "sending": "Sending…",
+    "error": "Something went wrong — try again.",
+    "success_contact": "Thank you — we'll get back to you soon.",
+    "success_volunteer": "Thank you! We'll be in touch before the next event.",
+    "success_partner": "Thank you — we'll reply with our partner sheet.",
+    "success_newsletter": "You're on the list. See you in December."
+  },
+  "kontakt": {
+    "title": "Contact",
+    "sub": "Write to us about anything — donations, events, partnerships, or a family that needs help.",
+    "formHeading": "Send a message",
+    "bankHeading": "Bank details",
+    "mapNote": "[[PLACEHOLDER: map embed once the registered address is confirmed]]"
+  },
+  "volunteer": {
+    "title": "Volunteer with us",
+    "sub": "Our events run on neighbours who show up. Tell us who you are and we'll find you a job with a red suit attached.",
+    "role1": "Event day: course marshals, water stations, finish-line medals, the kids' race.",
+    "role2": "Before the event: packet packing, poster runs, translation, photography.",
+    "role3": "All year: cash counting (always in pairs), social media, welcoming new runners."
+  },
+  "apply": {
+    "title": "Apply for help",
+    "sub": "Anyone can apply — no connections required. Families in crisis, children and youth, small local businesses after a disaster, and local organisations.",
+    "step1Title": "Anyone can apply",
+    "step1Desc": "An open form. No connections required.",
+    "step2Title": "The committee decides",
+    "step2Desc": "Majority not employed by us; conflicts declared and recused; criteria published.",
+    "step3Title": "Paid within 60 days",
+    "step3Desc": "And published in the ledger within 30 days of that, with documentation.",
+    "nameLabel": "Your name",
+    "contactLabel": "How can we reach you (phone or email)",
+    "categoryLabel": "Who is the help for",
+    "amountLabel": "Amount needed (€, optional)",
+    "descriptionLabel": "Tell us what happened and what would help",
+    "category_family": "A family in crisis",
+    "category_children": "Children and youth",
+    "category_business": "A small local business",
+    "category_organisation": "A local organisation",
+    "submit": "Send application",
+    "success": "Received. The committee reviews applications against published criteria; we will contact you either way.",
+    "error": "Something went wrong — try again."
   }
 }

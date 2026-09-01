@@ -19,7 +19,6 @@ const SITE_STUBS: Record<string, string> = {
   partneri: "partners",
   vijesti: "news",
   "cesta-pitanja": "faq",
-  kontakt: "contact",
 };
 
 const LEGAL_STUBS: Record<string, string> = {
