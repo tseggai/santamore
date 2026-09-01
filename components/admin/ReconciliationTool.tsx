@@ -5,6 +5,7 @@ import { useState, type ChangeEvent } from "react";
 
 import {
   approvePledge,
+  approveRegistrationFee,
   createDonationFromStatement,
 } from "@/app/[locale]/admin/(protected)/donacije/actions";
 import { parseCsv } from "@/lib/csv";
@@ -14,7 +15,7 @@ import {
   parseStatementDate,
   proposeMatches,
   type MatchProposal,
-  type PendingPledge,
+  type PendingTarget,
 } from "@/lib/reconcile";
 import type { Locale } from "@/i18n/routing";
 
@@ -36,7 +37,7 @@ export function ReconciliationTool({
   pledges,
 }: {
   locale: Locale;
-  pledges: PendingPledge[];
+  pledges: PendingTarget[];
 }) {
   const t = useTranslations("admin");
 
@@ -93,6 +94,22 @@ export function ReconciliationTool({
     setRowStates((state) => ({ ...state, [index]: "busy" }));
     const result = await action().catch(() => ({ ok: false }));
     setRowStates((state) => ({ ...state, [index]: result.ok ? "done" : "error" }));
+  };
+
+  // Pledges approve into donations, entry fees into registrations —
+  // different tables, same queue.
+  const approveTarget = (
+    target: PendingTarget,
+    statementAmountCents: number | null,
+    approvedAtIso: string | undefined,
+  ) => {
+    const amountOverride =
+      statementAmountCents === null || statementAmountCents === target.amountCents
+        ? {}
+        : { amountCents: statementAmountCents };
+    return target.target === "registration"
+      ? approveRegistrationFee({ registrationId: target.id, ...amountOverride })
+      : approvePledge({ donationId: target.id, approvedAtIso, ...amountOverride });
   };
 
   const money = (cents: number) => formatCents(cents, locale);
@@ -225,6 +242,11 @@ export function ReconciliationTool({
                         {money(proposal.pledge.amountCents)}
                       </span>
                     </span>
+                    {proposal.pledge.target === "registration" ? (
+                      <span className="rounded-full bg-sand px-2.5 py-0.5 font-mono text-[11px] text-ink/70">
+                        {t("targetFee")}
+                      </span>
+                    ) : null}
                     {!proposal.amountMatches ? (
                       <span className="font-semibold text-red-dark">
                         {t("amountDiffers", { pledged: money(proposal.pledge.amountCents) })}
@@ -238,13 +260,7 @@ export function ReconciliationTool({
                         disabled={state === "busy"}
                         onClick={() =>
                           run(index, () =>
-                            approvePledge({
-                              donationId: proposal.pledge.id,
-                              approvedAtIso,
-                              ...(proposal.amountMatches || row.amountCents === null
-                                ? {}
-                                : { amountCents: row.amountCents }),
-                            }),
+                            approveTarget(proposal.pledge, row.amountCents, approvedAtIso),
                           )
                         }
                         className="rounded-lg bg-red px-3.5 py-1.5 text-[12.5px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
@@ -284,14 +300,7 @@ export function ReconciliationTool({
                               disabled={state === "busy"}
                               onClick={() =>
                                 run(index, () =>
-                                  approvePledge({
-                                    donationId: candidate.id,
-                                    approvedAtIso,
-                                    ...(row.amountCents === null ||
-                                    row.amountCents === candidate.amountCents
-                                      ? {}
-                                      : { amountCents: row.amountCents }),
-                                  }),
+                                  approveTarget(candidate, row.amountCents, approvedAtIso),
                                 )
                               }
                               className="rounded-lg border-[1.5px] border-line px-3 py-1 text-[12px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
