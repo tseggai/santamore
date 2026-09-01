@@ -22,3 +22,4 @@ text are never invented — see CLAUDE.md.
 | ~~`docs/vendor/epc-qr.md`~~ **saved** (EPC069-12 v3.1, from the team's copy) and `lib/epc-qr.ts` verified against it — reference kept in the **unstructured** remittance element (brief §8 deviation, flagged); BIC enforced for non-EEA IBANs | `docs/vendor/epc-qr.md` | Remaining: **test the QR in ≥2 real EU banking apps** before launch |
 | Sample bank-statement CSV from our actual bank | admin reconciliation column mapping (`components/admin/ReconciliationTool.tsx`) guesses headers; a real export lets us preset it | Smoother reconciliation (Task 3) |
 | Russian donate/admin/email/dashboard strings — native review | `messages/ru.json` (new `donate.*`, `email.*`, `admin.*`, `dashboard.*`, `leaderboard.*` keys, drafted) | Same `_review` flag as the rest of ru.json |
+| Legal drafts — every `[[PLACEHOLDER]]` inside `content/legal/*.ts` + lawyer review of all 8 | `content/legal/` | Go-live (acquirer inspects these pages) |

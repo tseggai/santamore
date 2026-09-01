@@ -21,19 +21,8 @@ const SITE_STUBS: Record<string, string> = {
   "cesta-pitanja": "faq",
 };
 
-const LEGAL_STUBS: Record<string, string> = {
-  "pravila-privatnosti": "privacy",
-  kolacici: "cookies",
-  "uslovi-koriscenja": "terms",
-  "pravila-donacija": "donations",
-  "uslovi-ucesca": "eventTerms",
-  "zastita-djece": "safeguarding",
-  kodeks: "codeOfConduct",
-  "informacije-o-organizaciji": "impressum",
-};
-
 export function generateStaticParams() {
-  const slugs = [...Object.keys(SITE_STUBS), ...Object.keys(LEGAL_STUBS)];
+  const slugs = Object.keys(SITE_STUBS);
   return routing.locales.flatMap((locale) =>
     slugs.map((slug) => ({ locale, slug })),
   );
@@ -53,12 +42,9 @@ export default function StubPage({
   const t = useTranslations();
 
   const siteKey = SITE_STUBS[slug];
-  const legalKey = LEGAL_STUBS[slug];
-  if (!siteKey && !legalKey) notFound();
+  if (!siteKey) notFound();
 
-  const title = legalKey
-    ? t(`footer.legal.${legalKey}`)
-    : t(`footer.site.${siteKey}`);
+  const title = t(`footer.site.${siteKey}`);
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-20">
