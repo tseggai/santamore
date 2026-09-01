@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { detectDelimiter, parseCsv } from "@/lib/csv";
+import { detectDelimiter, parseCsv, toCsv } from "@/lib/csv";
 
 describe("detectDelimiter", () => {
   it("prefers semicolons in European bank exports", () => {
@@ -46,5 +46,21 @@ describe("parseCsv", () => {
 
   it("keeps empty fields and skips blank trailing lines", () => {
     expect(parseCsv("a,,c\n\n")).toEqual([["a", "", "c"]]);
+  });
+});
+
+describe("toCsv", () => {
+  it("escapes quotes, separators and newlines per RFC 4180", () => {
+    expect(toCsv([["a", 'he said "hi"', "x,y", "line\nbreak", null, 25]])).toBe(
+      'a,"he said ""hi""","x,y","line\nbreak",,25\r\n',
+    );
+  });
+
+  it("round-trips through parseCsv", () => {
+    const rows = [
+      ["date", "amount", "who"],
+      ["2026-12-20", "25.00", 'Kafana „Sidro", d.o.o.'],
+    ];
+    expect(parseCsv(toCsv(rows), ",")).toEqual(rows);
   });
 });

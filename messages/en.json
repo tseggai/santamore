@@ -159,7 +159,13 @@
     "railSepa": "SEPA",
     "railCash": "CASH · 2 signatures",
     "railMixed": "MIXED",
-    "footNote": "Names appear only when the donor chose to show them. Beneficiary identities are protected; documentation is available to an auditor."
+    "footNote": "Names appear only when the donor chose to show them. Beneficiary identities are protected; documentation is available to an auditor.",
+    "docPill": "documentation",
+    "correction": "Correction",
+    "emptyIn": "No donations recorded yet.",
+    "emptyOut": "No disbursements published yet.",
+    "downloadIn": "Download CSV — money in",
+    "downloadOut": "Download CSV — money out"
   },
   "dashboard": {
     "title": "My page",

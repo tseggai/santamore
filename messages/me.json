@@ -159,7 +159,13 @@
     "railSepa": "SEPA",
     "railCash": "KEŠ · 2 potpisa",
     "railMixed": "MJEŠOVITO",
-    "footNote": "Objavljeno je ime samo ako je donator tako izabrao. Identitet korisnika je zaštićen; dokumentacija je dostupna revizoru."
+    "footNote": "Objavljeno je ime samo ako je donator tako izabrao. Identitet korisnika je zaštićen; dokumentacija je dostupna revizoru.",
+    "docPill": "dokumentacija",
+    "correction": "Ispravka",
+    "emptyIn": "Još nema zabilježenih uplata.",
+    "emptyOut": "Još nema objavljenih isplata.",
+    "downloadIn": "Preuzmi CSV — uplate",
+    "downloadOut": "Preuzmi CSV — isplate"
   },
   "dashboard": {
     "title": "Moja stranica",
