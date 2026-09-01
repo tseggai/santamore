@@ -5,6 +5,8 @@ import LocaleSwitcher from "@/components/LocaleSwitcher";
 import logoWhite from "@/public/brand/SantamoreLogo-White.png";
 
 const SITE_LINKS = [
+  { href: "/o-nama", key: "about" },
+  { href: "/kako-radimo", key: "how" },
   { href: "/dogadjaji", key: "events" },
   { href: "/galerija", key: "gallery" },
   { href: "/transparentnost", key: "ledger" },

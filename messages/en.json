@@ -68,15 +68,11 @@
       "partners": "Partners",
       "news": "News",
       "faq": "FAQ",
-      "contact": "Contact"
+      "contact": "Contact",
+      "how": "How we work"
     },
     "cards": "[[PLACEHOLDER: accepted card brand logos]]",
     "note": "Not one cent of donations goes to salaries or overhead. Sponsors pay for those."
-  },
-  "legalStub": {
-    "title": "Page in preparation",
-    "body": "This document is being drafted and will be published before we start collecting donations. Every draft is reviewed by a lawyer in Montenegro before it goes live.",
-    "back": "Back to home"
   },
   "notFound": {
     "title": "Page not found",
@@ -409,5 +405,24 @@
     "opsNote": "Entry fees fund the event and our team (Operations Fund) — donations still go 100% to beneficiaries.",
     "paidNote": "Entry fee received. See you at the start line.",
     "noFeeNote": "No entry fee due. See you at the start line."
+  },
+  "gallery": {
+    "eyebrow": "Gallery",
+    "title": "The bay, on its feet",
+    "sub": "Photos from our events — published with consent, credited to the people who took them.",
+    "empty": "Photos from our next event will appear here — published with consent.",
+    "filterAll": "All",
+    "credit": "Photo:",
+    "close": "Close",
+    "prev": "Previous photo",
+    "next": "Next photo",
+    "counter": "{current} / {total}"
+  },
+  "news": {
+    "eyebrow": "News",
+    "title": "What happened, and what's next",
+    "sub": "Event announcements, results and reports — the same facts as the ledger, in sentences.",
+    "empty": "No posts yet. The first one lands with our next event.",
+    "backToIndex": "All news"
   }
 }

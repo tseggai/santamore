@@ -68,15 +68,11 @@
       "partners": "Partneri",
       "news": "Vijesti",
       "faq": "Česta pitanja",
-      "contact": "Kontakt"
+      "contact": "Kontakt",
+      "how": "Kako radimo"
     },
     "cards": "[[PLACEHOLDER: logotipi prihvaćenih kartica]]",
     "note": "Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori."
-  },
-  "legalStub": {
-    "title": "Stranica u pripremi",
-    "body": "Ovaj dokument je u izradi i biće objavljen prije početka prikupljanja donacija. Svaki nacrt pregleda advokat u Crnoj Gori prije objave.",
-    "back": "Nazad na početnu"
   },
   "notFound": {
     "title": "Stranica nije pronađena",
@@ -409,5 +405,24 @@
     "opsNote": "Kotizacije finansiraju događaj i naš tim (Operativni fond) — donacije i dalje idu 100% korisnicima.",
     "paidNote": "Kotizacija primljena. Vidimo se na startu.",
     "noFeeNote": "Nema kotizacije. Vidimo se na startu."
+  },
+  "gallery": {
+    "eyebrow": "Galerija",
+    "title": "Zaliv na nogama",
+    "sub": "Fotografije sa naših događaja — objavljene uz pristanak, sa imenom autora.",
+    "empty": "Fotografije sa sljedećeg događaja pojaviće se ovdje — objavljene uz pristanak.",
+    "filterAll": "Sve",
+    "credit": "Foto:",
+    "close": "Zatvori",
+    "prev": "Prethodna fotografija",
+    "next": "Sljedeća fotografija",
+    "counter": "{current} / {total}"
+  },
+  "news": {
+    "eyebrow": "Vijesti",
+    "title": "Šta se desilo, i šta slijedi",
+    "sub": "Najave događaja, rezultati i izvještaji — iste činjenice kao u registru, u rečenicama.",
+    "empty": "Još nema objava. Prva stiže sa sljedećim događajem.",
+    "backToIndex": "Sve vijesti"
   }
 }
