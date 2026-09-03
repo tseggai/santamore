@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-import { createFundraiserPage } from "@/app/[locale]/dashboard/(protected)/actions";
+import { createFundraiserPage } from "@/app/[locale]/(site)/dashboard/(protected)/actions";
 
 export function CreatePageForm() {
   const t = useTranslations("dashboard");

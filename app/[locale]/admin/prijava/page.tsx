@@ -19,11 +19,13 @@ export default async function AdminSignInPage({
   const t = await getTranslations("admin");
 
   return (
-    <div className="mx-auto max-w-md px-5 py-20">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
-        Santamore
-      </p>
-      <h1 className="type-display mt-3 text-3xl">{t("signInTitle")}</h1>
+    // Standalone console door — no public chrome on purpose.
+    <div className="flex min-h-screen items-center justify-center bg-sea px-5 py-10">
+      <div className="w-full max-w-md rounded-brand bg-paper px-6 py-8 sm:px-8">
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+          Santamore · {t("consoleBadge")}
+        </p>
+        <h1 className="type-display mt-3 text-3xl">{t("signInTitle")}</h1>
       {error ? (
         <p
           role="alert"
@@ -34,6 +36,7 @@ export default async function AdminSignInPage({
       ) : null}
       <div className="mt-6">
         <SignInForm locale={locale as Locale} />
+      </div>
       </div>
     </div>
   );

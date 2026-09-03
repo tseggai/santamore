@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-import { registerForEvent } from "@/app/[locale]/dogadjaji/actions";
+import { registerForEvent } from "@/app/[locale]/(site)/dogadjaji/actions";
 import { formatCents, type Cents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
