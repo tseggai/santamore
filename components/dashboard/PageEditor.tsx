@@ -9,7 +9,7 @@ import {
   createTeamAndJoin,
   setFundraiserStatus,
   updateFundraiserPage,
-} from "@/app/[locale]/dashboard/(protected)/actions";
+} from "@/app/[locale]/(site)/dashboard/(protected)/actions";
 import { Waterline } from "@/components/Waterline";
 import { downscaleToJpeg } from "@/lib/images";
 import { formatCents, parseEurosToCents, type Cents } from "@/lib/money";

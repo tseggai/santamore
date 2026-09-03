@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
 
-import { createSepaPledge } from "@/app/[locale]/podrzi/actions";
+import { createSepaPledge } from "@/app/[locale]/(site)/podrzi/actions";
 import { SepaPanel } from "@/components/donate/SepaPanel";
 import { formatCents, parseEurosToCents, type Cents } from "@/lib/money";
 import { hasBankDetails, type OrgBankDetails } from "@/lib/org";

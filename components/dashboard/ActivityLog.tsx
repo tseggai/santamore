@@ -7,7 +7,7 @@ import { useState, type FormEvent } from "react";
 import {
   deleteActivity,
   logActivity,
-} from "@/app/[locale]/dashboard/(protected)/actions";
+} from "@/app/[locale]/(site)/dashboard/(protected)/actions";
 import { formatMetricValue, type ChallengeMetric } from "@/lib/metrics";
 import type { Locale } from "@/i18n/routing";
 

@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-import { logCash } from "@/app/[locale]/dashboard/(protected)/actions";
+import { logCash } from "@/app/[locale]/(site)/dashboard/(protected)/actions";
 import { parseEurosToCents } from "@/lib/money";
 
 export function CashForm() {

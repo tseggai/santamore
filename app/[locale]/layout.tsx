@@ -5,8 +5,6 @@ import { setRequestLocale } from "next-intl/server";
 import { routing, htmlLang } from "@/i18n/routing";
 import { bodyFont, displayFont, dmMono } from "@/lib/fonts";
 import { siteOrigin } from "@/lib/site";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
 import { CookieConsent } from "@/components/CookieConsent";
 import "../globals.css";
 
@@ -60,11 +58,7 @@ export default async function LocaleLayout({
     >
       <body className="flex min-h-screen flex-col bg-paper text-ink">
         <NextIntlClientProvider>
-          <Header />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <Footer />
+          {children}
           <CookieConsent domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? null} />
         </NextIntlClientProvider>
         <script
