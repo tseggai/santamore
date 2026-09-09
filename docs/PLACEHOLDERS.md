@@ -27,3 +27,4 @@ text are never invented — see CLAUDE.md.
 | Board, grants-committee and team names + photos with consent | `content/site/about.ts` → `peopleNote` | `/o-nama` team section |
 | Photos with consent for the landing hero and `/galerija` | `v_public_gallery` is empty; landing + gallery render placeholder notes until staff publish items | Landing §12, gallery |
 | Beneficiary story with consent | `app/[locale]/page.tsx` story section renders a placeholder note | Landing §12 |
+| Demo data (`/admin/demo`): invented runners, teams, pages and **approved donations** that show in the public ledger | `demo_records` registry, `lib/demo/pools.ts` | **Purge before launch** with the "Purge demo data" button (calls `purge_demo_data()`) |
