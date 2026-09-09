@@ -201,24 +201,32 @@ export default async function EventPage({
         </div>
       ) : null}
 
-      <div className="mt-7">
+      {/* two ways in: take part, or raise money for it (your own page or a team) */}
+      <div className="mt-7 flex flex-wrap items-center gap-2">
         {registrationState === "open" ? (
           <Link
             href={`/dogadjaji/${event.slug}/prijava`}
-            className="inline-block rounded-xl bg-red px-8 py-3.5 text-[15.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+            className="inline-flex h-12 items-center rounded-xl bg-red px-8 text-[15.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
           >
             {t("registerCta")}
           </Link>
-        ) : (
-          <p className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
-            {registrationState === "before"
-              ? t("registrationOpens", {
-                  date: dateFormat.format(new Date(event.registration_opens_at!)),
-                })
-              : t("registrationClosed")}
-          </p>
-        )}
+        ) : null}
+        <Link
+          href={`/dashboard?event=${event.slug}`}
+          className="inline-flex h-12 items-center rounded-xl border-[1.5px] border-ink px-6 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+        >
+          {t("fundraiseCta")}
+        </Link>
       </div>
+      {registrationState !== "open" ? (
+        <p className="mt-4 rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
+          {registrationState === "before"
+            ? t("registrationOpens", {
+                date: dateFormat.format(new Date(event.registration_opens_at!)),
+              })
+            : t("registrationClosed")}
+        </p>
+      ) : null}
 
       {event.kind === "challenge" && challengeEntries.length > 0 ? (
         <div className="mt-10">

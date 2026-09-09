@@ -10,9 +10,12 @@ const ITEMS = [
   { href: "/admin/donacije", key: "navDonations", exact: false },
   { href: "/admin/prijave", key: "navRegistrations", exact: false },
   { href: "/admin/prikupljaci", key: "navFundraisers", exact: false },
+  { href: "/admin/dogadjaji", key: "navEvents", exact: false },
+  { href: "/admin/kampanje", key: "navCampaigns", exact: false },
   { href: "/admin/isplate", key: "navDisbursements", exact: false },
   { href: "/admin/sadrzaj", key: "navContent", exact: false },
   { href: "/admin/poruke", key: "navMessages", exact: false },
+  { href: "/admin/demo", key: "navDemo", exact: false },
 ] as const;
 
 /** Console nav: vertical in the sidebar (desktop), scrollable row on mobile. */
