@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Leaderboard, type LeaderboardEntry } from "@/components/Leaderboard";
 import { formatCents } from "@/lib/money";
+import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
@@ -13,12 +14,14 @@ export const dynamic = "force-dynamic";
 interface IndividualRow {
   slug: string;
   title: string;
+  photo_path: string | null;
   raised_cents: number;
   event_id: string;
 }
 interface TeamRow {
   slug: string;
   name: string;
+  photo_path: string | null;
   raised_cents: number;
   member_count: number;
   event_id: string;
@@ -52,13 +55,13 @@ async function fetchBoard() {
     const [{ data: individuals }, { data: teams }, { data: allTotals }] = await Promise.all([
       supabase
         .from("v_leaderboard")
-        .select("slug, title, raised_cents, event_id")
+        .select("slug, title, photo_path, raised_cents, event_id")
         .eq("event_id", event.id)
         .order("rank", { ascending: true })
         .limit(50),
       supabase
         .from("v_leaderboard_teams")
-        .select("slug, name, raised_cents, member_count, event_id")
+        .select("slug, name, photo_path, raised_cents, member_count, event_id")
         .eq("event_id", event.id)
         .order("rank", { ascending: true })
         .limit(50),
@@ -106,10 +109,19 @@ export default async function FundraisersDirectoryPage({
 
   return (
     <div className="mx-auto max-w-xl px-5 py-12">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
         {board?.event.name ?? "Santamore"}
       </p>
-      <h1 className="type-display mt-2 text-3xl">{t("title")}</h1>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+        <h1 className="type-display text-3xl">{t("title")}</h1>
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-red px-4 py-2.5 text-[14px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+        >
+          <span aria-hidden className="text-[17px] leading-none">+</span>
+          {t("myPageCta")}
+        </Link>
+      </div>
       <p className="mt-2 text-[13.5px] text-ink/65">
         <span className="font-mono tabular-nums">{board?.activeCount ?? 0}</span>{" "}
         {t("activeFundraisers")} ·{" "}
@@ -125,6 +137,7 @@ export default async function FundraisersDirectoryPage({
             (row): LeaderboardEntry => ({
               slug: row.slug,
               title: row.title,
+              photoUrl: fundraiserPhotoUrl(row.photo_path),
               raisedCents: row.raised_cents,
               href: `/f/${row.slug}`,
             }),
@@ -135,22 +148,14 @@ export default async function FundraisersDirectoryPage({
             (row): LeaderboardEntry => ({
               slug: row.slug,
               title: row.name,
+              photoUrl: fundraiserPhotoUrl(row.photo_path),
               raisedCents: row.raised_cents,
-              meta: String(row.member_count),
+              meta: t("memberCount", { count: row.member_count }),
               href: `/t/${row.slug}`,
             }),
           ) ?? []
         }
       />
-
-      <div className="mt-6">
-        <Link
-          href="/dashboard"
-          className="block w-full rounded-xl bg-red px-6 py-3.5 text-center text-[15.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
-        >
-          {t("cta")}
-        </Link>
-      </div>
     </div>
   );
 }

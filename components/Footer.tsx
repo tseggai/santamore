@@ -38,7 +38,7 @@ export default function Footer() {
     <footer className="bg-sea text-paper">
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 sm:grid-cols-2 lg:grid-cols-3">
         <div>
-          <Image src={logoWhite} alt={tc("siteName")} className="h-9 w-auto" />
+          <Image src={logoWhite} alt={tc("siteName")} className="h-16 w-auto" />
           <h2 className="mt-5 font-mono text-[11px] uppercase tracking-[0.16em] text-mist/70">
             {t("orgHeading")}
           </h2>
@@ -87,7 +87,7 @@ export default function Footer() {
             ))}
           </ul>
           <div className="mt-6">
-            <LocaleSwitcher />
+            <LocaleSwitcher variant="dark" />
           </div>
         </div>
       </div>

@@ -2,11 +2,11 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ActivityLog, type ActivityEntry } from "@/components/dashboard/ActivityLog";
-import { CreatePageForm } from "@/components/dashboard/CreatePageForm";
+import { CreatePageForm, type EventChoice } from "@/components/dashboard/CreatePageForm";
 import { Waterline } from "@/components/Waterline";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
+import { htmlLang, type Locale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
@@ -21,10 +21,12 @@ interface MyFundraiser {
 
 export default async function DashboardPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ event?: string }>;
 }) {
-  const { locale } = await params;
+  const [{ locale }, { event: eventParam }] = await Promise.all([params, searchParams]);
   setRequestLocale(locale);
   const t = await getTranslations("dashboard");
 
@@ -88,12 +90,48 @@ export default async function DashboardPage({
     ) : null;
 
   if (!mine) {
+    // Events you can still raise for: published, not yet finished.
+    const [{ data: profile }, { data: openEvents }] = await Promise.all([
+      supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+      supabase
+        .from("v_public_events")
+        .select("slug, name, starts_at, ends_at")
+        .order("starts_at", { ascending: true }),
+    ]);
+    const now = Date.now();
+    const dateFormat = new Intl.DateTimeFormat(htmlLang(locale as Locale), {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const choices = ((openEvents ?? []) as {
+      slug: string;
+      name: string;
+      starts_at: string | null;
+      ends_at: string | null;
+    }[])
+      .filter((event) => {
+        const end = event.ends_at ?? event.starts_at;
+        return !end || new Date(end).getTime() >= now;
+      })
+      .map(
+        (event): EventChoice => ({
+          slug: event.slug,
+          name: event.name,
+          dateLabel: event.starts_at ? dateFormat.format(new Date(event.starts_at)) : "",
+        }),
+      );
     return (
       <div className="py-8">
         <h1 className="type-display text-2xl">{t("createHeading")}</h1>
         <p className="mt-2 text-[14px] leading-relaxed text-ink/65">{t("createSub")}</p>
         <div className="mt-5">
-          <CreatePageForm />
+          <CreatePageForm
+            locale={locale}
+            defaultName={profile?.full_name ?? ""}
+            events={choices}
+            defaultEventSlug={eventParam ?? null}
+          />
         </div>
         {registrationsCard}
       </div>

@@ -31,6 +31,17 @@
   --font-mono: var(--font-dm-mono), ui-monospace, monospace;
 
   --radius-brand: 14px;
+
+  /* Page containers are 25% wider than Tailwind's defaults (owner decision,
+     2026-09). sm/md/lg stay stock — they size forms and inner text blocks,
+     not pages. */
+  --container-xl: 45rem;
+  --container-2xl: 52.5rem;
+  --container-3xl: 60rem;
+  --container-4xl: 70rem;
+  --container-5xl: 80rem;
+  --container-6xl: 90rem;
+  --container-7xl: 100rem;
 }
 
 /* Display type: big, light and elegant (Cormorant Garamond) — weight comes
