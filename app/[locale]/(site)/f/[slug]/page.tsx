@@ -1,8 +1,8 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { Avatar } from "@/components/Avatar";
 import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
 import { formatCents } from "@/lib/money";
@@ -84,54 +84,61 @@ export default async function FundraiserPage({
   if (!fundraiser) notFound();
 
   const photo = fundraiserPhotoUrl(fundraiser.photo_path);
-  const initial = fundraiser.title.trim().charAt(0).toUpperCase() || "S";
+  const linkClass =
+    "font-semibold text-ink underline decoration-line underline-offset-[3px] transition-colors hover:text-sea";
 
   return (
-    <div className="mx-auto max-w-xl px-5 py-12">
-      {/* runner-head: avatar + name + meta line, per the prototype */}
-      <div className="flex items-center gap-3.5">
-        {photo ? (
-          <Image
-            src={photo}
-            alt=""
-            width={52}
-            height={52}
-            className="h-[52px] w-[52px] shrink-0 rounded-full border-[1.5px] border-ink object-cover"
-          />
-        ) : (
-          <div
-            aria-hidden
-            className="type-display flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-ink bg-red text-[21px] font-bold text-paper"
-          >
-            {initial}
-          </div>
-        )}
-        <div className="min-w-0">
-          <h1 className="type-display text-lg leading-tight">{fundraiser.title}</h1>
-          <p className="mt-0.5 text-[12px] text-ink/60">
+    <div className="mx-auto max-w-xl px-5 py-10">
+      {/* runner head: a photo you can actually recognise, name, where they
+          run and with whom, and the two actions at header level */}
+      <header className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">
+        <Avatar
+          src={photo}
+          name={fundraiser.title}
+          size={136}
+          priority
+          className="sm:mt-1"
+        />
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+            {t("eyebrow")}
+          </p>
+          <h1 className="type-display mt-1 text-3xl leading-tight sm:text-4xl">
+            {fundraiser.title}
+          </h1>
+          <p className="mt-2 text-[13.5px] leading-relaxed text-ink/70">
             {fundraiser.team_name && fundraiser.team_slug ? (
               <>
-                {t("team")} ·{" "}
-                <Link
-                  href={`/t/${fundraiser.team_slug}`}
-                  className="underline decoration-line underline-offset-2 transition-colors hover:text-sea"
-                >
+                {t("runsWith")}{" "}
+                <Link href={`/t/${fundraiser.team_slug}`} className={linkClass}>
                   {fundraiser.team_name}
-                </Link>{" "}
-                ·{" "}
+                </Link>
+                {" · "}
               </>
             ) : null}
-            <Link
-              href="/prikupljaci"
-              className="underline decoration-line underline-offset-2 transition-colors hover:text-sea"
-            >
+            <Link href={`/dogadjaji/${fundraiser.event_slug}`} className={linkClass}>
               {fundraiser.event_name}
             </Link>
           </p>
+          <div className="mt-4 flex items-center gap-2">
+            <Link
+              href={`/f/${fundraiser.slug}/podrzi`}
+              className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+            >
+              {tDonate("payVerb")}
+            </Link>
+            <ShareButton
+              title={fundraiser.title}
+              path={`/${locale}/f/${fundraiser.slug}`}
+              label={t("share")}
+              copiedLabel={tDonate("copied")}
+              variant="icon"
+            />
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div className="mt-4">
+      <div className="mt-7">
         <Waterline
           raisedCents={fundraiser.raised_cents}
           goalCents={fundraiser.goal_cents}
@@ -141,31 +148,23 @@ export default async function FundraiserPage({
       </div>
 
       {fundraiser.story ? (
-        <p className="mt-4 text-[13.5px] leading-relaxed text-ink/70">
-          {fundraiser.story}
-        </p>
+        <>
+          <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
+            {t("story")}
+          </p>
+          <p className="mt-2 whitespace-pre-line text-[15px] leading-relaxed text-ink/80">
+            {fundraiser.story}
+          </p>
+        </>
       ) : null}
 
-      <div className="mt-4 space-y-2">
-        <Link
-          href={`/f/${fundraiser.slug}/podrzi`}
-          className="block w-full rounded-xl bg-red px-6 py-3.5 text-center text-[15.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
-        >
-          {tDonate("payVerb")}
-        </Link>
-        <ShareButton
-          title={fundraiser.title}
-          path={`/${locale}/f/${fundraiser.slug}`}
-          label={t("share")}
-          copiedLabel={tDonate("copied")}
-          variant="ghost"
-        />
-      </div>
-
-      <div className="my-5 h-px bg-line-soft" />
-      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-sea/80">
+      <div className="my-7 h-px bg-line-soft" />
+      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
         {t("donorWall")}
       </p>
+      {wall.length === 0 ? (
+        <p className="mt-2 text-[13.5px] text-ink/60">{t("wallEmpty")}</p>
+      ) : null}
       <ul className="mt-2">
         {wall.map((donor) => (
           <li
@@ -174,11 +173,11 @@ export default async function FundraiserPage({
           >
             <span aria-hidden className="mt-[7px] h-[7px] w-[7px] shrink-0 rounded-full bg-red" />
             <span className="min-w-0 flex-1">
-              <span className="block text-[13px] font-semibold">
+              <span className="block text-[13.5px] font-semibold">
                 {donor.display_name ?? t("anonymous")}
               </span>
               {donor.message ? (
-                <span className="mt-0.5 block text-[12px] leading-relaxed text-ink/60">
+                <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink/60">
                   {donor.message}
                 </span>
               ) : null}

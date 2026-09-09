@@ -1,16 +1,19 @@
-/* The signature waterline, ported 1:1 from docs/reference/app-prototype.html
+/* The signature waterline, ported from docs/reference/app-prototype.html
    (lines 116–140). Numbers are the prototype's decisions — don't tune them
-   here without updating the reference. The frosted plate keeps the amount
-   readable at any fill level (swapping text colour instead fails on the
-   upper half of the number). */
+   here without updating the reference. The box IS the progress bar: the sea
+   rises from the bottom to the funded percentage, so at 0% it reads empty
+   on purpose. The frosted plate keeps the amount readable at any fill
+   level (swapping text colour instead fails on the upper half of the
+   number). */
 
 .waterline {
   position: relative;
   height: 176px;
   border-radius: 14px;
   overflow: hidden;
-  background: var(--color-mist);
-  border: 1.5px solid var(--color-ink);
+  /* #f3f6f7 and no border — owner decision, 2026-09 (the prototype had the
+     mist fill with an ink hairline). */
+  background: #f3f6f7;
 }
 
 .fill {

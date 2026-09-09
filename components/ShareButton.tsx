@@ -4,7 +4,9 @@ import { useState } from "react";
 
 /**
  * Web Share where available, clipboard fallback elsewhere. `copiedLabel`
- * doubles as the post-copy confirmation.
+ * doubles as the post-copy confirmation. The "icon" variant is a compact
+ * square button for header action rows; the label becomes its
+ * accessible name and a short-lived badge after copying.
  */
 export function ShareButton({
   title,
@@ -18,7 +20,7 @@ export function ShareButton({
   path: string;
   label: string;
   copiedLabel: string;
-  variant?: "primary" | "ghost";
+  variant?: "primary" | "ghost" | "icon";
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -36,6 +38,42 @@ export function ShareButton({
       // Share sheet dismissed — nothing to do.
     }
   };
+
+  if (variant === "icon") {
+    return (
+      <span className="relative inline-flex">
+        <button
+          type="button"
+          onClick={share}
+          aria-label={label}
+          title={label}
+          className="inline-flex h-11 w-11 items-center justify-center rounded-xl border-[1.5px] border-line text-ink transition-colors hover:border-sea hover:text-sea"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
+            <path
+              d="M12 3v12m0-12L8 7m4-4 4 4M5 13v6h14v-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+        <span aria-live="polite" className="sr-only">
+          {copied ? copiedLabel : ""}
+        </span>
+        {copied ? (
+          <span
+            aria-hidden
+            className="absolute left-1/2 top-full mt-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-ink px-2 py-1 text-[11px] font-semibold text-paper"
+          >
+            {copiedLabel}
+          </span>
+        ) : null}
+      </span>
+    );
+  }
 
   const className =
     variant === "primary"
