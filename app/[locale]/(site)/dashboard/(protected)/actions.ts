@@ -23,23 +23,33 @@ export interface DashboardActionResult {
 
 const createPageSchema = z.object({
   title: z.string().trim().min(2).max(80),
+  /** Which event to raise for; null = the next upcoming published one. */
+  eventSlug: z.string().trim().min(1).max(100).nullable().optional(),
 });
+
+// "<uploader-folder>/<file>" as written by the editor's upload; ownership
+// is re-checked against the session — never trust client input.
+const ownedPhotoPath = z
+  .string()
+  .regex(/^[0-9a-f-]{36}\/[A-Za-z0-9._-]{1,100}$/i)
+  .nullable();
 
 const updatePageSchema = z.object({
   title: z.string().trim().min(2).max(80),
   story: z.string().trim().max(2000),
   goalCents: z.number().int().min(0).max(MAX_CENTS).nullable(),
   teamId: z.string().uuid().nullable(),
-  // "<uploader-folder>/<file>" as written by the editor's upload; ownership
-  // is re-checked against the session below — never trust client input.
-  photoPath: z
-    .string()
-    .regex(/^[0-9a-f-]{36}\/[A-Za-z0-9._-]{1,100}$/i)
-    .nullable(),
+  photoPath: ownedPhotoPath,
 });
 
-const createTeamSchema = z.object({
+const teamFieldsSchema = z.object({
   name: z.string().trim().min(2).max(60),
+  description: z.string().trim().max(600).default(""),
+  photoPath: ownedPhotoPath.default(null),
+});
+
+const updateTeamSchema = teamFieldsSchema.extend({
+  teamId: z.string().uuid(),
 });
 
 const cashSchema = z.object({
@@ -78,26 +88,48 @@ export async function createFundraiserPage(
 
   try {
     const service = createServiceClient();
-    // The next upcoming published event; if none is scheduled yet, the most
-    // recent one (never a long-finished event ahead of a current one).
-    const { data: upcoming } = await service
-      .from("events")
-      .select("id")
-      .eq("is_published", true)
-      .gte("starts_at", new Date().toISOString())
-      .order("starts_at", { ascending: true })
-      .limit(1)
-      .maybeSingle();
-    const { data: event } = upcoming
-      ? { data: upcoming }
-      : await service
-          .from("events")
-          .select("id")
-          .eq("is_published", true)
-          .order("starts_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
-    if (!event) return { ok: false, error: "server" };
+    let event: { id: string } | null = null;
+    if (parsed.data.eventSlug) {
+      // A chosen event must be published — the slug is client input.
+      const { data } = await service
+        .from("events")
+        .select("id")
+        .eq("slug", parsed.data.eventSlug)
+        .eq("is_published", true)
+        .maybeSingle();
+      event = data;
+    } else {
+      // The next upcoming published event; if none is scheduled yet, the
+      // most recent one (never a long-finished event ahead of a current one).
+      const { data: upcoming } = await service
+        .from("events")
+        .select("id")
+        .eq("is_published", true)
+        .gte("starts_at", new Date().toISOString())
+        .order("starts_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      event = upcoming
+        ? upcoming
+        : (
+            await service
+              .from("events")
+              .select("id")
+              .eq("is_published", true)
+              .order("starts_at", { ascending: false })
+              .limit(1)
+              .maybeSingle()
+          ).data;
+    }
+    if (!event) return { ok: false, error: "invalid" };
+
+    // The page title is the runner's name; remember it on the profile too
+    // (own-row update grant on full_name) if they haven't set one.
+    await supabase
+      .from("profiles")
+      .update({ full_name: parsed.data.title })
+      .eq("id", user.id)
+      .is("full_name", null);
 
     const base = slugify(parsed.data.title, "trkac");
     for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -137,14 +169,7 @@ export async function updateFundraiserPage(
   const { supabase, user } = await currentUser();
   if (!user) return { ok: false, error: "server" };
 
-  // The photo must live in THIS runner's storage folder — the same rule
-  // the bucket policies enforced at upload time.
-  if (
-    parsed.data.photoPath !== null &&
-    !parsed.data.photoPath.startsWith(`${user.id}/`)
-  ) {
-    return { ok: false, error: "invalid" };
-  }
+  if (!ownsPhoto(user.id, parsed.data.photoPath)) return { ok: false, error: "invalid" };
 
   const { error } = await supabase
     .from("fundraisers")
@@ -309,15 +334,22 @@ export async function logCash(input: unknown): Promise<DashboardActionResult> {
   }
 }
 
-/** Create a team on the runner's event and join it as captain. */
+function ownsPhoto(userId: string, photoPath: string | null): boolean {
+  // The photo must live in THIS runner's storage folder — the same rule
+  // the bucket policies enforced at upload time.
+  return photoPath === null || photoPath.startsWith(`${userId}/`);
+}
+
+/** Create a team (name, photo, description) on the runner's event and join it as captain. */
 export async function createTeamAndJoin(
   input: unknown,
 ): Promise<DashboardActionResult & { teamId?: string }> {
-  const parsed = createTeamSchema.safeParse(input);
+  const parsed = teamFieldsSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "invalid" };
 
   const { supabase, user } = await currentUser();
   if (!user) return { ok: false, error: "server" };
+  if (!ownsPhoto(user.id, parsed.data.photoPath)) return { ok: false, error: "invalid" };
 
   const { data: mine } = await supabase
     .from("fundraisers")
@@ -340,6 +372,8 @@ export async function createTeamAndJoin(
           name: parsed.data.name,
           slug,
           captain_id: user.id,
+          description: parsed.data.description === "" ? null : parsed.data.description,
+          photo_path: parsed.data.photoPath,
         })
         .select("id")
         .single();
@@ -367,4 +401,37 @@ export async function createTeamAndJoin(
     console.error("[dashboard] team create failed:", error);
     return { ok: false, error: "server" };
   }
+}
+
+/**
+ * Captain edits to a team's name, photo and description. Runs under the
+ * captain's session — teams_update_captain and the column-level update
+ * grant are the barrier.
+ */
+export async function updateTeam(
+  input: unknown,
+): Promise<DashboardActionResult & { teamId?: string }> {
+  const parsed = updateTeamSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  const { supabase, user } = await currentUser();
+  if (!user) return { ok: false, error: "server" };
+  if (!ownsPhoto(user.id, parsed.data.photoPath)) return { ok: false, error: "invalid" };
+
+  const { error } = await supabase
+    .from("teams")
+    .update({
+      name: parsed.data.name,
+      description: parsed.data.description === "" ? null : parsed.data.description,
+      photo_path: parsed.data.photoPath,
+    })
+    .eq("id", parsed.data.teamId)
+    .eq("captain_id", user.id)
+    .select("id")
+    .single();
+  if (error) return { ok: false, error: "server" };
+
+  revalidatePath("/[locale]/dashboard", "layout");
+  revalidatePath("/[locale]/t/[slug]", "page");
+  return { ok: true, teamId: parsed.data.teamId };
 }
