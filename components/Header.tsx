@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
-import logo from "@/public/brand/SantamoreLogo-Color.png";
+import icon from "@/public/brand/SantamoreIcon-Color.png";
 
 const NAV_ITEMS = [
   { href: "/dogadjaji", key: "events" },
@@ -24,7 +24,7 @@ export default function Header() {
       </a>
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-4">
         <Link href="/" className="shrink-0">
-          <Image src={logo} alt={t("common.siteName")} className="h-9 w-auto" priority />
+          <Image src={icon} alt={t("common.siteName")} className="h-11 w-auto" priority />
         </Link>
 
         <nav
