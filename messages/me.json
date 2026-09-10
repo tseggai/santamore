@@ -937,7 +937,8 @@
     "capacityStaffHint": "Za osoblje: Strava ograničava broj povezanih sportista po aplikaciji — 1 u single-player režimu (popunjava ga sportista vlasnika aplikacije), 10 nakon podizanja limita u API podešavanjima, više tek nakon Developer Program provjere. Trkač preko limita vidi Stravinu poruku „Error 403: Limit of connected athletes exceeded“.",
     "nurtureHeading": "Tvoja trčanja mogu i da prikupe novac",
     "nurtureBody": "Povezan/a si i osvajaš nagrade. Stranica za prikupljanje pretvara ista trčanja u podršku porodicama u Boki — fotografija, cilj, tri rečenice.",
-    "nurtureCta": "Napravi stranicu"
+    "nurtureCta": "Napravi stranicu",
+    "viewOnStrava": "View on Strava"
   },
   "giving": {
     "title": "Moje donacije",
