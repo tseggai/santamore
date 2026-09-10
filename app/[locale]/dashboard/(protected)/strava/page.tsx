@@ -74,6 +74,10 @@ export default async function StravaPage({
         .limit(10),
       supabase.from("profiles").select("role").eq("id", user.id).maybeSingle(),
     ]);
+  const { count: pageCount } = await supabase
+    .from("fundraisers")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id);
 
   const codes = (awardRows ?? []).map((row) => row.code);
   const { data: awardDetails } = codes.length
@@ -105,6 +109,19 @@ export default async function StravaPage({
           isStaff={profile?.role === "admin" || profile?.role === "chapter_lead"}
         />
       </div>
+
+      {connection && (pageCount ?? 0) === 0 ? (
+        <div className="mt-6 rounded-brand bg-[#f3f6f7] px-5 py-4">
+          <p className="text-[14px] font-bold">{t("nurtureHeading")}</p>
+          <p className="mt-1 text-[13px] leading-relaxed text-ink/65">{t("nurtureBody")}</p>
+          <Link
+            href="/dashboard/stranice"
+            className="mt-3 inline-flex rounded-xl border-[1.5px] border-ink px-4 py-2 text-[13px] font-semibold transition-colors hover:border-sea hover:text-sea"
+          >
+            {t("nurtureCta")}
+          </Link>
+        </div>
+      ) : null}
 
       <h2 className="mt-8 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
         {t("awardsHeading")}

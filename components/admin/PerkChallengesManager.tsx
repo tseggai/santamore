@@ -10,7 +10,7 @@ import {
   type PerkActionResult,
   type WebhookStatus,
 } from "@/app/[locale]/admin/(protected)/izazovi/actions";
-import { PerkRule } from "@/components/perks/PerkRule";
+import { PerkRule, formatPace } from "@/components/perks/PerkRule";
 import { slugify } from "@/lib/slug";
 import { Link } from "@/i18n/navigation";
 
@@ -25,6 +25,10 @@ export interface PerkChallengeAdminRow {
   min_distance_m: number;
   max_moving_time_s: number | null;
   min_elevation_m: number;
+  max_pace_s_per_km: number | null;
+  required_days: number;
+  window_days: number | null;
+  partner_url: string | null;
   allow_manual: boolean;
   per_user_daily_cap: number;
   daily_cap: number | null;
@@ -75,6 +79,14 @@ function ChallengeForm({
     challenge?.max_moving_time_s ? String(Math.round(challenge.max_moving_time_s / 60)) : "",
   );
   const [minElev, setMinElev] = useState(String(challenge?.min_elevation_m ?? 0));
+  const [pace, setPace] = useState(
+    challenge?.max_pace_s_per_km ? formatPace(challenge.max_pace_s_per_km) : "",
+  );
+  const [requiredDays, setRequiredDays] = useState(String(challenge?.required_days ?? 1));
+  const [windowDays, setWindowDays] = useState(
+    challenge?.window_days ? String(challenge.window_days) : "7",
+  );
+  const [partnerUrl, setPartnerUrl] = useState(challenge?.partner_url ?? "");
   const [allowManual, setAllowManual] = useState(challenge?.allow_manual ?? false);
   const [perUser, setPerUser] = useState(String(challenge?.per_user_daily_cap ?? 1));
   const [dailyCap, setDailyCap] = useState(challenge?.daily_cap ? String(challenge.daily_cap) : "5");
@@ -86,11 +98,17 @@ function ChallengeForm({
   const [state, setState] = useState<"idle" | "busy" | "error" | "slug" | "invalid">("idle");
 
   const minDistanceM = Math.round(Number(minKm.replace(",", ".")) * 1000);
+  // "5:00" or "5" → seconds per km; empty → no pace rule; garbage → NaN.
+  const paceMatch = /^(\d{1,2})(?::([0-5]\d))?$/.exec(pace.trim());
+  const paceS = pace.trim() === "" ? null : paceMatch ? Number(paceMatch[1]) * 60 + Number(paceMatch[2] ?? 0) : NaN;
   const preview = {
     sport_types: sports,
     min_distance_m: Number.isFinite(minDistanceM) ? minDistanceM : 0,
     max_moving_time_s: maxMin.trim() ? Number(maxMin) * 60 : null,
     min_elevation_m: Number(minElev) || 0,
+    max_pace_s_per_km: paceS !== null && Number.isFinite(paceS) ? paceS : null,
+    required_days: Number(requiredDays) || 1,
+    window_days: windowDays.trim() ? Number(windowDays) : null,
     per_user_daily_cap: Number(perUser) || 1,
     daily_cap: dailyCap.trim() ? Number(dailyCap) : null,
     valid_days: Number(validDays) || 7,
@@ -98,7 +116,7 @@ function ChallengeForm({
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!Number.isFinite(minDistanceM) || sports.length === 0) {
+    if (!Number.isFinite(minDistanceM) || sports.length === 0 || Number.isNaN(paceS)) {
       setState("invalid");
       return;
     }
@@ -114,6 +132,10 @@ function ChallengeForm({
       minDistanceM,
       maxMovingTimeS: preview.max_moving_time_s,
       minElevationM: preview.min_elevation_m,
+      maxPaceSPerKm: preview.max_pace_s_per_km,
+      requiredDays: preview.required_days,
+      windowDays: preview.window_days,
+      partnerUrl: partnerUrl.trim() || null,
       allowManual,
       perUserDailyCap: preview.per_user_daily_cap,
       dailyCap: preview.daily_cap,
@@ -204,6 +226,23 @@ function ChallengeForm({
         <div>
           <label htmlFor="pkMaxMin" className={labelClass}>{t("perkMaxMin")}</label>
           <input id="pkMaxMin" type="number" min={1} value={maxMin} onChange={(e) => setMaxMin(e.target.value)} placeholder="—" className={`${inputClass} font-mono`} />
+        </div>
+        <div>
+          <label htmlFor="pkPace" className={labelClass}>{t("perkMaxPace")}</label>
+          <input id="pkPace" type="text" inputMode="numeric" value={pace} onChange={(e) => setPace(e.target.value)} placeholder="5:00" className={`${inputClass} font-mono`} />
+        </div>
+        <div>
+          <label htmlFor="pkDays" className={labelClass}>{t("perkRequiredDays")}</label>
+          <input id="pkDays" type="number" min={1} value={requiredDays} onChange={(e) => setRequiredDays(e.target.value)} className={`${inputClass} font-mono`} />
+        </div>
+        <div>
+          <label htmlFor="pkWindow" className={labelClass}>{t("perkWindowDays")}</label>
+          <input id="pkWindow" type="number" min={1} value={windowDays} onChange={(e) => setWindowDays(e.target.value)} disabled={Number(requiredDays) <= 1} placeholder="—" className={`${inputClass} font-mono disabled:opacity-50`} />
+          <p className="mt-1 text-[12px] text-ink/55">{t("perkWindowHint")}</p>
+        </div>
+        <div>
+          <label htmlFor="pkPartnerUrl" className={labelClass}>{t("perkPartnerUrl")}</label>
+          <input id="pkPartnerUrl" type="url" value={partnerUrl} onChange={(e) => setPartnerUrl(e.target.value)} placeholder="https://" className={inputClass} />
         </div>
         <div>
           <label htmlFor="pkElev" className={labelClass}>{t("perkMinElev")}</label>

@@ -10,9 +10,19 @@ export interface PerkChallengeFields {
   min_distance_m: number;
   max_moving_time_s: number | null;
   min_elevation_m: number;
+  max_pace_s_per_km?: number | null;
+  required_days?: number;
+  window_days?: number | null;
   per_user_daily_cap: number;
   daily_cap: number | null;
   valid_days: number;
+}
+
+/** "5:00" for 300 s/km. */
+export function formatPace(secondsPerKm: number): string {
+  const minutes = Math.floor(secondsPerKm / 60);
+  const seconds = secondsPerKm % 60;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
 /**
@@ -23,7 +33,7 @@ export function PerkRule({ challenge }: { challenge: PerkChallengeFields }) {
   const t = useTranslations("perks");
   const locale = useLocale() as Locale;
   const sports = challenge.sport_types
-    .map((sport) => t.has(`sport.${sport}`) ? t(`sport.${sport}`) : sport)
+    .map((sport) => (t.has(`sport.${sport}`) ? t(`sport.${sport}`) : sport))
     .join(" / ");
   const parts: string[] = [
     t("ruleDistance", {
@@ -38,12 +48,23 @@ export function PerkRule({ challenge }: { challenge: PerkChallengeFields }) {
       }),
     );
   }
+  if (challenge.max_pace_s_per_km) {
+    parts.push(t("rulePace", { pace: formatPace(challenge.max_pace_s_per_km) }));
+  }
   if (challenge.min_elevation_m > 0) {
     parts.push(t("ruleElevation", { elevation: challenge.min_elevation_m }));
   }
+  const days = challenge.required_days ?? 1;
+  const dayRule =
+    days > 1
+      ? challenge.window_days
+        ? t("ruleDaysWindow", { days, window: challenge.window_days })
+        : t("ruleDaysPeriod", { days })
+      : null;
   return (
     <span>
       {parts.join(", ")}
+      {dayRule ? ` — ${dayRule}` : ""}
       {". "}
       {t("ruleCaps", { perUser: challenge.per_user_daily_cap })}
       {challenge.daily_cap ? ` ${t("ruleDailyCap", { cap: challenge.daily_cap })}` : ""}

@@ -10,16 +10,29 @@ Strava API Agreement at strava.com/legal/api, all read on 2026-09-10.
 A **partner challenge** (`/izazovi`, table `perk_challenges`) is a rule plus a
 reward, defined by staff in `/admin/izazovi`:
 
-| Field | Example: "5 km a day" | Example: "Fast 5" |
-|---|---|---|
-| Sports | Run, Trail run, Virtual run | Run |
-| Minimum distance | 5 km | 5 km |
-| Maximum moving time | — | 25 min |
-| Minimum elevation gain | — | — |
-| Reward | 1 smoothie | 1 smoothie |
-| Per athlete per day | 1 | 1 |
-| Partner capacity per day | 5 | 5 |
-| Code valid for | 7 days | 7 days |
+| Field | "5 km a day" (cafe) | "Fast 5" | "3 runs a week" (Lotta) |
+|---|---|---|---|
+| Sports | Run, Trail run, Virtual run | Run | Run, Trail run |
+| Minimum distance | 5 km | 5 km | 5 km |
+| Maximum moving time | — | 25 min | — |
+| Maximum pace | — | — | 6:00 /km |
+| Required days / window | 1 | 1 | 3 days in 7 |
+| Reward | 1 smoothie | 1 smoothie | 1 energy drink |
+| Per athlete per day | 1 | 1 | 1 |
+| Partner capacity per day | 5 | 5 | 10 |
+| Code valid for | 7 days | 7 days | 14 days |
+
+The partner is the author of the offer; Santamore only hosts the rule, the
+verification and the code. Each challenge carries the partner's name, an
+optional link, and the partner's own redemption PIN. Nothing requires a
+fundraising page: anyone can sign in with an email, connect Strava and take
+part — and the Strava page nudges them towards starting a page later.
+
+Rule semantics: a single-run rule (required days = 1) pays per qualifying
+activity, within the caps. A multi-day rule pays when the athlete has
+qualifying activities on N distinct days inside a rolling window of W days
+ending on the day of the activity that completes it, and at most once per
+athlete per window. Pace is moving time divided by distance.
 
 The flow for a runner:
 
@@ -122,7 +135,10 @@ Quotes from strava.com/legal/api:
   controls (a shared Santamore login, not a volunteer's personal one), since
   the client secret, the webhook and the athlete cap belong to that account.
 - New apps start in **single-player mode: only the owner's own athlete can
-  connect**. From the API settings dashboard you can raise it yourself to
+  connect** — and the owner's own athlete already fills that slot, so the
+  very first outside runner sees Strava's own page "Error 403: Limit of
+  connected athletes exceeded". That page is Strava's; our callback is
+  never reached, so nothing in the app can catch it. From the API settings dashboard you can raise it yourself to
   **10 athletes** (with 400 requests / 15 min, 4,000 / day). Beyond 10 you
   must submit the app to the Developer Program review with screenshots of
   every place Strava data is shown and of the "Connect with Strava" button,

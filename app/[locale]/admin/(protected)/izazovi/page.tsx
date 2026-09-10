@@ -21,6 +21,10 @@ interface ChallengeRow {
   min_distance_m: number;
   max_moving_time_s: number | null;
   min_elevation_m: number;
+  max_pace_s_per_km: number | null;
+  required_days: number;
+  window_days: number | null;
+  partner_url: string | null;
   allow_manual: boolean;
   per_user_daily_cap: number;
   daily_cap: number | null;
