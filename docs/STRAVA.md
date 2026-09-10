@@ -160,7 +160,8 @@ Quotes from strava.com/legal/api:
   organisation's name.
 
 1. Create an API application at https://www.strava.com/settings/api.
-   *Authorization Callback Domain* = the site host (e.g. `santamore.me`;
+   *Authorization Callback Domain* = the canonical host exactly as served
+   (e.g. `www.santamore.me`, see `docs/DEPLOY.md`;
    for previews, the Vercel preview host). Note the client id and secret.
 2. Set `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET` and a long random
    `STRAVA_WEBHOOK_VERIFY_TOKEN` in the environment (`.env.example`).
