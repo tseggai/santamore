@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
 import { saveEvent } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
+import { PreviewFrame } from "@/components/admin/PreviewFrame";
+import { EventPageView } from "@/components/events/EventPageView";
 import { slugify } from "@/lib/slug";
 
 export interface EventFormValues {
@@ -118,6 +120,22 @@ export function EventForm({
   const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "slug" | "invalid">(
     "idle",
   );
+
+  const previewEvent = {
+    slug: slug || slugify(name) || "dogadjaj",
+    name,
+    kind,
+    starts_at: toIso(startsAt),
+    ends_at: toIso(endsAt),
+    venue: venue.trim() || null,
+    registration_opens_at: toIso(regOpens),
+    registration_closes_at: toIso(regCloses),
+    distances: distances
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean),
+    tiers: parseTiers(tiers) ?? [],
+  };
 
   const submit = async (formEvent: FormEvent) => {
     formEvent.preventDefault();
@@ -394,6 +412,10 @@ export function EventForm({
       {state === "saved" ? (
         <p className="mt-3 text-[13px] font-semibold text-sea">{t("postSaved")}</p>
       ) : null}
+
+      <PreviewFrame liveHref={event?.is_published ? `/dogadjaji/${event.slug}` : null}>
+        <EventPageView event={previewEvent} preview />
+      </PreviewFrame>
 
       <div className="mt-4 flex gap-2">
         <button

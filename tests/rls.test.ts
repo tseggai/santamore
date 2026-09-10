@@ -63,6 +63,12 @@ describe.skipIf(!hasEnv)("RLS: anonymous client", () => {
     "registrations",
     "fundraisers",
     "teams",
+    "strava_connections",
+    "perk_awards",
+    "perk_challenges",
+    "perk_redeem_attempts",
+    "demo_records",
+    "activities",
   ];
 
   for (const table of lockedTables) {

@@ -12,6 +12,7 @@ const ITEMS = [
   { href: "/admin/prikupljaci", key: "navFundraisers", exact: false },
   { href: "/admin/dogadjaji", key: "navEvents", exact: false },
   { href: "/admin/kampanje", key: "navCampaigns", exact: false },
+  { href: "/admin/izazovi", key: "navChallenges", exact: false },
   { href: "/admin/isplate", key: "navDisbursements", exact: false },
   { href: "/admin/sadrzaj", key: "navContent", exact: false },
   { href: "/admin/poruke", key: "navMessages", exact: false },

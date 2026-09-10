@@ -6,8 +6,11 @@ import { useState, type FormEvent } from "react";
 
 import { saveCampaign } from "@/app/[locale]/admin/(protected)/kampanje/actions";
 import type { Option } from "@/components/admin/EventForm";
+import { PreviewFrame } from "@/components/admin/PreviewFrame";
+import { CampaignPageView } from "@/components/campaigns/CampaignPageView";
 import { formatCents, parseEurosToCents } from "@/lib/money";
 import { slugify } from "@/lib/slug";
+import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
 export interface CampaignRow {
@@ -101,6 +104,20 @@ function CampaignForm({
   const [monthly, setMonthly] = useState(monthlyInit.text);
   const [monthlyDefault, setMonthlyDefault] = useState(monthlyInit.defaultIndex);
   const [state, setState] = useState<"idle" | "busy" | "error" | "slug" | "invalid">("idle");
+
+  const previewCampaign = {
+    slug: slug || slugify(title) || "kampanja",
+    title,
+    description: description.trim() || null,
+    beneficiary_summary: summary.trim() || null,
+    goal_cents: goal.trim() === "" ? null : parseEurosToCents(goal),
+    raised_cents: campaign?.raised_cents ?? 0,
+    donor_count: 0,
+    starts_at: fromDateInput(startsAt, false),
+    ends_at: fromDateInput(endsAt, true),
+    chapter_name: chapters.find((chapter) => chapter.id === chapterId)?.name ?? null,
+    events: [],
+  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -342,6 +359,10 @@ function CampaignForm({
         </p>
       ) : null}
 
+      <PreviewFrame liveHref={campaign?.is_public ? `/kampanje/${campaign.slug}` : null}>
+        <CampaignPageView campaign={previewCampaign} preview />
+      </PreviewFrame>
+
       <div className="mt-4 flex gap-2">
         <button
           type="submit"
@@ -399,7 +420,13 @@ export function CampaignsManager({
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div className="min-w-0 flex-1">
                   <p className="flex flex-wrap items-center gap-2 text-[14.5px] font-bold">
-                    {campaign.title}
+                    {campaign.is_public ? (
+                      <Link href={`/kampanje/${campaign.slug}`} className="hover:underline">
+                        {campaign.title}
+                      </Link>
+                    ) : (
+                      campaign.title
+                    )}
                     <span
                       className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
                         campaign.is_public
