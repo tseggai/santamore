@@ -6,7 +6,9 @@ import icon from "@/public/brand/SantamoreIcon-Color.png";
 
 const NAV_ITEMS = [
   { href: "/dogadjaji", key: "events" },
+  { href: "/kampanje", key: "campaigns" },
   { href: "/prikupljaci", key: "fundraisers" },
+  { href: "/izazovi", key: "challenges" },
   { href: "/transparentnost", key: "ledger" },
   { href: "/o-nama", key: "about" },
 ] as const;

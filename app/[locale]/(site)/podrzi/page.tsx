@@ -12,8 +12,8 @@ import { routing, type Locale } from "@/i18n/routing";
 // Reads live campaign data on every request; never prerendered at build.
 export const dynamic = "force-dynamic";
 
-// Task 3 serves the single seeded campaign; fundraiser pages (Task 5) will
-// route here with their own slug and reference.
+// The flagship campaign when none is chosen; fundraiser pages have their
+// own checkout under /f/<slug>/podrzi.
 const DEFAULT_CAMPAIGN_SLUG = "santa-run-2026";
 
 interface CampaignRow {
@@ -59,7 +59,7 @@ function normalizeSuggested(value: unknown): SuggestedSets {
   return { oneoff, monthly: monthly.length > 0 ? monthly : oneoff };
 }
 
-async function fetchCampaign(): Promise<CampaignRow | null> {
+async function fetchCampaign(slug: string): Promise<CampaignRow | null> {
   try {
     // Anonymous read through the public view (CLAUDE.md: public data only
     // via v_public_*); the service role is confined to the pledge insert.
@@ -67,7 +67,7 @@ async function fetchCampaign(): Promise<CampaignRow | null> {
     const { data, error } = await supabase
       .from("v_public_campaigns")
       .select("slug, title, description, goal_cents, payment_reference, suggested_amounts")
-      .eq("slug", DEFAULT_CAMPAIGN_SLUG)
+      .eq("slug", slug)
       .single();
     if (error) {
       console.error("[donate] campaign fetch failed:", error.code);
@@ -95,10 +95,10 @@ export default async function DonatePage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ za?: string }>;
+  searchParams: Promise<{ za?: string; kampanja?: string }>;
 }) {
   const { locale } = await params;
-  const { za } = await searchParams;
+  const { za, kampanja } = await searchParams;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("donate");
@@ -108,7 +108,11 @@ export default async function DonatePage({
     redirect(`/${locale}/f/${encodeURIComponent(za)}/podrzi`);
   }
 
-  const campaign = await fetchCampaign();
+  // /kampanje/<slug> links here with its own campaign; bare /podrzi keeps
+  // the flagship one.
+  const campaign = await fetchCampaign(
+    kampanja && /^[a-z0-9-]{1,100}$/.test(kampanja) ? kampanja : DEFAULT_CAMPAIGN_SLUG,
+  );
   if (!campaign) {
     return (
       <div className="mx-auto max-w-xl px-5 py-20">
