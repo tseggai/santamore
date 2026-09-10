@@ -22,6 +22,7 @@ interface AwardRow {
 
 interface ActivityRow {
   id: string;
+  external_id: string | null;
   name: string | null;
   sport_type: string | null;
   started_on: string;
@@ -67,7 +68,7 @@ export default async function StravaPage({
         .limit(50),
       supabase
         .from("activities")
-        .select("id, name, sport_type, started_on, distance_m, moving_time_s")
+        .select("id, external_id, name, sport_type, started_on, distance_m, moving_time_s")
         .eq("user_id", user.id)
         .eq("source", "strava")
         .order("started_at", { ascending: false })
@@ -192,6 +193,16 @@ export default async function StravaPage({
                       ? ` · ${formatMetricValue(activity.moving_time_s, "moving_time_s", locale as Locale)}`
                       : null}
                   </span>
+                  {activity.external_id ? (
+                    <a
+                      href={`https://www.strava.com/activities/${activity.external_id}`}
+                      target="_blank"
+                      rel="noopener"
+                      className="shrink-0 text-[12px] font-semibold text-[#FC5200] underline underline-offset-2"
+                    >
+                      {t("viewOnStrava")}
+                    </a>
+                  ) : null}
                 </li>
               ))}
             </ul>
