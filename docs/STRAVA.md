@@ -113,6 +113,26 @@ Quotes from strava.com/legal/api:
 
 ## Setup
 
+**Account and capacity facts (developers.strava.com/docs/getting-started and
+/docs/rate-limits, read 2026-09-10):**
+
+- There is no "business account". Any personal Strava account creates the
+  application at strava.com/settings/api — but **a Strava subscription is a
+  prerequisite for creating an app**. Use an account the organisation
+  controls (a shared Santamore login, not a volunteer's personal one), since
+  the client secret, the webhook and the athlete cap belong to that account.
+- New apps start in **single-player mode: only the owner's own athlete can
+  connect**. From the API settings dashboard you can raise it yourself to
+  **10 athletes** (with 400 requests / 15 min, 4,000 / day). Beyond 10 you
+  must submit the app to the Developer Program review with screenshots of
+  every place Strava data is shown and of the "Connect with Strava" button,
+  and no further athletes can connect until approval. Increased access "is
+  not a guarantee". Plan the review weeks before the first partner
+  challenge opens to the public.
+- The API Agreement binds whoever registers: an individual over 18 or a
+  representative with authority to bind the entity. Register in the
+  organisation's name.
+
 1. Create an API application at https://www.strava.com/settings/api.
    *Authorization Callback Domain* = the site host (e.g. `santamore.me`;
    for previews, the Vercel preview host). Note the client id and secret.
