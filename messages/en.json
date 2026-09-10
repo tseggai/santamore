@@ -937,7 +937,8 @@
     "capacityStaffHint": "Staff: Strava caps connected athletes per app — 1 in single-player mode (the app owner's own athlete fills it), 10 after raising the cap in the API settings, more only after Developer Program review. A runner over the cap sees Strava's \"Error 403: Limit of connected athletes exceeded\".",
     "nurtureHeading": "Your runs could also raise money",
     "nurtureBody": "You are connected and earning rewards. A fundraising page turns the same runs into support for families in the Bay — a photo, a goal, three sentences.",
-    "nurtureCta": "Start a page"
+    "nurtureCta": "Start a page",
+    "viewOnStrava": "View on Strava"
   },
   "giving": {
     "title": "My giving",
