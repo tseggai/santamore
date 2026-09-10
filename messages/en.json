@@ -708,7 +708,8 @@
     "perkWindowHint": "Required days above 1 make a streak rule: N different days inside the window, one reward per athlete per window. Empty window = the challenge period.",
     "perkPartnerUrl": "Partner website",
     "perkPause": "Pause",
-    "perkResume": "Resume"
+    "perkResume": "Resume",
+    "linkRateLimited": "Too many sign-in emails in a short time. Wait a few minutes, or use the code from an email you already have."
   },
   "forms": {
     "nameLabel": "Full name",

@@ -708,7 +708,8 @@
     "perkWindowHint": "Više od 1 potrebnog dana pravi pravilo niza: N različitih dana unutar roka, jedna nagrada po sportisti po roku. Prazan rok = period izazova.",
     "perkPartnerUrl": "Sajt partnera",
     "perkPause": "Pauziraj",
-    "perkResume": "Nastavi"
+    "perkResume": "Nastavi",
+    "linkRateLimited": "Previše mejlova za prijavu u kratkom vremenu. Sačekaj nekoliko minuta ili unesi kod iz mejla koji već imaš."
   },
   "forms": {
     "nameLabel": "Ime i prezime",
