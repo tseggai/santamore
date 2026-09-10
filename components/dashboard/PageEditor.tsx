@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import {
   setFundraiserStatus,
   updateFundraiserPage,
-} from "@/app/[locale]/(site)/dashboard/(protected)/actions";
+} from "@/app/[locale]/dashboard/(protected)/actions";
 import { Avatar } from "@/components/Avatar";
 import { Editable, PencilIcon } from "@/components/dashboard/Editable";
 import { TeamPanel, type TeamOption } from "@/components/dashboard/TeamPanel";
@@ -19,6 +19,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { Locale } from "@/i18n/routing";
 
 interface EditorFundraiser {
+  id: string;
   slug: string;
   title: string;
   story: string;
@@ -26,6 +27,7 @@ interface EditorFundraiser {
   photoPath: string | null;
   status: "draft" | "active" | "hidden";
   teamId: string | null;
+  eventId: string;
   eventName: string;
 }
 
@@ -106,6 +108,7 @@ export function PageEditor({
 
   const persist = () =>
     updateFundraiserPage({
+      fundraiserId: fundraiser.id,
       title,
       story,
       goalCents,
@@ -142,7 +145,10 @@ export function PageEditor({
     // active row, so saving reduced content before leaving 'active' would
     // dead-end. Publishing judges the saved row, so save first there.
     if (isActive) {
-      const dropped = await setFundraiserStatus(false).catch(
+      const dropped = await setFundraiserStatus({
+        fundraiserId: fundraiser.id,
+        publish: false,
+      }).catch(
         () => ({ ok: false as const, error: "server" as const }),
       );
       if (!dropped.ok) {
@@ -165,7 +171,10 @@ export function PageEditor({
       return;
     }
     setDirty(false);
-    const result = await setFundraiserStatus(true).catch(
+    const result = await setFundraiserStatus({
+      fundraiserId: fundraiser.id,
+      publish: true,
+    }).catch(
       () => ({ ok: false as const, error: "server" as const }),
     );
     setBusy("");
@@ -399,6 +408,8 @@ export function PageEditor({
             {teamPanel === "create" ? (
               <TeamPanel
                 mode="create"
+                eventId={fundraiser.eventId}
+                joinFundraiserId={fundraiser.id}
                 onDone={onTeamDone}
                 onCancel={() => setTeamPanel("")}
               />

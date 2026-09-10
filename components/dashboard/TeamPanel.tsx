@@ -4,9 +4,9 @@ import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
 
 import {
-  createTeamAndJoin,
+  createTeam,
   updateTeam,
-} from "@/app/[locale]/(site)/dashboard/(protected)/actions";
+} from "@/app/[locale]/dashboard/(protected)/actions";
 import { Avatar } from "@/components/Avatar";
 import { downscaleToJpeg } from "@/lib/images";
 import { fundraiserPhotoUrl } from "@/lib/storage";
@@ -28,11 +28,17 @@ export interface TeamOption {
 export function TeamPanel({
   mode,
   team,
+  eventId,
+  joinFundraiserId = null,
   onDone,
   onCancel,
 }: {
   mode: "create" | "edit";
   team?: TeamOption;
+  /** Create mode: the event the team belongs to. */
+  eventId?: string;
+  /** Create mode: join with this page right away. */
+  joinFundraiserId?: string | null;
   onDone: (team: TeamOption) => void;
   onCancel: () => void;
 }) {
@@ -82,7 +88,9 @@ export function TeamPanel({
     const payload = { name, description, photoPath };
     const result =
       mode === "create"
-        ? await createTeamAndJoin(payload).catch(() => ({ ok: false as const }))
+        ? await createTeam({ ...payload, eventId: eventId ?? "", joinFundraiserId }).catch(
+            () => ({ ok: false as const }),
+          )
         : await updateTeam({ ...payload, teamId: team!.id }).catch(() => ({
             ok: false as const,
           }));
