@@ -42,7 +42,7 @@ export function authorizeUrl(redirectUri: string, state: string): string {
   return `${AUTHORIZE_URL}?${params}`;
 }
 
-class StravaError extends Error {
+export class StravaError extends Error {
   constructor(
     message: string,
     public status: number,

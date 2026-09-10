@@ -73,7 +73,9 @@
       "news": "Новости",
       "faq": "Вопросы и ответы",
       "contact": "Контакты",
-      "how": "Как мы работаем"
+      "how": "Как мы работаем",
+      "campaigns": "Кампании",
+      "challenges": "Челленджи"
     },
     "cards": "[[PLACEHOLDER: логотипы принимаемых карт]]",
     "note": "Ни один цент из пожертвований не идёт на зарплаты или расходы. Их оплачивают спонсоры."
@@ -936,11 +938,11 @@
     "activitiesEmpty": "Активности ещё не импортированы — здесь появятся публичные пробежки за последние 30 дней.",
     "poweredBy": "Powered by Strava",
     "unconfiguredStaffHint": "Для персонала: задайте STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET и STRAVA_WEBHOOK_VERIFY_TOKEN, затем зарегистрируйте webhook в Админ → Награды партнёров (docs/STRAVA.md).",
-    "capacityStaffHint": "Для персонала: Strava ограничивает число подключённых атлетов на приложение — 1 в режиме single-player (его занимает атлет владельца приложения), 10 после повышения лимита в настройках API, больше только после проверки Developer Program. Бегун сверх лимита видит страницу Strava «Error 403: Limit of connected athletes exceeded».",
     "nurtureHeading": "Ваши пробежки могут ещё и собирать деньги",
     "nurtureBody": "Вы подключены и получаете награды. Страница сбора превращает те же пробежки в помощь семьям в Боке — фото, цель, три предложения.",
     "nurtureCta": "Создать страницу",
-    "viewOnStrava": "View on Strava"
+    "viewOnStrava": "View on Strava",
+    "statusCredentials": "Strava отклонила учётные данные приложения сайта. Команда: проверьте STRAVA_CLIENT_ID и STRAVA_CLIENT_SECRET в настройках деплоя."
   },
   "giving": {
     "title": "Мои пожертвования",

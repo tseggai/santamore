@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { hasLocale } from "next-intl";
 
-import { exchangeCode, stravaConfig } from "@/lib/strava/api";
+import { exchangeCode, stravaConfig, StravaError } from "@/lib/strava/api";
 import { hasActivityScope, verifyState } from "@/lib/strava/rules";
 import { localToday, syncRecent } from "@/lib/strava/sync";
 import { siteOrigin } from "@/lib/site";
@@ -85,6 +85,9 @@ export async function GET(request: Request) {
     return back("connected");
   } catch (error) {
     console.error("[strava] callback failed:", error);
+    // 401 from /oauth/token means Strava rejected OUR client id/secret —
+    // a deployment problem, not something the runner can retry through.
+    if (error instanceof StravaError && error.status === 401) return back("credentials");
     return back("error");
   }
 }

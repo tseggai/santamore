@@ -3,12 +3,8 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import type { LeaderboardEntry } from "@/components/Leaderboard";
-import {
-  EventPageView,
-  parseDistances,
-  parseTiers,
-  type EventView,
-} from "@/components/events/EventPageView";
+import { EventPageView, type EventView } from "@/components/events/EventPageView";
+import { parseDistances, parseTiers } from "@/lib/events";
 import {
   formatMetricValue,
   metricValue,

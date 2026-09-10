@@ -72,7 +72,9 @@
       "news": "Vijesti",
       "faq": "Česta pitanja",
       "contact": "Kontakt",
-      "how": "Kako radimo"
+      "how": "Kako radimo",
+      "campaigns": "Kampanje",
+      "challenges": "Izazovi"
     },
     "cards": "[[PLACEHOLDER: logotipi prihvaćenih kartica]]",
     "note": "Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori."
@@ -935,11 +937,11 @@
     "activitiesEmpty": "Još nema uvezenih aktivnosti — ovdje se pojavljuju javna trčanja iz posljednjih 30 dana.",
     "poweredBy": "Powered by Strava",
     "unconfiguredStaffHint": "Za osoblje: podesi STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET i STRAVA_WEBHOOK_VERIFY_TOKEN, pa registruj webhook pod Admin → Nagrade partnera (docs/STRAVA.md).",
-    "capacityStaffHint": "Za osoblje: Strava ograničava broj povezanih sportista po aplikaciji — 1 u single-player režimu (popunjava ga sportista vlasnika aplikacije), 10 nakon podizanja limita u API podešavanjima, više tek nakon Developer Program provjere. Trkač preko limita vidi Stravinu poruku „Error 403: Limit of connected athletes exceeded“.",
     "nurtureHeading": "Tvoja trčanja mogu i da prikupe novac",
     "nurtureBody": "Povezan/a si i osvajaš nagrade. Stranica za prikupljanje pretvara ista trčanja u podršku porodicama u Boki — fotografija, cilj, tri rečenice.",
     "nurtureCta": "Napravi stranicu",
-    "viewOnStrava": "View on Strava"
+    "viewOnStrava": "View on Strava",
+    "statusCredentials": "Strava je odbila pristupne podatke ove aplikacije. Tim: provjerite STRAVA_CLIENT_ID i STRAVA_CLIENT_SECRET u deploy podešavanjima."
   },
   "giving": {
     "title": "Moje donacije",

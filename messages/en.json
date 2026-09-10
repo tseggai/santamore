@@ -72,7 +72,9 @@
       "news": "News",
       "faq": "FAQ",
       "contact": "Contact",
-      "how": "How we work"
+      "how": "How we work",
+      "campaigns": "Campaigns",
+      "challenges": "Challenges"
     },
     "cards": "[[PLACEHOLDER: accepted card brand logos]]",
     "note": "Not one cent of donations goes to salaries or overhead. Sponsors pay for those."
@@ -935,11 +937,11 @@
     "activitiesEmpty": "No activities imported yet — public runs from the last 30 days appear here.",
     "poweredBy": "Powered by Strava",
     "unconfiguredStaffHint": "Staff: set STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET and STRAVA_WEBHOOK_VERIFY_TOKEN, then register the webhook under Admin → Partner perks (docs/STRAVA.md).",
-    "capacityStaffHint": "Staff: Strava caps connected athletes per app — 1 in single-player mode (the app owner's own athlete fills it), 10 after raising the cap in the API settings, more only after Developer Program review. A runner over the cap sees Strava's \"Error 403: Limit of connected athletes exceeded\".",
     "nurtureHeading": "Your runs could also raise money",
     "nurtureBody": "You are connected and earning rewards. A fundraising page turns the same runs into support for families in the Bay — a photo, a goal, three sentences.",
     "nurtureCta": "Start a page",
-    "viewOnStrava": "View on Strava"
+    "viewOnStrava": "View on Strava",
+    "statusCredentials": "Strava rejected this site's app credentials. Staff: check STRAVA_CLIENT_ID and STRAVA_CLIENT_SECRET in the deployment."
   },
   "giving": {
     "title": "My giving",
