@@ -13,7 +13,8 @@
     "donate": "Donate",
     "menu": "Menu",
     "campaigns": "Campaigns",
-    "challenges": "Challenges"
+    "challenges": "Challenges",
+    "myPage": "My page"
   },
   "home": {
     "eyebrow": "Montenegrin non-profit · Tivat",
@@ -282,7 +283,44 @@
     "teamCreateSubmit": "Create team and join",
     "teamEditSubmit": "Save team",
     "cancel": "Cancel",
-    "stravaLink": "Strava and partner rewards"
+    "stravaLink": "Strava and partner rewards",
+    "consoleBadge": "My Santamore",
+    "viewSite": "View public site",
+    "navOverview": "Overview",
+    "navPages": "My pages",
+    "navTeams": "My teams",
+    "navShare": "Share toolkit",
+    "navCash": "Cash",
+    "navStrava": "Strava & rewards",
+    "welcome": "Hi {name}",
+    "statRaised": "Raised across my pages",
+    "statGoal": "Combined goal",
+    "statDonors": "Donors",
+    "statRewards": "Rewards ready to redeem",
+    "nextActionCreate": "Create your first page — pick the event, add a photo, a goal and three sentences.",
+    "quickActions": "Quick actions",
+    "qaNewPage": "New page",
+    "qaNewTeam": "New team",
+    "qaShare": "Share",
+    "qaCash": "Log cash",
+    "qaRewards": "My rewards",
+    "qaStrava": "Connect Strava",
+    "qaEvents": "Browse events",
+    "manage": "Manage",
+    "pagesEmpty": "No pages yet.",
+    "statusActiveShort": "live",
+    "statusDraftShort": "draft",
+    "teamsEmpty": "You don't captain a team yet.",
+    "registrationsHeading": "My registrations",
+    "registrationsEmpty": "Not registered for any event yet.",
+    "pagesSub": "One page per event you take part in. Each has its own story, goal, team and donate link.",
+    "createNoEvents": "There is no open event you don't already have a page for.",
+    "teamsSub": "Teams you captain. Anyone with a page on the same event can join from their editor; every member's page counts towards the team total.",
+    "memberCountShort": "{count, plural, one {# member} other {# members}}",
+    "teamJoinsPage": "Your page on this event joins the team automatically.",
+    "teamNoPageYet": "You have no page on this event yet — the team is created without you as a member; create a page to join it.",
+    "pagePickerLabel": "Page",
+    "shareDraftWarning": "This page is still a draft — publish it before sharing."
   },
   "email": {
     "instructions": {
@@ -636,7 +674,32 @@
       "desktop": "Desktop"
     },
     "previewOpenLive": "Open live page",
-    "previewNote": "Preview — current form values, unsaved"
+    "previewNote": "Preview — current form values, unsaved",
+    "navSponsors": "Sponsors",
+    "sponsorsTitle": "Sponsors and partners",
+    "sponsorsHint": "The sponsor pipeline. Tie a sponsor to a campaign and/or an event. Signed and active cash sponsors count towards the Operations Fund; donations never mix with them.",
+    "spName": "Name",
+    "spTier": "Tier",
+    "spTierHint": "e.g. gold, silver, media",
+    "spCampaign": "Campaign",
+    "spEvent": "Event",
+    "spStatus": "Status",
+    "spStatusValue": {
+      "prospect": "prospect",
+      "negotiating": "negotiating",
+      "signed": "signed",
+      "active": "active",
+      "ended": "ended"
+    },
+    "spAmount": "Amount (€)",
+    "spWebsite": "Website",
+    "spInKind": "In-kind (goods or services, not cash)",
+    "spInKindShort": "in kind",
+    "spOpsNote": "Only signed/active cash sponsors count in the public Operations Fund total.",
+    "spCreate": "Add sponsor",
+    "spNew": "New sponsor",
+    "spEmpty": "No sponsors yet.",
+    "goalInvalidAdmin": "Enter the amount as a number, e.g. 1500"
   },
   "forms": {
     "nameLabel": "Full name",
@@ -856,6 +919,7 @@
     },
     "activitiesHeading": "Recent Strava activities",
     "activitiesEmpty": "No activities imported yet — public runs from the last 30 days appear here.",
-    "poweredBy": "Powered by Strava"
+    "poweredBy": "Powered by Strava",
+    "unconfiguredStaffHint": "Staff: set STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET and STRAVA_WEBHOOK_VERIFY_TOKEN, then register the webhook under Admin → Partner perks (docs/STRAVA.md)."
   }
 }

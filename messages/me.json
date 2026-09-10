@@ -13,7 +13,8 @@
     "donate": "Podrži",
     "menu": "Meni",
     "campaigns": "Kampanje",
-    "challenges": "Izazovi"
+    "challenges": "Izazovi",
+    "myPage": "Moja stranica"
   },
   "home": {
     "eyebrow": "Crnogorska neprofitna organizacija · Tivat",
@@ -282,7 +283,44 @@
     "teamCreateSubmit": "Napravi tim i pridruži se",
     "teamEditSubmit": "Sačuvaj tim",
     "cancel": "Otkaži",
-    "stravaLink": "Strava i nagrade partnera"
+    "stravaLink": "Strava i nagrade partnera",
+    "consoleBadge": "Moj Santamore",
+    "viewSite": "Pogledaj javni sajt",
+    "navOverview": "Pregled",
+    "navPages": "Moje stranice",
+    "navTeams": "Moji timovi",
+    "navShare": "Alati za dijeljenje",
+    "navCash": "Keš",
+    "navStrava": "Strava i nagrade",
+    "welcome": "Zdravo {name}",
+    "statRaised": "Prikupljeno na mojim stranicama",
+    "statGoal": "Ukupan cilj",
+    "statDonors": "Donatora",
+    "statRewards": "Nagrade spremne za korišćenje",
+    "nextActionCreate": "Napravi prvu stranicu — izaberi događaj, dodaj fotografiju, cilj i tri rečenice.",
+    "quickActions": "Brze akcije",
+    "qaNewPage": "Nova stranica",
+    "qaNewTeam": "Novi tim",
+    "qaShare": "Podijeli",
+    "qaCash": "Zabilježi keš",
+    "qaRewards": "Moje nagrade",
+    "qaStrava": "Poveži Stravu",
+    "qaEvents": "Pogledaj događaje",
+    "manage": "Upravljaj",
+    "pagesEmpty": "Još nema stranica.",
+    "statusActiveShort": "objavljena",
+    "statusDraftShort": "nacrt",
+    "teamsEmpty": "Još ne vodiš nijedan tim.",
+    "registrationsHeading": "Moje prijave",
+    "registrationsEmpty": "Nisi prijavljen/a ni na jedan događaj.",
+    "pagesSub": "Jedna stranica po događaju u kojem učestvuješ. Svaka ima svoju priču, cilj, tim i link za donacije.",
+    "createNoEvents": "Nema otvorenog događaja za koji već nemaš stranicu.",
+    "teamsSub": "Timovi koje vodiš. Svako sa stranicom na istom događaju može se pridružiti iz svog uređivača; stranica svakog člana računa se u ukupan iznos tima.",
+    "memberCountShort": "{count, plural, one {# član} few {# člana} other {# članova}}",
+    "teamJoinsPage": "Tvoja stranica na ovom događaju automatski ulazi u tim.",
+    "teamNoPageYet": "Još nemaš stranicu na ovom događaju — tim se pravi bez tebe kao člana; napravi stranicu da mu se pridružiš.",
+    "pagePickerLabel": "Stranica",
+    "shareDraftWarning": "Ova stranica je još nacrt — objavi je prije dijeljenja."
   },
   "email": {
     "instructions": {
@@ -636,7 +674,32 @@
       "desktop": "Računar"
     },
     "previewOpenLive": "Otvori javnu stranicu",
-    "previewNote": "Pregled — trenutne vrijednosti forme, nesačuvano"
+    "previewNote": "Pregled — trenutne vrijednosti forme, nesačuvano",
+    "navSponsors": "Sponzori",
+    "sponsorsTitle": "Sponzori i partneri",
+    "sponsorsHint": "Sponzorska lista. Veži sponzora za kampanju i/ili događaj. Potpisani i aktivni novčani sponzori ulaze u Operativni fond; donacije se s njima nikad ne miješaju.",
+    "spName": "Naziv",
+    "spTier": "Nivo",
+    "spTierHint": "npr. zlatni, srebrni, medijski",
+    "spCampaign": "Kampanja",
+    "spEvent": "Događaj",
+    "spStatus": "Status",
+    "spStatusValue": {
+      "prospect": "potencijalni",
+      "negotiating": "u pregovorima",
+      "signed": "potpisan",
+      "active": "aktivan",
+      "ended": "završen"
+    },
+    "spAmount": "Iznos (€)",
+    "spWebsite": "Sajt",
+    "spInKind": "U naturi (roba ili usluge, ne novac)",
+    "spInKindShort": "u naturi",
+    "spOpsNote": "U javni zbir Operativnog fonda ulaze samo potpisani/aktivni novčani sponzori.",
+    "spCreate": "Dodaj sponzora",
+    "spNew": "Novi sponzor",
+    "spEmpty": "Još nema sponzora.",
+    "goalInvalidAdmin": "Upiši iznos kao broj, npr. 1500"
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -856,6 +919,7 @@
     },
     "activitiesHeading": "Nedavne Strava aktivnosti",
     "activitiesEmpty": "Još nema uvezenih aktivnosti — ovdje se pojavljuju javna trčanja iz posljednjih 30 dana.",
-    "poweredBy": "Powered by Strava"
+    "poweredBy": "Powered by Strava",
+    "unconfiguredStaffHint": "Za osoblje: podesi STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET i STRAVA_WEBHOOK_VERIFY_TOKEN, pa registruj webhook pod Admin → Nagrade partnera (docs/STRAVA.md)."
   }
 }
