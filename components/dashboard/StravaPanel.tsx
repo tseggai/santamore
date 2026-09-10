@@ -180,6 +180,9 @@ export function StravaPanel({
             </p>
           )}
           <p className="mt-3 text-[12px] leading-relaxed text-ink/55">{t("privacyNote")}</p>
+          {isStaff && configured ? (
+            <p className="mt-2 font-mono text-[11.5px] leading-relaxed text-ink/55">{t("capacityStaffHint")}</p>
+          ) : null}
         </>
       )}
 

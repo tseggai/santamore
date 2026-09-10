@@ -37,6 +37,10 @@ const challengeSchema = z.object({
   minDistanceM: z.number().int().min(0).max(1_000_000),
   maxMovingTimeS: z.number().int().min(60).max(86_400).nullable(),
   minElevationM: z.number().int().min(0).max(20_000),
+  maxPaceSPerKm: z.number().int().min(120).max(3600).nullable(),
+  requiredDays: z.number().int().min(1).max(365),
+  windowDays: z.number().int().min(1).max(365).nullable(),
+  partnerUrl: z.string().trim().url().max(300).nullable(),
   allowManual: z.boolean(),
   perUserDailyCap: z.number().int().min(1).max(20),
   dailyCap: z.number().int().min(1).max(10_000).nullable(),
@@ -65,6 +69,10 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
     min_distance_m: data.minDistanceM,
     max_moving_time_s: data.maxMovingTimeS,
     min_elevation_m: data.minElevationM,
+    max_pace_s_per_km: data.maxPaceSPerKm,
+    required_days: data.requiredDays,
+    window_days: data.requiredDays > 1 ? data.windowDays : null,
+    partner_url: data.partnerUrl,
     allow_manual: data.allowManual,
     per_user_daily_cap: data.perUserDailyCap,
     daily_cap: data.dailyCap,
@@ -95,6 +103,23 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
     }
   }
 
+  revalidatePath("/[locale]/admin/izazovi", "page");
+  revalidatePath("/[locale]/izazovi", "layout");
+  return { ok: true };
+}
+
+/** Pause / resume without touching anything else — the "we're out for today" switch. */
+export async function setPerkChallengeActive(input: unknown): Promise<PerkActionResult> {
+  const parsed = z.object({ id: z.string().uuid(), active: z.boolean() }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("perk_challenges")
+    .update({ is_active: parsed.data.active })
+    .eq("id", parsed.data.id)
+    .select("id")
+    .single();
+  if (error) return { ok: false, error: "server" };
   revalidatePath("/[locale]/admin/izazovi", "page");
   revalidatePath("/[locale]/izazovi", "layout");
   return { ok: true };

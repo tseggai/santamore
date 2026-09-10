@@ -18,6 +18,7 @@ export interface PerkChallengeRow extends PerkChallengeFields {
   reward_label: string;
   starts_at: string | null;
   ends_at: string | null;
+  partner_url: string | null;
   issued_today: number;
   redeemed_total: number;
 }
@@ -109,7 +110,7 @@ export default async function ChallengesIndexPage({
       )}
 
       <div className="mt-10 rounded-brand border-[1.5px] border-dashed border-line px-5 py-4 text-[13.5px] leading-relaxed text-ink/70">
-        {t("howNote")}{" "}
+        {t("noPageNeeded")} {t("howNote")}{" "}
         <Link href="/dashboard/strava" className="font-semibold text-sea underline underline-offset-2">
           {t("connectCta")}
         </Link>

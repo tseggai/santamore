@@ -59,7 +59,13 @@ export default async function ChallengePage({
   return (
     <div className="mx-auto max-w-xl px-5 py-12">
       <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
-        {challenge.partner_name}
+        {challenge.partner_url ? (
+          <a href={challenge.partner_url} rel="noopener" target="_blank" className="underline underline-offset-2 hover:text-sea">
+            {challenge.partner_name} ↗
+          </a>
+        ) : (
+          challenge.partner_name
+        )}
       </p>
       <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
         <h1 className="type-display text-3xl sm:text-4xl">{challenge.title}</h1>
@@ -98,7 +104,8 @@ export default async function ChallengePage({
         </p>
       ) : null}
 
-      <ol className="mt-6 space-y-2">
+      <p className="mt-6 text-[13.5px] leading-relaxed text-ink/70">{t("noPageNeeded")}</p>
+      <ol className="mt-3 space-y-2">
         {(["step1", "step2", "step3"] as const).map((step, index) => (
           <li key={step} className="flex gap-3 text-[13.5px] leading-relaxed">
             <span className="font-mono text-[11px] text-red">0{index + 1}</span>
