@@ -19,8 +19,8 @@
 
 -- 1 ─ team profile ------------------------------------------------------------
 alter table public.teams
-  add column description text,
-  add column photo_path  text;
+  add column if not exists description text,
+  add column if not exists photo_path  text;
 
 grant update (name, goal_cents, description, photo_path)
   on public.teams to authenticated;
@@ -47,7 +47,7 @@ join public.events e on e.id = t.event_id
 left join public.v_fundraiser_totals ft on ft.team_id = t.id
 group by t.id, e.id;
 
-create view public.v_leaderboard_teams
+create or replace view public.v_leaderboard_teams
   with (security_invoker = off, security_barrier = on) as
 select
   tt.*,
@@ -61,24 +61,29 @@ grant select on public.v_team_totals, public.v_leaderboard_teams
 -- 2 ─ staff event + campaign management -------------------------------------
 grant select, insert, update on public.events to authenticated;
 
+drop policy if exists events_staff_select on public.events;
 create policy events_staff_select on public.events
   for select to authenticated using (public.is_staff());
+drop policy if exists events_staff_insert on public.events;
 create policy events_staff_insert on public.events
   for insert to authenticated with check (public.is_staff());
+drop policy if exists events_staff_update on public.events;
 create policy events_staff_update on public.events
   for update to authenticated
   using (public.is_staff()) with check (public.is_staff());
 
 grant insert, update on public.campaigns to authenticated;
 
+drop policy if exists campaigns_staff_insert on public.campaigns;
 create policy campaigns_staff_insert on public.campaigns
   for insert to authenticated with check (public.is_staff());
+drop policy if exists campaigns_staff_update on public.campaigns;
 create policy campaigns_staff_update on public.campaigns
   for update to authenticated
   using (public.is_staff()) with check (public.is_staff());
 
 -- 3 ─ demo data registry + purge ---------------------------------------------
-create table public.demo_records (
+create table if not exists public.demo_records (
   kind        text not null
               check (kind in ('user', 'team', 'fundraiser', 'donation')),
   row_id      uuid not null,
