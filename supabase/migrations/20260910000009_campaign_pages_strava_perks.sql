@@ -68,9 +68,9 @@ where c.is_public;
 
 -- 2 ─ activities belong to people ---------------------------------------------
 alter table public.activities
-  add column user_id    uuid references public.profiles (id) on delete cascade,
-  add column started_on date,
-  add column name       text;
+  add column if not exists user_id    uuid references public.profiles (id) on delete cascade,
+  add column if not exists started_on date,
+  add column if not exists name       text;
 
 update public.activities a
    set user_id = f.user_id
@@ -86,18 +86,16 @@ alter table public.activities
   alter column started_on set not null,
   alter column fundraiser_id drop not null;
 
-create index activities_user_started_idx on public.activities (user_id, started_on);
+create index if not exists activities_user_started_idx on public.activities (user_id, started_on);
 
-drop policy activities_owner_select on public.activities;
-drop policy activities_owner_insert on public.activities;
-drop policy activities_owner_delete on public.activities;
-
+drop policy if exists activities_owner_select on public.activities;
 create policy activities_owner_select on public.activities
   for select to authenticated
   using (public.is_staff() or user_id = (select auth.uid()));
 
 -- Manual entries only; Strava rows arrive through the service role. A
 -- fundraiser_id, when set, must be the runner's own page.
+drop policy if exists activities_owner_insert on public.activities;
 create policy activities_owner_insert on public.activities
   for insert to authenticated
   with check (
@@ -108,12 +106,13 @@ create policy activities_owner_insert on public.activities
       where f.id = fundraiser_id and f.user_id = (select auth.uid())))
   );
 
+drop policy if exists activities_owner_delete on public.activities;
 create policy activities_owner_delete on public.activities
   for delete to authenticated
   using (source = 'manual' and user_id = (select auth.uid()));
 
 -- 3 ─ Strava connections --------------------------------------------------------
-create table public.strava_connections (
+create table if not exists public.strava_connections (
   user_id       uuid primary key references public.profiles (id) on delete cascade,
   athlete_id    bigint not null unique,
   access_token  text not null,
@@ -132,10 +131,12 @@ grant select (user_id, athlete_id, scope, share_public, connected_at, last_sync_
   on public.strava_connections to authenticated;
 grant update (share_public) on public.strava_connections to authenticated;
 
+drop policy if exists strava_connections_owner_select on public.strava_connections;
 create policy strava_connections_owner_select on public.strava_connections
   for select to authenticated
   using (user_id = (select auth.uid()));
 
+drop policy if exists strava_connections_owner_update on public.strava_connections;
 create policy strava_connections_owner_update on public.strava_connections
   for update to authenticated
   using (user_id = (select auth.uid()))
@@ -164,7 +165,7 @@ where f.status = 'active'
 group by f.id;
 
 -- 4 ─ partner perks --------------------------------------------------------------
-create table public.perk_challenges (
+create table if not exists public.perk_challenges (
   id                 uuid primary key default gen_random_uuid(),
   slug               text not null unique,
   partner_name       text not null,
@@ -190,15 +191,18 @@ alter table public.perk_challenges enable row level security;
 
 grant select, insert, update on public.perk_challenges to authenticated;
 
+drop policy if exists perk_challenges_staff_select on public.perk_challenges;
 create policy perk_challenges_staff_select on public.perk_challenges
   for select to authenticated using (public.is_staff());
+drop policy if exists perk_challenges_staff_insert on public.perk_challenges;
 create policy perk_challenges_staff_insert on public.perk_challenges
   for insert to authenticated with check (public.is_staff());
+drop policy if exists perk_challenges_staff_update on public.perk_challenges;
 create policy perk_challenges_staff_update on public.perk_challenges
   for update to authenticated
   using (public.is_staff()) with check (public.is_staff());
 
-create table public.perk_awards (
+create table if not exists public.perk_awards (
   id            uuid primary key default gen_random_uuid(),
   challenge_id  uuid not null references public.perk_challenges (id),
   user_id       uuid not null references public.profiles (id) on delete cascade,
@@ -215,26 +219,27 @@ create table public.perk_awards (
 
 alter table public.perk_awards enable row level security;
 
-create index perk_awards_challenge_day_idx on public.perk_awards (challenge_id, awarded_on);
-create index perk_awards_user_idx on public.perk_awards (user_id);
+create index if not exists perk_awards_challenge_day_idx on public.perk_awards (challenge_id, awarded_on);
+create index if not exists perk_awards_user_idx on public.perk_awards (user_id);
 
 grant select on public.perk_awards to authenticated;
 
+drop policy if exists perk_awards_owner_select on public.perk_awards;
 create policy perk_awards_owner_select on public.perk_awards
   for select to authenticated
   using (public.is_staff() or user_id = (select auth.uid()));
 
 -- PIN-guessing throttle; definer-function use only.
-create table public.perk_redeem_attempts (
+create table if not exists public.perk_redeem_attempts (
   code         text not null,
   attempted_at timestamptz not null default now()
 );
 alter table public.perk_redeem_attempts enable row level security;
-create index perk_redeem_attempts_idx on public.perk_redeem_attempts (code, attempted_at);
+create index if not exists perk_redeem_attempts_idx on public.perk_redeem_attempts (code, attempted_at);
 
 -- Public views: the challenge catalogue and one award by its code. The
 -- award view shows the award (ours) — never the underlying Strava activity.
-create view public.v_public_perk_challenges
+create or replace view public.v_public_perk_challenges
   with (security_invoker = off, security_barrier = on) as
 select
   c.id, c.slug, c.partner_name, c.title, c.description, c.reward_label,
@@ -250,7 +255,7 @@ select
 from public.perk_challenges c
 where c.is_active;
 
-create view public.v_public_perk_award
+create or replace view public.v_public_perk_award
   with (security_invoker = off, security_barrier = on) as
 select
   a.code,
