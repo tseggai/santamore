@@ -137,6 +137,7 @@ export default async function DashboardOverviewPage({
     { href: "/dashboard/gotovina", label: t("qaCash") },
     { href: "/dashboard/strava", label: connection ? t("qaRewards") : t("qaStrava") },
     { href: "/dogadjaji", label: t("qaEvents") },
+    { href: "/dashboard/donacije", label: t("qaGiving") },
   ];
 
   return (

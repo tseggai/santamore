@@ -12,6 +12,7 @@ const ITEMS = [
   { href: "/dashboard/alati", key: "navShare", exact: false },
   { href: "/dashboard/gotovina", key: "navCash", exact: false },
   { href: "/dashboard/strava", key: "navStrava", exact: false },
+  { href: "/dashboard/donacije", key: "navGiving", exact: false },
 ] as const;
 
 /** Runner console nav: vertical in the sidebar (desktop), scrollable row on mobile. */

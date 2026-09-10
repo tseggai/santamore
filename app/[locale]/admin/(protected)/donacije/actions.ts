@@ -3,12 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
-import { buildReceiptEmail } from "@/lib/email/donation";
-import { sendEmail } from "@/lib/email/send";
+import { sendReceiptFor } from "@/lib/email/receipt";
 import { MAX_CENTS } from "@/lib/money";
 import { PAYMENT_REFERENCE_PATTERN } from "@/lib/references";
 import { createClient } from "@/lib/supabase/server";
-import { routing, type Locale } from "@/i18n/routing";
 
 // All queries here run with the ADMIN'S OWN session (cookie client): the
 // is_staff() RLS policies from migration 0004 are the enforcement — a
@@ -33,42 +31,6 @@ const createSchema = z.object({
   approvedAtIso: z.string().datetime().optional(),
 });
 
-async function sendReceiptFor(donationId: string): Promise<void> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("donations")
-    .select(
-      "amount_cents, donor_name, donor_email, donor_locale, campaign:campaigns(title, payment_reference), fundraiser:fundraisers(title, payment_reference)",
-    )
-    .eq("id", donationId)
-    .single();
-  if (!data?.donor_email) return;
-
-  // Without generated DB types supabase-js types to-one embeds as arrays.
-  const pageRaw = (data.campaign ?? data.fundraiser) as
-    | { title: string; payment_reference: string }
-    | { title: string; payment_reference: string }[]
-    | null;
-  const page = Array.isArray(pageRaw) ? pageRaw[0] : pageRaw;
-  const locale: Locale = routing.locales.includes(data.donor_locale as Locale)
-    ? (data.donor_locale as Locale)
-    : routing.defaultLocale;
-  try {
-    await sendEmail(
-      await buildReceiptEmail({
-        locale,
-        donorName: data.donor_name ?? "",
-        donorEmail: data.donor_email,
-        campaignTitle: page?.title ?? "Santamore",
-        reference: page?.payment_reference ?? "",
-        amountCents: data.amount_cents,
-        isRecurring: false,
-      }),
-    );
-  } catch (error) {
-    console.error("[reconcile] receipt email failed:", error);
-  }
-}
 
 /** Approve a matched pending pledge (pending → approved, per the trigger). */
 export async function approvePledge(input: unknown): Promise<ActionResult> {
