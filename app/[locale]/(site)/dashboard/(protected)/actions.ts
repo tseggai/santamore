@@ -251,18 +251,22 @@ export async function logActivity(input: unknown): Promise<DashboardActionResult
     return { ok: false, error: "invalid" };
   }
 
+  // A page is optional now (activities are person-owned); attach it when
+  // it exists so challenge-event standings count the entry.
   const { data: mine } = await supabase
     .from("fundraisers")
     .select("id")
     .eq("user_id", user.id)
     .limit(1)
     .maybeSingle();
-  if (!mine) return { ok: false, error: "server" };
 
   const { error } = await supabase.from("activities").insert({
-    fundraiser_id: mine.id,
+    user_id: user.id,
+    fundraiser_id: mine?.id ?? null,
     source: "manual",
+    sport_type: "Run",
     started_at: `${parsed.data.date}T12:00:00Z`,
+    started_on: parsed.data.date,
     distance_m: Math.round(km * 1000),
     moving_time_s: minutes * 60,
   });

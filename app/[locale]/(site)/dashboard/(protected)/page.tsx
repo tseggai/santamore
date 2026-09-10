@@ -214,6 +214,7 @@ export default async function DashboardPage({
           { href: "/dashboard/stranica", label: t("editPage") },
           { href: "/dashboard/alati", label: t("shareTools") },
           { href: "/dashboard/gotovina", label: t("logCash") },
+          { href: "/dashboard/strava", label: t("stravaLink") },
           ...(isDraft ? [] : [{ href: `/f/${mine.slug}`, label: t("viewPublic") }]),
         ].map((item) => (
           <li key={item.href}>
