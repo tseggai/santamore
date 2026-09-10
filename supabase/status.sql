@@ -27,6 +27,8 @@ select * from (values
   ('20260910000010_multi_pages_sponsor_links',
      to_regclass('public.v_public_sponsors') is not null),
   ('20260911000011_perk_rules_days_pace',
-     to_regprocedure('public.perk_activity_qualifies(activities, perk_challenges)') is not null)
+     to_regprocedure('public.perk_activity_qualifies(activities, perk_challenges)') is not null),
+  ('20260911000012_my_giving',
+     to_regclass('public.v_my_donations') is not null)
 ) as m (migration, applied)
 order by migration;
