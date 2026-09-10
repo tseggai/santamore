@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { DonateButton } from "@/components/donate/DonateButton";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import icon from "@/public/brand/SantamoreIcon-Color.png";
 
@@ -52,12 +53,13 @@ export default function Header() {
             {t("nav.myPage")}
           </Link>
           <LocaleSwitcher />
-          <Link
+          <DonateButton
+            request={{ kind: "campaign" }}
             href="/podrzi"
             className="rounded-xl bg-red px-4 py-2 text-sm font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
           >
             {t("nav.donate")}
-          </Link>
+          </DonateButton>
         </div>
       </div>
     </header>

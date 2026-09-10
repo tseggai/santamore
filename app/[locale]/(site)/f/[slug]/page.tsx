@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { DonateButton } from "@/components/donate/DonateButton";
 import { Avatar } from "@/components/Avatar";
 import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
@@ -121,12 +122,13 @@ export default async function FundraiserPage({
             </Link>
           </p>
           <div className="mt-4 flex items-center gap-2">
-            <Link
+            <DonateButton
+              request={{ kind: "fundraiser", slug: fundraiser.slug }}
               href={`/f/${fundraiser.slug}/podrzi`}
               className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
             >
               {tDonate("payVerb")}
-            </Link>
+            </DonateButton>
             <ShareButton
               title={fundraiser.title}
               path={`/${locale}/f/${fundraiser.slug}`}

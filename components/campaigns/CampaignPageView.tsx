@@ -2,6 +2,7 @@
 
 import { useLocale, useTranslations } from "next-intl";
 
+import { DonateButton } from "@/components/donate/DonateButton";
 import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
 import { formatCents } from "@/lib/money";
@@ -100,12 +101,13 @@ export function CampaignPageView({
       </div>
 
       <div className="mt-5 flex items-center gap-2">
-        <Link
+        <DonateButton
+          request={{ kind: "campaign", slug: campaign.slug }}
           href={`/podrzi?kampanja=${campaign.slug}`}
           className="inline-flex h-12 items-center rounded-xl bg-red px-8 text-[15.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
         >
           {tDonate("payVerb")}
-        </Link>
+        </DonateButton>
         <Link
           href="/transparentnost"
           className="inline-flex h-12 items-center rounded-xl border-[1.5px] border-line px-5 text-[14px] font-semibold transition-colors hover:border-sea hover:text-sea"

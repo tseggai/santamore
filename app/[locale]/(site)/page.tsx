@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { DonateButton } from "@/components/donate/DonateButton";
 import { InboundForm } from "@/components/forms/InboundForm";
 import { LeaderboardList, type LeaderboardEntry } from "@/components/Leaderboard";
 import { landingContent } from "@/content/site/landing";
@@ -104,12 +105,13 @@ export default async function HomePage({
           {t("liveTotal")}
         </p>
         <div className="mt-7 flex flex-wrap gap-3">
-          <Link
+          <DonateButton
+            request={{ kind: "campaign" }}
             href="/podrzi"
             className="rounded-xl bg-red px-6 py-3.5 text-[15.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
           >
             {t("ctaDonate")}
-          </Link>
+          </DonateButton>
           {nextEvent ? (
             <Link
               href={`/dogadjaji/${nextEvent.slug}`}
