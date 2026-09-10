@@ -23,6 +23,8 @@ select * from (values
   ('20260909000008_teams_events_admin_demo',
      to_regclass('public.demo_records') is not null),
   ('20260910000009_campaign_pages_strava_perks',
-     to_regclass('public.perk_awards') is not null)
+     to_regclass('public.perk_awards') is not null),
+  ('20260910000010_multi_pages_sponsor_links',
+     to_regclass('public.v_public_sponsors') is not null)
 ) as m (migration, applied)
 order by migration;
