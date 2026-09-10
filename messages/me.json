@@ -320,7 +320,9 @@
     "teamJoinsPage": "Tvoja stranica na ovom događaju automatski ulazi u tim.",
     "teamNoPageYet": "Još nemaš stranicu na ovom događaju — tim se pravi bez tebe kao člana; napravi stranicu da mu se pridružiš.",
     "pagePickerLabel": "Stranica",
-    "shareDraftWarning": "Ova stranica je još nacrt — objavi je prije dijeljenja."
+    "shareDraftWarning": "Ova stranica je još nacrt — objavi je prije dijeljenja.",
+    "navGiving": "Moje donacije",
+    "qaGiving": "Moje donacije"
   },
   "email": {
     "instructions": {
@@ -936,5 +938,48 @@
     "nurtureHeading": "Tvoja trčanja mogu i da prikupe novac",
     "nurtureBody": "Povezan/a si i osvajaš nagrade. Stranica za prikupljanje pretvara ista trčanja u podršku porodicama u Boki — fotografija, cilj, tri rečenice.",
     "nurtureCta": "Napravi stranicu"
+  },
+  "giving": {
+    "title": "Moje donacije",
+    "sub": "Svaka donacija uplaćena sa {email}, sa potvrdama i stavkom u registru. I anonimne donacije su ovdje — ovu stranicu vidiš samo ti.",
+    "statGiven": "Ukupno dato",
+    "statDonations": "Donacija",
+    "statSupported": "Podržanih stranica i kampanja",
+    "statPending": "Uplata koje čekaju prijem",
+    "feesNote": "Uključuje {amount} koje si dodao/la za naknade — hvala, tako 100% donacija ide korisnicima.",
+    "monthlyHeading": "Mjesečno davanje",
+    "month": "mjesečno",
+    "nextCharge": "sljedeće {date}",
+    "monthlyManageNote": "Promjena iznosa ili otkazivanje: samostalno uređivanje stiže sa karticama; do tada nam piši.",
+    "subscriptionStatus": {
+      "active": "aktivno",
+      "paused": "pauzirano",
+      "past_due": "uplata nije prošla",
+      "canceled": "otkazano"
+    },
+    "historyHeading": "Istorija",
+    "empty": "Još nema donacija sa ovom e-mail adresom.",
+    "giveCta": "Daj prvu",
+    "status": {
+      "pending": "čeka uplatu",
+      "approved": "primljeno",
+      "declined": "odbijeno",
+      "refunded": "vraćeno"
+    },
+    "rail": {
+      "card": "kartica",
+      "sepa": "bankovni prenos",
+      "cash": "keš",
+      "other": "ostalo"
+    },
+    "monthly": "mjesečno",
+    "feeCovered": "naknade pokrivene {amount}",
+    "anonymous": "anonimno na zidu",
+    "pendingSepa": "Još nismo uparili uplatu za ovo obećanje. Navedi ovaj poziv na broj pri uplati i knjižimo je obično u roku od jednog radnog dana.",
+    "resendReceipt": "Pošalji potvrdu ponovo",
+    "receiptSent": "Potvrda poslata na tvoj e-mail.",
+    "receiptError": "Slanje nije uspjelo — pokušaj ponovo.",
+    "inLedger": "Pogledaj u registru",
+    "privacyNote": "Uparivanje ide preko tvoje potvrđene e-mail adrese za prijavu. Ako si donirao/la sa druge adrese, prijavi se njome da vidiš te donacije."
   }
 }

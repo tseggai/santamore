@@ -320,7 +320,9 @@
     "teamJoinsPage": "Your page on this event joins the team automatically.",
     "teamNoPageYet": "You have no page on this event yet — the team is created without you as a member; create a page to join it.",
     "pagePickerLabel": "Page",
-    "shareDraftWarning": "This page is still a draft — publish it before sharing."
+    "shareDraftWarning": "This page is still a draft — publish it before sharing.",
+    "navGiving": "My giving",
+    "qaGiving": "My giving"
   },
   "email": {
     "instructions": {
@@ -936,5 +938,48 @@
     "nurtureHeading": "Your runs could also raise money",
     "nurtureBody": "You are connected and earning rewards. A fundraising page turns the same runs into support for families in the Bay — a photo, a goal, three sentences.",
     "nurtureCta": "Start a page"
+  },
+  "giving": {
+    "title": "My giving",
+    "sub": "Every donation made with {email}, with receipts and the ledger entry. Donations you made anonymously are still listed here — only you can see this page.",
+    "statGiven": "Given in total",
+    "statDonations": "Donations",
+    "statSupported": "Pages and campaigns supported",
+    "statPending": "Transfers awaiting receipt",
+    "feesNote": "Includes {amount} you added to cover fees — thank you, it keeps 100% of donations for beneficiaries.",
+    "monthlyHeading": "Monthly giving",
+    "month": "month",
+    "nextCharge": "next {date}",
+    "monthlyManageNote": "Changing the amount or cancelling: self-service arrives with the card rail; until then write to us.",
+    "subscriptionStatus": {
+      "active": "active",
+      "paused": "paused",
+      "past_due": "payment failed",
+      "canceled": "cancelled"
+    },
+    "historyHeading": "History",
+    "empty": "No donations with this email yet.",
+    "giveCta": "Make the first one",
+    "status": {
+      "pending": "awaiting transfer",
+      "approved": "received",
+      "declined": "declined",
+      "refunded": "refunded"
+    },
+    "rail": {
+      "card": "card",
+      "sepa": "bank transfer",
+      "cash": "cash",
+      "other": "other"
+    },
+    "monthly": "monthly",
+    "feeCovered": "fees covered {amount}",
+    "anonymous": "anonymous on the wall",
+    "pendingSepa": "We have not matched a transfer for this pledge yet. Quote this reference in the transfer, and we credit it usually within one working day.",
+    "resendReceipt": "Send receipt again",
+    "receiptSent": "Receipt sent to your email.",
+    "receiptError": "Could not send — try again.",
+    "inLedger": "See it in the ledger",
+    "privacyNote": "Matching is by your verified sign-in email. If you gave with a different address, sign in with that one to see those donations."
   }
 }
