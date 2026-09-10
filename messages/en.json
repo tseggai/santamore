@@ -704,7 +704,9 @@
     "perkRequiredDays": "Required days",
     "perkWindowDays": "Within (days)",
     "perkWindowHint": "Required days above 1 make a streak rule: N different days inside the window, one reward per athlete per window. Empty window = the challenge period.",
-    "perkPartnerUrl": "Partner website"
+    "perkPartnerUrl": "Partner website",
+    "perkPause": "Pause",
+    "perkResume": "Resume"
   },
   "forms": {
     "nameLabel": "Full name",
@@ -935,4 +937,4 @@
     "nurtureBody": "You are connected and earning rewards. A fundraising page turns the same runs into support for families in the Bay — a photo, a goal, three sentences.",
     "nurtureCta": "Start a page"
   }
-}
+}\n

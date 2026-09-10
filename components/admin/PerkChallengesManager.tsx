@@ -7,6 +7,7 @@ import { useState, type FormEvent } from "react";
 import {
   registerStravaWebhook,
   savePerkChallenge,
+  setPerkChallengeActive,
   type PerkActionResult,
   type WebhookStatus,
 } from "@/app/[locale]/admin/(protected)/izazovi/actions";
@@ -331,6 +332,14 @@ export function PerkChallengesManager({
   const [open, setOpen] = useState<"" | "new" | string>("");
   const [hookBusy, setHookBusy] = useState(false);
   const [hookNotice, setHookNotice] = useState("");
+  const [rowBusy, setRowBusy] = useState<string | null>(null);
+
+  const toggleActive = async (challenge: PerkChallengeAdminRow) => {
+    setRowBusy(challenge.id);
+    await setPerkChallengeActive({ id: challenge.id, active: !challenge.is_active }).catch(() => null);
+    setRowBusy(null);
+    router.refresh();
+  };
 
   const registered = webhook.subscriptions.some((s) => s.callback_url === webhook.expectedCallback);
 
@@ -408,9 +417,20 @@ export function PerkChallengesManager({
                     {t("perkStats", { today: challenge.issued_today, issued: challenge.issued, redeemed: challenge.redeemed })}
                   </p>
                 </div>
-                <button type="button" onClick={() => setOpen(open === challenge.id ? "" : challenge.id)} className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea">
-                  {t("evEdit")}
-                </button>
+                <div className="flex shrink-0 gap-1.5">
+                  <button type="button" onClick={() => setOpen(open === challenge.id ? "" : challenge.id)} className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea">
+                    {t("evEdit")}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={rowBusy === challenge.id || (!challenge.is_active && !challenge.has_pin)}
+                    title={!challenge.is_active && !challenge.has_pin ? t("perkNoPin") : undefined}
+                    onClick={() => toggleActive(challenge)}
+                    className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
+                  >
+                    {challenge.is_active ? t("perkPause") : t("perkResume")}
+                  </button>
+                </div>
               </div>
               {open === challenge.id ? (
                 <div className="mt-3">

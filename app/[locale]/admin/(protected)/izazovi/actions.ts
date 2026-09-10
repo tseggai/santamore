@@ -108,6 +108,23 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
   return { ok: true };
 }
 
+/** Pause / resume without touching anything else — the "we're out for today" switch. */
+export async function setPerkChallengeActive(input: unknown): Promise<PerkActionResult> {
+  const parsed = z.object({ id: z.string().uuid(), active: z.boolean() }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("perk_challenges")
+    .update({ is_active: parsed.data.active })
+    .eq("id", parsed.data.id)
+    .select("id")
+    .single();
+  if (error) return { ok: false, error: "server" };
+  revalidatePath("/[locale]/admin/izazovi", "page");
+  revalidatePath("/[locale]/izazovi", "layout");
+  return { ok: true };
+}
+
 async function requireStaff(): Promise<boolean> {
   const supabase = await createClient();
   const {

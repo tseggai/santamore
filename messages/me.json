@@ -704,7 +704,9 @@
     "perkRequiredDays": "Potrebno dana",
     "perkWindowDays": "U roku od (dana)",
     "perkWindowHint": "Više od 1 potrebnog dana pravi pravilo niza: N različitih dana unutar roka, jedna nagrada po sportisti po roku. Prazan rok = period izazova.",
-    "perkPartnerUrl": "Sajt partnera"
+    "perkPartnerUrl": "Sajt partnera",
+    "perkPause": "Pauziraj",
+    "perkResume": "Nastavi"
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -935,4 +937,4 @@
     "nurtureBody": "Povezan/a si i osvajaš nagrade. Stranica za prikupljanje pretvara ista trčanja u podršku porodicama u Boki — fotografija, cilj, tri rečenice.",
     "nurtureCta": "Napravi stranicu"
   }
-}
+}\n

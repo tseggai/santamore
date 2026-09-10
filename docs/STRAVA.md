@@ -22,6 +22,16 @@ reward, defined by staff in `/admin/izazovi`:
 | Partner capacity per day | 5 | 5 | 10 |
 | Code valid for | 7 days | 7 days | 14 days |
 
+**Who creates challenges (owner decision, 2026-09-11):** Santamore staff
+create and edit every challenge on the partner's behalf, after agreeing the
+offer with them in one sentence. Partners never get an admin login. What
+the partner controls: their redemption PIN, and asking staff to pause or
+resume ("we're out for today" is one click on the admin row). Rationale:
+Strava's API obligations bind Santamore's app, the rule numbers decide how
+much the partner gives away, and every offer starts with a conversation
+anyway. A partner self-serve role and a shared "one rule, many partners"
+campaign are documented under *Ideas*, not built.
+
 The partner is the author of the offer; Santamore only hosts the rule, the
 verification and the code. Each challenge carries the partner's name, an
 optional link, and the partner's own redemption PIN. Nothing requires a
