@@ -66,6 +66,28 @@ export async function freshAccessToken(connection: Connection): Promise<string> 
 }
 
 /**
+ * With one page per event, an activity counts for the runner's page on a
+ * CHALLENGE event whose window contains it; otherwise it belongs to no
+ * page (it can still earn perks).
+ */
+export async function pageForActivities(userId: string, startedAt: string): Promise<string | null> {
+  const service = createServiceClient();
+  const { data: pages } = await service
+    .from("fundraisers")
+    .select("id, event:events(kind, starts_at, ends_at)")
+    .eq("user_id", userId);
+  const at = new Date(startedAt).getTime();
+  for (const page of pages ?? []) {
+    const event = Array.isArray(page.event) ? page.event[0] : page.event;
+    if (!event || event.kind !== "challenge") continue;
+    const starts = event.starts_at ? new Date(event.starts_at).getTime() : -Infinity;
+    const ends = event.ends_at ? new Date(event.ends_at).getTime() : Infinity;
+    if (at >= starts - 86_400_000 && at <= ends + 86_400_000) return page.id;
+  }
+  return null;
+}
+
+/**
  * Upsert one Strava activity for a user and return our row id. Attaches
  * the user's fundraiser page (if any) so challenge-event standings see it.
  */
@@ -75,16 +97,11 @@ export async function importActivity(
 ): Promise<string | null> {
   const service = createServiceClient();
   const row = mapStravaActivity(activity);
-  const { data: page } = await service
-    .from("fundraisers")
-    .select("id")
-    .eq("user_id", userId)
-    .limit(1)
-    .maybeSingle();
+  const pageId = await pageForActivities(userId, row.started_at);
   const { data, error } = await service
     .from("activities")
     .upsert(
-      { ...row, user_id: userId, fundraiser_id: page?.id ?? null },
+      { ...row, user_id: userId, fundraiser_id: pageId },
       { onConflict: "source,external_id" },
     )
     .select("id")

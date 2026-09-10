@@ -8,7 +8,7 @@ import {
   disconnectStrava,
   setStravaSharing,
   syncStravaNow,
-} from "@/app/[locale]/(site)/dashboard/(protected)/strava/actions";
+} from "@/app/[locale]/dashboard/(protected)/strava/actions";
 import type { Locale } from "@/i18n/routing";
 
 export interface ConnectionInfo {
@@ -29,10 +29,13 @@ export function StravaPanel({
   connection,
   configured,
   status,
+  isStaff = false,
 }: {
   locale: Locale;
   connection: ConnectionInfo | null;
   configured: boolean;
+  /** Staff see what is missing; runners just see "not yet". */
+  isStaff?: boolean;
   /** From ?strava= after the OAuth round-trip. */
   status: string | null;
 }) {
@@ -169,6 +172,11 @@ export function StravaPanel({
           ) : (
             <p className="mt-4 rounded-[11px] border-[1.5px] border-dashed border-line px-4 py-3 text-[13px] text-ink/60">
               {t("statusUnconfigured")}
+              {isStaff ? (
+                <span className="mt-1 block font-mono text-[12px] text-ink/70">
+                  {t("unconfiguredStaffHint")}
+                </span>
+              ) : null}
             </p>
           )}
           <p className="mt-3 text-[12px] leading-relaxed text-ink/55">{t("privacyNote")}</p>

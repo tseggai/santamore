@@ -52,7 +52,7 @@ export default async function StravaPage({
   } = await supabase.auth.getUser();
   if (!user) notFound();
 
-  const [{ data: connectionRow }, { data: awardRows }, { data: activityRows }] =
+  const [{ data: connectionRow }, { data: awardRows }, { data: activityRows }, { data: profile }] =
     await Promise.all([
       supabase
         .from("strava_connections")
@@ -72,6 +72,7 @@ export default async function StravaPage({
         .eq("source", "strava")
         .order("started_at", { ascending: false })
         .limit(10),
+      supabase.from("profiles").select("role").eq("id", user.id).maybeSingle(),
     ]);
 
   const codes = (awardRows ?? []).map((row) => row.code);
@@ -101,6 +102,7 @@ export default async function StravaPage({
           connection={connection}
           configured={stravaConfig().configured}
           status={status ?? null}
+          isStaff={profile?.role === "admin" || profile?.role === "chapter_lead"}
         />
       </div>
 

@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-import { createFundraiserPage } from "@/app/[locale]/(site)/dashboard/(protected)/actions";
+import { createFundraiserPage } from "@/app/[locale]/dashboard/(protected)/actions";
 
 export interface EventChoice {
   slug: string;
@@ -23,11 +23,14 @@ export function CreatePageForm({
   defaultName,
   events,
   defaultEventSlug,
+  joinTeamId = null,
 }: {
   locale: string;
   defaultName: string;
   events: EventChoice[];
   defaultEventSlug: string | null;
+  /** Open the new page's editor with this team preselected. */
+  joinTeamId?: string | null;
 }) {
   const t = useTranslations("dashboard");
   const router = useRouter();
@@ -45,9 +48,11 @@ export function CreatePageForm({
     const result = await createFundraiserPage({
       title,
       eventSlug: eventSlug || null,
-    }).catch(() => ({ ok: false }));
-    if (result.ok) {
-      router.push(`/${locale}/dashboard/stranica`);
+    }).catch(() => ({ ok: false as const, slug: undefined }));
+    if (result.ok && result.slug) {
+      router.push(
+        `/${locale}/dashboard/stranice/${result.slug}${joinTeamId ? `?team=${joinTeamId}` : ""}`,
+      );
     } else {
       setState("error");
     }

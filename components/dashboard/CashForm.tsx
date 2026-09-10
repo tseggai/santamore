@@ -4,10 +4,10 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-import { logCash } from "@/app/[locale]/(site)/dashboard/(protected)/actions";
+import { logCash } from "@/app/[locale]/dashboard/(protected)/actions";
 import { parseEurosToCents } from "@/lib/money";
 
-export function CashForm() {
+export function CashForm({ fundraiserId }: { fundraiserId: string }) {
   const t = useTranslations("dashboard");
   const router = useRouter();
   const [amountText, setAmountText] = useState("");
@@ -21,7 +21,7 @@ export function CashForm() {
       return;
     }
     setState("busy");
-    const result = await logCash({ amountCents }).catch(() => ({ ok: false }));
+    const result = await logCash({ fundraiserId, amountCents }).catch(() => ({ ok: false }));
     if (result.ok) {
       setAmountText("");
       setState("idle");

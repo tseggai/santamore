@@ -44,7 +44,13 @@ export default function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="hidden text-sm font-semibold text-ink/80 hover:text-sea sm:inline"
+          >
+            {t("nav.myPage")}
+          </Link>
           <LocaleSwitcher />
           <Link
             href="/podrzi"

@@ -14,6 +14,10 @@ import { createClient } from "@/lib/supabase/server";
 // appears only where migration 0005 demands it: creating rows, because the
 // payment reference and slug are minted server-side and clients hold no
 // insert grant.
+//
+// A runner can hold one page per event (migration 0010) and captain any
+// number of teams, so every page-level action names the page it targets
+// and the ownership filter is always `user_id = session user` too.
 
 export interface DashboardActionResult {
   ok: boolean;
@@ -35,6 +39,7 @@ const ownedPhotoPath = z
   .nullable();
 
 const updatePageSchema = z.object({
+  fundraiserId: z.string().uuid(),
   title: z.string().trim().min(2).max(80),
   story: z.string().trim().max(2000),
   goalCents: z.number().int().min(0).max(MAX_CENTS).nullable(),
@@ -48,11 +53,18 @@ const teamFieldsSchema = z.object({
   photoPath: ownedPhotoPath.default(null),
 });
 
+const createTeamSchema = teamFieldsSchema.extend({
+  eventId: z.string().uuid(),
+  /** Join this page (must be the runner's, on the same event) right away. */
+  joinFundraiserId: z.string().uuid().nullable().default(null),
+});
+
 const updateTeamSchema = teamFieldsSchema.extend({
   teamId: z.string().uuid(),
 });
 
 const cashSchema = z.object({
+  fundraiserId: z.string().uuid(),
   amountCents: z.number().int().min(100).max(MAX_CENTS),
 });
 
@@ -68,7 +80,13 @@ function randomSuffix(): string {
   return String(Math.floor(Math.random() * 10000)).padStart(4, "0");
 }
 
-/** One page per runner: idempotently returns the existing page's slug. */
+function ownsPhoto(userId: string, photoPath: string | null): boolean {
+  // The photo must live in THIS runner's storage folder — the same rule
+  // the bucket policies enforced at upload time.
+  return photoPath === null || photoPath.startsWith(`${userId}/`);
+}
+
+/** One page per runner per event: idempotently returns that event's page slug. */
 export async function createFundraiserPage(
   input: unknown,
 ): Promise<DashboardActionResult> {
@@ -77,14 +95,6 @@ export async function createFundraiserPage(
 
   const { supabase, user } = await currentUser();
   if (!user) return { ok: false, error: "server" };
-
-  const { data: existing } = await supabase
-    .from("fundraisers")
-    .select("slug")
-    .eq("user_id", user.id)
-    .limit(1)
-    .maybeSingle();
-  if (existing) return { ok: true, slug: existing.slug };
 
   try {
     const service = createServiceClient();
@@ -123,6 +133,14 @@ export async function createFundraiserPage(
     }
     if (!event) return { ok: false, error: "invalid" };
 
+    const { data: existing } = await supabase
+      .from("fundraisers")
+      .select("slug")
+      .eq("user_id", user.id)
+      .eq("event_id", event.id)
+      .maybeSingle();
+    if (existing) return { ok: true, slug: existing.slug };
+
     // The page title is the runner's name; remember it on the profile too
     // (own-row update grant on full_name) if they haven't set one.
     await supabase
@@ -143,7 +161,7 @@ export async function createFundraiserPage(
         status: "draft",
       });
       if (!error) {
-        revalidatePath("/[locale]/dashboard", "page");
+        revalidatePath("/[locale]/dashboard", "layout");
         return { ok: true, slug };
       }
       // 23505: slug/reference collision; P0001: cross-table reference
@@ -168,7 +186,6 @@ export async function updateFundraiserPage(
 
   const { supabase, user } = await currentUser();
   if (!user) return { ok: false, error: "server" };
-
   if (!ownsPhoto(user.id, parsed.data.photoPath)) return { ok: false, error: "invalid" };
 
   const { error } = await supabase
@@ -180,6 +197,7 @@ export async function updateFundraiserPage(
       team_id: parsed.data.teamId,
       photo_path: parsed.data.photoPath,
     })
+    .eq("id", parsed.data.fundraiserId)
     .eq("user_id", user.id)
     .select("id")
     .single();
@@ -194,16 +212,20 @@ export async function updateFundraiserPage(
   return { ok: true };
 }
 
-/** Publish / unpublish. The DB gate (photo + goal + story) is the truth. */
-export async function setFundraiserStatus(
-  publish: boolean,
-): Promise<DashboardActionResult> {
+/** Publish / unpublish one page. The DB gate (photo + goal + story) is the truth. */
+export async function setFundraiserStatus(input: unknown): Promise<DashboardActionResult> {
+  const parsed = z
+    .object({ fundraiserId: z.string().uuid(), publish: z.boolean() })
+    .safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
   const { supabase, user } = await currentUser();
   if (!user) return { ok: false, error: "server" };
 
   const { error } = await supabase
     .from("fundraisers")
-    .update({ status: publish ? "active" : "draft" })
+    .update({ status: parsed.data.publish ? "active" : "draft" })
+    .eq("id", parsed.data.fundraiserId)
     .eq("user_id", user.id)
     .select("id")
     .single();
@@ -220,6 +242,8 @@ const activitySchema = z
     km: z.string().trim().max(10),
     minutes: z.string().trim().max(10),
     date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    /** The page (challenge event) this entry counts for; null = none. */
+    fundraiserId: z.string().uuid().nullable().default(null),
   })
   .refine((data) => data.km !== "" || data.minutes !== "", {
     message: "distance or time required",
@@ -229,7 +253,7 @@ const activitySchema = z
  * Manual challenge activity (owner decision: challenges rank by distance,
  * time or frequency). Runs under the RUNNER'S session — the
  * activities_owner_insert policy is the barrier, and only 'manual' rows
- * can be created or deleted by owners (Strava rows arrive later, synced).
+ * can be created or deleted by owners (Strava rows arrive synced).
  */
 export async function logActivity(input: unknown): Promise<DashboardActionResult> {
   const parsed = activitySchema.safeParse(input);
@@ -251,18 +275,9 @@ export async function logActivity(input: unknown): Promise<DashboardActionResult
     return { ok: false, error: "invalid" };
   }
 
-  // A page is optional now (activities are person-owned); attach it when
-  // it exists so challenge-event standings count the entry.
-  const { data: mine } = await supabase
-    .from("fundraisers")
-    .select("id")
-    .eq("user_id", user.id)
-    .limit(1)
-    .maybeSingle();
-
   const { error } = await supabase.from("activities").insert({
     user_id: user.id,
-    fundraiser_id: mine?.id ?? null,
+    fundraiser_id: parsed.data.fundraiserId,
     source: "manual",
     sport_type: "Run",
     started_at: `${parsed.data.date}T12:00:00Z`,
@@ -274,7 +289,7 @@ export async function logActivity(input: unknown): Promise<DashboardActionResult
     console.error("[dashboard] activity log failed:", error.code);
     return { ok: false, error: "server" };
   }
-  revalidatePath("/[locale]/dashboard", "page");
+  revalidatePath("/[locale]/dashboard", "layout");
   return { ok: true };
 }
 
@@ -289,7 +304,7 @@ export async function deleteActivity(input: unknown): Promise<DashboardActionRes
     .delete()
     .eq("id", parsed.data.id);
   if (error) return { ok: false, error: "server" };
-  revalidatePath("/[locale]/dashboard", "page");
+  revalidatePath("/[locale]/dashboard", "layout");
   return { ok: true };
 }
 
@@ -297,7 +312,7 @@ export async function deleteActivity(input: unknown): Promise<DashboardActionRes
  * Log cash collected by hand (brief §10): a pending 'cash' donation that
  * hits the leaderboard only once an admin confirms the hand-in. Insert is
  * service-role (donations take no client writes) after verifying the
- * session owns a page; anonymous — hand collections have no single donor.
+ * session owns the page; anonymous — hand collections have no single donor.
  */
 export async function logCash(input: unknown): Promise<DashboardActionResult> {
   const parsed = cashSchema.safeParse(input);
@@ -311,10 +326,10 @@ export async function logCash(input: unknown): Promise<DashboardActionResult> {
     const { data: mine } = await service
       .from("fundraisers")
       .select("id, event:events(chapter_id)")
+      .eq("id", parsed.data.fundraiserId)
       .eq("user_id", user.id)
-      .limit(1)
       .maybeSingle();
-    if (!mine) return { ok: false, error: "server" };
+    if (!mine) return { ok: false, error: "invalid" };
     const event = Array.isArray(mine.event) ? mine.event[0] : mine.event;
 
     const { error } = await service.from("donations").insert({
@@ -338,33 +353,30 @@ export async function logCash(input: unknown): Promise<DashboardActionResult> {
   }
 }
 
-function ownsPhoto(userId: string, photoPath: string | null): boolean {
-  // The photo must live in THIS runner's storage folder — the same rule
-  // the bucket policies enforced at upload time.
-  return photoPath === null || photoPath.startsWith(`${userId}/`);
-}
-
-/** Create a team (name, photo, description) on the runner's event and join it as captain. */
-export async function createTeamAndJoin(
+/**
+ * Create a team (name, photo, description) on an event and captain it;
+ * optionally join it with one of the runner's pages on that event.
+ */
+export async function createTeam(
   input: unknown,
 ): Promise<DashboardActionResult & { teamId?: string }> {
-  const parsed = teamFieldsSchema.safeParse(input);
+  const parsed = createTeamSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "invalid" };
 
   const { supabase, user } = await currentUser();
   if (!user) return { ok: false, error: "server" };
   if (!ownsPhoto(user.id, parsed.data.photoPath)) return { ok: false, error: "invalid" };
 
-  const { data: mine } = await supabase
-    .from("fundraisers")
-    .select("id, event_id")
-    .eq("user_id", user.id)
-    .limit(1)
-    .maybeSingle();
-  if (!mine) return { ok: false, error: "server" };
-
   try {
     const service = createServiceClient();
+    const { data: event } = await service
+      .from("events")
+      .select("id")
+      .eq("id", parsed.data.eventId)
+      .eq("is_published", true)
+      .maybeSingle();
+    if (!event) return { ok: false, error: "invalid" };
+
     const base = slugify(parsed.data.name, "tim");
     let teamId: string | null = null;
     for (let attempt = 0; attempt < 5 && !teamId; attempt += 1) {
@@ -372,7 +384,7 @@ export async function createTeamAndJoin(
       const { data, error } = await service
         .from("teams")
         .insert({
-          event_id: mine.event_id,
+          event_id: event.id,
           name: parsed.data.name,
           slug,
           captain_id: user.id,
@@ -389,13 +401,17 @@ export async function createTeamAndJoin(
     }
     if (!teamId) return { ok: false, error: "server" };
 
-    const { error: joinError } = await supabase
-      .from("fundraisers")
-      .update({ team_id: teamId })
-      .eq("user_id", user.id)
-      .select("id")
-      .single();
-    if (joinError) return { ok: false, error: "server" };
+    if (parsed.data.joinFundraiserId) {
+      // Owner session: the integrity trigger refuses a page on another event.
+      const { error: joinError } = await supabase
+        .from("fundraisers")
+        .update({ team_id: teamId })
+        .eq("id", parsed.data.joinFundraiserId)
+        .eq("user_id", user.id)
+        .select("id")
+        .single();
+      if (joinError) return { ok: false, error: "server" };
+    }
 
     revalidatePath("/[locale]/dashboard", "layout");
     // The editor keeps team membership in local state; return the id so a

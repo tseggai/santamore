@@ -7,7 +7,7 @@ import { useState, type FormEvent } from "react";
 import {
   deleteActivity,
   logActivity,
-} from "@/app/[locale]/(site)/dashboard/(protected)/actions";
+} from "@/app/[locale]/dashboard/(protected)/actions";
 import { formatMetricValue, type ChallengeMetric } from "@/lib/metrics";
 import type { Locale } from "@/i18n/routing";
 
@@ -21,9 +21,11 @@ export interface ActivityEntry {
 
 /** Manual activity logging for challenge events, plus the running total. */
 export function ActivityLog({
+  fundraiserId,
   metric,
   activities,
 }: {
+  fundraiserId: string;
   metric: ChallengeMetric;
   activities: ActivityEntry[];
 }) {
@@ -46,7 +48,7 @@ export function ActivityLog({
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setState("busy");
-    const result = await logActivity({ km, minutes, date }).catch(() => ({
+    const result = await logActivity({ km, minutes, date, fundraiserId }).catch(() => ({
       ok: false,
     }));
     if (result.ok) {
