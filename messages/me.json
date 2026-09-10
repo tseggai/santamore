@@ -201,7 +201,7 @@
   "dashboard": {
     "title": "Moja stranica",
     "signInTitle": "Prijavi se",
-    "signInSub": "Napravi svoju stranicu za prikupljanje ili nastavi gdje si stao.",
+    "signInSub": "Jedan e-mail, bez lozinke: učestvuj u izazovima partnera, osvajaj nagrade i, ako želiš, napravi stranicu za prikupljanje.",
     "createHeading": "Napravi svoju stranicu",
     "createSub": "Daj stranici ime — fotografiju, priču i cilj dodaješ odmah zatim. Ostaje nacrt dok je ne objaviš.",
     "pageTitleLabel": "Naziv stranice",
@@ -699,7 +699,12 @@
     "spCreate": "Dodaj sponzora",
     "spNew": "Novi sponzor",
     "spEmpty": "Još nema sponzora.",
-    "goalInvalidAdmin": "Upiši iznos kao broj, npr. 1500"
+    "goalInvalidAdmin": "Upiši iznos kao broj, npr. 1500",
+    "perkMaxPace": "Najsporiji tempo (min:sek po km)",
+    "perkRequiredDays": "Potrebno dana",
+    "perkWindowDays": "U roku od (dana)",
+    "perkWindowHint": "Više od 1 potrebnog dana pravi pravilo niza: N različitih dana unutar roka, jedna nagrada po sportisti po roku. Prazan rok = period izazova.",
+    "perkPartnerUrl": "Sajt partnera"
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -881,7 +886,11 @@
       "redeemed": "Iskorišćeno",
       "revoked": "Poništeno",
       "expired": "Isteklo"
-    }
+    },
+    "rulePace": "tempom {pace} /km ili bržim",
+    "ruleDaysWindow": "u {days} različita dana u roku od {window} dana",
+    "ruleDaysPeriod": "u {days} različita dana tokom izazova",
+    "noPageNeeded": "Stranica za prikupljanje nije potrebna: prijavi se e-mailom, poveži Stravu, trči."
   },
   "strava": {
     "title": "Strava",
@@ -920,6 +929,10 @@
     "activitiesHeading": "Nedavne Strava aktivnosti",
     "activitiesEmpty": "Još nema uvezenih aktivnosti — ovdje se pojavljuju javna trčanja iz posljednjih 30 dana.",
     "poweredBy": "Powered by Strava",
-    "unconfiguredStaffHint": "Za osoblje: podesi STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET i STRAVA_WEBHOOK_VERIFY_TOKEN, pa registruj webhook pod Admin → Nagrade partnera (docs/STRAVA.md)."
+    "unconfiguredStaffHint": "Za osoblje: podesi STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET i STRAVA_WEBHOOK_VERIFY_TOKEN, pa registruj webhook pod Admin → Nagrade partnera (docs/STRAVA.md).",
+    "capacityStaffHint": "Za osoblje: Strava ograničava broj povezanih sportista po aplikaciji — 1 u single-player režimu (popunjava ga sportista vlasnika aplikacije), 10 nakon podizanja limita u API podešavanjima, više tek nakon Developer Program provjere. Trkač preko limita vidi Stravinu poruku „Error 403: Limit of connected athletes exceeded“.",
+    "nurtureHeading": "Tvoja trčanja mogu i da prikupe novac",
+    "nurtureBody": "Povezan/a si i osvajaš nagrade. Stranica za prikupljanje pretvara ista trčanja u podršku porodicama u Boki — fotografija, cilj, tri rečenice.",
+    "nurtureCta": "Napravi stranicu"
   }
 }

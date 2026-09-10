@@ -201,7 +201,7 @@
   "dashboard": {
     "title": "My page",
     "signInTitle": "Sign in",
-    "signInSub": "Create your fundraising page, or pick up where you left off.",
+    "signInSub": "One email, no password: run partner challenges, earn rewards, and create a fundraising page if you like.",
     "createHeading": "Start your page",
     "createSub": "Give your page a name — you'll add the photo, story and goal next. It stays a draft until you publish it.",
     "pageTitleLabel": "Page title",
@@ -699,7 +699,12 @@
     "spCreate": "Add sponsor",
     "spNew": "New sponsor",
     "spEmpty": "No sponsors yet.",
-    "goalInvalidAdmin": "Enter the amount as a number, e.g. 1500"
+    "goalInvalidAdmin": "Enter the amount as a number, e.g. 1500",
+    "perkMaxPace": "Maximum pace (min:sec per km)",
+    "perkRequiredDays": "Required days",
+    "perkWindowDays": "Within (days)",
+    "perkWindowHint": "Required days above 1 make a streak rule: N different days inside the window, one reward per athlete per window. Empty window = the challenge period.",
+    "perkPartnerUrl": "Partner website"
   },
   "forms": {
     "nameLabel": "Full name",
@@ -881,7 +886,11 @@
       "redeemed": "Redeemed",
       "revoked": "Revoked",
       "expired": "Expired"
-    }
+    },
+    "rulePace": "at a pace of {pace} /km or faster",
+    "ruleDaysWindow": "on {days} different days within {window} days",
+    "ruleDaysPeriod": "on {days} different days during the challenge",
+    "noPageNeeded": "No fundraising page needed: sign in with your email, connect Strava, run."
   },
   "strava": {
     "title": "Strava",
@@ -920,6 +929,10 @@
     "activitiesHeading": "Recent Strava activities",
     "activitiesEmpty": "No activities imported yet — public runs from the last 30 days appear here.",
     "poweredBy": "Powered by Strava",
-    "unconfiguredStaffHint": "Staff: set STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET and STRAVA_WEBHOOK_VERIFY_TOKEN, then register the webhook under Admin → Partner perks (docs/STRAVA.md)."
+    "unconfiguredStaffHint": "Staff: set STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET and STRAVA_WEBHOOK_VERIFY_TOKEN, then register the webhook under Admin → Partner perks (docs/STRAVA.md).",
+    "capacityStaffHint": "Staff: Strava caps connected athletes per app — 1 in single-player mode (the app owner's own athlete fills it), 10 after raising the cap in the API settings, more only after Developer Program review. A runner over the cap sees Strava's \"Error 403: Limit of connected athletes exceeded\".",
+    "nurtureHeading": "Your runs could also raise money",
+    "nurtureBody": "You are connected and earning rewards. A fundraising page turns the same runs into support for families in the Bay — a photo, a goal, three sentences.",
+    "nurtureCta": "Start a page"
   }
 }
