@@ -187,6 +187,10 @@ Quotes from strava.com/legal/api:
   evaluates perks **only for today's activities**, so joining never rewards
   old runs. A manual "Sync now" pulls 7 days, at most once per 10 minutes.
 - Deleting an activity on Strava revokes its unredeemed award.
+- Activities typed in by hand on Strava (`manual: true`, no device) are
+  stored with `is_manual` and never qualify unless the challenge's
+  "count manual entries" is on — the same switch that covers runs logged
+  in our own dashboard. Otherwise anyone could type "5 km" for a smoothie.
 - Connections made before the scope widened carry only `activity:read`
   (public runs). The runner's Strava page shows a "reconnect" hint until
   they re-consent; staff see a "public runs only" flag on the Athletes

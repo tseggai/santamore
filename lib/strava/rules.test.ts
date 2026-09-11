@@ -33,7 +33,19 @@ describe("mapStravaActivity", () => {
       distance_m: 5013,
       moving_time_s: 1500,
       elevation_m: 33,
+      is_manual: false,
     });
+  });
+
+  it("flags activities typed in by hand on Strava", () => {
+    const row = mapStravaActivity({
+      id: 1,
+      type: "Run",
+      distance: 5000,
+      start_date: "2026-09-10T06:00:00Z",
+      manual: true,
+    });
+    expect(row.is_manual).toBe(true);
   });
 
   it("falls back to type when sport_type is missing and never goes negative", () => {

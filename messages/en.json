@@ -673,7 +673,7 @@
     "perkPin": "Partner PIN (4–8 digits)",
     "perkPinReset": "New partner PIN (leave empty to keep)",
     "perkPinHint": "Stored hashed. Give it to the partner's staff.",
-    "perkAllowManual": "Also accept manually logged activities (unverified)",
+    "perkAllowManual": "Count manual entries (typed in on Strava or logged here, no GPS)",
     "perkActive": "Active — visible and awarding",
     "perkRulePreview": "Rule as visitors will read it",
     "perkInvalid": "Check the distance and pick at least one sport.",
@@ -987,7 +987,8 @@
     "progressNeedRun": "Run at least {km} today.",
     "progressPace": "{pace}/km or faster",
     "scopePartialHint": "Private runs are not included yet — reconnect and allow access to all activities.",
-    "reconnect": "Reconnect"
+    "reconnect": "Reconnect",
+    "manualEntry": "Manual entry — counts only where the partner allows it"
   },
   "giving": {
     "title": "My giving",

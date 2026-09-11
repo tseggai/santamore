@@ -279,6 +279,7 @@ export async function logActivity(input: unknown): Promise<DashboardActionResult
     user_id: user.id,
     fundraiser_id: parsed.data.fundraiserId,
     source: "manual",
+    is_manual: true,
     sport_type: "Run",
     started_at: `${parsed.data.date}T12:00:00Z`,
     started_on: parsed.data.date,

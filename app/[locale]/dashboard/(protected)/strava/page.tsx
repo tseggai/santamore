@@ -29,6 +29,7 @@ interface ActivityRow {
   started_on: string;
   distance_m: number;
   moving_time_s: number;
+  is_manual: boolean;
 }
 
 /**
@@ -75,7 +76,7 @@ export default async function StravaPage({
         .limit(50),
       supabase
         .from("activities")
-        .select("id, external_id, name, sport_type, started_on, distance_m, moving_time_s")
+        .select("id, external_id, name, sport_type, started_on, distance_m, moving_time_s, is_manual")
         .eq("user_id", user.id)
         .eq("source", "strava")
         .order("started_at", { ascending: false })
@@ -205,6 +206,9 @@ export default async function StravaPage({
                   <span className="min-w-0 flex-1 truncate">
                     {activity.name ?? activity.sport_type ?? "—"}
                     <span className="text-ink/50"> · {activity.sport_type}</span>
+                    {activity.is_manual ? (
+                      <span className="text-ink/50"> · {t("manualEntry")}</span>
+                    ) : null}
                   </span>
                   <span className="font-mono tabular-nums">
                     {formatMetricValue(activity.distance_m, "distance_m", locale as Locale)}

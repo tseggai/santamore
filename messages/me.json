@@ -673,7 +673,7 @@
     "perkPin": "Partnerski PIN (4–8 cifara)",
     "perkPinReset": "Novi partnerski PIN (prazno = ostaje isti)",
     "perkPinHint": "Čuva se heširan. Daj ga osoblju partnera.",
-    "perkAllowManual": "Prihvati i ručno unesene aktivnosti (neprovjerene)",
+    "perkAllowManual": "Računaj ručne unose (ukucane na Stravi ili ovdje, bez GPS-a)",
     "perkActive": "Aktivan — vidljiv i dodjeljuje nagrade",
     "perkRulePreview": "Pravilo kako ga posjetioci čitaju",
     "perkInvalid": "Provjeri distancu i izaberi bar jedan sport.",
@@ -987,7 +987,8 @@
     "progressNeedRun": "Pretrči bar {km} danas.",
     "progressPace": "{pace}/km ili brže",
     "scopePartialHint": "Privatna trčanja se još ne računaju — poveži ponovo i dozvoli pristup svim aktivnostima.",
-    "reconnect": "Poveži ponovo"
+    "reconnect": "Poveži ponovo",
+    "manualEntry": "Ručni unos — računa se samo gdje partner dozvoli"
   },
   "giving": {
     "title": "Moje donacije",
