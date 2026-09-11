@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import { useState } from "react";
 
 import { formatMetricValue } from "@/lib/metrics";
 import type { Locale } from "@/i18n/routing";
@@ -36,18 +37,21 @@ function pace(secondsPerKm: number): string {
  * my_perk_progress() — the same predicate the awarding engine uses, so
  * "2 of 3 days" here is exactly what the engine will count.
  */
-export function PerkProgressList({ rows }: { rows: PerkProgressRow[] }) {
+export function PerkProgressList({ rows, limit }: { rows: PerkProgressRow[]; limit?: number }) {
   const t = useTranslations("strava");
   const locale = useLocale() as Locale;
   const km = (m: number) => formatMetricValue(m, "distance_m", locale);
+  const [open, setOpen] = useState(false);
 
   if (rows.length === 0) {
     return <p className="mt-2 text-[13.5px] text-ink/60">{t("progressEmpty")}</p>;
   }
+  const visible = limit && !open ? rows.slice(0, limit) : rows;
 
   return (
+    <>
     <ul className="mt-2 space-y-2">
-      {rows.map((row) => {
+      {visible.map((row) => {
         const needed = row.required_days;
         const done = Math.min(row.qualifying_days, needed);
         const shortfall = Math.max(row.min_distance_m - row.best_today_m, 0);
@@ -100,5 +104,16 @@ export function PerkProgressList({ rows }: { rows: PerkProgressRow[] }) {
         );
       })}
     </ul>
+    {limit && rows.length > limit ? (
+      <button
+        type="button"
+        onClick={() => setOpen((value) => !value)}
+        aria-expanded={open}
+        className="mt-2 text-[13px] font-semibold text-sea underline underline-offset-2"
+      >
+        {open ? t("showLess") : t("showAll", { count: rows.length })}
+      </button>
+    ) : null}
+    </>
   );
 }

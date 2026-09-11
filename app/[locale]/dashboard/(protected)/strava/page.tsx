@@ -1,19 +1,23 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { Expandable } from "@/components/dashboard/Expandable";
 import { PerkProgressList, type PerkProgressRow } from "@/components/dashboard/PerkProgressList";
 import { StravaPanel, type ConnectionInfo } from "@/components/dashboard/StravaPanel";
+import { WeeklyKmChart } from "@/components/dashboard/WeeklyKmChart";
 import { stravaConfig } from "@/lib/strava/api";
+import { localToday } from "@/lib/strava/sync";
+import { weeklyTotals } from "@/lib/strava/weeks";
 import { formatMetricValue } from "@/lib/metrics";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
+import { htmlLang, type Locale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
 interface AwardRow {
   code: string;
-  status: string;
+  status: "issued" | "redeemed" | "revoked" | "expired";
   awarded_on: string;
   expires_at: string;
   challenge_title: string;
@@ -32,11 +36,23 @@ interface ActivityRow {
   is_manual: boolean;
 }
 
+const WEEKS = 8;
+const RECENT_LIMIT = 8;
+const REWARD_LIMIT = 5;
+const CHALLENGE_LIMIT = 4;
+
+function shiftDay(day: string, days: number): string {
+  return new Date(Date.parse(`${day}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
+}
+
 /**
- * The runner's Strava page: connection, consent, manual sync, the rewards
- * they have earned (each opens its QR page) and their recent activities.
- * Everything shown here is the athlete's own data — the only place Strava
- * data appears without consent (API Agreement §2.3).
+ * The athlete's Strava dashboard: the numbers first (this week, the month,
+ * rewards waiting), the weekly trend, then progress on every partner
+ * challenge, rewards ready to redeem, and the runs themselves. The
+ * connection is a status strip, not the subject. Everything here is the
+ * athlete's own data — the only place Strava data appears without consent
+ * (API Agreement §2.3). Lists cap and expand, so one run and three hundred
+ * get the same page.
  */
 export default async function StravaPage({
   params,
@@ -48,6 +64,7 @@ export default async function StravaPage({
   const [{ locale }, { strava: status }] = await Promise.all([params, searchParams]);
   setRequestLocale(locale);
   const t = await getTranslations("strava");
+  const loc = locale as Locale;
 
   const supabase = await createClient();
   const {
@@ -55,40 +72,41 @@ export default async function StravaPage({
   } = await supabase.auth.getUser();
   if (!user) notFound();
 
+  const today = localToday();
+  const monthFrom = shiftDay(today, -29);
+  const trendFrom = shiftDay(today, -7 * WEEKS);
+
   const [
     { data: connectionRow },
     { data: awardRows },
     { data: activityRows },
     { data: profile },
     { data: progressRows },
-  ] =
-    await Promise.all([
-      supabase
-        .from("strava_connections")
-        .select("athlete_id, share_public, connected_at, last_sync_at, scope")
-        .eq("user_id", user.id)
-        .maybeSingle(),
-      supabase
-        .from("perk_awards")
-        .select("code")
-        .eq("user_id", user.id)
-        .order("issued_at", { ascending: false })
-        .limit(50),
-      supabase
-        .from("activities")
-        .select("id, external_id, name, sport_type, started_on, distance_m, moving_time_s, is_manual")
-        .eq("user_id", user.id)
-        .eq("source", "strava")
-        .order("started_at", { ascending: false })
-        .limit(10),
-      supabase.from("profiles").select("role").eq("id", user.id).maybeSingle(),
-      supabase.rpc("my_perk_progress"),
-    ]);
-  const progress = (progressRows ?? []) as PerkProgressRow[];
-  const { count: pageCount } = await supabase
-    .from("fundraisers")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", user.id);
+    { count: pageCount },
+  ] = await Promise.all([
+    supabase
+      .from("strava_connections")
+      .select("athlete_id, share_public, connected_at, last_sync_at, scope")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("perk_awards")
+      .select("code")
+      .eq("user_id", user.id)
+      .order("issued_at", { ascending: false })
+      .limit(200),
+    supabase
+      .from("activities")
+      .select("id, external_id, name, sport_type, started_on, distance_m, moving_time_s, is_manual")
+      .eq("user_id", user.id)
+      .eq("source", "strava")
+      .gte("started_on", trendFrom)
+      .order("started_at", { ascending: false })
+      .limit(500),
+    supabase.from("profiles").select("role").eq("id", user.id).maybeSingle(),
+    supabase.rpc("my_perk_progress"),
+    supabase.from("fundraisers").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+  ]);
 
   const codes = (awardRows ?? []).map((row) => row.code);
   const { data: awardDetails } = codes.length
@@ -96,7 +114,11 @@ export default async function StravaPage({
     : { data: [] };
   const awards = (awardDetails ?? []) as AwardRow[];
   awards.sort((a, b) => codes.indexOf(a.code) - codes.indexOf(b.code));
+  const ready = awards.filter((award) => award.status === "issued");
+  const past = awards.filter((award) => award.status !== "issued");
 
+  const activities = (activityRows ?? []) as ActivityRow[];
+  const progress = (progressRows ?? []) as PerkProgressRow[];
   const connection: ConnectionInfo | null = connectionRow
     ? {
         athleteId: connectionRow.athlete_id,
@@ -107,14 +129,120 @@ export default async function StravaPage({
       }
     : null;
 
+  // Numbers
+  const weeks = weeklyTotals(activities, today, WEEKS);
+  const thisWeek = weeks[weeks.length - 1];
+  const lastWeek = weeks[weeks.length - 2];
+  const month = activities.filter((a) => a.started_on >= monthFrom);
+  const monthKm = month.reduce((sum, a) => sum + a.distance_m, 0);
+  const longest = month.reduce((best, a) => Math.max(best, a.distance_m), 0);
+  const km = (m: number) => formatMetricValue(m, "distance_m", loc);
+  const delta = thisWeek.distance_m - lastWeek.distance_m;
+  const shortDate = new Intl.DateTimeFormat(htmlLang(loc), { day: "numeric", month: "short" });
+  const weekLabel = (weekStart: string) => shortDate.format(new Date(`${weekStart}T00:00:00Z`));
+
+  const tiles = [
+    {
+      label: t("statThisWeek"),
+      value: km(thisWeek.distance_m),
+      sub:
+        lastWeek.distance_m > 0 || thisWeek.distance_m > 0
+          ? t("statVsLastWeek", { delta: `${delta >= 0 ? "+" : "−"}${km(Math.abs(delta))}` })
+          : t("statNoRunsYet"),
+      tone: "ink",
+    },
+    {
+      label: t("statMonth"),
+      value: km(monthKm),
+      sub: t("statActivities", { count: month.length }),
+      tone: "ink",
+    },
+    {
+      label: t("statLongest"),
+      value: longest > 0 ? km(longest) : "—",
+      sub: t("statLongestSub"),
+      tone: "sea",
+    },
+    {
+      label: t("statRewardsReady"),
+      value: String(ready.length),
+      sub: t("statRewardsSub", { count: awards.length }),
+      tone: ready.length > 0 ? "red" : "ink",
+    },
+  ] as const;
+
+  const heading = (text: string, count?: number) => (
+    <h2 className="mt-8 flex items-baseline gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
+      {text}
+      {count !== undefined && count > 0 ? <span className="text-ink/40">{count}</span> : null}
+    </h2>
+  );
+
+  const awardItem = (award: AwardRow) => (
+    <li key={award.code}>
+      <Link
+        href={`/r/${award.code}`}
+        className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-[11px] border-[1.5px] border-line px-4 py-3 transition-colors hover:border-sea"
+      >
+        <span className="min-w-0 flex-1">
+          <span className="block text-[14px] font-semibold">
+            {award.reward_label} · {award.partner_name}
+          </span>
+          <span className="block text-[12.5px] text-ink/60">
+            {award.challenge_title} · {award.awarded_on}
+            {award.status === "issued" ? ` · ${t("expiresOn", { date: award.expires_at.slice(0, 10) })}` : ""}
+          </span>
+        </span>
+        <span className="font-mono text-[13px] tabular-nums">{award.code}</span>
+        <span
+          className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
+            award.status === "issued"
+              ? "bg-sea text-paper"
+              : award.status === "redeemed"
+                ? "bg-mist text-sea"
+                : "border border-line text-ink/50"
+          }`}
+        >
+          {t(`awardStatus.${award.status}`)}
+        </span>
+      </Link>
+    </li>
+  );
+
+  const activityItem = (activity: ActivityRow) => (
+    <li key={activity.id} className="flex items-baseline gap-3 border-t border-line-soft py-2 text-[13px]">
+      <span className="font-mono tabular-nums text-ink/60">{activity.started_on}</span>
+      <span className="min-w-0 flex-1 truncate">
+        {activity.name ?? activity.sport_type ?? "—"}
+        <span className="text-ink/50"> · {activity.sport_type}</span>
+        {activity.is_manual ? <span className="text-ink/50"> · {t("manualEntry")}</span> : null}
+      </span>
+      <span className="font-mono tabular-nums">
+        {km(activity.distance_m)}
+        {activity.moving_time_s > 0 ? ` · ${formatMetricValue(activity.moving_time_s, "moving_time_s", loc)}` : null}
+      </span>
+      {activity.external_id ? (
+        <a
+          href={`https://www.strava.com/activities/${activity.external_id}`}
+          target="_blank"
+          rel="noopener"
+          className="shrink-0 text-[12px] font-semibold text-[#FC5200] underline underline-offset-2"
+        >
+          {t("viewOnStrava")}
+        </a>
+      ) : null}
+    </li>
+  );
+
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("title")}</h1>
       <p className="mt-2 text-[14px] leading-relaxed text-ink/65">{t("sub")}</p>
 
+      {/* connection: the hero only until it exists, a status strip after */}
       <div className="mt-5">
         <StravaPanel
-          locale={locale as Locale}
+          locale={loc}
           connection={connection}
           configured={stravaConfig().configured}
           status={status ?? null}
@@ -122,8 +250,106 @@ export default async function StravaPage({
         />
       </div>
 
+      {connection ? (
+        <>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {tiles.map((tile) => (
+              <div key={tile.label} className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3.5">
+                <p className="text-[12px] font-semibold text-ink/60">{tile.label}</p>
+                <p
+                  className={`mt-1 font-mono text-2xl tabular-nums ${
+                    tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-ink"
+                  }`}
+                >
+                  {tile.value}
+                </p>
+                <p className="mt-0.5 text-[11.5px] text-ink/50">{tile.sub}</p>
+              </div>
+            ))}
+          </div>
+
+          {heading(t("trendHeading"))}
+          {activities.length === 0 ? (
+            <p className="mt-2 text-[13.5px] text-ink/60">{t("trendEmpty")}</p>
+          ) : (
+            <div className="mt-3 text-ink">
+              <WeeklyKmChart
+                weeks={weeks}
+                weekLabel={weekLabel}
+                km={km}
+                caption={t("trendCaption", { weeks: WEEKS })}
+              />
+            </div>
+          )}
+        </>
+      ) : null}
+
+      {heading(t("progressHeading"), progress.length)}
+      {progress.length === 0 ? (
+        <p className="mt-2 text-[13.5px] text-ink/60">
+          {t("progressEmpty")}{" "}
+          <Link href="/izazovi" className="font-semibold text-sea underline underline-offset-2">
+            {t("browseChallenges")}
+          </Link>
+        </p>
+      ) : (
+        <PerkProgressList rows={progress} limit={CHALLENGE_LIMIT} />
+      )}
+
+      {heading(t("rewardsReadyHeading"), ready.length)}
+      {ready.length === 0 ? (
+        <p className="mt-2 text-[13.5px] text-ink/60">
+          {awards.length === 0 ? t("awardsEmpty") : t("rewardsNoneReady")}{" "}
+          {awards.length === 0 ? (
+            <Link href="/izazovi" className="font-semibold text-sea underline underline-offset-2">
+              {t("browseChallenges")}
+            </Link>
+          ) : null}
+        </p>
+      ) : (
+        <Expandable
+          items={ready.map(awardItem)}
+          limit={REWARD_LIMIT}
+          moreLabel={t("showAll", { count: ready.length })}
+          lessLabel={t("showLess")}
+          className="mt-2 space-y-2"
+        />
+      )}
+      {past.length > 0 ? (
+        <details className="mt-3">
+          <summary className="cursor-pointer text-[13px] font-semibold text-ink/60 hover:text-sea">
+            {t("rewardsPastHeading", { count: past.length })}
+          </summary>
+          <Expandable
+            items={past.map(awardItem)}
+            limit={REWARD_LIMIT}
+            moreLabel={t("showAll", { count: past.length })}
+            lessLabel={t("showLess")}
+            className="mt-2 space-y-2"
+          />
+        </details>
+      ) : null}
+
+      {connection ? (
+        <>
+          {heading(t("activitiesHeading"), activities.length)}
+          {activities.length === 0 ? (
+            <p className="mt-2 text-[13.5px] text-ink/60">{t("activitiesEmpty")}</p>
+          ) : (
+            <Expandable
+              items={activities.map(activityItem)}
+              limit={RECENT_LIMIT}
+              moreLabel={t("showAll", { count: activities.length })}
+              lessLabel={t("showLess")}
+              className="mt-2"
+            />
+          )}
+          <p className="mt-2 text-[12px] text-ink/50">{t("poweredBy")}</p>
+        </>
+      ) : null}
+
       {connection && (pageCount ?? 0) === 0 ? (
-        <div className="mt-6 rounded-brand bg-[#f3f6f7] px-5 py-4">
+        <div className="mt-8 rounded-brand bg-[#f3f6f7] px-5 py-4">
           <p className="text-[14px] font-bold">{t("nurtureHeading")}</p>
           <p className="mt-1 text-[13px] leading-relaxed text-ink/65">{t("nurtureBody")}</p>
           <Link
@@ -133,105 +359,6 @@ export default async function StravaPage({
             {t("nurtureCta")}
           </Link>
         </div>
-      ) : null}
-
-      {connection ? (
-        <>
-          <h2 className="mt-8 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
-            {t("progressHeading")}
-          </h2>
-          <PerkProgressList rows={progress} />
-        </>
-      ) : null}
-
-      <h2 className="mt-8 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
-        {t("awardsHeading")}
-      </h2>
-      {awards.length === 0 ? (
-        <p className="mt-2 text-[13.5px] text-ink/60">
-          {t("awardsEmpty")}{" "}
-          <Link href="/izazovi" className="font-semibold text-sea underline underline-offset-2">
-            {t("browseChallenges")}
-          </Link>
-        </p>
-      ) : (
-        <ul className="mt-2 space-y-2">
-          {awards.map((award) => (
-            <li key={award.code}>
-              <Link
-                href={`/r/${award.code}`}
-                className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-[11px] border-[1.5px] border-line px-4 py-3 transition-colors hover:border-sea"
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[14px] font-semibold">
-                    {award.reward_label} · {award.partner_name}
-                  </span>
-                  <span className="block text-[12.5px] text-ink/60">
-                    {award.challenge_title} · {award.awarded_on}
-                  </span>
-                </span>
-                <span className="font-mono text-[13px] tabular-nums">{award.code}</span>
-                <span
-                  className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
-                    award.status === "issued"
-                      ? "bg-sea text-paper"
-                      : award.status === "redeemed"
-                        ? "bg-mist text-sea"
-                        : "border border-line text-ink/50"
-                  }`}
-                >
-                  {t(`awardStatus.${award.status}`)}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {connection ? (
-        <>
-          <h2 className="mt-8 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
-            {t("activitiesHeading")}
-          </h2>
-          {(activityRows ?? []).length === 0 ? (
-            <p className="mt-2 text-[13.5px] text-ink/60">{t("activitiesEmpty")}</p>
-          ) : (
-            <ul className="mt-2">
-              {((activityRows ?? []) as ActivityRow[]).map((activity) => (
-                <li
-                  key={activity.id}
-                  className="flex items-baseline gap-3 border-t border-line-soft py-2 text-[13px]"
-                >
-                  <span className="font-mono tabular-nums text-ink/60">{activity.started_on}</span>
-                  <span className="min-w-0 flex-1 truncate">
-                    {activity.name ?? activity.sport_type ?? "—"}
-                    <span className="text-ink/50"> · {activity.sport_type}</span>
-                    {activity.is_manual ? (
-                      <span className="text-ink/50"> · {t("manualEntry")}</span>
-                    ) : null}
-                  </span>
-                  <span className="font-mono tabular-nums">
-                    {formatMetricValue(activity.distance_m, "distance_m", locale as Locale)}
-                    {activity.moving_time_s > 0
-                      ? ` · ${formatMetricValue(activity.moving_time_s, "moving_time_s", locale as Locale)}`
-                      : null}
-                  </span>
-                  {activity.external_id ? (
-                    <a
-                      href={`https://www.strava.com/activities/${activity.external_id}`}
-                      target="_blank"
-                      rel="noopener"
-                      className="shrink-0 text-[12px] font-semibold text-[#FC5200] underline underline-offset-2"
-                    >
-                      {t("viewOnStrava")}
-                    </a>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          )}
-          <p className="mt-2 text-[12px] text-ink/50">{t("poweredBy")}</p>
-        </>
       ) : null}
     </div>
   );
