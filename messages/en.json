@@ -722,10 +722,7 @@
     "perkPartnerUrl": "Partner website",
     "perkPause": "Pause",
     "perkResume": "Resume",
-    "linkRateLimited": "Too many sign-in emails in a short time. Wait a few minutes, or use the code from an email you already have.",
-    "continueWithGoogle": "Continue with Google",
-    "continueWithApple": "Continue with Apple",
-    "orWithEmail": "or with email"
+    "linkRateLimited": "Too many sign-in emails in a short time. Wait a few minutes, or use the code from an email you already have."
   },
   "forms": {
     "nameLabel": "Full name",

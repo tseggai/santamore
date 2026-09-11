@@ -722,10 +722,7 @@
     "perkPartnerUrl": "Sajt partnera",
     "perkPause": "Pauziraj",
     "perkResume": "Nastavi",
-    "linkRateLimited": "Previše mejlova za prijavu u kratkom vremenu. Sačekaj nekoliko minuta ili unesi kod iz mejla koji već imaš.",
-    "continueWithGoogle": "Nastavi sa Google nalogom",
-    "continueWithApple": "Nastavi sa Apple nalogom",
-    "orWithEmail": "ili putem e-pošte"
+    "linkRateLimited": "Previše mejlova za prijavu u kratkom vremenu. Sačekaj nekoliko minuta ili unesi kod iz mejla koji već imaš."
   },
   "forms": {
     "nameLabel": "Ime i prezime",
