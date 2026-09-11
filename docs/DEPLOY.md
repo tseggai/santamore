@@ -38,12 +38,55 @@ well. The allow-list is therefore not optional.
 The "Magic Link" email template must contain `{{ .Token }}` so the 6-digit
 code reaches the inbox for people whose mail scanner consumes the link.
 
+### Custom SMTP (required before real sign-ups)
+
+Supabase's built-in mailer sends only a handful of auth emails per hour and
+only to project team members. Authentication → **Emails** → **SMTP
+Settings** tab (older dashboards: Project Settings → Authentication):
+
+| Field | Value |
+|---|---|
+| Host | `smtp.resend.com` |
+| Port | `465` |
+| Username | `resend` |
+| Password | the Resend API key (the same one as `RESEND_API_KEY`) |
+| Sender | an address on a domain verified in Resend, e.g. `[[PLACEHOLDER: no-reply@santamore.me]]` |
+
+Then raise the per-hour email limit under Authentication → Rate Limits.
+
 ## 4. Strava → My API Application
 
 | Field | Value |
 |---|---|
 | Authorization Callback Domain | the canonical hostname without scheme, e.g. `www.santamore.me` (Strava accepts the registered domain; register the exact host you serve) |
 | Webhook | created from the admin Challenges screen once `NEXT_PUBLIC_SITE_URL` is live |
+
+## 5. Google and Apple sign-in (optional)
+
+The sign-in form shows a "Continue with Google / Apple" button for each
+provider named in `NEXT_PUBLIC_AUTH_PROVIDERS` (`google,apple`). Keep the
+variable empty until the provider works end to end; the magic link and the
+6-digit code always remain.
+
+**Google.** Google Cloud console → APIs & Services → Credentials → Create
+OAuth client ID (Web application). Authorised JavaScript origin: the
+canonical origin. Authorised redirect URI: the value Supabase shows under
+Authentication → Sign In / Providers → Google (`https://<project-ref>.supabase.co/auth/v1/callback`).
+Paste the client ID and secret into that Supabase screen and enable it.
+The consent screen needs the app name, the logo and the privacy-policy URL
+(`/pravila-privatnosti`) before Google lets people outside the test list
+sign in.
+
+**Apple.** Needs a paid Apple Developer account. Certificates, Identifiers
+& Profiles → register an App ID with "Sign in with Apple", then a Services
+ID (this is the client ID) with the site's domain and the same Supabase
+return URL, then a Sign in with Apple key. Supabase's Apple provider takes
+the Services ID, the Team ID, the Key ID and the key file; the secret it
+derives expires every six months and must be regenerated. Note that Apple
+lets people hide their email behind a relay address, so a donation made
+with the person's real email will not appear under "My giving" for an
+account created that way — Google, and the magic link, always carry the
+real address.
 
 ## Checklist for a sign-in loop
 
