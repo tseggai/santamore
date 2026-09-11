@@ -47,7 +47,9 @@ athlete per window. Pace is moving time divided by distance.
 The flow for a runner:
 
 1. Sign in to the dashboard and **connect Strava** (`/dashboard/strava`). We
-   ask for `read,activity:read` (public activities only).
+   ask for `read,activity:read_all` so private runs count too (owner
+   decision 2026-09-11); nothing becomes public unless the runner ticks
+   "show my activities on public standings".
 2. Run. Strava posts a webhook event; we fetch the activity and evaluate it
    against every active challenge in one database transaction
    (`evaluate_activity_perks`).
@@ -185,9 +187,17 @@ Quotes from strava.com/legal/api:
   evaluates perks **only for today's activities**, so joining never rewards
   old runs. A manual "Sync now" pulls 7 days, at most once per 10 minutes.
 - Deleting an activity on Strava revokes its unredeemed award.
-- Private activities are invisible under `activity:read`; a runner whose
-  activities default to private must make the qualifying run public (or we
-  request `activity:read_all` later — a scope change needs re-consent).
+- Connections made before the scope widened carry only `activity:read`
+  (public runs). The runner's Strava page shows a "reconnect" hint until
+  they re-consent; staff see a "public runs only" flag on the Athletes
+  screen. Untick "private activities" on Strava's consent screen and the
+  connection still works, public runs only.
+- The runner's page shows progress against every active challenge
+  ("2 of 3 days", "1.9 km more today") from `my_perk_progress()`, which
+  reuses `perk_activity_qualifies` so it can never disagree with the engine.
+- Staff: `/admin/sportisti` lists connected athletes with activity and
+  reward counts (aggregates only — individual runs stay with the athlete,
+  per the API Agreement).
 - Strava's `sport_type` is normalised by removing spaces (`Trail Run` →
   `TrailRun`) so both old and new payload shapes match.
 - Deployment note: the webhook handler uses `after()` from `next/server` so

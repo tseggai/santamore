@@ -16,6 +16,8 @@ export interface ConnectionInfo {
   sharePublic: boolean;
   connectedAt: string;
   lastSyncAt: string | null;
+  /** Scopes Strava granted, e.g. "read,activity:read_all". */
+  scope: string;
 }
 
 /**
@@ -144,6 +146,17 @@ export function StravaPanel({
             </button>
           </div>
           <p className="mt-3 text-[12px] leading-relaxed text-ink/55">{t("disconnectHint")}</p>
+          {!connection.scope.includes("activity:read_all") ? (
+            <p className="mt-3 rounded-[11px] border-[1.5px] border-dashed border-line px-4 py-3 text-[13px] text-ink/70">
+              {t("scopePartialHint")}{" "}
+              <a
+                href={`/api/strava/connect?locale=${locale}${connection.sharePublic ? "&share=1" : ""}`}
+                className="font-semibold text-sea underline underline-offset-2"
+              >
+                {t("reconnect")}
+              </a>
+            </p>
+          ) : null}
         </>
       ) : (
         <>

@@ -13,6 +13,7 @@ const ITEMS = [
   { href: "/admin/dogadjaji", key: "navEvents", exact: false },
   { href: "/admin/kampanje", key: "navCampaigns", exact: false },
   { href: "/admin/izazovi", key: "navChallenges", exact: false },
+  { href: "/admin/sportisti", key: "navAthletes", exact: false },
   { href: "/admin/partneri", key: "navSponsors", exact: false },
   { href: "/admin/isplate", key: "navDisbursements", exact: false },
   { href: "/admin/sadrzaj", key: "navContent", exact: false },
