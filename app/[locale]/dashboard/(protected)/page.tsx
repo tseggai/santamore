@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Avatar } from "@/components/Avatar";
 import { DonateButton } from "@/components/donate/DonateButton";
+import { ShareButton } from "@/components/ShareButton";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
@@ -41,7 +42,7 @@ export default async function DashboardOverviewPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("dashboard");
+  const [t, tDonate] = await Promise.all([getTranslations("dashboard"), getTranslations("donate")]);
 
   const supabase = await createClient();
   const {
@@ -123,15 +124,11 @@ export default async function DashboardOverviewPage({
         : raised === 0
           ? { text: t("nextActionSelf"), href: `/f/${pages[0].slug}/podrzi`, donateSlug: pages[0].slug }
           : { text: t("nudgeShare"), href: "/dashboard/stranice", donateSlug: null };
-  const nextClass =
-    "group mt-6 block rounded-lg bg-ink px-6 py-6 text-paper transition-opacity hover:opacity-95 sm:px-8 sm:py-7";
+  const nextClass = "mt-5 block rounded-lg bg-ink px-4 py-3.5 text-paper transition-opacity hover:opacity-90";
   const nextBody = (
     <>
-      <span className="type-eyebrow block text-red">{t("nextHeading")}</span>
-      <span className="type-display mt-2 block max-w-2xl text-xl text-paper sm:text-2xl">{nextAction.text}</span>
-      <span className="mt-4 inline-flex items-center gap-2 rounded-lg bg-paper px-4 py-2 text-[15px] font-bold text-black transition-colors group-hover:bg-mist">
-        {t("nextGo")} →
-      </span>
+      <span className="block text-[15px] font-bold">{t("nextHeading")}</span>
+      <span className="mt-1 block text-[14.5px] leading-relaxed text-paper/70">{nextAction.text}</span>
     </>
   );
 
@@ -142,12 +139,18 @@ export default async function DashboardOverviewPage({
     { label: t("statRewards"), value: String(rewardsReady), tone: "red" },
   ] as const;
 
-  const quickActions = [
-    { href: "/dashboard/stranice", label: pages.length === 0 ? t("qaNewPage") : t("navPages") },
-    { href: "/dashboard/strava", label: connection ? t("qaRewards") : t("qaStrava") },
-    { href: "/dogadjaji", label: t("qaEvents") },
-    { href: "/dashboard/donacije", label: t("qaGiving") },
-  ];
+  // Quick actions are verbs: things a runner does, not places they go.
+  const livePage = pages.find((page) => page.status === "active") ?? null;
+  const captainedTeam = (teamRows ?? [])[0] ?? null;
+  const inviteEvent = nextEvent ?? (livePage ? eventById.get(livePage.event_id) : undefined);
+  const invitePath = captainedTeam
+    ? `/${locale}/t/${captainedTeam.slug}`
+    : inviteEvent
+      ? `/${locale}/dogadjaji/${inviteEvent.slug}`
+      : `/${locale}/prikupljaci`;
+  const inviteTitle = captainedTeam?.name ?? inviteEvent?.name ?? "Santamore";
+  const actionClass =
+    "rounded-lg bg-mist px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea";
 
   return (
     <div className="py-8">
@@ -196,15 +199,45 @@ export default async function DashboardOverviewPage({
       <section className="mt-8">
         <h2 className="text-[16px] font-bold">{t("quickActions")}</h2>
         <div className="mt-3 flex flex-wrap gap-2">
-          {quickActions.map((action) => (
-            <Link
-              key={action.href + action.label}
-              href={action.href}
-              className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
-            >
-              {action.label}
+          {livePage ? (
+            <ShareButton
+              title={livePage.title}
+              path={`/${locale}/f/${livePage.slug}`}
+              text={t("shareMessageShort", { title: livePage.title })}
+              label={t("qaSharePage")}
+              copiedLabel={tDonate("copied")}
+              className={actionClass}
+            />
+          ) : (
+            <Link href="/dashboard/stranice" className={actionClass}>
+              {t("qaNewPage")}
             </Link>
-          ))}
+          )}
+          <DonateButton
+            request={livePage ? { kind: "fundraiser", slug: livePage.slug } : { kind: "campaign" }}
+            href={livePage ? `/f/${livePage.slug}/podrzi` : "/podrzi"}
+            className={actionClass}
+          >
+            {livePage ? t("qaGiveOwn") : t("qaDonate")}
+          </DonateButton>
+          <ShareButton
+            title={inviteTitle}
+            path={invitePath}
+            text={t("inviteMessage", { name: inviteTitle })}
+            label={t("qaInvite")}
+            copiedLabel={tDonate("copied")}
+            className={actionClass}
+          />
+          {pages.length > 0 ? (
+            <Link href={`/dashboard/stranice/${pages[0].slug}#gotovina`} className={actionClass}>
+              {t("qaCash")}
+            </Link>
+          ) : null}
+          {!connection ? (
+            <Link href="/dashboard/strava" className={actionClass}>
+              {t("qaStrava")}
+            </Link>
+          ) : null}
         </div>
       </section>
 
@@ -294,8 +327,8 @@ export default async function DashboardOverviewPage({
           {(regRows ?? []).length === 0 ? (
             <p className="mt-2 text-[14.5px] text-black/60">
               {t("registrationsEmpty")}{" "}
-              <Link href="/dogadjaji" className="font-semibold text-sea underline underline-offset-2">
-                {t("qaEvents")}
+              <Link href="/dashboard/dogadjaji" className="font-semibold text-sea underline underline-offset-2">
+                {t("navEvents")}
               </Link>
             </p>
           ) : (

@@ -2,9 +2,9 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { GivingList, type MyDonation } from "@/components/dashboard/GivingList";
+import { DonateButton } from "@/components/donate/DonateButton";
 import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
-import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
@@ -107,9 +107,13 @@ export default async function GivingPage({
         {donations.length === 0 ? (
           <p className="mt-2 text-[14.5px] text-black/60">
             {t("empty")}{" "}
-            <Link href="/podrzi" className="font-semibold text-sea underline underline-offset-2">
+            <DonateButton
+              request={{ kind: "campaign" }}
+              href="/podrzi"
+              className="font-semibold text-sea underline underline-offset-2"
+            >
               {t("giveCta")}
-            </Link>
+            </DonateButton>
           </p>
         ) : (
           <GivingList donations={donations} />
