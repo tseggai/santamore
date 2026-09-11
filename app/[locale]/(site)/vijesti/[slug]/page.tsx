@@ -98,7 +98,7 @@ export default async function NewsPostPage({
 
       <Link
         href="/vijesti"
-        className="mt-10 inline-block rounded-xl border-[1.5px] border-line px-5 py-3 text-sm font-semibold hover:border-sea hover:text-sea"
+        className="mt-10 inline-block rounded-lg border-[1.5px] border-line px-5 py-3 text-sm font-semibold hover:border-sea hover:text-sea"
       >
         ← {t("backToIndex")}
       </Link>

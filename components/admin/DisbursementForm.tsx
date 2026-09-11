@@ -16,7 +16,7 @@ export interface ChapterOption {
 type State = "idle" | "busy" | "error";
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
+  "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 
 /**
  * New-disbursement form. Documentation files upload straight to the
@@ -154,7 +154,7 @@ export function DisbursementForm({ chapters }: { chapters: ChapterOption[] }) {
       <button
         type="submit"
         disabled={state === "busy" || uploading}
-        className="rounded-xl bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
+        className="rounded-lg bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
       >
         {t("disbCreate")}
       </button>

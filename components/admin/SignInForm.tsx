@@ -34,7 +34,7 @@ export function SignInForm({
   const [detail, setDetail] = useState<{ rateLimited: boolean; message: string } | null>(null);
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[16px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-lg border-[1.5px] border-line px-3.5 py-3 text-[16px] outline-none focus:border-sea";
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -115,7 +115,7 @@ export function SignInForm({
           <button
             type="submit"
             disabled={state === "verifying"}
-            className="w-full rounded-xl bg-sea px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
+            className="w-full rounded-lg bg-sea px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
           >
             {t("codeSubmit")}
           </button>
@@ -153,7 +153,7 @@ export function SignInForm({
       <button
         type="submit"
         disabled={state === "sending"}
-        className="w-full rounded-xl bg-sea px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
+        className="w-full rounded-lg bg-sea px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
       >
         {t("sendLink")}
       </button>

@@ -52,7 +52,7 @@ export function InboundForm({
   };
 
   const inputClass =
-    "w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
+    "w-full rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
   const labelClass = "text-[14px] font-semibold";
 
   if (state === "done") {
@@ -95,7 +95,7 @@ export function InboundForm({
         <button
           type="submit"
           disabled={state === "busy"}
-          className="rounded-xl bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
+          className="rounded-lg bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
         >
           {t("submit")}
         </button>
@@ -192,7 +192,7 @@ export function InboundForm({
       <button
         type="submit"
         disabled={state === "busy"}
-        className="w-full rounded-xl bg-red px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+        className="w-full rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
       >
         {state === "busy" ? t("sending") : t("submit")}
       </button>

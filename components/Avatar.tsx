@@ -30,7 +30,7 @@ export function Avatar({
         height={size}
         priority={priority}
         style={style}
-        className={`shrink-0 rounded-full border-[1.5px] border-ink object-cover ${className}`}
+        className={`shrink-0 rounded-full object-cover ${className}`}
       />
     );
   }
@@ -38,7 +38,7 @@ export function Avatar({
     <div
       aria-hidden
       style={style}
-      className={`type-display flex shrink-0 items-center justify-center rounded-full border-[1.5px] border-ink bg-red font-medium text-paper ${className}`}
+      className={`type-display flex shrink-0 items-center justify-center rounded-full bg-red font-medium text-paper ${className}`}
     >
       {initial}
     </div>

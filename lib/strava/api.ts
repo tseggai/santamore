@@ -21,7 +21,26 @@ export interface StravaTokens {
   refresh_token: string;
   expires_at: number; // unix seconds
   scope?: string;
-  athlete?: { id: number; firstname?: string; lastname?: string };
+  athlete?: {
+    id: number;
+    firstname?: string;
+    lastname?: string;
+    /** Avatar URLs; Strava's default placeholder ends in "avatar/athlete/large.png". */
+    profile?: string;
+    profile_medium?: string;
+  };
+}
+
+/** The athlete's picture, or null when Strava is showing its placeholder. */
+export function athleteAvatar(athlete: StravaTokens["athlete"]): string | null {
+  const url = athlete?.profile_medium ?? athlete?.profile ?? "";
+  if (!url.startsWith("https://") || url.includes("avatar/athlete/")) return null;
+  return url;
+}
+
+export function athleteName(athlete: StravaTokens["athlete"]): string | null {
+  const name = `${athlete?.firstname ?? ""} ${athlete?.lastname ?? ""}`.trim();
+  return name === "" ? null : name.slice(0, 120);
 }
 
 export function stravaConfig() {

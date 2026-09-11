@@ -59,7 +59,7 @@
   --text-6xl: 70px;
   --text-6xl--line-height: 1.1;
 
-  --radius-brand: 14px;
+  --radius-brand: 8px; /* every box and button (owner decision 2026-09-11) */
 
   /* Page containers are 25% wider than Tailwind's defaults (owner decision,
      2026-09). sm/md/lg stay stock — they size forms and inner text blocks,

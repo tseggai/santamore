@@ -115,7 +115,7 @@ export function ReconciliationTool({
   const money = (cents: number) => formatCents(cents, locale);
 
   const selectClass =
-    "mt-1 w-full rounded-[9px] border-[1.5px] border-line bg-paper px-2.5 py-2 text-[14.5px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-2.5 py-2 text-[14.5px] outline-none focus:border-sea";
 
   return (
     <section className="mt-10 rounded-brand border-[1.5px] border-line px-4 py-4">
@@ -205,7 +205,7 @@ export function ReconciliationTool({
           <button
             type="button"
             onClick={propose}
-            className="mt-4 rounded-xl bg-sea px-5 py-2.5 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2"
+            className="mt-4 rounded-lg bg-sea px-5 py-2.5 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2"
           >
             {t("propose")}
           </button>
@@ -221,7 +221,7 @@ export function ReconciliationTool({
             return (
               <li
                 key={index}
-                className="rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[14.5px]"
+                className="rounded-lg border-[1.5px] border-line px-3.5 py-3 text-[14.5px]"
               >
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <span className="font-mono tabular-nums text-ink/60">{row.dateText}</span>
@@ -280,7 +280,7 @@ export function ReconciliationTool({
                       {proposal.candidates.map((candidate) => (
                         <li
                           key={candidate.id}
-                          className="flex flex-wrap items-center gap-3 rounded-[9px] bg-mist px-3 py-2"
+                          className="flex flex-wrap items-center gap-3 rounded-lg bg-mist px-3 py-2"
                         >
                           <span>
                             {candidate.donorName ?? "—"}

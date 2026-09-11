@@ -140,7 +140,7 @@ export default async function AdminFundraisersPage({
           {messages.map((row) => (
             <li
               key={row.id}
-              className={`rounded-[11px] border-[1.5px] px-3.5 py-2.5 text-[14.5px] ${
+              className={`rounded-lg border-[1.5px] px-3.5 py-2.5 text-[14.5px] ${
                 row.is_message_hidden ? "border-line-soft opacity-60" : "border-line"
               }`}
             >

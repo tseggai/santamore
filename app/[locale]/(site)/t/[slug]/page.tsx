@@ -116,7 +116,7 @@ export default async function TeamPage({
           <div className="mt-4 flex items-center gap-2">
             <Link
               href={`/dashboard/stranice?team=${team.id}`}
-              className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+              className="inline-flex h-11 items-center rounded-lg bg-red px-7 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark"
             >
               {t("joinTeam")}
             </Link>

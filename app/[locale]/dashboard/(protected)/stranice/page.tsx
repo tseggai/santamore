@@ -192,7 +192,7 @@ export default async function PagesHubPage({
 
   const single = pages.length === 1;
   const iconBtn =
-    "inline-flex h-10 w-10 items-center justify-center rounded-xl bg-paper text-ink transition-colors hover:bg-mist-2 hover:text-sea";
+    "inline-flex h-10 w-10 items-center justify-center rounded-lg bg-paper text-ink transition-colors hover:bg-mist-2 hover:text-sea";
 
   return (
     <div className="py-8">
@@ -293,7 +293,7 @@ export default async function PagesHubPage({
                 <div className="mt-4">
                   <Link
                     href={`/dashboard/stranice/${page.slug}#gotovina`}
-                    className="inline-flex rounded-xl bg-ink px-4 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90"
+                    className="inline-flex rounded-lg bg-ink px-4 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90"
                   >
                     {t("qaCash")}
                   </Link>

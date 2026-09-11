@@ -110,7 +110,7 @@ export default function LocaleSwitcher({
           role="menu"
           aria-label={t("languageSwitcher")}
           onKeyDown={onMenuKey}
-          className={`absolute z-40 mt-1.5 min-w-[160px] overflow-hidden rounded-[11px] border-[1.5px] bg-paper py-1 shadow-[0_8px_24px_rgba(54,67,75,0.14)] ${
+          className={`absolute z-40 mt-1.5 min-w-[160px] overflow-hidden rounded-lg border-[1.5px] bg-paper py-1 shadow-[0_8px_24px_rgba(54,67,75,0.14)] ${
             dark ? "bottom-full left-0 mb-1.5 mt-0 border-line" : "right-0 border-line"
           }`}
         >

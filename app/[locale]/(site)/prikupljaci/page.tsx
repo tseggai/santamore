@@ -116,7 +116,7 @@ export default async function FundraisersDirectoryPage({
         <h1 className="type-display text-3xl">{t("title")}</h1>
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-1.5 rounded-xl bg-red px-4 py-2.5 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-red px-4 py-2.5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark"
         >
           <span aria-hidden className="text-[18px] leading-none">+</span>
           {t("myPageCta")}

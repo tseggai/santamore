@@ -264,11 +264,11 @@ export default async function AdminDonationsPage({
           name="q"
           defaultValue={query}
           placeholder={t("searchPlaceholder")}
-          className="w-full max-w-sm rounded-[10px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15px] outline-none focus:border-sea"
+          className="w-full max-w-sm rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15px] outline-none focus:border-sea"
         />
         <button
           type="submit"
-          className="rounded-xl bg-sea px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-sea-2"
+          className="rounded-lg bg-sea px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-sea-2"
         >
           {t("searchButton")}
         </button>

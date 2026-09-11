@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Avatar } from "@/components/Avatar";
+import { DonateButton } from "@/components/donate/DonateButton";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
@@ -116,12 +117,23 @@ export default async function DashboardOverviewPage({
   // The one next move (brief §10 nudge treatment).
   const nextAction =
     pages.length === 0
-      ? { text: t("nextActionCreate"), href: "/dashboard/stranice" }
+      ? { text: t("nextActionCreate"), href: "/dashboard/stranice", donateSlug: null }
       : drafts.length > 0
-        ? { text: t("nextActionPublish"), href: `/dashboard/stranice/${drafts[0].slug}` }
+        ? { text: t("nextActionPublish"), href: `/dashboard/stranice/${drafts[0].slug}`, donateSlug: null }
         : raised === 0
-          ? { text: t("nextActionSelf"), href: `/f/${pages[0].slug}/podrzi` }
-          : { text: t("nudgeShare"), href: "/dashboard/stranice" };
+          ? { text: t("nextActionSelf"), href: `/f/${pages[0].slug}/podrzi`, donateSlug: pages[0].slug }
+          : { text: t("nudgeShare"), href: "/dashboard/stranice", donateSlug: null };
+  const nextClass =
+    "group mt-6 block rounded-lg bg-ink px-6 py-6 text-paper transition-opacity hover:opacity-95 sm:px-8 sm:py-7";
+  const nextBody = (
+    <>
+      <span className="type-eyebrow block text-red">{t("nextHeading")}</span>
+      <span className="type-display mt-2 block max-w-2xl text-xl text-paper sm:text-2xl">{nextAction.text}</span>
+      <span className="mt-4 inline-flex items-center gap-2 rounded-lg bg-paper px-4 py-2 text-[15px] font-bold text-ink transition-colors group-hover:bg-mist">
+        {t("nextGo")} →
+      </span>
+    </>
+  );
 
   const tiles = [
     { label: t("statRaised"), value: money(raised), tone: "ink" },
@@ -166,13 +178,20 @@ export default async function DashboardOverviewPage({
         ))}
       </div>
 
-      <Link
-        href={nextAction.href}
-        className="mt-5 block rounded-xl bg-ink px-4 py-3.5 text-paper transition-opacity hover:opacity-90"
-      >
-        <span className="block text-[14px] font-bold">{t("nextHeading")}</span>
-        <span className="mt-1 block text-[13.5px] leading-relaxed text-paper/70">{nextAction.text}</span>
-      </Link>
+      {nextAction.donateSlug ? (
+        /* Donating to their own page opens the checkout here, in the console. */
+        <DonateButton
+          request={{ kind: "fundraiser", slug: nextAction.donateSlug }}
+          href={nextAction.href}
+          className={nextClass}
+        >
+          {nextBody}
+        </DonateButton>
+      ) : (
+        <Link href={nextAction.href} className={nextClass}>
+          {nextBody}
+        </Link>
+      )}
 
       <section className="mt-8">
         <h2 className="text-[16px] font-bold">{t("quickActions")}</h2>
@@ -181,7 +200,7 @@ export default async function DashboardOverviewPage({
             <Link
               key={action.href + action.label}
               href={action.href}
-              className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+              className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
             >
               {action.label}
             </Link>
@@ -211,7 +230,7 @@ export default async function DashboardOverviewPage({
                 <li key={page.id}>
                   <Link
                     href={`/dashboard/stranice/${page.slug}`}
-                    className="flex items-center gap-3 rounded-[11px] bg-mist px-4 py-3 transition-colors hover:bg-mist-2"
+                    className="flex items-center gap-3 rounded-lg bg-mist px-4 py-3 transition-colors hover:bg-mist-2"
                   >
                     <Avatar src={fundraiserPhotoUrl(page.photo_path)} name={page.title} size={40} />
                     <span className="min-w-0 flex-1">

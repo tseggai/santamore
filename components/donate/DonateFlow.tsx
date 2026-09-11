@@ -169,12 +169,12 @@ export function DonateFlow({
           alt=""
           width={44}
           height={44}
-          className="h-[44px] w-[44px] shrink-0 rounded-full border-[1.5px] border-ink object-cover"
+          className="h-[44px] w-[44px] shrink-0 rounded-full object-cover"
         />
       ) : (
         <span
           aria-hidden
-          className="type-display flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-ink bg-red text-[19px] font-bold text-paper"
+          className="type-display flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full bg-red text-[19px] font-bold text-paper"
         >
           {campaign.title.trim().charAt(0).toUpperCase() || "S"}
         </span>
@@ -182,13 +182,13 @@ export function DonateFlow({
     ) : null;
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
   const primaryBtn =
-    "rounded-xl bg-red px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60";
+    "rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60";
   const secondaryBtn =
-    "rounded-xl border-[1.5px] border-line px-5 py-3 text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea";
+    "rounded-lg border-[1.5px] border-line px-5 py-3 text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea";
   const chipClass = (selected: boolean) =>
-    `rounded-[11px] border-[1.5px] px-1.5 py-3 text-center transition-colors ${
+    `rounded-lg border-[1.5px] px-1.5 py-3 text-center transition-colors ${
       selected
         ? "border-red bg-red/[0.07] shadow-[inset_0_0_0_0.5px_var(--color-red)]"
         : "border-line hover:border-sea"
@@ -406,7 +406,7 @@ export function DonateFlow({
             })}
           </div>
 
-          <label className="mt-3 flex items-center gap-2 rounded-[11px] border-[1.5px] border-line px-3.5 py-3 focus-within:border-sea">
+          <label className="mt-3 flex items-center gap-2 rounded-lg border-[1.5px] border-line px-3.5 py-3 focus-within:border-sea">
             <span aria-hidden className="font-mono text-[16px] text-ink/50">
               €
             </span>
@@ -524,7 +524,7 @@ export function DonateFlow({
                 type="button"
                 aria-pressed={false}
                 disabled
-                className="rounded-[11px] border-[1.5px] border-line px-3 py-3 text-left opacity-50"
+                className="rounded-lg border-[1.5px] border-line px-3 py-3 text-left opacity-50"
               >
                 <span className="block text-[15.5px] font-semibold">{t("railCard")}</span>
                 <span className="block text-[13px] text-ink/60">{t("railCardSub")}</span>
@@ -533,7 +533,7 @@ export function DonateFlow({
             <button
               type="button"
               aria-pressed
-              className="rounded-[11px] border-2 border-ink bg-ink px-3 py-3 text-left text-paper"
+              className="rounded-lg border-2 border-ink bg-ink px-3 py-3 text-left text-paper"
             >
               <span className="block text-[15.5px] font-semibold">{t("railSepa")}</span>
               <span className="block text-[13px] text-paper/70">{t("railSepaSub")}</span>

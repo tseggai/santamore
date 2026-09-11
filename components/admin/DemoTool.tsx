@@ -11,7 +11,7 @@ import {
 } from "@/app/[locale]/admin/(protected)/demo/actions";
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 font-mono text-[15px] tabular-nums outline-none focus:border-sea";
+  "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2.5 font-mono text-[15px] tabular-nums outline-none focus:border-sea";
 
 export function DemoTool({
   counts,
@@ -124,7 +124,7 @@ export function DemoTool({
         <button
           type="submit"
           disabled={busy !== ""}
-          className="mt-4 rounded-xl bg-red px-5 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+          className="mt-4 rounded-lg bg-red px-5 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
         >
           {busy === "generate" ? t("demoGenerating") : t("demoGenerate")}
         </button>
@@ -139,14 +139,14 @@ export function DemoTool({
               type="button"
               disabled={busy !== ""}
               onClick={purge}
-              className="rounded-xl bg-red-dark px-5 py-2.5 text-[14.5px] font-bold text-paper disabled:opacity-60"
+              className="rounded-lg bg-red-dark px-5 py-2.5 text-[14.5px] font-bold text-paper disabled:opacity-60"
             >
               {busy === "purge" ? t("demoPurging") : t("demoPurgeConfirm")}
             </button>
             <button
               type="button"
               onClick={() => setConfirmPurge(false)}
-              className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold"
+              className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold"
             >
               {t("cancel")}
             </button>
@@ -156,7 +156,7 @@ export function DemoTool({
             type="button"
             disabled={busy !== "" || !hasDemo}
             onClick={() => setConfirmPurge(true)}
-            className="mt-3 rounded-xl border-[1.5px] border-red px-5 py-2.5 text-[14.5px] font-bold text-red-dark transition-colors hover:bg-red hover:text-paper disabled:opacity-40"
+            className="mt-3 rounded-lg border-[1.5px] border-red px-5 py-2.5 text-[14.5px] font-bold text-red-dark transition-colors hover:bg-red hover:text-paper disabled:opacity-40"
           >
             {t("demoPurge")}
           </button>

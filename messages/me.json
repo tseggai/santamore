@@ -334,7 +334,9 @@
     "cashDonorPlaceholder": "Ime na zidu donatora; prazno = anonimno",
     "cashNoteLabel": "Napomena (opciono)",
     "cashNotePlaceholder": "Gdje ili kako je prikupljeno — samo za tebe i tim",
-    "cashLogged": "Zabilježeno — računa se kad tim potvrdi predaju."
+    "cashLogged": "Zabilježeno — računa se kad tim potvrdi predaju.",
+    "nextGo": "Idemo",
+    "donateWhenPublished": "Prvo objavi stranicu — onda možeš donirati ovdje."
   },
   "email": {
     "instructions": {
@@ -1011,7 +1013,8 @@
     "notConnectedHeading": "Strava nije povezana",
     "autoSyncNote": "Nova trčanja stižu sama u roku od minuta; stranica se osvježava i pri otvaranju.",
     "trendEmptyDisconnected": "Poveži Stravu da vidiš kilometre po sedmici.",
-    "activitiesEmptyDisconnected": "Trčanja iz zadnjih 8 sedmica se pojavljuju ovdje nakon povezivanja."
+    "activitiesEmptyDisconnected": "Trčanja iz zadnjih 8 sedmica se pojavljuju ovdje nakon povezivanja.",
+    "onStrava": "na Stravi"
   },
   "giving": {
     "title": "Moje donacije",

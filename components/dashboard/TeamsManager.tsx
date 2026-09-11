@@ -51,7 +51,7 @@ export function TeamsManager({
       ) : (
         <ul className="space-y-2">
           {teams.map((team) => (
-            <li key={team.id} className="rounded-[11px] bg-mist px-4 py-3">
+            <li key={team.id} className="rounded-lg bg-mist px-4 py-3">
               <div className="flex items-center gap-3">
                 <Avatar src={fundraiserPhotoUrl(team.photoPath)} name={team.name} size={40} />
                 <span className="min-w-0 flex-1">
@@ -94,7 +94,7 @@ export function TeamsManager({
                 id="teamEvent"
                 value={eventId}
                 onChange={(event) => setEventId(event.target.value)}
-                className="mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15px] outline-none focus:border-sea"
+                className="mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15px] outline-none focus:border-sea"
               >
                 {events.map((event) => (
                   <option key={event.id} value={event.id}>
@@ -121,7 +121,7 @@ export function TeamsManager({
           <button
             type="button"
             onClick={() => setOpen("new")}
-            className="mt-4 rounded-xl bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+            className="mt-4 rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark"
           >
             + {t("newTeamOption").replace(/^\+\s*/, "")}
           </button>

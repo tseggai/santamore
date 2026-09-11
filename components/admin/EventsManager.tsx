@@ -58,7 +58,7 @@ export function EventsManager({
         <button
           type="button"
           onClick={() => setOpen("new")}
-          className="rounded-xl bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+          className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark"
         >
           + {t("evNew")}
         </button>

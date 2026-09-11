@@ -56,7 +56,7 @@ export default function Header() {
           <DonateButton
             request={{ kind: "campaign" }}
             href="/podrzi"
-            className="rounded-xl bg-red px-4 py-2 text-sm font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+            className="rounded-lg bg-red px-4 py-2 text-sm font-bold text-paper transition-colors hover:bg-red-dark"
           >
             {t("nav.donate")}
           </DonateButton>

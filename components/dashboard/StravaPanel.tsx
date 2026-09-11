@@ -18,6 +18,8 @@ export interface ConnectionInfo {
   lastSyncAt: string | null;
   /** Scopes Strava granted, e.g. "read,activity:read_all". */
   scope: string;
+  athleteName: string | null;
+  avatarUrl: string | null;
 }
 
 /**
@@ -90,14 +92,14 @@ export function StravaPanel({
 
   const connectHref = `/api/strava/connect?locale=${locale}${(connection ? connection.sharePublic : share) ? "&share=1" : ""}`;
   const ghostBtn =
-    "rounded-xl bg-mist px-4 py-2 text-[14px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-60";
+    "rounded-lg bg-mist px-4 py-2 text-[14px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-60";
 
   return (
     <div>
       {status && statusText[status] ? (
         <p
           role={status === "connected" ? "status" : "alert"}
-          className={`mb-4 rounded-[11px] px-4 py-3 text-[14.5px] font-semibold ${
+          className={`mb-4 rounded-lg px-4 py-3 text-[14.5px] font-semibold ${
             status === "connected" ? "bg-mist text-sea" : "bg-red/8 text-red-dark"
           }`}
         >
@@ -107,13 +109,38 @@ export function StravaPanel({
 
       {/* row 1: state, and the one action that changes it — top right */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="flex items-center gap-2 text-[16px] font-bold">
-          <span
-            aria-hidden
-            className={`h-2.5 w-2.5 shrink-0 rounded-full ${connection ? "bg-sea" : "bg-ink/25"}`}
-          />
-          {connection ? t("connectedHeading") : t("notConnectedHeading")}
-        </p>
+        {connection ? (
+          <p className="flex min-w-0 items-center gap-3">
+            {connection.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element -- Strava CDN, sizes vary; not worth the optimizer
+              <img
+                src={connection.avatarUrl}
+                alt=""
+                width={36}
+                height={36}
+                className="h-9 w-9 shrink-0 rounded-full object-cover"
+              />
+            ) : (
+              <span
+                aria-hidden
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#FC5200] text-[15px] font-bold text-paper"
+              >
+                {(connection.athleteName ?? "S").charAt(0).toUpperCase()}
+              </span>
+            )}
+            <span className="min-w-0 truncate text-[16px]">
+              <span className="font-bold">{connection.athleteName ?? t("connectedHeading")}</span>
+              {connection.athleteName ? (
+                <span className="text-ink/55"> {t("onStrava")}</span>
+              ) : null}
+            </span>
+          </p>
+        ) : (
+          <p className="flex items-center gap-2 text-[16px] font-bold">
+            <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full bg-ink/25" />
+            {t("notConnectedHeading")}
+          </p>
+        )}
         {connection ? (
           <button
             type="button"
@@ -126,7 +153,7 @@ export function StravaPanel({
         ) : configured ? (
           <a
             href={connectHref}
-            className="inline-flex h-11 items-center rounded-xl bg-[#FC5200] px-5 text-[15px] font-bold text-paper transition-opacity hover:opacity-90"
+            className="inline-flex h-11 items-center rounded-lg bg-[#FC5200] px-5 text-[15px] font-bold text-paper transition-opacity hover:opacity-90"
           >
             {t("connectButton")}
           </a>
@@ -156,7 +183,7 @@ export function StravaPanel({
       )}
 
       {connection && !connection.scope.includes("activity:read_all") ? (
-        <p className="mt-3 rounded-[11px] bg-mist px-4 py-3 text-[14px] text-ink/70">
+        <p className="mt-3 rounded-lg bg-mist px-4 py-3 text-[14px] text-ink/70">
           {t("scopePartialHint")}{" "}
           <a href={connectHref} className="font-semibold text-sea underline underline-offset-2">
             {t("reconnect")}

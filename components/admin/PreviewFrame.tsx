@@ -64,7 +64,7 @@ export function PreviewFrame({
             {t("previewNote")}
           </p>
           <div
-            className="mx-auto max-h-[720px] overflow-y-auto rounded-[18px] border-[1.5px] border-ink bg-paper shadow-[0_12px_32px_rgba(54,67,75,0.16)]"
+            className="mx-auto max-h-[720px] overflow-y-auto rounded-lg border-[1.5px] border-ink bg-paper shadow-[0_12px_32px_rgba(54,67,75,0.16)]"
             style={{ width: width === "phone" ? "min(100%, 400px)" : "100%" }}
           >
             {children}

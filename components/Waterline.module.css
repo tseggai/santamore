@@ -9,11 +9,16 @@
 .waterline {
   position: relative;
   height: 176px;
-  border-radius: 14px;
+  border-radius: 8px;
   overflow: hidden;
   /* #f3f6f7 and no border — owner decision, 2026-09 (the prototype had the
      mist fill with an ink hairline). */
   background: #f1f5f6;
+}
+
+/* On a mist surface (the editor) the tank sits on paper instead. */
+.paper {
+  background: #ffffff;
 }
 
 .fill {

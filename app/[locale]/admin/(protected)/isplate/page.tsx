@@ -58,7 +58,7 @@ export default async function AdminDisbursementsPage({
       {items.map((row) => (
         <li
           key={row.id}
-          className="rounded-[11px] border-[1.5px] border-line px-3.5 py-2.5 text-[14.5px]"
+          className="rounded-lg border-[1.5px] border-line px-3.5 py-2.5 text-[14.5px]"
         >
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="font-mono tabular-nums text-ink/60">

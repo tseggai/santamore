@@ -59,7 +59,7 @@ export function DonationActions({
             onChange={(event) => setReason(event.target.value)}
             placeholder={t("refundReason")}
             maxLength={500}
-            className="w-44 rounded-[9px] border-[1.5px] border-line bg-paper px-2.5 py-1.5 text-[13.5px] outline-none focus:border-sea"
+            className="w-44 rounded-lg border-[1.5px] border-line bg-paper px-2.5 py-1.5 text-[13.5px] outline-none focus:border-sea"
           />
           <button
             type="button"

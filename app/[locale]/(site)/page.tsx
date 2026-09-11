@@ -108,14 +108,14 @@ export default async function HomePage({
           <DonateButton
             request={{ kind: "campaign" }}
             href="/podrzi"
-            className="rounded-xl bg-red px-6 py-3.5 text-[16.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+            className="rounded-lg bg-red px-6 py-3.5 text-[16.5px] font-bold text-paper transition-colors hover:bg-red-dark"
           >
             {t("ctaDonate")}
           </DonateButton>
           {nextEvent ? (
             <Link
               href={`/dogadjaji/${nextEvent.slug}`}
-              className="rounded-xl border-[1.5px] border-line px-6 py-3.5 text-[15.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+              className="rounded-lg border-[1.5px] border-line px-6 py-3.5 text-[15.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
             >
               {t("ctaRegister")}
             </Link>
@@ -176,7 +176,7 @@ export default async function HomePage({
             </div>
             <Link
               href={`/dogadjaji/${nextEvent.slug}/prijava`}
-              className="rounded-xl bg-red px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+              className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark"
             >
               {tEvents("registerCta")}
             </Link>
@@ -222,7 +222,7 @@ export default async function HomePage({
           </div>
           <Link
             href="/dashboard"
-            className="mt-4 inline-block rounded-xl border-[1.5px] border-line px-5 py-3 text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea"
+            className="mt-4 inline-block rounded-lg border-[1.5px] border-line px-5 py-3 text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea"
           >
             {tLb("cta")}
           </Link>

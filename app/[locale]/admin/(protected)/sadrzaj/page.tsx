@@ -68,7 +68,7 @@ export default async function AdminContentPage({
               <li key={post.id}>
                 <Link
                   href={`/admin/sadrzaj?post=${post.id}`}
-                  className="flex flex-wrap items-baseline gap-x-3 rounded-[10px] border-[1.5px] border-line px-3.5 py-2 text-[14.5px] transition-colors hover:border-sea"
+                  className="flex flex-wrap items-baseline gap-x-3 rounded-lg border-[1.5px] border-line px-3.5 py-2 text-[14.5px] transition-colors hover:border-sea"
                 >
                   <span className="font-mono text-[12px] uppercase text-sea">
                     {post.locale}

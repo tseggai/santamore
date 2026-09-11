@@ -17,7 +17,7 @@ export function CashForm({ fundraiserId }: { fundraiserId: string }) {
   const [state, setState] = useState<"idle" | "busy" | "error" | "done">("idle");
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15.5px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15.5px] outline-none focus:border-sea";
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -88,7 +88,7 @@ export function CashForm({ fundraiserId }: { fundraiserId: string }) {
         <button
           type="submit"
           disabled={state === "busy"}
-          className="rounded-xl bg-red px-5 py-2.5 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+          className="rounded-lg bg-red px-5 py-2.5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
         >
           {t("cashSubmit")}
         </button>

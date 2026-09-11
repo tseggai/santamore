@@ -74,7 +74,7 @@ export default async function AdminLayout({
         <>
           <Link
             href="/"
-            className="whitespace-nowrap rounded-[9px] px-3.5 py-2 text-[13.5px] font-medium text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper"
+            className="whitespace-nowrap rounded-lg px-3.5 py-2 text-[13.5px] font-medium text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper"
           >
             {t("viewSite")} ↗
           </Link>

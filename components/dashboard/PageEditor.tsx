@@ -9,6 +9,7 @@ import {
   updateFundraiserPage,
 } from "@/app/[locale]/dashboard/(protected)/actions";
 import { Avatar } from "@/components/Avatar";
+import { DonateButton } from "@/components/donate/DonateButton";
 import { Editable, PencilIcon } from "@/components/dashboard/Editable";
 import { TeamPanel, type TeamOption } from "@/components/dashboard/TeamPanel";
 import { Waterline } from "@/components/Waterline";
@@ -240,7 +241,7 @@ export function PageEditor({
 
   const linkClass = "font-semibold text-ink underline decoration-line underline-offset-[3px]";
   const fieldInput =
-    "w-full rounded-[11px] border-[1.5px] border-sea bg-paper px-3 py-2 outline-none";
+    "w-full rounded-lg border-[1.5px] border-sea bg-paper px-3 py-2 outline-none";
 
   return (
     <div>
@@ -263,7 +264,7 @@ export function PageEditor({
             type="button"
             disabled={busy !== ""}
             onClick={save}
-            className="rounded-xl border-[1.5px] border-line px-4 py-2 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
+            className="rounded-lg border-[1.5px] border-line px-4 py-2 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
           >
             {t("save")}
           </button>
@@ -271,7 +272,7 @@ export function PageEditor({
             type="button"
             disabled={busy !== ""}
             onClick={togglePublish}
-            className="rounded-xl bg-red px-4 py-2 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+            className="rounded-lg bg-red px-4 py-2 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
           >
             {isActive ? t("unpublish") : t("publish")}
           </button>
@@ -423,12 +424,28 @@ export function PageEditor({
               />
             ) : null}
 
-            {/* the public actions, shown muted so the preview is honest */}
-            <div aria-hidden className="pointer-events-none mt-4 flex items-center gap-2 opacity-50">
-              <span className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[16px] font-bold text-paper">
-                {tDonate("payVerb")}
-              </span>
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border-[1.5px] border-line">
+            {/* Donate is live once the page is published — the runner's own
+                first gift happens right here (brief §10: pages that open at
+                €0 stay at €0); the share icon stays a muted stand-in because
+                the real one sits in the header above. */}
+            <div className="mt-4 flex items-center gap-2">
+              {isActive ? (
+                <DonateButton
+                  request={{ kind: "fundraiser", slug: fundraiser.slug }}
+                  href={`/f/${fundraiser.slug}/podrzi`}
+                  className="inline-flex h-11 items-center rounded-lg bg-red px-7 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark"
+                >
+                  {tDonate("payVerb")}
+                </DonateButton>
+              ) : (
+                <span
+                  title={t("donateWhenPublished")}
+                  className="inline-flex h-11 items-center rounded-lg bg-red px-7 text-[16px] font-bold text-paper opacity-50"
+                >
+                  {tDonate("payVerb")}
+                </span>
+              )}
+              <span aria-hidden className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-paper opacity-60">
                 <svg viewBox="0 0 24 24" className="h-5 w-5">
                   <path
                     d="M12 3v12m0-12L8 7m4-4 4 4M5 13v6h14v-6"
@@ -451,6 +468,7 @@ export function PageEditor({
             goalCents={goalCents ?? 0}
             donorCount={donorCount}
             locale={locale}
+            surface="paper"
           />
           <div className="absolute right-3 top-3">
             <Editable
@@ -508,7 +526,7 @@ export function PageEditor({
                 {story}
               </p>
             ) : (
-              <p className="rounded-[11px] bg-mist px-4 py-3 text-[15px] leading-relaxed text-ink/45">
+              <p className="rounded-lg bg-mist px-4 py-3 text-[15px] leading-relaxed text-ink/45">
                 {t("storyPlaceholder")}
               </p>
             )

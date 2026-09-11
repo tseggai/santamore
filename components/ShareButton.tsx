@@ -53,7 +53,7 @@ export function ShareButton({
           onClick={share}
           aria-label={label}
           title={label}
-          className={className ?? "inline-flex h-11 w-11 items-center justify-center rounded-xl bg-mist text-ink transition-colors hover:bg-mist-2 hover:text-sea"}
+          className={className ?? "inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mist text-ink transition-colors hover:bg-mist-2 hover:text-sea"}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
             <path
@@ -83,8 +83,8 @@ export function ShareButton({
 
   const buttonClass =
     variant === "primary"
-      ? "block w-full rounded-xl bg-red px-6 py-3.5 text-center text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
-      : "block w-full rounded-xl border-[1.5px] border-line px-6 py-3 text-center text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea";
+      ? "block w-full rounded-lg bg-red px-6 py-3.5 text-center text-[16px] font-bold text-paper transition-colors hover:bg-red-dark"
+      : "block w-full rounded-lg border-[1.5px] border-line px-6 py-3 text-center text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea";
 
   return (
     <button type="button" onClick={share} aria-live="polite" className={buttonClass}>

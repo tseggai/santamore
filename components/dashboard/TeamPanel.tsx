@@ -103,7 +103,7 @@ export function TeamPanel({
   };
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15px] outline-none focus:border-sea";
 
   return (
     <form
@@ -180,14 +180,14 @@ export function TeamPanel({
         <button
           type="submit"
           disabled={busy !== "" || name.trim().length < 2}
-          className="rounded-xl bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-50"
         >
           {mode === "create" ? t("teamCreateSubmit") : t("teamEditSubmit")}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+          className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
         >
           {t("cancel")}
         </button>

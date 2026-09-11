@@ -35,6 +35,10 @@ select * from (values
   ('20260911000014_manual_activities',
      exists (select 1 from information_schema.columns
               where table_schema = 'public' and table_name = 'activities'
-                and column_name = 'is_manual'))
+                and column_name = 'is_manual')),
+  ('20260911000015_strava_athlete_profile',
+     exists (select 1 from information_schema.columns
+              where table_schema = 'public' and table_name = 'strava_connections'
+                and column_name = 'athlete_name'))
 ) as m (migration, applied)
 order by migration;
