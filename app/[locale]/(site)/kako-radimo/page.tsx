@@ -118,7 +118,7 @@ export default async function HowPage({
         </div>
         <Link
           href="/transparentnost"
-          className="mt-6 inline-block rounded-xl bg-red px-5 py-3 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+          className="mt-6 inline-block rounded-lg bg-red px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark"
         >
           {content.ledgerCta}
         </Link>

@@ -94,7 +94,7 @@ export default async function StravaPage({
   ] = await Promise.all([
     supabase
       .from("strava_connections")
-      .select("athlete_id, share_public, connected_at, last_sync_at, scope")
+      .select("athlete_id, share_public, connected_at, last_sync_at, scope, athlete_name, athlete_avatar_url")
       .eq("user_id", user.id)
       .maybeSingle(),
     supabase
@@ -134,6 +134,8 @@ export default async function StravaPage({
         connectedAt: connectionRow.connected_at,
         lastSyncAt: connectionRow.last_sync_at,
         scope: connectionRow.scope ?? "",
+        athleteName: connectionRow.athlete_name ?? null,
+        avatarUrl: connectionRow.athlete_avatar_url ?? null,
       }
     : null;
 
@@ -191,7 +193,7 @@ export default async function StravaPage({
     <li key={award.code}>
       <Link
         href={`/r/${award.code}`}
-        className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-[11px] bg-paper px-4 py-3 transition-colors hover:bg-mist-2"
+        className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg bg-paper px-4 py-3 transition-colors hover:bg-mist-2"
       >
         <span className="min-w-0 flex-1">
           <span className="block text-[15px] font-semibold">
@@ -368,7 +370,7 @@ export default async function StravaPage({
           <p className="mt-1 text-[14px] leading-relaxed text-ink/65">{t("nurtureBody")}</p>
           <Link
             href="/dashboard/stranice"
-            className="mt-3 inline-flex rounded-xl bg-ink px-4 py-2 text-[14px] font-semibold text-paper transition-opacity hover:opacity-90"
+            className="mt-3 inline-flex rounded-lg bg-ink px-4 py-2 text-[14px] font-semibold text-paper transition-opacity hover:opacity-90"
           >
             {t("nurtureCta")}
           </Link>

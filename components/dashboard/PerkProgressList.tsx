@@ -69,7 +69,7 @@ export function PerkProgressList({ rows, limit }: { rows: PerkProgressRow[]; lim
               ? { text: t("progressNeedMore", { km: km(shortfall) }), tone: "text-red-dark" }
               : { text: t("progressNeedRun", { km: km(row.min_distance_m) }), tone: "text-ink/70" };
         return (
-          <li key={row.challenge_id} className="rounded-[11px] bg-paper px-4 py-3">
+          <li key={row.challenge_id} className="rounded-lg bg-paper px-4 py-3">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
               <span className="min-w-0 text-[15px] font-semibold">
                 {row.reward_label} · {row.partner_name}

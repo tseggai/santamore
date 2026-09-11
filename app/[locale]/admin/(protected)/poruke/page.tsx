@@ -79,7 +79,7 @@ export default async function AdminMessagesPage({
           {rows.map((row) => (
             <li
               key={row.id}
-              className="rounded-[11px] border-[1.5px] border-line px-3.5 py-2.5 text-[14.5px]"
+              className="rounded-lg border-[1.5px] border-line px-3.5 py-2.5 text-[14.5px]"
             >
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="rounded-full bg-mist px-2.5 py-0.5 font-mono text-[11.5px] uppercase tracking-[0.1em] text-sea">

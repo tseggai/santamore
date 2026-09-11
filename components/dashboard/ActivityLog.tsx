@@ -67,7 +67,7 @@ export function ActivityLog({
   };
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3 py-2.5 font-mono text-[15px] tabular-nums outline-none focus:border-sea";
+    "mt-1 w-full rounded-lg border-[1.5px] border-line px-3 py-2.5 font-mono text-[15px] tabular-nums outline-none focus:border-sea";
 
   return (
     <div className="mt-6 rounded-brand bg-mist px-4 py-4">
@@ -112,7 +112,7 @@ export function ActivityLog({
         <button
           type="submit"
           disabled={state === "busy" || (km.trim() === "" && minutes.trim() === "")}
-          className="rounded-xl bg-sea px-4 py-2.5 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
+          className="rounded-lg bg-sea px-4 py-2.5 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
         >
           {t("activitySubmit")}
         </button>

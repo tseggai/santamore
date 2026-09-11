@@ -60,10 +60,10 @@ export function ConsoleShell({
   const rail = (
     <>
       <div className="hidden md:block">
-        <Link href={homeHref} className="inline-block">
+        <Link href={homeHref} className="block w-fit">
           <Image src={icon} alt="Santamore" className="h-14 w-auto" priority />
         </Link>
-        <span className="mt-3 inline-block rounded-full border border-paper/30 px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-[0.18em] text-paper/80">
+        <span className="mt-5 inline-block rounded-full border border-paper/30 px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-[0.18em] text-paper/80">
           {badge}
         </span>
       </div>
@@ -88,7 +88,7 @@ export function ConsoleShell({
           aria-label={menuLabel}
           aria-haspopup="dialog"
           aria-controls={drawerId}
-          className="flex h-10 w-10 items-center justify-center rounded-[9px] border border-paper/30 text-paper"
+          className="flex h-10 w-10 items-center justify-center rounded-lg border border-paper/30 text-paper"
         >
           <svg aria-hidden viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
             <path d="M3 5h14M3 10h14M3 15h14" />
@@ -115,7 +115,7 @@ export function ConsoleShell({
               type="button"
               onClick={() => setOpen(false)}
               aria-label={closeLabel}
-              className="flex h-10 w-10 items-center justify-center rounded-[9px] border border-paper/30 text-[21px] leading-none"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-paper/30 text-[21px] leading-none"
             >
               ×
             </button>
@@ -134,7 +134,7 @@ export function ConsoleShell({
       </aside>
 
       <main id="main" className="min-w-0 flex-1 px-4 py-5 md:px-8 md:py-8">
-        <div className={`mx-auto ${width} rounded-[18px] border-[1.5px] border-line-soft bg-paper px-5 md:px-8`}>
+        <div className={`mx-auto ${width} rounded-lg bg-paper px-5 md:px-8`}>
           {children}
         </div>
       </main>

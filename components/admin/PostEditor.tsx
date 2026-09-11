@@ -23,7 +23,7 @@ export interface EditablePost {
 type State = "idle" | "busy" | "done" | "error";
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
+  "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 
 /** Markdown post editor — one row per locale, same slug links translations. */
 export function PostEditor({ post }: { post: EditablePost | null }) {
@@ -160,7 +160,7 @@ export function PostEditor({ post }: { post: EditablePost | null }) {
       <button
         type="submit"
         disabled={state === "busy" || uploading}
-        className="rounded-xl bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
+        className="rounded-lg bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
       >
         {t("postSave")}
       </button>

@@ -45,12 +45,12 @@ export function RedeemForm({ code }: { code: string }) {
           value={pin}
           onChange={(event) => setPin(event.target.value.replace(/\D/g, ""))}
           placeholder={t("pinLabel")}
-          className="w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 font-mono text-[19px] tracking-[0.3em] outline-none focus:border-sea"
+          className="w-full rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-3 font-mono text-[19px] tracking-[0.3em] outline-none focus:border-sea"
         />
         <button
           type="submit"
           disabled={busy || pin.length < 4}
-          className="shrink-0 rounded-xl bg-red px-5 py-3 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+          className="shrink-0 rounded-lg bg-red px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
         >
           {busy ? "…" : t("redeemButton")}
         </button>

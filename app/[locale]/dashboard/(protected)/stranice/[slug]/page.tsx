@@ -133,7 +133,7 @@ export default async function EditPagePage({
             />
             <Link
               href={`/f/${mine.slug}`}
-              className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+              className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
             >
               {t("viewPublic")} ↗
             </Link>

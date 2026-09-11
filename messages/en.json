@@ -334,7 +334,9 @@
     "cashDonorPlaceholder": "Name shown on the donor wall; empty = anonymous",
     "cashNoteLabel": "Note (optional)",
     "cashNotePlaceholder": "Where or how you collected it — for you and staff only",
-    "cashLogged": "Logged — it counts once staff confirm the hand-in."
+    "cashLogged": "Logged — it counts once staff confirm the hand-in.",
+    "nextGo": "Let's go",
+    "donateWhenPublished": "Publish the page first — then you can give to it here."
   },
   "email": {
     "instructions": {
@@ -1011,7 +1013,8 @@
     "notConnectedHeading": "Strava not connected",
     "autoSyncNote": "New runs arrive on their own within a minute; the page also refreshes when you open it.",
     "trendEmptyDisconnected": "Connect Strava to see kilometres per week.",
-    "activitiesEmptyDisconnected": "Your runs from the last 8 weeks appear here once connected."
+    "activitiesEmptyDisconnected": "Your runs from the last 8 weeks appear here once connected.",
+    "onStrava": "on Strava"
   },
   "giving": {
     "title": "My giving",

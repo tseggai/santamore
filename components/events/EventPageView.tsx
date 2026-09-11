@@ -108,14 +108,14 @@ export function EventPageView({
         {registrationState === "open" ? (
           <Link
             href={`/dogadjaji/${event.slug}/prijava`}
-            className="inline-flex h-12 items-center rounded-xl bg-red px-8 text-[16.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+            className="inline-flex h-12 items-center rounded-lg bg-red px-8 text-[16.5px] font-bold text-paper transition-colors hover:bg-red-dark"
           >
             {t("registerCta")}
           </Link>
         ) : null}
         <Link
           href={`/dashboard?event=${event.slug}`}
-          className="inline-flex h-12 items-center rounded-xl border-[1.5px] border-ink px-6 text-[15.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+          className="inline-flex h-12 items-center rounded-lg border-[1.5px] border-ink px-6 text-[15.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
         >
           {t("fundraiseCta")}
         </Link>

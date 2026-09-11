@@ -71,14 +71,14 @@ export function CookieConsent({ domain }: { domain: string | null }) {
           <button
             type="button"
             onClick={() => decide("rejected")}
-            className="rounded-xl border-[1.5px] border-ink px-5 py-2.5 text-[14.5px] font-bold hover:bg-mist"
+            className="rounded-lg border-[1.5px] border-ink px-5 py-2.5 text-[14.5px] font-bold hover:bg-mist"
           >
             {t("reject")}
           </button>
           <button
             type="button"
             onClick={() => decide("accepted")}
-            className="rounded-xl border-[1.5px] border-ink bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper hover:opacity-90"
+            className="rounded-lg border-[1.5px] border-ink bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper hover:opacity-90"
           >
             {t("accept")}
           </button>

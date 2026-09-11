@@ -46,7 +46,7 @@ export interface PerkChallengeAdminRow {
 const SPORTS = ["Run", "TrailRun", "VirtualRun", "Walk", "Hike", "Ride", "Swim"] as const;
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
+  "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 const labelClass = "text-[13.5px] font-semibold";
 
 function toDateInput(iso: string | null): string {
@@ -298,7 +298,7 @@ function ChallengeForm({
         </div>
       </div>
 
-      <p className="mt-4 rounded-[11px] bg-paper px-4 py-3 text-[14px] leading-relaxed text-ink/75">
+      <p className="mt-4 rounded-lg bg-paper px-4 py-3 text-[14px] leading-relaxed text-ink/75">
         <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink/50">{t("perkRulePreview")}</span>
         <br />
         <PerkRule challenge={preview} />
@@ -309,10 +309,10 @@ function ChallengeForm({
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("perkInvalid")}</p> : null}
 
       <div className="mt-4 flex gap-2">
-        <button type="submit" disabled={state === "busy"} className="rounded-xl bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
+        <button type="submit" disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
           {challenge ? t("evSave") : t("perkCreate")}
         </button>
-        <button type="button" onClick={onDone} className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea">
+        <button type="button" onClick={onDone} className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea">
           {t("cancel")}
         </button>
       </div>
@@ -381,7 +381,7 @@ export function PerkChallengesManager({
       {open === "new" ? (
         <ChallengeForm challenge={null} onDone={() => setOpen("")} />
       ) : (
-        <button type="button" onClick={() => setOpen("new")} className="rounded-xl bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark">
+        <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
           + {t("perkNew")}
         </button>
       )}

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { hasLocale } from "next-intl";
 
-import { exchangeCode, stravaConfig, StravaError } from "@/lib/strava/api";
+import { athleteAvatar, athleteName, exchangeCode, stravaConfig, StravaError } from "@/lib/strava/api";
 import { hasActivityScope, verifyState } from "@/lib/strava/rules";
 import { localToday, syncRecent } from "@/lib/strava/sync";
 import { siteOrigin } from "@/lib/site";
@@ -62,6 +62,8 @@ export async function GET(request: Request) {
         expires_at: new Date(tokens.expires_at * 1000).toISOString(),
         scope: tokens.scope ?? url.searchParams.get("scope") ?? "",
         share_public: state.sharePublic,
+        athlete_name: athleteName(tokens.athlete),
+        athlete_avatar_url: athleteAvatar(tokens.athlete),
       },
       { onConflict: "user_id" },
     );

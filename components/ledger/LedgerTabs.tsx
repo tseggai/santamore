@@ -106,7 +106,7 @@ export function LedgerTabs({
       <div
         role="group"
         aria-label={t("title")}
-        className="mt-5 grid grid-cols-2 overflow-hidden rounded-[11px] border-[1.5px] border-ink"
+        className="mt-5 grid grid-cols-2 overflow-hidden rounded-lg border-[1.5px] border-ink"
       >
         <button
           type="button"

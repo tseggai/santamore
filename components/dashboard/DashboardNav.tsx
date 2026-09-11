@@ -29,8 +29,8 @@ export function DashboardNav() {
                 aria-current={active ? "page" : undefined}
                 className={
                   active
-                    ? "block whitespace-nowrap rounded-[9px] bg-paper/15 px-3.5 py-2 text-[14.5px] font-semibold text-paper"
-                    : "block whitespace-nowrap rounded-[9px] px-3.5 py-2 text-[14.5px] font-medium text-paper/65 transition-colors hover:bg-paper/10 hover:text-paper"
+                    ? "block whitespace-nowrap rounded-lg bg-paper/15 px-3.5 py-2 text-[14.5px] font-semibold text-paper"
+                    : "block whitespace-nowrap rounded-lg px-3.5 py-2 text-[14.5px] font-medium text-paper/65 transition-colors hover:bg-paper/10 hover:text-paper"
                 }
               >
                 {t(item.key)}

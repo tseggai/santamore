@@ -93,7 +93,7 @@ export function DonateProvider({ children }: { children: ReactNode }) {
         }}
         className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-end justify-center bg-transparent p-0 backdrop:bg-ink/55 open:flex sm:items-center sm:p-4"
       >
-        <div className="relative flex max-h-[100dvh] w-full max-w-[600px] flex-col rounded-t-[18px] border-[1.5px] border-ink bg-paper shadow-[0_24px_60px_rgba(14,58,70,0.25)] sm:max-h-[calc(100dvh-2rem)] sm:rounded-[18px]">
+        <div className="relative flex max-h-[100dvh] w-full max-w-[600px] flex-col rounded-t-lg border-[1.5px] border-ink bg-paper shadow-[0_24px_60px_rgba(14,58,70,0.25)] sm:max-h-[calc(100dvh-2rem)] sm:rounded-lg">
           <button
             type="button"
             onClick={close}
@@ -130,7 +130,7 @@ export function DonateProvider({ children }: { children: ReactNode }) {
                   {[0, 1, 2].map((i) => (
                     <div
                       key={i}
-                      className="h-[68px] animate-pulse rounded-[11px] bg-mist motion-reduce:animate-none"
+                      className="h-[68px] animate-pulse rounded-lg bg-mist motion-reduce:animate-none"
                     />
                   ))}
                 </div>

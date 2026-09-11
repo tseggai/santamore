@@ -89,7 +89,7 @@ export default async function GivingPage({
           <h2 className="text-[16px] font-bold">{t("monthlyHeading")}</h2>
           <ul className="mt-3 space-y-2">
             {subscriptions.map((sub) => (
-              <li key={sub.id} className="flex flex-wrap items-baseline justify-between gap-2 rounded-[11px] bg-mist px-4 py-3 text-[14.5px]">
+              <li key={sub.id} className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg bg-mist px-4 py-3 text-[14.5px]">
                 <span className="font-mono text-[15px] font-medium tabular-nums">{money(sub.amount_cents)} / {t("month")}</span>
                 <span className={sub.status === "active" ? "text-sea" : "text-ink/55"}>
                   {t(`subscriptionStatus.${sub.status}`)}

@@ -82,7 +82,7 @@ export default async function AdminRegistrationsPage({
             id="event-filter"
             name="event"
             defaultValue={selectedEvent?.id}
-            className="rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2 text-[14.5px] outline-none focus:border-sea"
+            className="rounded-lg border-[1.5px] border-line bg-paper px-3 py-2 text-[14.5px] outline-none focus:border-sea"
           >
             {events.map((eventRow) => (
               <option key={eventRow.id} value={eventRow.id}>
@@ -92,7 +92,7 @@ export default async function AdminRegistrationsPage({
           </select>
           <button
             type="submit"
-            className="rounded-xl border-[1.5px] border-line px-3.5 py-2 text-[14px] font-semibold hover:border-sea hover:text-sea"
+            className="rounded-lg border-[1.5px] border-line px-3.5 py-2 text-[14px] font-semibold hover:border-sea hover:text-sea"
           >
             {t("regShow")}
           </button>

@@ -125,7 +125,7 @@ export default async function FundraiserPage({
             <DonateButton
               request={{ kind: "fundraiser", slug: fundraiser.slug }}
               href={`/f/${fundraiser.slug}/podrzi`}
-              className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+              className="inline-flex h-11 items-center rounded-lg bg-red px-7 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark"
             >
               {tDonate("payVerb")}
             </DonateButton>

@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { SignOutButton } from "@/components/admin/SignOutButton";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { DonateProvider } from "@/components/donate/DonateDialog";
 import { DashboardNav } from "@/components/dashboard/DashboardNav";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
@@ -50,7 +51,7 @@ export default async function DashboardLayout({
         <>
           <Link
             href="/"
-            className="whitespace-nowrap rounded-[9px] px-3.5 py-2 text-[13.5px] font-medium text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper"
+            className="whitespace-nowrap rounded-lg px-3.5 py-2 text-[13.5px] font-medium text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper"
           >
             {t("viewSite")} ↗
           </Link>
@@ -64,7 +65,7 @@ export default async function DashboardLayout({
         </>
       }
     >
-      {children}
+      <DonateProvider>{children}</DonateProvider>
     </ConsoleShell>
   );
 }

@@ -31,11 +31,14 @@ export function Waterline({
   goalCents,
   donorCount,
   locale,
+  surface = "mist",
 }: {
   raisedCents: Cents;
   goalCents: Cents;
   donorCount: number;
   locale: Locale;
+  /** "paper" when the tank already sits on a mist surface, e.g. the editor. */
+  surface?: "mist" | "paper";
 }) {
   const t = useTranslations("runner");
   const pct =
@@ -50,7 +53,7 @@ export function Waterline({
   const money = (cents: Cents) => formatCents(cents, locale, { trimWholeCents: true });
 
   return (
-    <div className={`${styles.waterline}${fill > 55 ? ` ${styles.deep}` : ""}`}>
+    <div className={`${styles.waterline}${surface === "paper" ? ` ${styles.paper}` : ""}${fill > 55 ? ` ${styles.deep}` : ""}`}>
       <div className={styles.fill} style={{ height: `${fill}%` }} />
       <div className={styles.waveA} style={{ bottom: `calc(${fill}% - 13px)` }}>
         <Wave d={WAVE_A} fill="#15505F" />

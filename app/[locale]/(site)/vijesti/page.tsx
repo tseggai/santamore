@@ -86,7 +86,7 @@ export default async function NewsIndexPage({
                       alt=""
                       width={160}
                       height={120}
-                      className="hidden h-[92px] w-[124px] shrink-0 rounded-[10px] object-cover sm:block"
+                      className="hidden h-[92px] w-[124px] shrink-0 rounded-lg object-cover sm:block"
                     />
                   ) : null}
                   <div className="min-w-0">

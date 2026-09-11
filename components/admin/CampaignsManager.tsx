@@ -73,7 +73,7 @@ function fromDateInput(value: string, endOfDay: boolean): string | null {
 }
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
+  "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 const labelClass = "text-[13.5px] font-semibold";
 
 function CampaignForm({
@@ -367,14 +367,14 @@ function CampaignForm({
         <button
           type="submit"
           disabled={state === "busy"}
-          className="rounded-xl bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {campaign ? t("evSave") : t("campCreate")}
         </button>
         <button
           type="button"
           onClick={onDone}
-          className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+          className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
         >
           {t("cancel")}
         </button>
@@ -405,7 +405,7 @@ export function CampaignsManager({
         <button
           type="button"
           onClick={() => setOpen("new")}
-          className="rounded-xl bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+          className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark"
         >
           + {t("campNew")}
         </button>

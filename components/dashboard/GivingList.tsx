@@ -59,7 +59,7 @@ export function GivingList({ donations }: { donations: MyDonation[] }) {
               ? "border border-red text-red-dark"
               : "border border-line text-ink/50";
         return (
-          <li key={donation.id} className="rounded-[11px] bg-mist px-4 py-3">
+          <li key={donation.id} className="rounded-lg bg-mist px-4 py-3">
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
               <span className="font-mono text-[13.5px] tabular-nums text-ink/60">{donation.entry_date}</span>
               <span className="min-w-0 flex-1 text-[15px] font-semibold">
@@ -89,7 +89,7 @@ export function GivingList({ donations }: { donations: MyDonation[] }) {
             </p>
 
             {donation.status === "pending" && donation.rail === "sepa" && donation.payment_reference ? (
-              <div className="mt-2 rounded-[10px] bg-red/8 px-3 py-2.5 text-[14px]">
+              <div className="mt-2 rounded-lg bg-red/8 px-3 py-2.5 text-[14px]">
                 <p className="text-red-dark">{t("pendingSepa")}</p>
                 <p className="mt-1 flex flex-wrap items-center gap-2">
                   <span className="font-mono text-[15px] tabular-nums">{donation.payment_reference}</span>

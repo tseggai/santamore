@@ -36,7 +36,7 @@ export function BeneficiaryForm() {
   };
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
   const labelClass = "text-[14px] font-semibold";
 
   if (state === "done") {
@@ -148,7 +148,7 @@ export function BeneficiaryForm() {
       <button
         type="submit"
         disabled={state === "busy"}
-        className="w-full rounded-xl bg-red px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+        className="w-full rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
       >
         {t("submit")}
       </button>

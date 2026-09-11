@@ -95,7 +95,7 @@ export default async function AboutPage({
         </div>
         <Link
           href="/kako-radimo"
-          className="mt-5 inline-block rounded-xl bg-red px-5 py-3 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+          className="mt-5 inline-block rounded-lg bg-red px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark"
         >
           {howContent[locale as Locale].heroEyebrow} →
         </Link>
