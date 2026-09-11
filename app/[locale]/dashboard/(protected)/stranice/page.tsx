@@ -3,6 +3,12 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Avatar } from "@/components/Avatar";
 import { CreatePageForm, type EventChoice } from "@/components/dashboard/CreatePageForm";
+import {
+  TeamsManager,
+  type MyTeam,
+  type TeamEventChoice,
+} from "@/components/dashboard/TeamsManager";
+import { ShareButton } from "@/components/ShareButton";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
@@ -21,6 +27,7 @@ interface PageRow {
   goal_cents: number | null;
   photo_path: string | null;
   event_id: string;
+  team_id: string | null;
 }
 
 interface EventRow {
@@ -31,12 +38,32 @@ interface EventRow {
   ends_at: string | null;
 }
 
+interface TotalsRow {
+  slug: string;
+  raised_cents: number;
+  donor_count: number;
+}
+
+interface TeamRow {
+  id: string;
+  slug: string;
+  name: string;
+  description: string | null;
+  photo_path: string | null;
+  event_id: string;
+  event_name: string;
+  member_count: number;
+  raised_cents: number;
+}
+
 /**
- * My pages: one per event. `?event=` preselects an event to create for,
+ * The hub of the runner console: every page they hold — with its total,
+ * team, share button and editor — the teams they captain, and the way to
+ * start another page. `?event=` preselects an event to create for,
  * `?team=` (from "Join this team") goes straight to the editor of the
  * runner's page on that team's event, or to creating one.
  */
-export default async function PagesListPage({
+export default async function PagesHubPage({
   params,
   searchParams,
 }: {
@@ -48,7 +75,11 @@ export default async function PagesListPage({
     searchParams,
   ]);
   setRequestLocale(locale);
-  const t = await getTranslations("dashboard");
+  const [t, tDonate, tRunner] = await Promise.all([
+    getTranslations("dashboard"),
+    getTranslations("donate"),
+    getTranslations("runner"),
+  ]);
 
   const supabase = await createClient();
   const {
@@ -56,18 +87,20 @@ export default async function PagesListPage({
   } = await supabase.auth.getUser();
   if (!user) notFound();
 
-  const [{ data: pageRows }, { data: eventRows }, { data: profile }] = await Promise.all([
-    supabase
-      .from("fundraisers")
-      .select("id, slug, title, status, goal_cents, photo_path, event_id")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("v_public_events")
-      .select("id, slug, name, starts_at, ends_at")
-      .order("starts_at", { ascending: true }),
-    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
-  ]);
+  const [{ data: pageRows }, { data: eventRows }, { data: profile }, { data: captained }] =
+    await Promise.all([
+      supabase
+        .from("fundraisers")
+        .select("id, slug, title, status, goal_cents, photo_path, event_id, team_id")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("v_public_events")
+        .select("id, slug, name, starts_at, ends_at")
+        .order("starts_at", { ascending: true }),
+      supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+      supabase.from("teams").select("id").eq("captain_id", user.id),
+    ]);
   const pages = (pageRows ?? []) as PageRow[];
   const events = (eventRows ?? []) as EventRow[];
 
@@ -88,6 +121,32 @@ export default async function PagesListPage({
     }
   }
 
+  const teamIds = [
+    ...new Set([
+      ...(captained ?? []).map((row) => row.id),
+      ...pages.flatMap((page) => (page.team_id ? [page.team_id] : [])),
+    ]),
+  ];
+  const [{ data: totalsRows }, { data: teamRows }] = await Promise.all([
+    pages.length
+      ? supabase
+          .from("v_fundraiser_totals")
+          .select("slug, raised_cents, donor_count")
+          .in("slug", pages.map((page) => page.slug))
+      : Promise.resolve({ data: [] as TotalsRow[] }),
+    teamIds.length
+      ? supabase
+          .from("v_team_totals")
+          .select("id, slug, name, description, photo_path, event_id, event_name, member_count, raised_cents")
+          .in("id", teamIds)
+          .order("name")
+      : Promise.resolve({ data: [] as TeamRow[] }),
+  ]);
+  const totalsBySlug = new Map(((totalsRows ?? []) as TotalsRow[]).map((row) => [row.slug, row]));
+  const teamById = new Map(((teamRows ?? []) as TeamRow[]).map((row) => [row.id, row]));
+  const captainIds = new Set((captained ?? []).map((row) => row.id));
+
+  const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
   const now = Date.now();
   const dateFormat = new Intl.DateTimeFormat(htmlLang(locale as Locale), {
     day: "numeric",
@@ -95,11 +154,12 @@ export default async function PagesListPage({
     year: "numeric",
   });
   const haveEvent = new Set(pages.map((page) => page.event_id));
-  const choices = events
-    .filter((event) => {
-      const end = event.ends_at ?? event.starts_at;
-      return (!end || new Date(end).getTime() >= now) && !haveEvent.has(event.id);
-    })
+  const openEvents = events.filter((event) => {
+    const end = event.ends_at ?? event.starts_at;
+    return !end || new Date(end).getTime() >= now;
+  });
+  const choices = openEvents
+    .filter((event) => !haveEvent.has(event.id))
     .map(
       (event): EventChoice => ({
         slug: event.slug,
@@ -108,51 +168,138 @@ export default async function PagesListPage({
       }),
     );
   const eventById = new Map(events.map((event) => [event.id, event]));
-  const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
+
+  const myTeams: MyTeam[] = ((teamRows ?? []) as TeamRow[])
+    .filter((team) => captainIds.has(team.id))
+    .map((team) => ({
+      id: team.id,
+      slug: team.slug,
+      name: team.name,
+      description: team.description,
+      photoPath: team.photo_path,
+      eventId: team.event_id,
+      eventName: team.event_name,
+      memberCount: team.member_count,
+      raisedLabel: money(team.raised_cents),
+    }));
+  const pageByEvent = new Map(pages.map((page) => [page.event_id, page.id]));
+  const teamEventChoices: TeamEventChoice[] = openEvents.map((event) => ({
+    id: event.id,
+    name: event.name,
+    fundraiserId: pageByEvent.get(event.id) ?? null,
+  }));
+
+  const single = pages.length === 1;
 
   return (
     <div className="py-8">
-      <h1 className="type-display text-2xl">{t("navPages")}</h1>
-      <p className="mt-2 text-[14px] leading-relaxed text-ink/65">{t("pagesSub")}</p>
+      <h1 className="type-display text-2xl">{single ? t("title") : t("navPages")}</h1>
+      <p className="mt-2 text-[14px] leading-relaxed text-ink/65">
+        {pages.length === 0 ? t("hubEmptySub") : t("pagesSub")}
+      </p>
 
       {pages.length > 0 ? (
-        <ul className="mt-5 space-y-2">
+        <ul className="mt-5 space-y-3">
           {pages.map((page) => {
             const event = eventById.get(page.event_id);
+            const totals = totalsBySlug.get(page.slug);
+            const team = page.team_id ? teamById.get(page.team_id) : null;
+            const raised = totals?.raised_cents ?? 0;
+            const pct =
+              page.goal_cents && page.goal_cents > 0
+                ? Math.min(100, Math.round((raised / page.goal_cents) * 100))
+                : 0;
+            const live = page.status === "active";
             return (
-              <li key={page.id}>
-                <Link
-                  href={`/dashboard/stranice/${page.slug}`}
-                  className="flex items-center gap-3 rounded-[11px] border-[1.5px] border-line px-4 py-3 transition-colors hover:border-sea"
-                >
-                  <Avatar src={fundraiserPhotoUrl(page.photo_path)} name={page.title} size={40} />
-                  <span className="min-w-0 flex-1">
-                    <span className="flex flex-wrap items-center gap-2 text-[14px] font-semibold">
-                      {page.title}
+              <li key={page.id} className="rounded-brand border-[1.5px] border-line p-4 sm:p-5">
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <Avatar src={fundraiserPhotoUrl(page.photo_path)} name={page.title} size={single ? 64 : 48} />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`font-semibold ${single ? "text-[18px]" : "text-[15px]"}`}>{page.title}</span>
                       <span
                         className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
-                          page.status === "active" ? "bg-sea text-paper" : "border border-line text-ink/60"
+                          live ? "bg-sea text-paper" : "border border-line text-ink/60"
                         }`}
                       >
-                        {page.status === "active" ? t("statusActiveShort") : t("statusDraftShort")}
+                        {live ? t("statusActiveShort") : t("statusDraftShort")}
                       </span>
-                    </span>
-                    <span className="block text-[12.5px] text-ink/60">
+                    </div>
+                    <p className="mt-0.5 text-[12.5px] text-ink/60">
                       {event?.name ?? "—"}
                       {event?.starts_at ? ` · ${dateFormat.format(new Date(event.starts_at))}` : ""}
-                      {page.goal_cents ? ` · ${t("goalChip", { amount: money(page.goal_cents) })}` : ""}
+                      {team ? (
+                        <>
+                          {" · "}
+                          <Link href={`/t/${team.slug}`} className="font-semibold text-ink/80 hover:text-sea">
+                            {team.name}
+                          </Link>
+                        </>
+                      ) : null}
+                    </p>
+                    <div className="mt-3 flex items-baseline justify-between gap-3">
+                      <span className="font-mono text-[15px] font-medium tabular-nums">
+                        {money(raised)}
+                        {page.goal_cents ? (
+                          <span className="text-[12.5px] text-ink/50"> / {money(page.goal_cents)}</span>
+                        ) : null}
+                      </span>
+                      <span className="text-[12.5px] text-ink/55">
+                        {totals?.donor_count ?? 0} {tRunner("donors")}
+                        {page.goal_cents ? ` · ${pct}%` : ""}
+                      </span>
+                    </div>
+                    <span className="mt-1.5 block h-[6px] overflow-hidden rounded-[3px] bg-line-soft">
+                      <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
                     </span>
-                  </span>
-                  <span className="shrink-0 text-[13px] font-semibold text-sea">{t("editPage")} →</span>
-                </Link>
+                  </div>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <Link
+                    href={`/dashboard/stranice/${page.slug}`}
+                    className="rounded-xl bg-ink px-4 py-2.5 text-[13.5px] font-bold text-paper transition-opacity hover:opacity-90"
+                  >
+                    {live ? t("editPage") : t("finishPage")}
+                  </Link>
+                  {live ? (
+                    <>
+                      <ShareButton
+                        title={page.title}
+                        path={`/${locale}/f/${page.slug}`}
+                        text={t("shareMessageShort", { title: page.title })}
+                        label={tRunner("share")}
+                        copiedLabel={tDonate("copied")}
+                        variant="icon"
+                      />
+                      <Link
+                        href={`/f/${page.slug}`}
+                        className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+                      >
+                        {t("viewPublic")} ↗
+                      </Link>
+                    </>
+                  ) : null}
+                  <Link
+                    href={`/dashboard/stranice/${page.slug}#gotovina`}
+                    className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+                  >
+                    {t("qaCash")}
+                  </Link>
+                </div>
               </li>
             );
           })}
         </ul>
       ) : null}
 
+      <section id="timovi" className="mt-8 scroll-mt-6">
+        <h2 className="text-[15px] font-bold">{t("navTeams")}</h2>
+        <p className="mt-1 text-[13.5px] leading-relaxed text-ink/65">{t("teamsSub")}</p>
+        <TeamsManager teams={myTeams} events={teamEventChoices} />
+      </section>
+
       <section className="mt-8 rounded-brand border-[1.5px] border-line p-5">
-        <h2 className="text-[15px] font-bold">{t("createHeading")}</h2>
+        <h2 className="text-[15px] font-bold">{pages.length === 0 ? t("createHeading") : t("createAnotherHeading")}</h2>
         <p className="mt-1 text-[13.5px] leading-relaxed text-ink/65">
           {choices.length === 0 ? t("createNoEvents") : t("createSub")}
         </p>

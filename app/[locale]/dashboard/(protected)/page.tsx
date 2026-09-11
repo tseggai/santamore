@@ -121,7 +121,7 @@ export default async function DashboardOverviewPage({
         ? { text: t("nextActionPublish"), href: `/dashboard/stranice/${drafts[0].slug}` }
         : raised === 0
           ? { text: t("nextActionSelf"), href: `/f/${pages[0].slug}/podrzi` }
-          : { text: t("nudgeShare"), href: "/dashboard/alati" };
+          : { text: t("nudgeShare"), href: "/dashboard/stranice" };
 
   const tiles = [
     { label: t("statRaised"), value: money(raised), tone: "ink" },
@@ -131,10 +131,7 @@ export default async function DashboardOverviewPage({
   ] as const;
 
   const quickActions = [
-    { href: "/dashboard/stranice", label: t("qaNewPage") },
-    { href: "/dashboard/timovi", label: t("qaNewTeam") },
-    { href: "/dashboard/alati", label: t("qaShare") },
-    { href: "/dashboard/gotovina", label: t("qaCash") },
+    { href: "/dashboard/stranice", label: pages.length === 0 ? t("qaNewPage") : t("navPages") },
     { href: "/dashboard/strava", label: connection ? t("qaRewards") : t("qaStrava") },
     { href: "/dogadjaji", label: t("qaEvents") },
     { href: "/dashboard/donacije", label: t("qaGiving") },
@@ -254,7 +251,7 @@ export default async function DashboardOverviewPage({
         <section>
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-[15px] font-bold">{t("navTeams")}</h2>
-            <Link href="/dashboard/timovi" className="text-[13px] font-semibold text-sea underline underline-offset-2">
+            <Link href="/dashboard/stranice#timovi" className="text-[13px] font-semibold text-sea underline underline-offset-2">
               {t("manage")}
             </Link>
           </div>

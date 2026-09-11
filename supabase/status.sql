@@ -31,6 +31,10 @@ select * from (values
   ('20260911000012_my_giving',
      to_regclass('public.v_my_donations') is not null),
   ('20260911000013_strava_visibility',
-     to_regclass('public.v_staff_athletes') is not null)
+     to_regclass('public.v_staff_athletes') is not null),
+  ('20260911000014_manual_activities',
+     exists (select 1 from information_schema.columns
+              where table_schema = 'public' and table_name = 'activities'
+                and column_name = 'is_manual'))
 ) as m (migration, applied)
 order by migration;

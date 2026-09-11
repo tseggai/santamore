@@ -32,6 +32,8 @@ export interface ActivityRow {
   distance_m: number;
   moving_time_s: number;
   elevation_m: number;
+  /** Typed in by hand on Strava (no device recording). Never qualifies unless the challenge allows manual entries. */
+  is_manual: boolean;
 }
 
 /**
@@ -58,6 +60,7 @@ export function mapStravaActivity(activity: StravaActivity): ActivityRow {
     distance_m: Math.max(0, Math.round(activity.distance ?? 0)),
     moving_time_s: Math.max(0, Math.round(activity.moving_time ?? 0)),
     elevation_m: Math.max(0, Math.round(activity.total_elevation_gain ?? 0)),
+    is_manual: activity.manual === true,
   };
 }
 

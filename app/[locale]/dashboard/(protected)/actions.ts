@@ -66,6 +66,10 @@ const updateTeamSchema = teamFieldsSchema.extend({
 const cashSchema = z.object({
   fundraiserId: z.string().uuid(),
   amountCents: z.number().int().min(100).max(MAX_CENTS),
+  /** Who handed it over — shown on the donor wall once staff confirm; empty = anonymous. */
+  donorName: z.string().trim().max(100).default(""),
+  /** Where or how it was collected — for staff and the runner, never public. */
+  note: z.string().trim().max(200).default(""),
 });
 
 async function currentUser() {
@@ -279,6 +283,7 @@ export async function logActivity(input: unknown): Promise<DashboardActionResult
     user_id: user.id,
     fundraiser_id: parsed.data.fundraiserId,
     source: "manual",
+    is_manual: true,
     sport_type: "Run",
     started_at: `${parsed.data.date}T12:00:00Z`,
     started_on: parsed.data.date,
@@ -332,12 +337,16 @@ export async function logCash(input: unknown): Promise<DashboardActionResult> {
     if (!mine) return { ok: false, error: "invalid" };
     const event = Array.isArray(mine.event) ? mine.event[0] : mine.event;
 
+    const donorName = parsed.data.donorName;
     const { error } = await service.from("donations").insert({
       amount_cents: parsed.data.amountCents,
       fee_covered_cents: 0,
       fundraiser_id: mine.id,
       chapter_id: event?.chapter_id ?? null,
-      is_anonymous: true,
+      donor_name: donorName || null,
+      display_name: donorName || null,
+      is_anonymous: donorName === "",
+      message: parsed.data.note || null,
       rail: "cash",
       status: "pending",
     });
@@ -345,7 +354,7 @@ export async function logCash(input: unknown): Promise<DashboardActionResult> {
       console.error("[dashboard] cash log failed:", error.code);
       return { ok: false, error: "server" };
     }
-    revalidatePath("/[locale]/dashboard/gotovina", "page");
+    revalidatePath("/[locale]/dashboard/stranice/[slug]", "page");
     return { ok: true };
   } catch (error) {
     console.error("[dashboard] cash log failed:", error);

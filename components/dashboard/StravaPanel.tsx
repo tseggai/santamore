@@ -89,7 +89,7 @@ export function StravaPanel({
   };
 
   return (
-    <div className="rounded-brand border-[1.5px] border-line p-5">
+    <div className={connection ? "rounded-brand border-[1.5px] border-line px-4 py-3.5" : "rounded-brand border-[1.5px] border-line p-5"}>
       {status && statusText[status] ? (
         <p
           role={status === "connected" ? "status" : "alert"}
@@ -103,49 +103,25 @@ export function StravaPanel({
 
       {connection ? (
         <>
-          <p className="text-[14px] font-bold">{t("connectedHeading")}</p>
-          <p className="mt-1 text-[13px] text-ink/65">
-            {t("connectedSince", { date: connection.connectedAt.slice(0, 10) })}
-            {connection.lastSyncAt ? (
-              <> · {t("lastSync", { date: connection.lastSyncAt.slice(0, 16).replace("T", " ") })}</>
-            ) : null}
-          </p>
-
-          <label className="mt-4 flex items-start gap-3 text-[13.5px]">
-            <input
-              type="checkbox"
-              checked={connection.sharePublic}
-              disabled={busy === "share"}
-              onChange={(event) => toggleShare(event.target.checked)}
-              className="mt-0.5 h-4 w-4 accent-red"
-            />
-            <span>
-              <span className="font-semibold">{t("shareLabel")}</span>
-              <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink/60">
-                {t("shareHint")}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            <p className="flex min-w-0 flex-1 items-center gap-2 text-[13.5px]">
+              <span aria-hidden className="h-2.5 w-2.5 shrink-0 rounded-full bg-sea" />
+              <span className="font-semibold">{t("connectedHeading")}</span>
+              <span className="truncate text-ink/60">
+                {connection.lastSyncAt
+                  ? t("lastSync", { date: connection.lastSyncAt.slice(0, 16).replace("T", " ") })
+                  : t("connectedSince", { date: connection.connectedAt.slice(0, 10) })}
               </span>
-            </span>
-          </label>
-
-          <div className="mt-4 flex flex-wrap gap-2">
+            </p>
             <button
               type="button"
               disabled={busy !== ""}
               onClick={sync}
-              className="rounded-xl bg-ink px-4 py-2.5 text-[13.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="rounded-xl bg-ink px-4 py-2 text-[13px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
             >
               {busy === "sync" ? t("syncing") : t("syncNow")}
             </button>
-            <button
-              type="button"
-              disabled={busy !== ""}
-              onClick={disconnect}
-              className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-red hover:text-red-dark disabled:opacity-60"
-            >
-              {t("disconnect")}
-            </button>
           </div>
-          <p className="mt-3 text-[12px] leading-relaxed text-ink/55">{t("disconnectHint")}</p>
           {!connection.scope.includes("activity:read_all") ? (
             <p className="mt-3 rounded-[11px] border-[1.5px] border-dashed border-line px-4 py-3 text-[13px] text-ink/70">
               {t("scopePartialHint")}{" "}
@@ -157,6 +133,41 @@ export function StravaPanel({
               </a>
             </p>
           ) : null}
+          <details className="mt-3 group">
+            <summary className="cursor-pointer list-none text-[12.5px] font-semibold text-ink/60 hover:text-sea">
+              <span className="inline-block transition-transform group-open:rotate-90 motion-reduce:transition-none">▸</span>{" "}
+              {t("settings")}
+            </summary>
+            <div className="mt-3 border-t border-line-soft pt-3">
+              <label className="flex items-start gap-3 text-[13.5px]">
+                <input
+                  type="checkbox"
+                  checked={connection.sharePublic}
+                  disabled={busy === "share"}
+                  onChange={(event) => toggleShare(event.target.checked)}
+                  className="mt-0.5 h-4 w-4 accent-red"
+                />
+                <span>
+                  <span className="font-semibold">{t("shareLabel")}</span>
+                  <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink/60">
+                    {t("shareHint")}
+                  </span>
+                </span>
+              </label>
+              <p className="mt-3 text-[12.5px] text-ink/55">
+                {t("connectedSince", { date: connection.connectedAt.slice(0, 10) })}
+              </p>
+              <button
+                type="button"
+                disabled={busy !== ""}
+                onClick={disconnect}
+                className="mt-3 rounded-xl border-[1.5px] border-line px-4 py-2 text-[13px] font-semibold transition-colors hover:border-red hover:text-red-dark disabled:opacity-60"
+              >
+                {t("disconnect")}
+              </button>
+              <p className="mt-2 text-[12px] leading-relaxed text-ink/55">{t("disconnectHint")}</p>
+            </div>
+          </details>
         </>
       ) : (
         <>

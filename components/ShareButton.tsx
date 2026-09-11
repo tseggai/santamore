@@ -14,6 +14,7 @@ export function ShareButton({
   label,
   copiedLabel,
   variant = "primary",
+  text,
 }: {
   title: string;
   /** Site-absolute path to share, e.g. "/me/f/ana". */
@@ -21,6 +22,8 @@ export function ShareButton({
   label: string;
   copiedLabel: string;
   variant?: "primary" | "ghost" | "icon";
+  /** Pre-written message for the share sheet (WhatsApp, Viber…); the copy fallback still copies the bare URL. */
+  text?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -28,7 +31,7 @@ export function ShareButton({
     const url = `${window.location.origin}${path}`;
     try {
       if (navigator.share) {
-        await navigator.share({ title, url });
+        await navigator.share(text ? { title, text, url } : { title, url });
       } else {
         await navigator.clipboard.writeText(url);
         setCopied(true);
