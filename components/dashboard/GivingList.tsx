@@ -59,10 +59,10 @@ export function GivingList({ donations }: { donations: MyDonation[] }) {
               ? "border border-red text-red-dark"
               : "border border-line text-ink/50";
         return (
-          <li key={donation.id} className="rounded-[11px] border-[1.5px] border-line px-4 py-3">
+          <li key={donation.id} className="rounded-[11px] bg-mist px-4 py-3">
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="font-mono text-[12.5px] tabular-nums text-ink/60">{donation.entry_date}</span>
-              <span className="min-w-0 flex-1 text-[14px] font-semibold">
+              <span className="font-mono text-[13.5px] tabular-nums text-ink/60">{donation.entry_date}</span>
+              <span className="min-w-0 flex-1 text-[15px] font-semibold">
                 {target ? (
                   <Link href={target.href} className="hover:text-sea">
                     {target.label}
@@ -74,12 +74,12 @@ export function GivingList({ donations }: { donations: MyDonation[] }) {
                   <span className="font-normal text-ink/50"> · {donation.event_name}</span>
                 ) : null}
               </span>
-              <span className="font-mono text-[14px] font-medium tabular-nums">{money(donation.amount_cents)}</span>
-              <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${tone}`}>
+              <span className="font-mono text-[15px] font-medium tabular-nums">{money(donation.amount_cents)}</span>
+              <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${tone}`}>
                 {t(`status.${donation.status}`)}
               </span>
             </div>
-            <p className="mt-1 text-[12.5px] text-ink/60">
+            <p className="mt-1 text-[13.5px] text-ink/60">
               {t(`rail.${donation.rail}`)}
               {donation.is_recurring ? ` · ${t("monthly")}` : ""}
               {donation.fee_covered_cents > 0
@@ -89,10 +89,10 @@ export function GivingList({ donations }: { donations: MyDonation[] }) {
             </p>
 
             {donation.status === "pending" && donation.rail === "sepa" && donation.payment_reference ? (
-              <div className="mt-2 rounded-[10px] border-[1.5px] border-dashed border-red bg-red/5 px-3 py-2.5 text-[13px]">
+              <div className="mt-2 rounded-[10px] bg-red/8 px-3 py-2.5 text-[14px]">
                 <p className="text-red-dark">{t("pendingSepa")}</p>
                 <p className="mt-1 flex flex-wrap items-center gap-2">
-                  <span className="font-mono text-[14px] tabular-nums">{donation.payment_reference}</span>
+                  <span className="font-mono text-[15px] tabular-nums">{donation.payment_reference}</span>
                   <CopyButton value={donation.payment_reference} label={tDonate("copy")} copiedLabel={tDonate("copied")} />
                 </p>
               </div>
@@ -104,17 +104,17 @@ export function GivingList({ donations }: { donations: MyDonation[] }) {
                   type="button"
                   disabled={busy === donation.id}
                   onClick={() => resend(donation.id)}
-                  className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
+                  className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
                 >
                   {busy === donation.id ? "…" : t("resendReceipt")}
                 </button>
                 {notice[donation.id] === "sent" ? (
-                  <span role="status" className="text-[12px] font-semibold text-sea">{t("receiptSent")}</span>
+                  <span role="status" className="text-[13px] font-semibold text-sea">{t("receiptSent")}</span>
                 ) : null}
                 {notice[donation.id] === "error" ? (
-                  <span role="alert" className="text-[12px] font-semibold text-red-dark">{t("receiptError")}</span>
+                  <span role="alert" className="text-[13px] font-semibold text-red-dark">{t("receiptError")}</span>
                 ) : null}
-                <Link href="/transparentnost" className="text-[12px] font-semibold text-sea underline underline-offset-2">
+                <Link href="/transparentnost" className="text-[13px] font-semibold text-sea underline underline-offset-2">
                   {t("inLedger")}
                 </Link>
               </div>

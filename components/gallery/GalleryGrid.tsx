@@ -111,8 +111,8 @@ export function GalleryGrid({
               }}
               className={
                 filter === f.slug
-                  ? "rounded-full bg-sea px-4 py-1.5 text-[12.5px] font-semibold text-paper"
-                  : "rounded-full border-[1.5px] border-line px-4 py-1.5 text-[12.5px] font-semibold text-ink/70 hover:border-sea hover:text-sea"
+                  ? "rounded-full bg-sea px-4 py-1.5 text-[13.5px] font-semibold text-paper"
+                  : "rounded-full border-[1.5px] border-line px-4 py-1.5 text-[13.5px] font-semibold text-ink/70 hover:border-sea hover:text-sea"
               }
             >
               {f.label}
@@ -167,7 +167,7 @@ export function GalleryGrid({
           }}
         >
           <div className="flex items-center justify-between px-4 py-3">
-            <span className="font-mono text-[12px] tabular-nums text-paper/70">
+            <span className="font-mono text-[13px] tabular-nums text-paper/70">
               {labels.counter
                 .replace("{current}", String((openIndex ?? 0) + 1))
                 .replace("{total}", String(visible.length))}
@@ -208,9 +208,9 @@ export function GalleryGrid({
             >
               ‹
             </button>
-            <div className="min-w-0 text-center text-[13px] leading-relaxed text-paper/85">
+            <div className="min-w-0 text-center text-[14px] leading-relaxed text-paper/85">
               {current.caption ? <p>{current.caption}</p> : null}
-              <p className="text-[11.5px] text-paper/55">
+              <p className="text-[12.5px] text-paper/55">
                 {[current.eventName, current.credit ? `${labels.credit} ${current.credit}` : null]
                   .filter(Boolean)
                   .join(" · ")}

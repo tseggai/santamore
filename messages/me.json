@@ -1008,7 +1008,10 @@
     "expiresOn": "važi do {date}",
     "showAll": "Prikaži sve ({count})",
     "showLess": "Prikaži manje",
-    "settings": "Podešavanja veze"
+    "notConnectedHeading": "Strava nije povezana",
+    "autoSyncNote": "Nova trčanja stižu sama u roku od minuta; stranica se osvježava i pri otvaranju.",
+    "trendEmptyDisconnected": "Poveži Stravu da vidiš kilometre po sedmici.",
+    "activitiesEmptyDisconnected": "Trčanja iz zadnjih 8 sedmica se pojavljuju ovdje nakon povezivanja."
   },
   "giving": {
     "title": "Moje donacije",

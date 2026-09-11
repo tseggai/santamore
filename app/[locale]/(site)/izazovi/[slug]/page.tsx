@@ -58,7 +58,7 @@ export default async function ChallengePage({
 
   return (
     <div className="mx-auto max-w-xl px-5 py-12">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
         {challenge.partner_url ? (
           <a href={challenge.partner_url} rel="noopener" target="_blank" className="underline underline-offset-2 hover:text-sea">
             {challenge.partner_name} ↗
@@ -78,19 +78,19 @@ export default async function ChallengePage({
         />
       </div>
 
-      <div className="mt-5 rounded-brand bg-[#f3f6f7] px-5 py-5">
-        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">{t("reward")}</p>
+      <div className="mt-5 rounded-brand bg-mist px-5 py-5">
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">{t("reward")}</p>
         <p className="type-display mt-1 text-3xl">{challenge.reward_label}</p>
-        <p className="mt-3 text-[14px] leading-relaxed text-ink/80">
+        <p className="mt-3 text-[15px] leading-relaxed text-ink/80">
           <PerkRule challenge={challenge} />
         </p>
         {left !== null ? (
-          <p className="mt-3 font-mono text-[12.5px] tabular-nums text-sea">
+          <p className="mt-3 font-mono text-[13.5px] tabular-nums text-sea">
             {t("leftToday", { count: left })}
           </p>
         ) : null}
         {challenge.starts_at || challenge.ends_at ? (
-          <p className="mt-1 text-[12.5px] text-ink/60">
+          <p className="mt-1 text-[13.5px] text-ink/60">
             {challenge.starts_at ? dateFormat.format(new Date(challenge.starts_at)) : "…"}
             {" — "}
             {challenge.ends_at ? dateFormat.format(new Date(challenge.ends_at)) : "…"}
@@ -99,16 +99,16 @@ export default async function ChallengePage({
       </div>
 
       {challenge.description ? (
-        <p className="mt-5 whitespace-pre-line text-[15px] leading-relaxed text-ink/80">
+        <p className="mt-5 whitespace-pre-line text-[16px] leading-relaxed text-ink/80">
           {challenge.description}
         </p>
       ) : null}
 
-      <p className="mt-6 text-[13.5px] leading-relaxed text-ink/70">{t("noPageNeeded")}</p>
+      <p className="mt-6 text-[14.5px] leading-relaxed text-ink/70">{t("noPageNeeded")}</p>
       <ol className="mt-3 space-y-2">
         {(["step1", "step2", "step3"] as const).map((step, index) => (
-          <li key={step} className="flex gap-3 text-[13.5px] leading-relaxed">
-            <span className="font-mono text-[11px] text-red">0{index + 1}</span>
+          <li key={step} className="flex gap-3 text-[14.5px] leading-relaxed">
+            <span className="font-mono text-[12px] text-red">0{index + 1}</span>
             <span>{t(step)}</span>
           </li>
         ))}
@@ -117,12 +117,12 @@ export default async function ChallengePage({
       <div className="mt-6">
         <Link
           href="/dashboard/strava"
-          className="inline-flex h-12 items-center rounded-xl bg-red px-7 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+          className="inline-flex h-12 items-center rounded-xl bg-red px-7 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
         >
           {t("connectCta")}
         </Link>
       </div>
-      <p className="mt-4 text-[12px] text-ink/50">{t("poweredBy")}</p>
+      <p className="mt-4 text-[13px] text-ink/50">{t("poweredBy")}</p>
     </div>
   );
 }

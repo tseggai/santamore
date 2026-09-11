@@ -48,8 +48,8 @@ export function SepaPanel({
     }
   }, [bankReady, bank.name, bank.iban, bank.bic, amountCents, reference]);
 
-  const labelClass = "font-mono text-[10.5px] uppercase tracking-[0.14em] text-sea";
-  const valueClass = "font-mono text-[15px] font-medium tabular-nums break-all";
+  const labelClass = "font-mono text-[11.5px] uppercase tracking-[0.14em] text-sea";
+  const valueClass = "font-mono text-[16px] font-medium tabular-nums break-all";
 
   return (
     <div className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-4">
@@ -58,7 +58,7 @@ export function SepaPanel({
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div>
               <div className={labelClass}>{t("sepaBeneficiary")}</div>
-              <div className="text-[14.5px] font-semibold">{bank.name}</div>
+              <div className="text-[15.5px] font-semibold">{bank.name}</div>
             </div>
             <div className="text-right">
               <div className={labelClass}>{t("sepaAmount")}</div>
@@ -85,7 +85,7 @@ export function SepaPanel({
             {qrPayload ? (
               <figure className="shrink-0">
                 <EpcQrCode payload={qrPayload} alt={t("qrCaption")} />
-                <figcaption className="mt-1.5 max-w-[148px] text-[11px] leading-snug text-ink/60">
+                <figcaption className="mt-1.5 max-w-[148px] text-[12px] leading-snug text-ink/60">
                   {t("qrCaption")}
                 </figcaption>
               </figure>
@@ -100,21 +100,21 @@ export function SepaPanel({
                   copiedLabel={t("copied")}
                 />
               </div>
-              <p className="mt-2 text-[12.5px] leading-relaxed text-ink/70">{t("sepaNote")}</p>
+              <p className="mt-2 text-[13.5px] leading-relaxed text-ink/70">{t("sepaNote")}</p>
               {monthly ? (
-                <p className="mt-2 text-[12.5px] leading-relaxed text-ink/70">
+                <p className="mt-2 text-[13.5px] leading-relaxed text-ink/70">
                   {t("standingOrderNote")}
                 </p>
               ) : null}
             </div>
           </div>
 
-          <p className="mt-3 border-t border-line-soft pt-3 text-[12.5px] leading-relaxed text-ink/70">
+          <p className="mt-3 border-t border-line-soft pt-3 text-[13.5px] leading-relaxed text-ink/70">
             {t("whatNext")} {t("qrManualNote")}
           </p>
         </>
       ) : (
-        <p className="text-[13.5px] leading-relaxed text-sea">{t("bankDetailsPending")}</p>
+        <p className="text-[14.5px] leading-relaxed text-sea">{t("bankDetailsPending")}</p>
       )}
     </div>
   );

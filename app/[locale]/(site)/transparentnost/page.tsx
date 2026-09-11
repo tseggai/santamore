@@ -163,7 +163,7 @@ export default async function LedgerPage({
 
   const heroRow = (label: string, cents: number, big = false) => (
     <div
-      className={`flex items-baseline justify-between gap-3 py-[7px] text-[12.5px] ${
+      className={`flex items-baseline justify-between gap-3 py-[7px] text-[13.5px] ${
         big
           ? "mt-1.5 border-t-[1.5px] border-paper/40 pt-3"
           : "border-b border-paper/15"
@@ -172,7 +172,7 @@ export default async function LedgerPage({
       <span>{label}</span>
       <span
         className={`whitespace-nowrap font-mono tabular-nums ${
-          big ? "text-[19px] font-medium" : "text-[15px]"
+          big ? "text-[20px] font-medium" : "text-[16px]"
         }`}
       >
         {money(cents)}
@@ -182,7 +182,7 @@ export default async function LedgerPage({
 
   return (
     <div className="mx-auto max-w-xl px-5 py-12">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
         {t("eyebrow")}
       </p>
       <h1 className="type-display mt-2 text-3xl sm:text-4xl">{t("title")}</h1>
@@ -197,29 +197,29 @@ export default async function LedgerPage({
 
       {/* the two funds — the core promise, most legible thing on the page */}
       <div className="mt-3 rounded-brand border-[1.5px] border-ink px-4 py-4">
-        <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-sea/80">
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
           {t("twoFunds")}
         </p>
-        <div className="flex items-baseline justify-between gap-3 border-b border-line-soft py-2 text-[12.5px]">
+        <div className="flex items-baseline justify-between gap-3 border-b border-line-soft py-2 text-[13.5px]">
           <span>{t("impactFund")}</span>
-          <span className="whitespace-nowrap font-mono text-[13px] font-medium text-red">
+          <span className="whitespace-nowrap font-mono text-[14px] font-medium text-red">
             {t("impactFundValue")}
           </span>
         </div>
-        <div className="flex items-baseline justify-between gap-3 py-2 text-[12.5px]">
+        <div className="flex items-baseline justify-between gap-3 py-2 text-[13.5px]">
           <span>{t("operationsFund")}</span>
-          <span className="whitespace-nowrap font-mono text-[15px] tabular-nums">
+          <span className="whitespace-nowrap font-mono text-[16px] tabular-nums">
             {money(opsCents)}
           </span>
         </div>
-        <p className="mt-1.5 text-[11.5px] leading-relaxed text-ink/60">{t("fundsNote")}</p>
+        <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink/60">{t("fundsNote")}</p>
       </div>
 
       <LedgerTabs locale={locale as Locale} moneyIn={moneyIn} moneyOut={moneyOut} />
 
       {/* CSV downloads are attachment responses, not navigations — plain
           anchors on purpose. */}
-      <div className="mt-6 flex flex-wrap gap-3 text-[12.5px] font-semibold">
+      <div className="mt-6 flex flex-wrap gap-3 text-[13.5px] font-semibold">
         <a
           href="/api/ledger/in"
           download
@@ -236,7 +236,7 @@ export default async function LedgerPage({
         </a>
       </div>
 
-      <p className="mt-5 text-[11.5px] leading-relaxed text-ink/60">{t("footNote")}</p>
+      <p className="mt-5 text-[12.5px] leading-relaxed text-ink/60">{t("footNote")}</p>
     </div>
   );
 }

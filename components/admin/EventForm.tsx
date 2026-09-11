@@ -81,8 +81,8 @@ function tiersToText(value: unknown): string {
 }
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-sea";
-const labelClass = "text-[12.5px] font-semibold";
+  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
+const labelClass = "text-[13.5px] font-semibold";
 
 export function EventForm({
   event,
@@ -383,7 +383,7 @@ export function EventForm({
             className={`${inputClass} font-mono`}
           />
         </div>
-        <label className="flex items-center gap-2 text-[13.5px] sm:col-span-2">
+        <label className="flex items-center gap-2 text-[14.5px] sm:col-span-2">
           <input
             type="checkbox"
             checked={published}
@@ -395,22 +395,22 @@ export function EventForm({
       </div>
 
       {state === "error" ? (
-        <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">
           {t("actionError")}
         </p>
       ) : null}
       {state === "slug" ? (
-        <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">
           {t("evSlugTaken")}
         </p>
       ) : null}
       {state === "invalid" ? (
-        <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">
           {t("evInvalid")}
         </p>
       ) : null}
       {state === "saved" ? (
-        <p className="mt-3 text-[13px] font-semibold text-sea">{t("postSaved")}</p>
+        <p className="mt-3 text-[14px] font-semibold text-sea">{t("postSaved")}</p>
       ) : null}
 
       <PreviewFrame liveHref={event?.is_published ? `/dogadjaji/${event.slug}` : null}>
@@ -421,7 +421,7 @@ export function EventForm({
         <button
           type="submit"
           disabled={state === "busy"}
-          className="rounded-xl bg-ink px-5 py-2.5 text-[13.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="rounded-xl bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {event ? t("evSave") : t("evCreate")}
         </button>
@@ -429,7 +429,7 @@ export function EventForm({
           <button
             type="button"
             onClick={onDone}
-            className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+            className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
           >
             {t("cancel")}
           </button>

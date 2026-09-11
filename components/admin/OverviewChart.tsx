@@ -32,7 +32,7 @@ export function OverviewChart({
   const peak = days.reduce((best, d) => (d.cents > best.cents ? d : best), days[0]);
 
   if (max === 0) {
-    return <p className="mt-3 text-[13.5px] text-ink/55">{labels.empty}</p>;
+    return <p className="mt-3 text-[14.5px] text-ink/55">{labels.empty}</p>;
   }
 
   return (
@@ -59,23 +59,23 @@ export function OverviewChart({
           </div>
         ))}
       </div>
-      <div className="mt-1.5 flex justify-between font-mono text-[10.5px] text-ink/45">
+      <div className="mt-1.5 flex justify-between font-mono text-[11.5px] text-ink/45">
         <span>{label(days[0].date)}</span>
         <span>{label(days[days.length - 1].date)}</span>
       </div>
-      <p className="mt-2 text-[12.5px] text-ink/60">
+      <p className="mt-2 text-[13.5px] text-ink/60">
         {labels.peak}:{" "}
         <span className="font-mono tabular-nums text-ink">{money(peak.cents)}</span> ·{" "}
         {label(peak.date)}
       </p>
 
       <details className="mt-2">
-        <summary className="cursor-pointer text-[12.5px] font-semibold text-sea hover:underline">
+        <summary className="cursor-pointer text-[13.5px] font-semibold text-sea hover:underline">
           {labels.table}
         </summary>
-        <table className="mt-2 w-full max-w-xs border-collapse text-[12.5px]">
+        <table className="mt-2 w-full max-w-xs border-collapse text-[13.5px]">
           <thead>
-            <tr className="border-b border-line text-left font-mono text-[10px] uppercase tracking-[0.12em] text-sea">
+            <tr className="border-b border-line text-left font-mono text-[11px] uppercase tracking-[0.12em] text-sea">
               <th className="py-1 pr-3">{labels.dateCol}</th>
               <th className="py-1 text-right">{labels.amountCol}</th>
             </tr>

@@ -22,14 +22,14 @@ export default async function AdminSignInPage({
     // Standalone console door — no public chrome on purpose.
     <div className="flex min-h-screen items-center justify-center bg-sea px-5 py-10">
       <div className="w-full max-w-md rounded-brand bg-paper px-6 py-8 sm:px-8">
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+        <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
           Santamore · {t("consoleBadge")}
         </p>
         <h1 className="type-display mt-3 text-3xl">{t("signInTitle")}</h1>
       {error ? (
         <p
           role="alert"
-          className="mt-4 rounded-brand border-[1.5px] border-dashed border-red bg-red/5 px-4 py-3 text-[13.5px] font-semibold text-red-dark"
+          className="mt-4 rounded-brand border-[1.5px] border-dashed border-red bg-red/5 px-4 py-3 text-[14.5px] font-semibold text-red-dark"
         >
           {t("linkFailed")}
         </p>

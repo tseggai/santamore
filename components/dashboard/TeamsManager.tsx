@@ -47,18 +47,18 @@ export function TeamsManager({
   return (
     <div className="mt-5 space-y-6">
       {teams.length === 0 ? (
-        <p className="text-[13.5px] text-ink/60">{t("teamsEmpty")}</p>
+        <p className="text-[14.5px] text-ink/60">{t("teamsEmpty")}</p>
       ) : (
         <ul className="space-y-2">
           {teams.map((team) => (
-            <li key={team.id} className="rounded-[11px] border-[1.5px] border-line px-4 py-3">
+            <li key={team.id} className="rounded-[11px] bg-mist px-4 py-3">
               <div className="flex items-center gap-3">
                 <Avatar src={fundraiserPhotoUrl(team.photoPath)} name={team.name} size={40} />
                 <span className="min-w-0 flex-1">
-                  <Link href={`/t/${team.slug}`} className="block text-[14px] font-semibold hover:text-sea">
+                  <Link href={`/t/${team.slug}`} className="block text-[15px] font-semibold hover:text-sea">
                     {team.name}
                   </Link>
-                  <span className="block text-[12.5px] text-ink/60">
+                  <span className="block text-[13.5px] text-ink/60">
                     {team.eventName} · {t("memberCountShort", { count: team.memberCount })} ·{" "}
                     <span className="font-mono tabular-nums">{team.raisedLabel}</span>
                   </span>
@@ -66,7 +66,7 @@ export function TeamsManager({
                 <button
                   type="button"
                   onClick={() => setOpen(open === team.id ? "" : team.id)}
-                  className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea"
+                  className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea"
                 >
                   {t("teamEdit")}
                 </button>
@@ -79,22 +79,22 @@ export function TeamsManager({
         </ul>
       )}
 
-      <section className="rounded-brand border-[1.5px] border-line p-5">
-        <h2 className="text-[15px] font-bold">{t("teamCreateHeading")}</h2>
-        <p className="mt-1 text-[13.5px] leading-relaxed text-ink/65">{t("teamCreateSub")}</p>
+      <section className="border-t-[0.5px] border-line pt-6">
+        <h2 className="text-[16px] font-bold">{t("teamCreateHeading")}</h2>
+        <p className="mt-1 text-[14.5px] leading-relaxed text-ink/65">{t("teamCreateSub")}</p>
         {events.length === 0 ? (
-          <p className="mt-3 text-[13.5px] text-ink/60">{t("createNoEvents")}</p>
+          <p className="mt-3 text-[14.5px] text-ink/60">{t("createNoEvents")}</p>
         ) : open === "new" ? (
           <>
             <div className="mt-4">
-              <label htmlFor="teamEvent" className="text-[12.5px] font-semibold">
+              <label htmlFor="teamEvent" className="text-[13.5px] font-semibold">
                 {t("eventLabel")}
               </label>
               <select
                 id="teamEvent"
                 value={eventId}
                 onChange={(event) => setEventId(event.target.value)}
-                className="mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[14px] outline-none focus:border-sea"
+                className="mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15px] outline-none focus:border-sea"
               >
                 {events.map((event) => (
                   <option key={event.id} value={event.id}>
@@ -103,9 +103,9 @@ export function TeamsManager({
                 ))}
               </select>
               {chosen?.fundraiserId ? (
-                <p className="mt-1 text-[12.5px] text-ink/55">{t("teamJoinsPage")}</p>
+                <p className="mt-1 text-[13.5px] text-ink/55">{t("teamJoinsPage")}</p>
               ) : (
-                <p className="mt-1 text-[12.5px] text-ink/55">{t("teamNoPageYet")}</p>
+                <p className="mt-1 text-[13.5px] text-ink/55">{t("teamNoPageYet")}</p>
               )}
             </div>
             <TeamPanel
@@ -121,7 +121,7 @@ export function TeamsManager({
           <button
             type="button"
             onClick={() => setOpen("new")}
-            className="mt-4 rounded-xl bg-red px-4 py-2.5 text-[13.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+            className="mt-4 rounded-xl bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
           >
             + {t("newTeamOption").replace(/^\+\s*/, "")}
           </button>

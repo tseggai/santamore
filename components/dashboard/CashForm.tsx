@@ -17,7 +17,7 @@ export function CashForm({ fundraiserId }: { fundraiserId: string }) {
   const [state, setState] = useState<"idle" | "busy" | "error" | "done">("idle");
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[14.5px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15.5px] outline-none focus:border-sea";
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -42,7 +42,7 @@ export function CashForm({ fundraiserId }: { fundraiserId: string }) {
   return (
     <form onSubmit={submit} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
       <div>
-        <label htmlFor="cashAmount" className="text-[13px] font-semibold">
+        <label htmlFor="cashAmount" className="text-[14px] font-semibold">
           {t("cashAmountLabel")}
         </label>
         <input
@@ -56,7 +56,7 @@ export function CashForm({ fundraiserId }: { fundraiserId: string }) {
         />
       </div>
       <div>
-        <label htmlFor="cashDonor" className="text-[13px] font-semibold">
+        <label htmlFor="cashDonor" className="text-[14px] font-semibold">
           {t("cashDonorLabel")}
         </label>
         <input
@@ -71,7 +71,7 @@ export function CashForm({ fundraiserId }: { fundraiserId: string }) {
         />
       </div>
       <div className="sm:col-span-2">
-        <label htmlFor="cashNote" className="text-[13px] font-semibold">
+        <label htmlFor="cashNote" className="text-[14px] font-semibold">
           {t("cashNoteLabel")}
         </label>
         <input
@@ -88,17 +88,17 @@ export function CashForm({ fundraiserId }: { fundraiserId: string }) {
         <button
           type="submit"
           disabled={state === "busy"}
-          className="rounded-xl bg-red px-5 py-2.5 text-[14px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+          className="rounded-xl bg-red px-5 py-2.5 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
         >
           {t("cashSubmit")}
         </button>
         {state === "error" ? (
-          <p role="alert" className="text-[13px] font-semibold text-red-dark">
+          <p role="alert" className="text-[14px] font-semibold text-red-dark">
             {t("actionError")}
           </p>
         ) : null}
         {state === "done" ? (
-          <p role="status" className="text-[13px] font-semibold text-sea">
+          <p role="status" className="text-[14px] font-semibold text-sea">
             {t("cashLogged")}
           </p>
         ) : null}

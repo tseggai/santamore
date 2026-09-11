@@ -70,12 +70,12 @@ export default async function AdminFundraisersPage({
       <h1 className="type-display text-2xl">{t("fundraisersTitle")}</h1>
 
       {pages.length === 0 ? (
-        <p className="mt-4 text-[13.5px] text-ink/60">{t("pagesEmpty")}</p>
+        <p className="mt-4 text-[14.5px] text-ink/60">{t("pagesEmpty")}</p>
       ) : (
         <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-[13.5px]">
+          <table className="w-full min-w-[640px] border-collapse text-[14.5px]">
             <thead>
-              <tr className="border-b border-line text-left font-mono text-[10.5px] uppercase tracking-[0.12em] text-sea">
+              <tr className="border-b border-line text-left font-mono text-[11.5px] uppercase tracking-[0.12em] text-sea">
                 <th className="py-2 pr-3">{t("pageTitleCol")}</th>
                 <th className="py-2 pr-3">{t("pageOwner")}</th>
                 <th className="py-2 pr-3">{t("pageGoal")}</th>
@@ -97,7 +97,7 @@ export default async function AdminFundraisersPage({
                     ) : (
                       <span className="font-semibold">{page.title}</span>
                     )}
-                    <span className="block font-mono text-[11.5px] text-ink/45">
+                    <span className="block font-mono text-[12.5px] text-ink/45">
                       /f/{page.slug}
                     </span>
                   </td>
@@ -131,22 +131,22 @@ export default async function AdminFundraisersPage({
         </div>
       )}
 
-      <h2 className="mt-12 text-[15px] font-bold">{t("wallHeading")}</h2>
-      <p className="mt-1 text-[13px] text-ink/60">{t("wallHint")}</p>
+      <h2 className="mt-12 text-[16px] font-bold">{t("wallHeading")}</h2>
+      <p className="mt-1 text-[14px] text-ink/60">{t("wallHint")}</p>
       {messages.length === 0 ? (
-        <p className="mt-3 text-[13.5px] text-ink/60">{t("wallEmpty")}</p>
+        <p className="mt-3 text-[14.5px] text-ink/60">{t("wallEmpty")}</p>
       ) : (
         <ul className="mt-3 space-y-2">
           {messages.map((row) => (
             <li
               key={row.id}
-              className={`rounded-[11px] border-[1.5px] px-3.5 py-2.5 text-[13.5px] ${
+              className={`rounded-[11px] border-[1.5px] px-3.5 py-2.5 text-[14.5px] ${
                 row.is_message_hidden ? "border-line-soft opacity-60" : "border-line"
               }`}
             >
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="font-semibold">{row.donor_name ?? "—"}</span>
-                <span className="text-[12px] text-ink/50">
+                <span className="text-[13px] text-ink/50">
                   {one(row.fundraiser)?.title ?? "—"} ·{" "}
                   <span className="font-mono tabular-nums">
                     {row.created_at.slice(0, 10)}

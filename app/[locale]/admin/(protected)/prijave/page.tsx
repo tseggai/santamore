@@ -75,14 +75,14 @@ export default async function AdminRegistrationsPage({
 
       {events.length > 1 ? (
         <form method="get" className="mt-4 flex items-center gap-2">
-          <label className="text-[13px] font-semibold" htmlFor="event-filter">
+          <label className="text-[14px] font-semibold" htmlFor="event-filter">
             {t("regEvent")}
           </label>
           <select
             id="event-filter"
             name="event"
             defaultValue={selectedEvent?.id}
-            className="rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2 text-[13.5px] outline-none focus:border-sea"
+            className="rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2 text-[14.5px] outline-none focus:border-sea"
           >
             {events.map((eventRow) => (
               <option key={eventRow.id} value={eventRow.id}>
@@ -92,7 +92,7 @@ export default async function AdminRegistrationsPage({
           </select>
           <button
             type="submit"
-            className="rounded-xl border-[1.5px] border-line px-3.5 py-2 text-[13px] font-semibold hover:border-sea hover:text-sea"
+            className="rounded-xl border-[1.5px] border-line px-3.5 py-2 text-[14px] font-semibold hover:border-sea hover:text-sea"
           >
             {t("regShow")}
           </button>
@@ -101,26 +101,26 @@ export default async function AdminRegistrationsPage({
 
       {selectedEvent ? (
         <>
-          <p className="mt-4 text-[13.5px] text-ink/65">
+          <p className="mt-4 text-[14.5px] text-ink/65">
             {t("regSummary", { total: rows.length, confirmed })}
           </p>
           <p className="mt-1">
             <a
               href={`/api/admin/registrations?event=${selectedEvent.id}`}
               download
-              className="text-[13px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+              className="text-[14px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
             >
               {t("regCsv")}
             </a>
           </p>
 
           {rows.length === 0 ? (
-            <p className="mt-6 text-[13.5px] text-ink/60">{t("regEmpty")}</p>
+            <p className="mt-6 text-[14.5px] text-ink/60">{t("regEmpty")}</p>
           ) : (
             <div className="mt-4 overflow-x-auto">
-              <table className="w-full min-w-[760px] border-collapse text-[13px]">
+              <table className="w-full min-w-[760px] border-collapse text-[14px]">
                 <thead>
-                  <tr className="border-b border-line text-left font-mono text-[10.5px] uppercase tracking-[0.12em] text-sea">
+                  <tr className="border-b border-line text-left font-mono text-[11.5px] uppercase tracking-[0.12em] text-sea">
                     <th className="py-2 pr-3">{t("regRunner")}</th>
                     <th className="py-2 pr-3">{t("regDistance")}</th>
                     <th className="py-2 pr-3">{t("regSize")}</th>
@@ -137,7 +137,7 @@ export default async function AdminRegistrationsPage({
                       <td className="py-2.5 pr-3 font-semibold">
                         {one(row.profile)?.full_name ?? "—"}
                         {row.tier_label ? (
-                          <span className="block text-[11.5px] font-normal text-ink/50">
+                          <span className="block text-[12.5px] font-normal text-ink/50">
                             {row.tier_label}
                           </span>
                         ) : null}
@@ -185,7 +185,7 @@ export default async function AdminRegistrationsPage({
           )}
         </>
       ) : (
-        <p className="mt-6 text-[13.5px] text-ink/60">{t("regNoEvents")}</p>
+        <p className="mt-6 text-[14.5px] text-ink/60">{t("regNoEvents")}</p>
       )}
     </div>
   );

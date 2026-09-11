@@ -16,7 +16,7 @@ export interface ChapterOption {
 type State = "idle" | "busy" | "error";
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-sea";
+  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 
 /**
  * New-disbursement form. Documentation files upload straight to the
@@ -81,7 +81,7 @@ export function DisbursementForm({ chapters }: { chapters: ChapterOption[] }) {
 
   return (
     <form onSubmit={submit} className="mt-4 grid max-w-xl gap-3">
-      <label className="text-[13px] font-semibold">
+      <label className="text-[14px] font-semibold">
         {t("disbChapter")}
         <select name="chapter" required className={inputClass}>
           {chapters.map((chapter) => (
@@ -91,7 +91,7 @@ export function DisbursementForm({ chapters }: { chapters: ChapterOption[] }) {
           ))}
         </select>
       </label>
-      <label className="text-[13px] font-semibold">
+      <label className="text-[14px] font-semibold">
         {t("disbLabel")}
         <input
           name="label"
@@ -102,12 +102,12 @@ export function DisbursementForm({ chapters }: { chapters: ChapterOption[] }) {
           className={inputClass}
         />
       </label>
-      <label className="text-[13px] font-semibold">
+      <label className="text-[14px] font-semibold">
         {t("disbNote")}
         <textarea name="note" rows={2} maxLength={2000} className={inputClass} />
       </label>
       <div className="grid gap-3 sm:grid-cols-3">
-        <label className="text-[13px] font-semibold">
+        <label className="text-[14px] font-semibold">
           {t("disbAmount")}
           <input
             name="amount"
@@ -117,22 +117,22 @@ export function DisbursementForm({ chapters }: { chapters: ChapterOption[] }) {
             className={`${inputClass} font-mono tabular-nums`}
           />
         </label>
-        <label className="text-[13px] font-semibold">
+        <label className="text-[14px] font-semibold">
           {t("disbCategory")}
           <input name="category" maxLength={80} className={inputClass} />
         </label>
-        <label className="text-[13px] font-semibold">
+        <label className="text-[14px] font-semibold">
           {t("disbDecided")}
           <input name="decided" type="date" className={inputClass} />
         </label>
       </div>
-      <label className="text-[13px] font-semibold">
+      <label className="text-[14px] font-semibold">
         {t("disbCommittee")}
         <input name="committee" maxLength={120} className={inputClass} />
       </label>
 
       <div>
-        <span className="text-[13px] font-semibold">{t("disbDocs")}</span>
+        <span className="text-[14px] font-semibold">{t("disbDocs")}</span>
         <label className="mt-1 block">
           <span className="sr-only">{t("disbDocs")}</span>
           <input
@@ -141,11 +141,11 @@ export function DisbursementForm({ chapters }: { chapters: ChapterOption[] }) {
             accept="image/jpeg,image/png,image/webp,application/pdf"
             onChange={onFiles}
             disabled={uploading}
-            className="text-[13.5px] file:mr-3 file:rounded-lg file:border-0 file:bg-sea file:px-4 file:py-2 file:font-semibold file:text-paper"
+            className="text-[14.5px] file:mr-3 file:rounded-lg file:border-0 file:bg-sea file:px-4 file:py-2 file:font-semibold file:text-paper"
           />
         </label>
         {paths.length > 0 ? (
-          <p className="mt-1 font-mono text-[12px] text-sea">
+          <p className="mt-1 font-mono text-[13px] text-sea">
             {t("disbDocsCount", { count: paths.length })}
           </p>
         ) : null}
@@ -154,12 +154,12 @@ export function DisbursementForm({ chapters }: { chapters: ChapterOption[] }) {
       <button
         type="submit"
         disabled={state === "busy" || uploading}
-        className="rounded-xl bg-sea px-5 py-3 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
+        className="rounded-xl bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
       >
         {t("disbCreate")}
       </button>
       {state === "error" ? (
-        <p role="alert" className="text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="text-[14px] font-semibold text-red-dark">
           {t("actionError")}
         </p>
       ) : null}

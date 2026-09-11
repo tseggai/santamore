@@ -24,7 +24,7 @@ export function ConfirmCashButton({ donationId }: { donationId: string }) {
   };
 
   if (state === "done") {
-    return <span className="text-[12px] font-semibold text-sea">{t("approvedOk")}</span>;
+    return <span className="text-[13px] font-semibold text-sea">{t("approvedOk")}</span>;
   }
   return (
     <span className="inline-flex items-center gap-2">
@@ -32,12 +32,12 @@ export function ConfirmCashButton({ donationId }: { donationId: string }) {
         type="button"
         disabled={state === "busy"}
         onClick={confirm}
-        className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
+        className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
       >
         {t("confirmCash")}
       </button>
       {state === "error" ? (
-        <span role="alert" className="text-[12px] font-semibold text-red-dark">
+        <span role="alert" className="text-[13px] font-semibold text-red-dark">
           {t("actionError")}
         </span>
       ) : null}

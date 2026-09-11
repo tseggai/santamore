@@ -94,7 +94,7 @@ export default function LocaleSwitcher({
         }`}
       >
         <Flag locale={locale} className="h-[14px] w-[21px] rounded-[2px]" />
-        <span className="font-mono text-[11px] uppercase tracking-wider">{locale}</span>
+        <span className="font-mono text-[12px] uppercase tracking-wider">{locale}</span>
         <svg
           viewBox="0 0 12 12"
           aria-hidden="true"
@@ -127,7 +127,7 @@ export default function LocaleSwitcher({
                 role="menuitem"
                 aria-current={active ? "true" : undefined}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2 text-[13px] text-ink transition-colors hover:bg-mist focus-visible:bg-mist ${
+                className={`flex items-center gap-2.5 px-3 py-2 text-[14px] text-ink transition-colors hover:bg-mist focus-visible:bg-mist ${
                   active ? "font-semibold" : ""
                 }`}
               >

@@ -25,8 +25,8 @@ export interface SponsorRow {
 const STATUSES = ["prospect", "negotiating", "signed", "active", "ended"] as const;
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-sea";
-const labelClass = "text-[12.5px] font-semibold";
+  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
+const labelClass = "text-[13.5px] font-semibold";
 
 function SponsorForm({
   sponsor,
@@ -128,19 +128,19 @@ function SponsorForm({
           <label htmlFor="spWebsite" className={labelClass}>{t("spWebsite")}</label>
           <input id="spWebsite" type="url" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://" className={inputClass} />
         </div>
-        <label className="flex items-center gap-2 text-[13.5px] sm:col-span-2">
+        <label className="flex items-center gap-2 text-[14.5px] sm:col-span-2">
           <input type="checkbox" checked={inKind} onChange={(e) => setInKind(e.target.checked)} className="h-4 w-4 accent-red" />
           {t("spInKind")}
         </label>
       </div>
-      <p className="mt-2 text-[12px] text-ink/55">{t("spOpsNote")}</p>
-      {state === "error" ? <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">{t("actionError")}</p> : null}
-      {state === "invalid" ? <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">{t("goalInvalidAdmin")}</p> : null}
+      <p className="mt-2 text-[13px] text-ink/55">{t("spOpsNote")}</p>
+      {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
+      {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("goalInvalidAdmin")}</p> : null}
       <div className="mt-4 flex gap-2">
-        <button type="submit" disabled={state === "busy"} className="rounded-xl bg-ink px-5 py-2.5 text-[13.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
+        <button type="submit" disabled={state === "busy"} className="rounded-xl bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
           {sponsor ? t("evSave") : t("spCreate")}
         </button>
-        <button type="button" onClick={onDone} className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea">
+        <button type="button" onClick={onDone} className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea">
           {t("cancel")}
         </button>
       </div>
@@ -171,28 +171,28 @@ export function SponsorsManager({
       {open === "new" ? (
         <SponsorForm sponsor={null} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setOpen("")} />
       ) : (
-        <button type="button" onClick={() => setOpen("new")} className="rounded-xl bg-red px-4 py-2.5 text-[13.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark">
+        <button type="button" onClick={() => setOpen("new")} className="rounded-xl bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark">
           + {t("spNew")}
         </button>
       )}
       {sponsors.length === 0 ? (
-        <p className="text-[13.5px] text-ink/60">{t("spEmpty")}</p>
+        <p className="text-[14.5px] text-ink/60">{t("spEmpty")}</p>
       ) : (
         <ul className="space-y-2">
           {sponsors.map((sponsor) => (
             <li key={sponsor.id} className="rounded-brand border-[1.5px] border-line px-4 py-3.5">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div className="min-w-0 flex-1">
-                  <p className="flex flex-wrap items-center gap-2 text-[14.5px] font-bold">
+                  <p className="flex flex-wrap items-center gap-2 text-[15.5px] font-bold">
                     {sponsor.name}
-                    <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
+                    <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
                       sponsor.status === "active" || sponsor.status === "signed" ? "bg-sea text-paper" : "border border-line text-ink/60"
                     }`}>
                       {t(`spStatusValue.${sponsor.status}`)}
                     </span>
-                    {sponsor.tier ? <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-ink/60">{sponsor.tier}</span> : null}
+                    {sponsor.tier ? <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink/60">{sponsor.tier}</span> : null}
                   </p>
-                  <p className="mt-0.5 text-[12.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-ink/60">
                     {sponsor.amount_cents ? (
                       <span className="font-mono tabular-nums">
                         {formatCents(sponsor.amount_cents, locale, { trimWholeCents: true })}
@@ -203,7 +203,7 @@ export function SponsorsManager({
                     {sponsor.event_id ? <> · {eventName.get(sponsor.event_id) ?? "—"}</> : null}
                   </p>
                 </div>
-                <button type="button" onClick={() => setOpen(open === sponsor.id ? "" : sponsor.id)} className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea">
+                <button type="button" onClick={() => setOpen(open === sponsor.id ? "" : sponsor.id)} className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea">
                   {t("evEdit")}
                 </button>
               </div>

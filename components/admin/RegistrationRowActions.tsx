@@ -59,13 +59,13 @@ export function RegistrationRowActions({
         }}
         maxLength={10}
         placeholder={t("bib")}
-        className="w-16 rounded-[8px] border-[1.5px] border-line bg-paper px-2 py-1 font-mono text-[12.5px] tabular-nums outline-none focus:border-sea"
+        className="w-16 rounded-[8px] border-[1.5px] border-line bg-paper px-2 py-1 font-mono text-[13.5px] tabular-nums outline-none focus:border-sea"
       />
       <button
         type="button"
         disabled={bibState === "busy" || value === (bib ?? "")}
         onClick={saveBib}
-        className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
+        className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
       >
         {bibState === "done" ? "✓" : t("bibSave")}
       </button>
@@ -74,13 +74,13 @@ export function RegistrationRowActions({
           type="button"
           disabled={cancelState === "busy"}
           onClick={cancel}
-          className="rounded-lg px-2 py-1 text-[12px] font-semibold text-ink/50 hover:text-red-dark disabled:opacity-40"
+          className="rounded-lg px-2 py-1 text-[13px] font-semibold text-ink/50 hover:text-red-dark disabled:opacity-40"
         >
           {t("regCancel")}
         </button>
       ) : null}
       {bibState === "error" || cancelState === "error" ? (
-        <span role="alert" className="text-[12px] font-semibold text-red-dark">
+        <span role="alert" className="text-[13px] font-semibold text-red-dark">
           {t("actionError")}
         </span>
       ) : null}

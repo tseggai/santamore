@@ -53,11 +53,11 @@ export default async function EventRegistrationPage({
   if (!user) {
     return (
       <div className="mx-auto max-w-md px-5 py-14">
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+        <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
           {event.name}
         </p>
         <h1 className="type-display mt-2 text-3xl">{t("signInTitle")}</h1>
-        <p className="mt-3 text-[14px] leading-relaxed text-ink/65">{t("signInSub")}</p>
+        <p className="mt-3 text-[15px] leading-relaxed text-ink/65">{t("signInSub")}</p>
         <div className="mt-6">
           <SignInForm
             locale={locale as Locale}
@@ -85,7 +85,7 @@ export default async function EventRegistrationPage({
       <div className="mx-auto max-w-xl px-5 py-14">
         <Link
           href={`/dogadjaji/${event.slug}`}
-          className="inline-block text-[12.5px] font-semibold text-sea transition-colors hover:text-sea-2"
+          className="inline-block text-[13.5px] font-semibold text-sea transition-colors hover:text-sea-2"
         >
           ← {event.name}
         </Link>
@@ -94,14 +94,14 @@ export default async function EventRegistrationPage({
             ? t("confirmedTitle")
             : t("registeredTitle")}
         </h1>
-        <p className="mt-3 text-[14px] leading-relaxed text-ink/70">
+        <p className="mt-3 text-[15px] leading-relaxed text-ink/70">
           {registration.distance ? <>{registration.distance} · </> : null}
           {registration.tier_label}
           {registration.shirt_size ? <> · {registration.shirt_size}</> : null}
         </p>
         {pendingPayment ? (
           <>
-            <p className="mt-4 text-[14px] leading-relaxed text-ink/70">
+            <p className="mt-4 text-[15px] leading-relaxed text-ink/70">
               {t("payInstructions")}
             </p>
             <div className="mt-4">
@@ -113,12 +113,12 @@ export default async function EventRegistrationPage({
                 monthly={false}
               />
             </div>
-            <p className="mt-3 text-[12.5px] leading-relaxed text-ink/60">
+            <p className="mt-3 text-[13.5px] leading-relaxed text-ink/60">
               {t("opsNote")}
             </p>
           </>
         ) : (
-          <p className="mt-4 rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
+          <p className="mt-4 rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[14.5px] text-sea">
             {registration.status === "confirmed" ? t("paidNote") : t("noFeeNote")}
           </p>
         )}
@@ -135,7 +135,7 @@ export default async function EventRegistrationPage({
     <div className="mx-auto max-w-xl px-5 py-14">
       <Link
         href={`/dogadjaji/${event.slug}`}
-        className="inline-block text-[12.5px] font-semibold text-sea transition-colors hover:text-sea-2"
+        className="inline-block text-[13.5px] font-semibold text-sea transition-colors hover:text-sea-2"
       >
         ← {event.name}
       </Link>

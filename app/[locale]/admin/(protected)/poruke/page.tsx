@@ -51,7 +51,7 @@ export default async function AdminMessagesPage({
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("messagesTitle")}</h1>
-      <p className="mt-1 text-[13px] text-ink/60">{t("messagesHint")}</p>
+      <p className="mt-1 text-[14px] text-ink/60">{t("messagesHint")}</p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {[null, ...KINDS].map((kindOption) => {
@@ -62,8 +62,8 @@ export default async function AdminMessagesPage({
               href={kindOption ? `/admin/poruke?kind=${kindOption}` : "/admin/poruke"}
               className={
                 selected
-                  ? "rounded-full bg-sea px-4 py-1.5 text-[12.5px] font-semibold text-paper"
-                  : "rounded-full border-[1.5px] border-line px-4 py-1.5 text-[12.5px] font-semibold text-ink/70 hover:border-sea hover:text-sea"
+                  ? "rounded-full bg-sea px-4 py-1.5 text-[13.5px] font-semibold text-paper"
+                  : "rounded-full border-[1.5px] border-line px-4 py-1.5 text-[13.5px] font-semibold text-ink/70 hover:border-sea hover:text-sea"
               }
             >
               {kindOption ? t(`msgKind.${kindOption}`) : t("msgKindAll")}
@@ -73,16 +73,16 @@ export default async function AdminMessagesPage({
       </div>
 
       {rows.length === 0 ? (
-        <p className="mt-6 text-[13.5px] text-ink/60">{t("messagesEmpty")}</p>
+        <p className="mt-6 text-[14.5px] text-ink/60">{t("messagesEmpty")}</p>
       ) : (
         <ul className="mt-5 space-y-2">
           {rows.map((row) => (
             <li
               key={row.id}
-              className="rounded-[11px] border-[1.5px] border-line px-3.5 py-2.5 text-[13.5px]"
+              className="rounded-[11px] border-[1.5px] border-line px-3.5 py-2.5 text-[14.5px]"
             >
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="rounded-full bg-mist px-2.5 py-0.5 font-mono text-[10.5px] uppercase tracking-[0.1em] text-sea">
+                <span className="rounded-full bg-mist px-2.5 py-0.5 font-mono text-[11.5px] uppercase tracking-[0.1em] text-sea">
                   {t(`msgKind.${row.kind}`)}
                 </span>
                 <span className="font-semibold">{row.name ?? "—"}</span>
@@ -95,7 +95,7 @@ export default async function AdminMessagesPage({
                   </a>
                 ) : null}
                 {row.phone ? <span className="font-mono">{row.phone}</span> : null}
-                <span className="ml-auto font-mono text-[11.5px] tabular-nums text-ink/45">
+                <span className="ml-auto font-mono text-[12.5px] tabular-nums text-ink/45">
                   {dateFormat.format(new Date(row.created_at))} · {row.locale}
                 </span>
               </div>

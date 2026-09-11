@@ -36,14 +36,14 @@ export function BeneficiaryForm() {
   };
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[15px] outline-none focus:border-sea";
-  const labelClass = "text-[13px] font-semibold";
+    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
+  const labelClass = "text-[14px] font-semibold";
 
   if (state === "done") {
     return (
       <p
         role="status"
-        className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[14px] text-sea"
+        className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[15px] text-sea"
       >
         {t("success")}
       </p>
@@ -141,14 +141,14 @@ export function BeneficiaryForm() {
         className="absolute -left-[9999px] h-px w-px opacity-0"
       />
       {state === "error" ? (
-        <p role="alert" className="text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="text-[14px] font-semibold text-red-dark">
           {t("error")}
         </p>
       ) : null}
       <button
         type="submit"
         disabled={state === "busy"}
-        className="w-full rounded-xl bg-red px-6 py-3.5 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+        className="w-full rounded-xl bg-red px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
       >
         {t("submit")}
       </button>

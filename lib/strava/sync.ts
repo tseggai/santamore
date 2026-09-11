@@ -38,6 +38,30 @@ export async function connectionForUser(userId: string): Promise<Connection | nu
   return (data as Connection | null) ?? null;
 }
 
+/**
+ * Opening the Strava page refreshes the athlete's data when the last sync
+ * is older than an hour — the webhook covers the live case, this covers
+ * the gaps (events missed while the subscription was down, edits). Errors
+ * are logged and swallowed: a stale page beats an error page.
+ */
+export async function syncIfStale(
+  userId: string,
+  lastSyncAt: string | null,
+  maxAgeMinutes = 60,
+): Promise<boolean> {
+  const age = lastSyncAt ? Date.now() - new Date(lastSyncAt).getTime() : Infinity;
+  if (age < maxAgeMinutes * 60 * 1000) return false;
+  const connection = await connectionForUser(userId);
+  if (!connection) return false;
+  try {
+    await syncRecent(connection, 7, localToday());
+    return true;
+  } catch (error) {
+    console.error("[strava] background sync failed:", error);
+    return false;
+  }
+}
+
 export async function connectionForAthlete(athleteId: number): Promise<Connection | null> {
   const service = createServiceClient();
   const { data } = await service

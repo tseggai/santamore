@@ -139,22 +139,22 @@ export default async function DashboardOverviewPage({
 
   return (
     <div className="py-8">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
         {t("consoleBadge")}
       </p>
       <h1 className="type-display mt-2 text-3xl">
         {t("welcome", { name: profile?.full_name?.split(" ")[0] ?? "" }).trim()}
       </h1>
       {nextEvent && daysLeft !== null ? (
-        <p className="mt-1 text-[13.5px] text-ink/60">
+        <p className="mt-1 text-[14.5px] text-ink/60">
           {t("daysLeft", { count: daysLeft })} · {nextEvent.name}
         </p>
       ) : null}
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map((tile) => (
-          <div key={tile.label} className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3.5">
-            <p className="text-[12px] font-semibold text-ink/60">{tile.label}</p>
+          <div key={tile.label} className="rounded-brand bg-mist px-4 py-3.5">
+            <p className="text-[13px] font-semibold text-ink/60">{tile.label}</p>
             <p
               className={`mt-1 font-mono text-2xl tabular-nums ${
                 tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-ink"
@@ -170,18 +170,18 @@ export default async function DashboardOverviewPage({
         href={nextAction.href}
         className="mt-5 block rounded-xl bg-ink px-4 py-3.5 text-paper transition-opacity hover:opacity-90"
       >
-        <span className="block text-[13px] font-bold">{t("nextHeading")}</span>
-        <span className="mt-1 block text-[12.5px] leading-relaxed text-paper/70">{nextAction.text}</span>
+        <span className="block text-[14px] font-bold">{t("nextHeading")}</span>
+        <span className="mt-1 block text-[13.5px] leading-relaxed text-paper/70">{nextAction.text}</span>
       </Link>
 
       <section className="mt-8">
-        <h2 className="text-[15px] font-bold">{t("quickActions")}</h2>
+        <h2 className="text-[16px] font-bold">{t("quickActions")}</h2>
         <div className="mt-3 flex flex-wrap gap-2">
           {quickActions.map((action) => (
             <Link
               key={action.href + action.label}
               href={action.href}
-              className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+              className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
             >
               {action.label}
             </Link>
@@ -191,13 +191,13 @@ export default async function DashboardOverviewPage({
 
       <section className="mt-8">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-[15px] font-bold">{t("navPages")}</h2>
-          <Link href="/dashboard/stranice" className="text-[13px] font-semibold text-sea underline underline-offset-2">
+          <h2 className="text-[16px] font-bold">{t("navPages")}</h2>
+          <Link href="/dashboard/stranice" className="text-[14px] font-semibold text-sea underline underline-offset-2">
             {t("manage")}
           </Link>
         </div>
         {pages.length === 0 ? (
-          <p className="mt-2 text-[13.5px] text-ink/60">{t("pagesEmpty")}</p>
+          <p className="mt-2 text-[14.5px] text-ink/60">{t("pagesEmpty")}</p>
         ) : (
           <ul className="mt-3 space-y-2">
             {pages.map((page) => {
@@ -211,21 +211,21 @@ export default async function DashboardOverviewPage({
                 <li key={page.id}>
                   <Link
                     href={`/dashboard/stranice/${page.slug}`}
-                    className="flex items-center gap-3 rounded-[11px] border-[1.5px] border-line px-4 py-3 transition-colors hover:border-sea"
+                    className="flex items-center gap-3 rounded-[11px] bg-mist px-4 py-3 transition-colors hover:bg-mist-2"
                   >
                     <Avatar src={fundraiserPhotoUrl(page.photo_path)} name={page.title} size={40} />
                     <span className="min-w-0 flex-1">
-                      <span className="flex flex-wrap items-center gap-2 text-[14px] font-semibold">
+                      <span className="flex flex-wrap items-center gap-2 text-[15px] font-semibold">
                         {page.title}
                         <span
-                          className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
+                          className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
                             page.status === "active" ? "bg-sea text-paper" : "border border-line text-ink/60"
                           }`}
                         >
                           {page.status === "active" ? t("statusActiveShort") : t("statusDraftShort")}
                         </span>
                       </span>
-                      <span className="block text-[12.5px] text-ink/60">
+                      <span className="block text-[13.5px] text-ink/60">
                         {event?.name ?? "—"}
                         {event?.starts_at ? ` · ${dateFormat.format(new Date(event.starts_at))}` : ""}
                       </span>
@@ -233,10 +233,10 @@ export default async function DashboardOverviewPage({
                         <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
                       </span>
                     </span>
-                    <span className="shrink-0 text-right font-mono text-[13px] tabular-nums">
+                    <span className="shrink-0 text-right font-mono text-[14px] tabular-nums">
                       {money(totals?.raised_cents ?? 0)}
                       {page.goal_cents ? (
-                        <span className="block text-[11px] text-ink/50">/ {money(page.goal_cents)}</span>
+                        <span className="block text-[12px] text-ink/50">/ {money(page.goal_cents)}</span>
                       ) : null}
                     </span>
                   </Link>
@@ -250,17 +250,17 @@ export default async function DashboardOverviewPage({
       <div className="mt-8 grid gap-6 sm:grid-cols-2">
         <section>
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-[15px] font-bold">{t("navTeams")}</h2>
-            <Link href="/dashboard/stranice#timovi" className="text-[13px] font-semibold text-sea underline underline-offset-2">
+            <h2 className="text-[16px] font-bold">{t("navTeams")}</h2>
+            <Link href="/dashboard/stranice#timovi" className="text-[14px] font-semibold text-sea underline underline-offset-2">
               {t("manage")}
             </Link>
           </div>
           {(teamRows ?? []).length === 0 ? (
-            <p className="mt-2 text-[13.5px] text-ink/60">{t("teamsEmpty")}</p>
+            <p className="mt-2 text-[14.5px] text-ink/60">{t("teamsEmpty")}</p>
           ) : (
             <ul className="mt-3 space-y-1.5">
               {(teamRows ?? []).map((team) => (
-                <li key={team.id} className="text-[13.5px]">
+                <li key={team.id} className="text-[14.5px]">
                   <Link href={`/t/${team.slug}`} className="font-semibold hover:text-sea">
                     {team.name}
                   </Link>
@@ -271,9 +271,9 @@ export default async function DashboardOverviewPage({
           )}
         </section>
         <section>
-          <h2 className="text-[15px] font-bold">{t("registrationsHeading")}</h2>
+          <h2 className="text-[16px] font-bold">{t("registrationsHeading")}</h2>
           {(regRows ?? []).length === 0 ? (
-            <p className="mt-2 text-[13.5px] text-ink/60">
+            <p className="mt-2 text-[14.5px] text-ink/60">
               {t("registrationsEmpty")}{" "}
               <Link href="/dogadjaji" className="font-semibold text-sea underline underline-offset-2">
                 {t("qaEvents")}
@@ -284,7 +284,7 @@ export default async function DashboardOverviewPage({
               {(regRows ?? []).map((registration) => {
                 const event = eventById.get(registration.event_id);
                 return (
-                  <li key={registration.id} className="flex items-baseline justify-between gap-3 text-[13.5px]">
+                  <li key={registration.id} className="flex items-baseline justify-between gap-3 text-[14.5px]">
                     {event ? (
                       <Link href={`/dogadjaji/${event.slug}/prijava`} className="font-semibold hover:text-sea">
                         {event.name}

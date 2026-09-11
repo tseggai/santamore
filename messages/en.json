@@ -1008,7 +1008,10 @@
     "expiresOn": "valid until {date}",
     "showAll": "Show all {count}",
     "showLess": "Show less",
-    "settings": "Connection settings"
+    "notConnectedHeading": "Strava not connected",
+    "autoSyncNote": "New runs arrive on their own within a minute; the page also refreshes when you open it.",
+    "trendEmptyDisconnected": "Connect Strava to see kilometres per week.",
+    "activitiesEmptyDisconnected": "Your runs from the last 8 weeks appear here once connected."
   },
   "giving": {
     "title": "My giving",

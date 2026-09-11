@@ -61,8 +61,8 @@ export function RegistrationForm({
   };
 
   const selectClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[15px] outline-none focus:border-sea";
-  const labelClass = "text-[13px] font-semibold";
+    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
+  const labelClass = "text-[14px] font-semibold";
 
   return (
     <form onSubmit={submit} className="max-w-lg space-y-4">
@@ -129,7 +129,7 @@ export function RegistrationForm({
 
       {/* waiver: summary + link to the full terms, acceptance recorded with
           its version */}
-      <div className="max-h-44 space-y-2 overflow-y-auto rounded-brand border-[1.5px] border-line bg-sand px-4 py-3 text-[12.5px] leading-relaxed text-ink/75">
+      <div className="max-h-44 space-y-2 overflow-y-auto rounded-brand border-[1.5px] border-line bg-sand px-4 py-3 text-[13.5px] leading-relaxed text-ink/75">
         <p>{t("waiver1")}</p>
         <p>{t("waiver2")}</p>
         <p>{t("waiver3")}</p>
@@ -143,7 +143,7 @@ export function RegistrationForm({
           </Link>
         </p>
       </div>
-      <label className="flex items-start gap-2.5 text-[13.5px] font-semibold">
+      <label className="flex items-start gap-2.5 text-[14.5px] font-semibold">
         <input
           type="checkbox"
           required
@@ -155,17 +155,17 @@ export function RegistrationForm({
       </label>
 
       {state === "error" ? (
-        <p role="alert" className="text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="text-[14px] font-semibold text-red-dark">
           {t("error")}
         </p>
       ) : null}
       {state === "closed" ? (
-        <p role="alert" className="text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="text-[14px] font-semibold text-red-dark">
           {t("registrationClosed")}
         </p>
       ) : null}
       {state === "full" ? (
-        <p role="alert" className="text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="text-[14px] font-semibold text-red-dark">
           {t("registrationFull")}
         </p>
       ) : null}
@@ -173,7 +173,7 @@ export function RegistrationForm({
       <button
         type="submit"
         disabled={state === "busy" || !waiverAccepted}
-        className="w-full rounded-xl bg-red px-6 py-3.5 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+        className="w-full rounded-xl bg-red px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
       >
         {t("submit")}
       </button>

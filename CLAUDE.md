@@ -29,13 +29,16 @@ or legal text. Use `[[PLACEHOLDER: description]]` and log every one in `docs/PLA
 
 ```
 red #F35353 · red-dark #D93B3B · ink #36434B · paper #FFFFFF
-sea #0E3A46 · sea-2 #15505F · mist #EAF1F2 · sand #F6F3EE
+sea #0E3A46 · sea-2 #15505F · mist #F1F5F6 · mist-2 #E3EBED · sand #F6F3EE
 ```
 
-Cormorant Garamond (display: big, light, elegant — never bolded) · DM Sans (body,
-Helvetica Neue in the fallback stack) · DM Mono (money, references, ledger).
-All faces must render Montenegrin diacritics: č ć š ž đ.
-(Ink and type softened from the original prototype values by owner decision, 2026-09.)
+One family everywhere: **Nunito** (owner decision 2026-09-11) — display is the same
+face at weight 800 with generous line height, body at 500/16px, figures (money,
+references, distances) at 600 with tabular digits via `font-mono`. Type styles live
+in `app/globals.css` (`type-display`, `type-eyebrow`, `type-figure`, `type-caption`
+and the `--text-*` scale); nothing that carries content goes below 14px. Boxes are
+mist surfaces without borders; sections separate with 0.5px lines.
+All text must render Montenegrin diacritics (č ć š ž đ) and Cyrillic.
 
 ## Reference files
 

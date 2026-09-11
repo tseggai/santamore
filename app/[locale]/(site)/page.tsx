@@ -87,7 +87,7 @@ export default async function HomePage({
       )
     : null;
 
-  const eyebrowClass = "font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80";
+  const eyebrowClass = "font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80";
 
   return (
     <div className="mx-auto max-w-6xl px-5 pb-20">
@@ -97,10 +97,10 @@ export default async function HomePage({
         <h1 className="type-display mt-3 max-w-3xl text-4xl leading-[1.08] sm:text-6xl">
           {t("title")}
         </h1>
-        <p className="mt-5 max-w-2xl text-[15.5px] leading-relaxed text-ink/70">
+        <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-ink/70">
           {t("sub")}
         </p>
-        <p className="mt-6 font-mono text-[13px] text-sea">
+        <p className="mt-6 font-mono text-[14px] text-sea">
           <span className="type-display text-3xl tabular-nums">{money(receivedCents)}</span>{" "}
           {t("liveTotal")}
         </p>
@@ -108,20 +108,20 @@ export default async function HomePage({
           <DonateButton
             request={{ kind: "campaign" }}
             href="/podrzi"
-            className="rounded-xl bg-red px-6 py-3.5 text-[15.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+            className="rounded-xl bg-red px-6 py-3.5 text-[16.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
           >
             {t("ctaDonate")}
           </DonateButton>
           {nextEvent ? (
             <Link
               href={`/dogadjaji/${nextEvent.slug}`}
-              className="rounded-xl border-[1.5px] border-line px-6 py-3.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+              className="rounded-xl border-[1.5px] border-line px-6 py-3.5 text-[15.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
             >
               {t("ctaRegister")}
             </Link>
           ) : null}
         </div>
-        <p className="mt-8 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[12px] text-sea">
+        <p className="mt-8 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13px] text-sea">
           {t("heroPhotoNote")}
         </p>
       </section>
@@ -131,7 +131,7 @@ export default async function HomePage({
         {content.triad.map((item) => (
           <div key={item.big}>
             <p className="type-display text-5xl text-red">{item.big}</p>
-            <p className="mt-2 max-w-xs text-[13.5px] leading-relaxed text-ink/70">
+            <p className="mt-2 max-w-xs text-[14.5px] leading-relaxed text-ink/70">
               {item.label}
             </p>
           </div>
@@ -144,9 +144,9 @@ export default async function HomePage({
         <div className="mt-5 grid gap-6 sm:grid-cols-3">
           {content.steps.map((step, index) => (
             <div key={step.title} className="rounded-brand border-[1.5px] border-line px-5 py-4">
-              <span className="font-mono text-[11px] text-red">0{index + 1}</span>
+              <span className="font-mono text-[12px] text-red">0{index + 1}</span>
               <p className="type-display mt-1 text-xl">{step.title}</p>
-              <p className="mt-2 text-[13px] leading-relaxed text-ink/65">{step.desc}</p>
+              <p className="mt-2 text-[14px] leading-relaxed text-ink/65">{step.desc}</p>
             </div>
           ))}
         </div>
@@ -157,11 +157,11 @@ export default async function HomePage({
         <section className="border-t border-line-soft py-12">
           <div className="flex flex-wrap items-center justify-between gap-5 rounded-brand bg-sea px-6 py-6 text-paper">
             <div>
-              <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-paper/70">
+              <p className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-paper/70">
                 {t("nextEvent")}
               </p>
               <p className="type-display mt-1 text-2xl">{nextEvent.name}</p>
-              <p className="mt-1 text-[13px] text-paper/75">
+              <p className="mt-1 text-[14px] text-paper/75">
                 {dateFormat.format(new Date(nextEvent.starts_at))}
                 {daysToEvent !== null ? (
                   <>
@@ -176,7 +176,7 @@ export default async function HomePage({
             </div>
             <Link
               href={`/dogadjaji/${nextEvent.slug}/prijava`}
-              className="rounded-xl bg-red px-6 py-3.5 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+              className="rounded-xl bg-red px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
             >
               {tEvents("registerCta")}
             </Link>
@@ -189,7 +189,7 @@ export default async function HomePage({
         <p className={eyebrowClass}>{t("fundsHeading")}</p>
         <ul className="mt-4 max-w-2xl space-y-2">
           {content.funds.map((line) => (
-            <li key={line} className="flex gap-2.5 text-[14.5px] leading-relaxed">
+            <li key={line} className="flex gap-2.5 text-[15.5px] leading-relaxed">
               <span aria-hidden className="mt-[9px] h-[6px] w-[6px] shrink-0 rounded-full bg-red" />
               {line}
             </li>
@@ -197,7 +197,7 @@ export default async function HomePage({
         </ul>
         <Link
           href="/transparentnost"
-          className="mt-4 inline-block text-[13.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+          className="mt-4 inline-block text-[14.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
         >
           {content.fundsCta}
         </Link>
@@ -222,7 +222,7 @@ export default async function HomePage({
           </div>
           <Link
             href="/dashboard"
-            className="mt-4 inline-block rounded-xl border-[1.5px] border-line px-5 py-3 text-[14px] font-semibold transition-colors hover:border-sea hover:text-sea"
+            className="mt-4 inline-block rounded-xl border-[1.5px] border-line px-5 py-3 text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea"
           >
             {tLb("cta")}
           </Link>
@@ -251,7 +251,7 @@ export default async function HomePage({
           </div>
           <Link
             href="/galerija"
-            className="mt-3 inline-block text-[13.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+            className="mt-3 inline-block text-[14.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
           >
             {t("galleryCta")}
           </Link>
@@ -268,8 +268,8 @@ export default async function HomePage({
                 key={chapter.slug}
                 className="rounded-brand border-[1.5px] border-line px-5 py-3.5"
               >
-                <p className="text-[14.5px] font-semibold">{chapter.name}</p>
-                <p className="mt-0.5 font-mono text-[12.5px] tabular-nums text-sea">
+                <p className="text-[15.5px] font-semibold">{chapter.name}</p>
+                <p className="mt-0.5 font-mono text-[13.5px] tabular-nums text-sea">
                   {money(chapter.raised_cents)}
                 </p>
               </div>
@@ -281,12 +281,12 @@ export default async function HomePage({
       {/* 9 — partner wall (placeholder until real, consented logos exist) */}
       <section className="border-t border-line-soft py-12">
         <p className={eyebrowClass}>{t("partnersHeading")}</p>
-        <p className="mt-4 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[12.5px] text-sea">
+        <p className="mt-4 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
           {t("partnersNote")}
         </p>
         <Link
           href="/partneri"
-          className="mt-3 inline-block text-[13.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+          className="mt-3 inline-block text-[14.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
         >
           {t("partnersCta")}
         </Link>
@@ -295,7 +295,7 @@ export default async function HomePage({
       {/* 10 — beneficiary story (needs a real story with consent) */}
       <section className="border-t border-line-soft py-12">
         <p className={eyebrowClass}>{t("storyHeading")}</p>
-        <p className="mt-4 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[12.5px] text-sea">
+        <p className="mt-4 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
           {t("storyNote")}
         </p>
       </section>
@@ -303,7 +303,7 @@ export default async function HomePage({
       {/* 11 — newsletter + monthly donor club */}
       <section className="border-t border-line-soft py-12">
         <p className={eyebrowClass}>{t("newsletterHeading")}</p>
-        <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-ink/70">
+        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-ink/70">
           {t("newsletterSub")}
         </p>
         <div className="mt-4">

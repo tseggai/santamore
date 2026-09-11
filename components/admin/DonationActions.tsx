@@ -43,7 +43,7 @@ export function DonationActions({
   };
 
   if (refundState === "done") {
-    return <span className="text-[12px] font-semibold text-sea">{t("refundDone")}</span>;
+    return <span className="text-[13px] font-semibold text-sea">{t("refundDone")}</span>;
   }
 
   return (
@@ -59,20 +59,20 @@ export function DonationActions({
             onChange={(event) => setReason(event.target.value)}
             placeholder={t("refundReason")}
             maxLength={500}
-            className="w-44 rounded-[9px] border-[1.5px] border-line bg-paper px-2.5 py-1.5 text-[12.5px] outline-none focus:border-sea"
+            className="w-44 rounded-[9px] border-[1.5px] border-line bg-paper px-2.5 py-1.5 text-[13.5px] outline-none focus:border-sea"
           />
           <button
             type="button"
             disabled={refundState === "busy" || reason.trim().length < 3}
             onClick={refund}
-            className="rounded-lg bg-red px-3 py-1.5 text-[12px] font-bold text-paper hover:bg-red-dark disabled:opacity-50"
+            className="rounded-lg bg-red px-3 py-1.5 text-[13px] font-bold text-paper hover:bg-red-dark disabled:opacity-50"
           >
             {t("refundConfirm")}
           </button>
           <button
             type="button"
             onClick={() => setReasonOpen(false)}
-            className="text-[12px] font-semibold text-ink/60 hover:text-ink"
+            className="text-[13px] font-semibold text-ink/60 hover:text-ink"
           >
             {t("cancel")}
           </button>
@@ -81,27 +81,27 @@ export function DonationActions({
         <button
           type="button"
           onClick={() => setReasonOpen(true)}
-          className="rounded-lg border-[1.5px] border-line px-3 py-1.5 text-[12px] font-semibold hover:border-red hover:text-red-dark"
+          className="rounded-lg border-[1.5px] border-line px-3 py-1.5 text-[13px] font-semibold hover:border-red hover:text-red-dark"
         >
           {t("refund")}
         </button>
       )}
       {hasEmail ? (
         resendState === "done" ? (
-          <span className="text-[12px] font-semibold text-sea">{t("resendDone")}</span>
+          <span className="text-[13px] font-semibold text-sea">{t("resendDone")}</span>
         ) : (
           <button
             type="button"
             disabled={resendState === "busy"}
             onClick={resend}
-            className="rounded-lg border-[1.5px] border-line px-3 py-1.5 text-[12px] font-semibold hover:border-sea hover:text-sea disabled:opacity-50"
+            className="rounded-lg border-[1.5px] border-line px-3 py-1.5 text-[13px] font-semibold hover:border-sea hover:text-sea disabled:opacity-50"
           >
             {t("resendReceipt")}
           </button>
         )
       ) : null}
       {refundState === "error" || resendState === "error" ? (
-        <span role="alert" className="text-[12px] font-semibold text-red-dark">
+        <span role="alert" className="text-[13px] font-semibold text-red-dark">
           {t("actionError")}
         </span>
       ) : null}

@@ -114,7 +114,7 @@ export default async function EditPagePage({
 
   return (
     <div className="py-8">
-      <p className="text-[12.5px]">
+      <p className="text-[13.5px]">
         <Link href="/dashboard/stranice" className="font-semibold text-sea underline underline-offset-2">
           ← {t("navPages")}
         </Link>
@@ -133,7 +133,7 @@ export default async function EditPagePage({
             />
             <Link
               href={`/f/${mine.slug}`}
-              className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+              className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
             >
               {t("viewPublic")} ↗
             </Link>
@@ -183,9 +183,9 @@ export default async function EditPagePage({
         />
       ) : null}
 
-      <section id="gotovina" className="mt-10 scroll-mt-6 rounded-brand border-[1.5px] border-line p-5">
-        <h2 className="text-[15px] font-bold">{t("logCash")}</h2>
-        <p className="mt-1 text-[13.5px] leading-relaxed text-ink/65">{t("cashSub")}</p>
+      <section id="gotovina" className="mt-10 scroll-mt-6 rounded-brand bg-mist p-5">
+        <h2 className="text-[16px] font-bold">{t("logCash")}</h2>
+        <p className="mt-1 text-[14.5px] leading-relaxed text-ink/65">{t("cashSub")}</p>
         <div className="mt-4">
           <CashForm fundraiserId={mine.id} />
         </div>
@@ -194,14 +194,14 @@ export default async function EditPagePage({
             {cash.map((row) => (
               <li
                 key={row.id}
-                className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t border-line-soft py-2.5 text-[13.5px]"
+                className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t-[0.5px] border-line py-2.5 text-[14.5px]"
               >
                 <span className="font-mono tabular-nums text-ink/60">{row.created_at.slice(0, 10)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="font-semibold">{row.donor_name ?? tRunner("anonymous")}</span>
                   {row.message ? <span className="text-ink/55"> · {row.message}</span> : null}
                 </span>
-                <span className={`text-[12.5px] ${row.status === "approved" ? "text-sea" : "text-ink/50"}`}>
+                <span className={`text-[13.5px] ${row.status === "approved" ? "text-sea" : "text-ink/50"}`}>
                   {row.status === "approved" ? t("cashConfirmed") : t("cashAwaiting")}
                 </span>
                 <span className="font-mono font-medium tabular-nums">{money(row.amount_cents)}</span>

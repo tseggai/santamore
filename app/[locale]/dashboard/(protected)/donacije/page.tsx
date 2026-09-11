@@ -62,14 +62,14 @@ export default async function GivingPage({
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("title")}</h1>
-      <p className="mt-2 text-[14px] leading-relaxed text-ink/65">
+      <p className="mt-2 text-[15px] leading-relaxed text-ink/65">
         {t("sub", { email: user.email ?? "" })}
       </p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map((tile) => (
-          <div key={tile.label} className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3.5">
-            <p className="text-[12px] font-semibold text-ink/60">{tile.label}</p>
+          <div key={tile.label} className="rounded-brand bg-mist px-4 py-3.5">
+            <p className="text-[13px] font-semibold text-ink/60">{tile.label}</p>
             <p
               className={`mt-1 font-mono text-2xl tabular-nums ${
                 tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-ink"
@@ -81,16 +81,16 @@ export default async function GivingPage({
         ))}
       </div>
       {fees > 0 ? (
-        <p className="mt-2 text-[12.5px] text-ink/60">{t("feesNote", { amount: money(fees) })}</p>
+        <p className="mt-2 text-[13.5px] text-ink/60">{t("feesNote", { amount: money(fees) })}</p>
       ) : null}
 
       {subscriptions.length > 0 ? (
         <section className="mt-8">
-          <h2 className="text-[15px] font-bold">{t("monthlyHeading")}</h2>
+          <h2 className="text-[16px] font-bold">{t("monthlyHeading")}</h2>
           <ul className="mt-3 space-y-2">
             {subscriptions.map((sub) => (
-              <li key={sub.id} className="flex flex-wrap items-baseline justify-between gap-2 rounded-[11px] border-[1.5px] border-line px-4 py-3 text-[13.5px]">
-                <span className="font-mono text-[14px] font-medium tabular-nums">{money(sub.amount_cents)} / {t("month")}</span>
+              <li key={sub.id} className="flex flex-wrap items-baseline justify-between gap-2 rounded-[11px] bg-mist px-4 py-3 text-[14.5px]">
+                <span className="font-mono text-[15px] font-medium tabular-nums">{money(sub.amount_cents)} / {t("month")}</span>
                 <span className={sub.status === "active" ? "text-sea" : "text-ink/55"}>
                   {t(`subscriptionStatus.${sub.status}`)}
                   {sub.next_charge_on ? ` · ${t("nextCharge", { date: sub.next_charge_on })}` : ""}
@@ -98,14 +98,14 @@ export default async function GivingPage({
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-[12.5px] text-ink/55">{t("monthlyManageNote")}</p>
+          <p className="mt-2 text-[13.5px] text-ink/55">{t("monthlyManageNote")}</p>
         </section>
       ) : null}
 
       <section className="mt-8">
-        <h2 className="text-[15px] font-bold">{t("historyHeading")}</h2>
+        <h2 className="text-[16px] font-bold">{t("historyHeading")}</h2>
         {donations.length === 0 ? (
-          <p className="mt-2 text-[13.5px] text-ink/60">
+          <p className="mt-2 text-[14.5px] text-ink/60">
             {t("empty")}{" "}
             <Link href="/podrzi" className="font-semibold text-sea underline underline-offset-2">
               {t("giveCta")}
@@ -116,7 +116,7 @@ export default async function GivingPage({
         )}
       </section>
 
-      <p className="mt-8 text-[12.5px] leading-relaxed text-ink/55">{t("privacyNote")}</p>
+      <p className="mt-8 text-[13.5px] leading-relaxed text-ink/55">{t("privacyNote")}</p>
     </div>
   );
 }

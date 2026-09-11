@@ -15,6 +15,7 @@ export function ShareButton({
   copiedLabel,
   variant = "primary",
   text,
+  className,
 }: {
   title: string;
   /** Site-absolute path to share, e.g. "/me/f/ana". */
@@ -24,6 +25,8 @@ export function ShareButton({
   variant?: "primary" | "ghost" | "icon";
   /** Pre-written message for the share sheet (WhatsApp, Viber…); the copy fallback still copies the bare URL. */
   text?: string;
+  /** Icon variant only: replaces the default surface classes. */
+  className?: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -50,7 +53,7 @@ export function ShareButton({
           onClick={share}
           aria-label={label}
           title={label}
-          className="inline-flex h-11 w-11 items-center justify-center rounded-xl border-[1.5px] border-line text-ink transition-colors hover:border-sea hover:text-sea"
+          className={className ?? "inline-flex h-11 w-11 items-center justify-center rounded-xl bg-mist text-ink transition-colors hover:bg-mist-2 hover:text-sea"}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
             <path
@@ -69,7 +72,7 @@ export function ShareButton({
         {copied ? (
           <span
             aria-hidden
-            className="absolute left-1/2 top-full mt-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-ink px-2 py-1 text-[11px] font-semibold text-paper"
+            className="absolute left-1/2 top-full mt-1.5 -translate-x-1/2 whitespace-nowrap rounded-md bg-ink px-2 py-1 text-[12px] font-semibold text-paper"
           >
             {copiedLabel}
           </span>
@@ -78,13 +81,13 @@ export function ShareButton({
     );
   }
 
-  const className =
+  const buttonClass =
     variant === "primary"
-      ? "block w-full rounded-xl bg-red px-6 py-3.5 text-center text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
-      : "block w-full rounded-xl border-[1.5px] border-line px-6 py-3 text-center text-[14px] font-semibold transition-colors hover:border-sea hover:text-sea";
+      ? "block w-full rounded-xl bg-red px-6 py-3.5 text-center text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+      : "block w-full rounded-xl border-[1.5px] border-line px-6 py-3 text-center text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea";
 
   return (
-    <button type="button" onClick={share} aria-live="polite" className={className}>
+    <button type="button" onClick={share} aria-live="polite" className={buttonClass}>
       {copied ? copiedLabel : label}
     </button>
   );

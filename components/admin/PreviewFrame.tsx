@@ -29,7 +29,7 @@ export function PreviewFrame({
           type="button"
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
-          className="rounded-lg border-[1.5px] border-line bg-paper px-3 py-1.5 text-[12.5px] font-semibold hover:border-sea hover:text-sea"
+          className="rounded-lg border-[1.5px] border-line bg-paper px-3 py-1.5 text-[13.5px] font-semibold hover:border-sea hover:text-sea"
         >
           {open ? t("previewHide") : t("previewShow")}
         </button>
@@ -41,7 +41,7 @@ export function PreviewFrame({
                 type="button"
                 aria-pressed={width === option}
                 onClick={() => setWidth(option)}
-                className="px-3 py-1.5 text-[12px] font-semibold aria-pressed:bg-ink aria-pressed:text-paper"
+                className="px-3 py-1.5 text-[13px] font-semibold aria-pressed:bg-ink aria-pressed:text-paper"
               >
                 {t(`preview.${option}`)}
               </button>
@@ -52,7 +52,7 @@ export function PreviewFrame({
           <Link
             href={liveHref}
             target="_blank"
-            className="text-[12.5px] font-semibold text-sea underline underline-offset-2"
+            className="text-[13.5px] font-semibold text-sea underline underline-offset-2"
           >
             {t("previewOpenLive")} ↗
           </Link>
@@ -60,7 +60,7 @@ export function PreviewFrame({
       </div>
       {open ? (
         <div className="mt-3">
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.14em] text-ink/50">
+          <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink/50">
             {t("previewNote")}
           </p>
           <div

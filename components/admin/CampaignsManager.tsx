@@ -73,8 +73,8 @@ function fromDateInput(value: string, endOfDay: boolean): string | null {
 }
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-sea";
-const labelClass = "text-[12.5px] font-semibold";
+  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
+const labelClass = "text-[13.5px] font-semibold";
 
 function CampaignForm({
   campaign,
@@ -331,7 +331,7 @@ function CampaignForm({
           </label>
           {defaultPicker("cMonthlyDefault", monthly, monthlyDefault, setMonthlyDefault)}
         </div>
-        <label className="flex items-center gap-2 text-[13.5px] sm:col-span-2">
+        <label className="flex items-center gap-2 text-[14.5px] sm:col-span-2">
           <input
             type="checkbox"
             checked={isPublic}
@@ -341,20 +341,20 @@ function CampaignForm({
           {t("campPublic")}
         </label>
       </div>
-      <p className="mt-2 text-[12px] text-ink/55">{t("campAmountsHint")}</p>
+      <p className="mt-2 text-[13px] text-ink/55">{t("campAmountsHint")}</p>
 
       {state === "error" ? (
-        <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">
           {t("actionError")}
         </p>
       ) : null}
       {state === "slug" ? (
-        <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">
           {t("evSlugTaken")}
         </p>
       ) : null}
       {state === "invalid" ? (
-        <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">
           {t("evInvalid")}
         </p>
       ) : null}
@@ -367,14 +367,14 @@ function CampaignForm({
         <button
           type="submit"
           disabled={state === "busy"}
-          className="rounded-xl bg-ink px-5 py-2.5 text-[13.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="rounded-xl bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {campaign ? t("evSave") : t("campCreate")}
         </button>
         <button
           type="button"
           onClick={onDone}
-          className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+          className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
         >
           {t("cancel")}
         </button>
@@ -405,21 +405,21 @@ export function CampaignsManager({
         <button
           type="button"
           onClick={() => setOpen("new")}
-          className="rounded-xl bg-red px-4 py-2.5 text-[13.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+          className="rounded-xl bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
         >
           + {t("campNew")}
         </button>
       )}
 
       {campaigns.length === 0 ? (
-        <p className="text-[13.5px] text-ink/60">{t("campEmpty")}</p>
+        <p className="text-[14.5px] text-ink/60">{t("campEmpty")}</p>
       ) : (
         <ul className="space-y-2">
           {campaigns.map((campaign) => (
             <li key={campaign.id} className="rounded-brand border-[1.5px] border-line px-4 py-3.5">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div className="min-w-0 flex-1">
-                  <p className="flex flex-wrap items-center gap-2 text-[14.5px] font-bold">
+                  <p className="flex flex-wrap items-center gap-2 text-[15.5px] font-bold">
                     {campaign.is_public ? (
                       <Link href={`/kampanje/${campaign.slug}`} className="hover:underline">
                         {campaign.title}
@@ -428,7 +428,7 @@ export function CampaignsManager({
                       campaign.title
                     )}
                     <span
-                      className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
+                      className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
                         campaign.is_public
                           ? "bg-sea text-paper"
                           : "border border-line text-ink/60"
@@ -437,7 +437,7 @@ export function CampaignsManager({
                       {campaign.is_public ? t("campPublicBadge") : t("postDraft")}
                     </span>
                   </p>
-                  <p className="mt-0.5 text-[12.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-ink/60">
                     <span className="font-mono">{campaign.payment_reference}</span>
                     {" · "}
                     {t("campRaised", { amount: money(campaign.raised_cents) })}
@@ -449,7 +449,7 @@ export function CampaignsManager({
                 <button
                   type="button"
                   onClick={() => setOpen(open === campaign.id ? "" : campaign.id)}
-                  className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea"
+                  className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea"
                 >
                   {t("evEdit")}
                 </button>
