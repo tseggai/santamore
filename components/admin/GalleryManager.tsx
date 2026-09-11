@@ -31,7 +31,7 @@ export interface EventOption {
 type State = "idle" | "busy" | "error";
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-sea";
+  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 
 /**
  * Batch photo upload (downscaled client-side) plus the publish/take-down
@@ -117,23 +117,23 @@ export function GalleryManager({
     <div className="mt-4">
       <form onSubmit={submit} className="grid max-w-xl gap-3">
         <label className="block">
-          <span className="text-[13px] font-semibold">{t("galleryFiles")}</span>
+          <span className="text-[14px] font-semibold">{t("galleryFiles")}</span>
           <input
             type="file"
             multiple
             accept="image/jpeg,image/png,image/webp"
             onChange={onFiles}
             disabled={uploading}
-            className="mt-1 block text-[13.5px] file:mr-3 file:rounded-lg file:border-0 file:bg-sea file:px-4 file:py-2 file:font-semibold file:text-paper"
+            className="mt-1 block text-[14.5px] file:mr-3 file:rounded-lg file:border-0 file:bg-sea file:px-4 file:py-2 file:font-semibold file:text-paper"
           />
         </label>
         {paths.length > 0 ? (
-          <p className="font-mono text-[12px] text-sea">
+          <p className="font-mono text-[13px] text-sea">
             {t("galleryUploaded", { count: paths.length })}
           </p>
         ) : null}
         <div className="grid gap-3 sm:grid-cols-3">
-          <label className="text-[13px] font-semibold">
+          <label className="text-[14px] font-semibold">
             {t("galleryEvent")}
             <select name="event" className={inputClass}>
               <option value="">—</option>
@@ -144,28 +144,28 @@ export function GalleryManager({
               ))}
             </select>
           </label>
-          <label className="text-[13px] font-semibold">
+          <label className="text-[14px] font-semibold">
             {t("galleryCaption")}
             <input name="caption" maxLength={300} className={inputClass} />
           </label>
-          <label className="text-[13px] font-semibold">
+          <label className="text-[14px] font-semibold">
             {t("galleryCredit")}
             <input name="credit" maxLength={120} className={inputClass} />
           </label>
         </div>
-        <label className="flex items-center gap-2 text-[13.5px] font-semibold">
+        <label className="flex items-center gap-2 text-[14.5px] font-semibold">
           <input type="checkbox" name="publish" defaultChecked className="h-4 w-4 accent-sea" />
           {t("galleryPublishNow")}
         </label>
         <button
           type="submit"
           disabled={state === "busy" || uploading || paths.length === 0}
-          className="rounded-xl bg-sea px-5 py-3 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
+          className="rounded-xl bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
         >
           {t("gallerySave")}
         </button>
         {state === "error" ? (
-          <p role="alert" className="text-[13px] font-semibold text-red-dark">
+          <p role="alert" className="text-[14px] font-semibold text-red-dark">
             {t("actionError")}
           </p>
         ) : null}
@@ -191,7 +191,7 @@ export function GalleryManager({
                     className="aspect-[4/3] w-full rounded-[8px] object-cover"
                   />
                 ) : null}
-                <p className="mt-1 truncate text-[11.5px] text-ink/60">
+                <p className="mt-1 truncate text-[12.5px] text-ink/60">
                   {item.caption ?? "—"}
                 </p>
                 <div className="mt-1 flex items-center gap-1.5">
@@ -199,7 +199,7 @@ export function GalleryManager({
                     type="button"
                     disabled={rowBusy === item.id}
                     onClick={() => toggle(item)}
-                    className="rounded-lg border-[1.5px] border-line px-2 py-0.5 text-[11.5px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
+                    className="rounded-lg border-[1.5px] border-line px-2 py-0.5 text-[12.5px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
                   >
                     {item.is_published ? t("galleryUnpublish") : t("galleryPublish")}
                   </button>
@@ -207,7 +207,7 @@ export function GalleryManager({
                     type="button"
                     disabled={rowBusy === item.id}
                     onClick={() => remove(item)}
-                    className="rounded-lg px-1.5 py-0.5 text-[11.5px] font-semibold text-ink/50 hover:text-red-dark disabled:opacity-40"
+                    className="rounded-lg px-1.5 py-0.5 text-[12.5px] font-semibold text-ink/50 hover:text-red-dark disabled:opacity-40"
                   >
                     {t("galleryDelete")}
                   </button>

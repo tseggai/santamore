@@ -99,11 +99,11 @@ export default async function TeamPage({
       <header className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">
         <Avatar src={photo} name={team.name} size={136} priority className="sm:mt-1" />
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+          <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
             {t("teamEyebrow")}
           </p>
           <h1 className="type-display mt-1 text-3xl leading-tight sm:text-4xl">{team.name}</h1>
-          <p className="mt-2 text-[13.5px] leading-relaxed text-ink/70">
+          <p className="mt-2 text-[14.5px] leading-relaxed text-ink/70">
             {t("memberCount", { count: team.member_count })}
             {" · "}
             <Link
@@ -116,7 +116,7 @@ export default async function TeamPage({
           <div className="mt-4 flex items-center gap-2">
             <Link
               href={`/dashboard/stranice?team=${team.id}`}
-              className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+              className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
             >
               {t("joinTeam")}
             </Link>
@@ -140,11 +140,11 @@ export default async function TeamPage({
             locale={locale as Locale}
           />
         ) : (
-          <div className="rounded-brand bg-[#f3f6f7] px-5 py-5">
+          <div className="rounded-brand bg-mist px-5 py-5">
             <span className="type-display block text-4xl tabular-nums">
               {formatCents(team.raised_cents, locale as Locale, { trimWholeCents: true })}
             </span>
-            <span className="mt-1 block text-[12.5px] text-ink/70">
+            <span className="mt-1 block text-[13.5px] text-ink/70">
               {t("teamRaisedBy", { count: team.member_count })} ·{" "}
               <span className="font-mono tabular-nums">{team.donor_count}</span>{" "}
               {tRunner("donors")}
@@ -155,20 +155,20 @@ export default async function TeamPage({
 
       {team.description ? (
         <>
-          <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
+          <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
             {t("teamAbout")}
           </p>
-          <p className="mt-2 whitespace-pre-line text-[15px] leading-relaxed text-ink/80">
+          <p className="mt-2 whitespace-pre-line text-[16px] leading-relaxed text-ink/80">
             {team.description}
           </p>
         </>
       ) : null}
 
       <div className="my-7 h-px bg-line-soft" />
-      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
         {t("teamMembers")}
       </p>
-      <p className="mt-1 text-[12.5px] text-ink/55">{t("teamMembersHint")}</p>
+      <p className="mt-1 text-[13.5px] text-ink/55">{t("teamMembersHint")}</p>
       <LeaderboardList
         locale={locale as Locale}
         emptyLabel={t("emptyIndividuals")}

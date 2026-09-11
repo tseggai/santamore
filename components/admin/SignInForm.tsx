@@ -34,7 +34,7 @@ export function SignInForm({
   const [detail, setDetail] = useState<{ rateLimited: boolean; message: string } | null>(null);
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[15px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[16px] outline-none focus:border-sea";
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -87,15 +87,15 @@ export function SignInForm({
   if (state === "sent" || state === "verifying" || state === "codeError") {
     return (
       <div className="space-y-4">
-        <p className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[14px] text-sea">
+        <p className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[15px] text-sea">
           {t("linkSent")}
         </p>
         <form onSubmit={verifyCode} className="space-y-3">
           <div>
-            <label htmlFor="adminCode" className="text-[13px] font-semibold">
+            <label htmlFor="adminCode" className="text-[14px] font-semibold">
               {t("codeLabel")}
             </label>
-            <p className="mt-0.5 text-[12.5px] text-ink/60">{t("codeHint")}</p>
+            <p className="mt-0.5 text-[13.5px] text-ink/60">{t("codeHint")}</p>
             <input
               id="adminCode"
               type="text"
@@ -108,14 +108,14 @@ export function SignInForm({
             />
           </div>
           {state === "codeError" ? (
-            <p role="alert" className="text-[13px] font-semibold text-red-dark">
+            <p role="alert" className="text-[14px] font-semibold text-red-dark">
               {t("codeError")}
             </p>
           ) : null}
           <button
             type="submit"
             disabled={state === "verifying"}
-            className="w-full rounded-xl bg-sea px-6 py-3.5 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
+            className="w-full rounded-xl bg-sea px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
           >
             {t("codeSubmit")}
           </button>
@@ -127,7 +127,7 @@ export function SignInForm({
   return (
     <form onSubmit={submit} className="space-y-3">
       <div>
-        <label htmlFor="adminEmail" className="text-[13px] font-semibold">
+        <label htmlFor="adminEmail" className="text-[14px] font-semibold">
           {t("emailLabel")}
         </label>
         <input
@@ -141,19 +141,19 @@ export function SignInForm({
         />
       </div>
       {state === "error" ? (
-        <div role="alert" className="text-[13px] text-red-dark">
+        <div role="alert" className="text-[14px] text-red-dark">
           <p className="font-semibold">
             {detail?.rateLimited ? t("linkRateLimited") : t("linkError")}
           </p>
           {detail?.message ? (
-            <p className="mt-0.5 font-mono text-[11.5px] text-ink/55">{detail.message}</p>
+            <p className="mt-0.5 font-mono text-[12.5px] text-ink/55">{detail.message}</p>
           ) : null}
         </div>
       ) : null}
       <button
         type="submit"
         disabled={state === "sending"}
-        className="w-full rounded-xl bg-sea px-6 py-3.5 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
+        className="w-full rounded-xl bg-sea px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
       >
         {t("sendLink")}
       </button>

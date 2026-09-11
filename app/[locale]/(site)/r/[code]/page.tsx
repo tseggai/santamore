@@ -74,11 +74,11 @@ export default async function AwardPage({
 
   return (
     <div className="mx-auto max-w-md px-5 py-12">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
         {award.partner_name}
       </p>
       <h1 className="type-display mt-1 text-3xl">{award.reward_label}</h1>
-      <p className="mt-2 text-[14px] text-ink/70">
+      <p className="mt-2 text-[15px] text-ink/70">
         {t("awardFor", { name: award.participant_name ?? t("someone") })} ·{" "}
         <Link
           href={`/izazovi/${award.challenge_slug}`}
@@ -89,14 +89,14 @@ export default async function AwardPage({
       </p>
 
       <div className="mt-5 flex flex-col items-center rounded-brand border-[1.5px] border-line p-5">
-        <span className={`rounded-full px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] ${tone}`}>
+        <span className={`rounded-full px-3 py-1 font-mono text-[12px] uppercase tracking-[0.14em] ${tone}`}>
           {t(`awardStatus.${award.status}`)}
         </span>
         <div className="mt-4">
           <QrImage value={url} alt={t("qrAlt")} size={220} />
         </div>
-        <p className="mt-3 font-mono text-[22px] tracking-[0.2em]">{award.code}</p>
-        <p className="mt-2 text-center text-[12.5px] text-ink/60">
+        <p className="mt-3 font-mono text-[23px] tracking-[0.2em]">{award.code}</p>
+        <p className="mt-2 text-center text-[13.5px] text-ink/60">
           {t("earnedOn", { date: dateFormat.format(new Date(award.awarded_on)) })}
           {" · "}
           {award.status === "redeemed" && award.redeemed_at
@@ -120,7 +120,7 @@ export default async function AwardPage({
           variant="ghost"
         />
       </div>
-      <p className="mt-4 text-[12px] leading-relaxed text-ink/50">{t("awardNote")}</p>
+      <p className="mt-4 text-[13px] leading-relaxed text-ink/50">{t("awardNote")}</p>
     </div>
   );
 }

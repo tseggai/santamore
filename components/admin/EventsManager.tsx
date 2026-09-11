@@ -58,14 +58,14 @@ export function EventsManager({
         <button
           type="button"
           onClick={() => setOpen("new")}
-          className="rounded-xl bg-red px-4 py-2.5 text-[13.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+          className="rounded-xl bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
         >
           + {t("evNew")}
         </button>
       )}
 
       {events.length === 0 ? (
-        <p className="text-[13.5px] text-ink/60">{t("regNoEvents")}</p>
+        <p className="text-[14.5px] text-ink/60">{t("regNoEvents")}</p>
       ) : (
         <ul className="space-y-2">
           {events.map((event) => (
@@ -75,7 +75,7 @@ export function EventsManager({
             >
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div className="min-w-0 flex-1">
-                  <p className="flex flex-wrap items-center gap-2 text-[14.5px] font-bold">
+                  <p className="flex flex-wrap items-center gap-2 text-[15.5px] font-bold">
                     {event.is_published ? (
                       <Link href={`/dogadjaji/${event.slug}`} className="hover:underline">
                         {event.name}
@@ -84,7 +84,7 @@ export function EventsManager({
                       event.name
                     )}
                     <span
-                      className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
+                      className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
                         event.is_published
                           ? "bg-sea text-paper"
                           : "border border-line text-ink/60"
@@ -92,17 +92,17 @@ export function EventsManager({
                     >
                       {event.is_published ? t("postLive") : t("postDraft")}
                     </span>
-                    <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-ink/60">
+                    <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink/60">
                       {event.kind === "challenge" ? t("evKindChallenge") : t("evKindRace")}
                     </span>
                   </p>
-                  <p className="mt-0.5 text-[12.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-ink/60">
                     <span className="font-mono tabular-nums">{dateLabels[event.id]}</span>
                     {event.venue ? <> · {event.venue}</> : null}
                     {" · "}
                     <span className="font-mono">/dogadjaji/{event.slug}</span>
                   </p>
-                  <p className="mt-0.5 text-[12.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-ink/60">
                     {t("evCounts", { registrations: event.registrations, pages: event.pages })}
                   </p>
                 </div>
@@ -110,7 +110,7 @@ export function EventsManager({
                   <button
                     type="button"
                     onClick={() => setOpen(open === event.id ? "" : event.id)}
-                    className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea"
+                    className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea"
                   >
                     {t("evEdit")}
                   </button>
@@ -118,7 +118,7 @@ export function EventsManager({
                     type="button"
                     disabled={busy === event.id}
                     onClick={() => togglePublished(event)}
-                    className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
+                    className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
                   >
                     {event.is_published ? t("galleryUnpublish") : t("galleryPublish")}
                   </button>

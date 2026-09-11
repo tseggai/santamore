@@ -59,19 +59,19 @@ export default async function ChallengesIndexPage({
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
       <h1 className="type-display text-4xl">{t("title")}</h1>
-      <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink/70">{t("sub")}</p>
+      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-ink/70">{t("sub")}</p>
 
       <ol className="mt-6 grid gap-3 sm:grid-cols-3">
         {(["step1", "step2", "step3"] as const).map((step, index) => (
-          <li key={step} className="rounded-brand bg-[#f3f6f7] px-4 py-3.5 text-[13.5px] leading-relaxed">
-            <span className="font-mono text-[11px] text-red">0{index + 1}</span>
+          <li key={step} className="rounded-brand bg-mist px-4 py-3.5 text-[14.5px] leading-relaxed">
+            <span className="font-mono text-[12px] text-red">0{index + 1}</span>
             <span className="mt-1 block">{t(step)}</span>
           </li>
         ))}
       </ol>
 
       {challenges.length === 0 ? (
-        <p className="mt-8 text-[14px] text-ink/60">{t("empty")}</p>
+        <p className="mt-8 text-[15px] text-ink/60">{t("empty")}</p>
       ) : (
         <ul className="mt-8 space-y-3">
           {challenges.map((challenge) => {
@@ -85,20 +85,20 @@ export default async function ChallengesIndexPage({
                   href={`/izazovi/${challenge.slug}`}
                   className="block rounded-brand border-[1.5px] border-line px-5 py-4 transition-colors hover:border-sea"
                 >
-                  <span className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+                  <span className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
                     {challenge.partner_name}
                   </span>
                   <span className="mt-1 flex flex-wrap items-baseline justify-between gap-2">
                     <span className="type-display text-2xl">{challenge.title}</span>
-                    <span className="rounded-full bg-red px-3 py-1 text-[12.5px] font-bold text-paper">
+                    <span className="rounded-full bg-red px-3 py-1 text-[13.5px] font-bold text-paper">
                       {challenge.reward_label}
                     </span>
                   </span>
-                  <span className="mt-2 block text-[13.5px] leading-relaxed text-ink/70">
+                  <span className="mt-2 block text-[14.5px] leading-relaxed text-ink/70">
                     <PerkRule challenge={challenge} />
                   </span>
                   {left !== null ? (
-                    <span className="mt-2 block font-mono text-[12px] tabular-nums text-sea">
+                    <span className="mt-2 block font-mono text-[13px] tabular-nums text-sea">
                       {t("leftToday", { count: left })}
                     </span>
                   ) : null}
@@ -109,13 +109,13 @@ export default async function ChallengesIndexPage({
         </ul>
       )}
 
-      <div className="mt-10 rounded-brand border-[1.5px] border-dashed border-line px-5 py-4 text-[13.5px] leading-relaxed text-ink/70">
+      <div className="mt-10 rounded-brand border-[1.5px] border-dashed border-line px-5 py-4 text-[14.5px] leading-relaxed text-ink/70">
         {t("noPageNeeded")} {t("howNote")}{" "}
         <Link href="/dashboard/strava" className="font-semibold text-sea underline underline-offset-2">
           {t("connectCta")}
         </Link>
       </div>
-      <p className="mt-4 text-[12px] text-ink/50">{t("poweredBy")}</p>
+      <p className="mt-4 text-[13px] text-ink/50">{t("poweredBy")}</p>
     </div>
   );
 }

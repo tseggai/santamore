@@ -38,7 +38,7 @@ export function FundraiserStatusButtons({
           type="button"
           disabled={state === "busy"}
           onClick={() => set("active")}
-          className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
+          className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
         >
           {t("pageActivate")}
         </button>
@@ -48,13 +48,13 @@ export function FundraiserStatusButtons({
           type="button"
           disabled={state === "busy"}
           onClick={() => set("hidden")}
-          className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-red hover:text-red-dark disabled:opacity-40"
+          className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-red hover:text-red-dark disabled:opacity-40"
         >
           {t("pageHide")}
         </button>
       ) : null}
       {state === "error" ? (
-        <span role="alert" className="text-[12px] font-semibold text-red-dark">
+        <span role="alert" className="text-[13px] font-semibold text-red-dark">
           {t("actionError")}
         </span>
       ) : null}
@@ -88,12 +88,12 @@ export function MessageHideButton({
         type="button"
         disabled={state === "busy"}
         onClick={toggle}
-        className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
+        className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
       >
         {hidden ? t("messageShow") : t("messageHide")}
       </button>
       {state === "error" ? (
-        <span role="alert" className="text-[12px] font-semibold text-red-dark">
+        <span role="alert" className="text-[13px] font-semibold text-red-dark">
           {t("actionError")}
         </span>
       ) : null}

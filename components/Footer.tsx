@@ -41,10 +41,10 @@ export default function Footer() {
       <div className="mx-auto grid max-w-6xl gap-10 px-5 py-12 sm:grid-cols-2 lg:grid-cols-3">
         <div>
           <Image src={logoWhite} alt={tc("siteName")} className="h-16 w-auto" />
-          <h2 className="mt-5 font-mono text-[11px] uppercase tracking-[0.16em] text-mist/70">
+          <h2 className="mt-5 font-mono text-[12px] uppercase tracking-[0.16em] text-mist/70">
             {t("orgHeading")}
           </h2>
-          <ul className="mt-3 space-y-1.5 text-[13px] leading-relaxed text-mist/90">
+          <ul className="mt-3 space-y-1.5 text-[14px] leading-relaxed text-mist/90">
             <li>{t("orgName")}</li>
             <li>{t("orgAddress")}</li>
             <li>{t("orgId")}</li>
@@ -55,7 +55,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-mist/70">
+          <h2 className="font-mono text-[12px] uppercase tracking-[0.16em] text-mist/70">
             {t("siteHeading")}
           </h2>
           <ul className="mt-3 space-y-1.5">
@@ -63,7 +63,7 @@ export default function Footer() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="text-[13px] text-mist/90 hover:text-paper hover:underline"
+                  className="text-[14px] text-mist/90 hover:text-paper hover:underline"
                 >
                   {t(`site.${item.key}`)}
                 </Link>
@@ -73,7 +73,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h2 className="font-mono text-[11px] uppercase tracking-[0.16em] text-mist/70">
+          <h2 className="font-mono text-[12px] uppercase tracking-[0.16em] text-mist/70">
             {t("legalHeading")}
           </h2>
           <ul className="mt-3 space-y-1.5">
@@ -81,7 +81,7 @@ export default function Footer() {
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="text-[13px] text-mist/90 hover:text-paper hover:underline"
+                  className="text-[14px] text-mist/90 hover:text-paper hover:underline"
                 >
                   {t(`legal.${item.key}`)}
                 </Link>
@@ -94,7 +94,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-paper/20">
-        <p className="mx-auto max-w-6xl px-5 py-5 text-[12.5px] text-mist/80">
+        <p className="mx-auto max-w-6xl px-5 py-5 text-[13.5px] text-mist/80">
           {t("note")}
         </p>
       </div>

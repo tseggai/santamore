@@ -8,6 +8,7 @@ import {
   type MyTeam,
   type TeamEventChoice,
 } from "@/components/dashboard/TeamsManager";
+import { ExternalIcon, PencilIcon } from "@/components/Icons";
 import { ShareButton } from "@/components/ShareButton";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
@@ -190,11 +191,13 @@ export default async function PagesHubPage({
   }));
 
   const single = pages.length === 1;
+  const iconBtn =
+    "inline-flex h-10 w-10 items-center justify-center rounded-xl bg-paper text-ink transition-colors hover:bg-mist-2 hover:text-sea";
 
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{single ? t("title") : t("navPages")}</h1>
-      <p className="mt-2 text-[14px] leading-relaxed text-ink/65">
+      <p className="mt-2 text-[15px] leading-relaxed text-ink/65">
         {pages.length === 0 ? t("hubEmptySub") : t("pagesSub")}
       </p>
 
@@ -211,21 +214,54 @@ export default async function PagesHubPage({
                 : 0;
             const live = page.status === "active";
             return (
-              <li key={page.id} className="rounded-brand border-[1.5px] border-line p-4 sm:p-5">
+              <li key={page.id} className="rounded-brand bg-mist p-4 sm:p-5">
                 <div className="flex items-start gap-3 sm:gap-4">
                   <Avatar src={fundraiserPhotoUrl(page.photo_path)} name={page.title} size={single ? 64 : 48} />
                   <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className={`font-semibold ${single ? "text-[18px]" : "text-[15px]"}`}>{page.title}</span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
-                          live ? "bg-sea text-paper" : "border border-line text-ink/60"
-                        }`}
-                      >
-                        {live ? t("statusActiveShort") : t("statusDraftShort")}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                      <span className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                        <span className={`font-bold ${single ? "text-[20px]" : "text-[16px]"}`}>{page.title}</span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
+                            live ? "bg-sea text-paper" : "bg-paper text-ink/60"
+                          }`}
+                        >
+                          {live ? t("statusActiveShort") : t("statusDraftShort")}
+                        </span>
+                      </span>
+                      <span className="flex items-center gap-1.5">
+                        <Link
+                          href={`/dashboard/stranice/${page.slug}`}
+                          aria-label={live ? t("editPage") : t("finishPage")}
+                          title={live ? t("editPage") : t("finishPage")}
+                          className={iconBtn}
+                        >
+                          <PencilIcon />
+                        </Link>
+                        {live ? (
+                          <>
+                            <ShareButton
+                              title={page.title}
+                              path={`/${locale}/f/${page.slug}`}
+                              text={t("shareMessageShort", { title: page.title })}
+                              label={tRunner("share")}
+                              copiedLabel={tDonate("copied")}
+                              variant="icon"
+                              className={iconBtn}
+                            />
+                            <Link
+                              href={`/f/${page.slug}`}
+                              aria-label={t("viewPublic")}
+                              title={t("viewPublic")}
+                              className={iconBtn}
+                            >
+                              <ExternalIcon />
+                            </Link>
+                          </>
+                        ) : null}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-[12.5px] text-ink/60">
+                    <p className="mt-1 text-[14px] text-ink/60">
                       {event?.name ?? "—"}
                       {event?.starts_at ? ` · ${dateFormat.format(new Date(event.starts_at))}` : ""}
                       {team ? (
@@ -238,50 +274,26 @@ export default async function PagesHubPage({
                       ) : null}
                     </p>
                     <div className="mt-3 flex items-baseline justify-between gap-3">
-                      <span className="font-mono text-[15px] font-medium tabular-nums">
+                      <span className="font-mono text-[16px] tabular-nums">
                         {money(raised)}
                         {page.goal_cents ? (
-                          <span className="text-[12.5px] text-ink/50"> / {money(page.goal_cents)}</span>
+                          <span className="text-[13.5px] font-medium text-ink/50"> / {money(page.goal_cents)}</span>
                         ) : null}
                       </span>
-                      <span className="text-[12.5px] text-ink/55">
+                      <span className="text-[13.5px] text-ink/55">
                         {totals?.donor_count ?? 0} {tRunner("donors")}
                         {page.goal_cents ? ` · ${pct}%` : ""}
                       </span>
                     </div>
-                    <span className="mt-1.5 block h-[6px] overflow-hidden rounded-[3px] bg-line-soft">
+                    <span className="mt-1.5 block h-[6px] overflow-hidden rounded-[3px] bg-mist-2">
                       <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
                     </span>
                   </div>
                 </div>
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <Link
-                    href={`/dashboard/stranice/${page.slug}`}
-                    className="rounded-xl bg-ink px-4 py-2.5 text-[13.5px] font-bold text-paper transition-opacity hover:opacity-90"
-                  >
-                    {live ? t("editPage") : t("finishPage")}
-                  </Link>
-                  {live ? (
-                    <>
-                      <ShareButton
-                        title={page.title}
-                        path={`/${locale}/f/${page.slug}`}
-                        text={t("shareMessageShort", { title: page.title })}
-                        label={tRunner("share")}
-                        copiedLabel={tDonate("copied")}
-                        variant="icon"
-                      />
-                      <Link
-                        href={`/f/${page.slug}`}
-                        className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
-                      >
-                        {t("viewPublic")} ↗
-                      </Link>
-                    </>
-                  ) : null}
+                <div className="mt-4">
                   <Link
                     href={`/dashboard/stranice/${page.slug}#gotovina`}
-                    className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+                    className="inline-flex rounded-xl bg-ink px-4 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90"
                   >
                     {t("qaCash")}
                   </Link>
@@ -292,15 +304,15 @@ export default async function PagesHubPage({
         </ul>
       ) : null}
 
-      <section id="timovi" className="mt-8 scroll-mt-6">
-        <h2 className="text-[15px] font-bold">{t("navTeams")}</h2>
-        <p className="mt-1 text-[13.5px] leading-relaxed text-ink/65">{t("teamsSub")}</p>
+      <section id="timovi" className="mt-8 scroll-mt-6 border-t-[0.5px] border-line pt-6">
+        <h2 className="text-[16px] font-bold">{t("navTeams")}</h2>
+        <p className="mt-1 text-[14.5px] leading-relaxed text-ink/65">{t("teamsSub")}</p>
         <TeamsManager teams={myTeams} events={teamEventChoices} />
       </section>
 
-      <section className="mt-8 rounded-brand border-[1.5px] border-line p-5">
-        <h2 className="text-[15px] font-bold">{pages.length === 0 ? t("createHeading") : t("createAnotherHeading")}</h2>
-        <p className="mt-1 text-[13.5px] leading-relaxed text-ink/65">
+      <section className="mt-8 border-t-[0.5px] border-line pt-6">
+        <h2 className="text-[16px] font-bold">{pages.length === 0 ? t("createHeading") : t("createAnotherHeading")}</h2>
+        <p className="mt-1 text-[14.5px] leading-relaxed text-ink/65">
           {choices.length === 0 ? t("createNoEvents") : t("createSub")}
         </p>
         {choices.length > 0 ? (

@@ -109,20 +109,20 @@ export default async function FundraisersDirectoryPage({
 
   return (
     <div className="mx-auto max-w-xl px-5 py-12">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
         {board?.event.name ?? "Santamore"}
       </p>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
         <h1 className="type-display text-3xl">{t("title")}</h1>
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-1.5 rounded-xl bg-red px-4 py-2.5 text-[14px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-red px-4 py-2.5 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
         >
-          <span aria-hidden className="text-[17px] leading-none">+</span>
+          <span aria-hidden className="text-[18px] leading-none">+</span>
           {t("myPageCta")}
         </Link>
       </div>
-      <p className="mt-2 text-[13.5px] text-ink/65">
+      <p className="mt-2 text-[14.5px] text-ink/65">
         <span className="font-mono tabular-nums">{board?.activeCount ?? 0}</span>{" "}
         {t("activeFundraisers")} ·{" "}
         <span className="font-mono tabular-nums">

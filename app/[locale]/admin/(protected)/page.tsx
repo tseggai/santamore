@@ -134,7 +134,7 @@ export default async function AdminOverviewPage({
 
   return (
     <div className="py-8">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
         {t("consoleBadge")}
       </p>
       <h1 className="type-display mt-2 text-3xl">{t("navOverview")}</h1>
@@ -146,7 +146,7 @@ export default async function AdminOverviewPage({
             key={tile.label}
             className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3.5"
           >
-            <p className="text-[12px] font-semibold text-ink/60">{tile.label}</p>
+            <p className="text-[13px] font-semibold text-ink/60">{tile.label}</p>
             <p
               className={`mt-1 font-mono text-2xl tabular-nums ${
                 tile.tone === "red"
@@ -165,8 +165,8 @@ export default async function AdminOverviewPage({
       {/* 30-day money-in */}
       <section className="mt-8">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-[15px] font-bold">{t("chartHeading")}</h2>
-          <p className="font-mono text-[13px] tabular-nums text-ink/60">
+          <h2 className="text-[16px] font-bold">{t("chartHeading")}</h2>
+          <p className="font-mono text-[14px] tabular-nums text-ink/60">
             {t("chartTotal", { amount: money(data.chartTotal) })}
           </p>
         </div>
@@ -185,7 +185,7 @@ export default async function AdminOverviewPage({
 
       {/* work queues */}
       <section className="mt-8">
-        <h2 className="text-[15px] font-bold">{t("queueHeading")}</h2>
+        <h2 className="text-[16px] font-bold">{t("queueHeading")}</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           {queues.map((queue, index) => (
             <Link
@@ -200,7 +200,7 @@ export default async function AdminOverviewPage({
               >
                 {queue.count}
               </p>
-              <p className="mt-1 text-[12.5px] font-semibold text-ink/70">{queue.label}</p>
+              <p className="mt-1 text-[13.5px] font-semibold text-ink/70">{queue.label}</p>
             </Link>
           ))}
         </div>
@@ -208,7 +208,7 @@ export default async function AdminOverviewPage({
 
       {/* platform state */}
       <section className="mt-8">
-        <h2 className="text-[15px] font-bold">{t("stateHeading")}</h2>
+        <h2 className="text-[16px] font-bold">{t("stateHeading")}</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Link
             href="/admin/prijave"
@@ -218,7 +218,7 @@ export default async function AdminOverviewPage({
               {data.regConfirmed}
               <span className="text-ink/40"> / {data.regTotal}</span>
             </p>
-            <p className="mt-1 text-[12.5px] font-semibold text-ink/70">
+            <p className="mt-1 text-[13.5px] font-semibold text-ink/70">
               {t("stateRegistrations")}
             </p>
           </Link>
@@ -233,7 +233,7 @@ export default async function AdminOverviewPage({
                 / {data.pageCounts.active + data.pageCounts.draft + data.pageCounts.hidden}
               </span>
             </p>
-            <p className="mt-1 text-[12.5px] font-semibold text-ink/70">
+            <p className="mt-1 text-[13.5px] font-semibold text-ink/70">
               {t("statePages", {
                 draft: data.pageCounts.draft,
                 hidden: data.pageCounts.hidden,

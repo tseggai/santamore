@@ -52,14 +52,14 @@ export function InboundForm({
   };
 
   const inputClass =
-    "w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[15px] outline-none focus:border-sea";
-  const labelClass = "text-[13px] font-semibold";
+    "w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
+  const labelClass = "text-[14px] font-semibold";
 
   if (state === "done") {
     return (
       <p
         role="status"
-        className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[14px] text-sea"
+        className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[15px] text-sea"
       >
         {t(`success_${kind}`)}
       </p>
@@ -95,12 +95,12 @@ export function InboundForm({
         <button
           type="submit"
           disabled={state === "busy"}
-          className="rounded-xl bg-sea px-5 py-3 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
+          className="rounded-xl bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
         >
           {t("submit")}
         </button>
         {state === "error" ? (
-          <p role="alert" className="w-full text-[13px] font-semibold text-red-dark">
+          <p role="alert" className="w-full text-[14px] font-semibold text-red-dark">
             {t("error")}
           </p>
         ) : null}
@@ -185,14 +185,14 @@ export function InboundForm({
         className="absolute -left-[9999px] h-px w-px opacity-0"
       />
       {state === "error" ? (
-        <p role="alert" className="text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="text-[14px] font-semibold text-red-dark">
           {t("error")}
         </p>
       ) : null}
       <button
         type="submit"
         disabled={state === "busy"}
-        className="w-full rounded-xl bg-red px-6 py-3.5 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+        className="w-full rounded-xl bg-red px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
       >
         {state === "busy" ? t("sending") : t("submit")}
       </button>

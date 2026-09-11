@@ -31,8 +31,8 @@ export function SignOutButton({
       onClick={signOut}
       className={
         variant === "dark"
-          ? "rounded-lg border-[1.5px] border-paper/30 px-3 py-1.5 text-[12.5px] font-semibold text-paper/80 transition-colors hover:border-paper hover:text-paper"
-          : "rounded-lg border-[1.5px] border-line px-3 py-1.5 text-[12.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+          ? "rounded-lg border-[1.5px] border-paper/30 px-3 py-1.5 text-[13.5px] font-semibold text-paper/80 transition-colors hover:border-paper hover:text-paper"
+          : "rounded-lg border-[1.5px] border-line px-3 py-1.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
       }
     >
       {t("signOut")}

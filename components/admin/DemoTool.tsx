@@ -11,7 +11,7 @@ import {
 } from "@/app/[locale]/admin/(protected)/demo/actions";
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 font-mono text-[14px] tabular-nums outline-none focus:border-sea";
+  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 font-mono text-[15px] tabular-nums outline-none focus:border-sea";
 
 export function DemoTool({
   counts,
@@ -69,17 +69,17 @@ export function DemoTool({
         ).map(([key, value]) => (
           <div key={key} className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3">
             <p className="font-mono text-2xl tabular-nums">{value}</p>
-            <p className="mt-0.5 text-[12px] font-semibold text-ink/60">{t(key)}</p>
+            <p className="mt-0.5 text-[13px] font-semibold text-ink/60">{t(key)}</p>
           </div>
         ))}
       </div>
 
       <form onSubmit={generate} className="rounded-brand border-[1.5px] border-line p-4 sm:p-5">
-        <h2 className="text-[15px] font-bold">{t("demoGenerateHeading")}</h2>
-        <p className="mt-1 text-[13px] text-ink/60">{t("demoGenerateHint")}</p>
+        <h2 className="text-[16px] font-bold">{t("demoGenerateHeading")}</h2>
+        <p className="mt-1 text-[14px] text-ink/60">{t("demoGenerateHint")}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <div>
-            <label htmlFor="demoTeams" className="text-[12.5px] font-semibold">
+            <label htmlFor="demoTeams" className="text-[13.5px] font-semibold">
               {t("demoTeamsLabel")}
             </label>
             <input
@@ -93,7 +93,7 @@ export function DemoTool({
             />
           </div>
           <div>
-            <label htmlFor="demoPerTeam" className="text-[12.5px] font-semibold">
+            <label htmlFor="demoPerTeam" className="text-[13.5px] font-semibold">
               {t("demoPerTeamLabel")}
             </label>
             <input
@@ -107,7 +107,7 @@ export function DemoTool({
             />
           </div>
           <div>
-            <label htmlFor="demoDonations" className="text-[12.5px] font-semibold">
+            <label htmlFor="demoDonations" className="text-[13.5px] font-semibold">
               {t("demoDonationsLabel")}
             </label>
             <input
@@ -124,29 +124,29 @@ export function DemoTool({
         <button
           type="submit"
           disabled={busy !== ""}
-          className="mt-4 rounded-xl bg-red px-5 py-2.5 text-[13.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+          className="mt-4 rounded-xl bg-red px-5 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
         >
           {busy === "generate" ? t("demoGenerating") : t("demoGenerate")}
         </button>
       </form>
 
       <div className="rounded-brand border-[1.5px] border-dashed border-red bg-red/5 p-4 sm:p-5">
-        <h2 className="text-[15px] font-bold text-red-dark">{t("demoPurgeHeading")}</h2>
-        <p className="mt-1 text-[13px] text-ink/70">{t("demoPurgeHint")}</p>
+        <h2 className="text-[16px] font-bold text-red-dark">{t("demoPurgeHeading")}</h2>
+        <p className="mt-1 text-[14px] text-ink/70">{t("demoPurgeHint")}</p>
         {confirmPurge ? (
           <div className="mt-3 flex gap-2">
             <button
               type="button"
               disabled={busy !== ""}
               onClick={purge}
-              className="rounded-xl bg-red-dark px-5 py-2.5 text-[13.5px] font-bold text-paper disabled:opacity-60"
+              className="rounded-xl bg-red-dark px-5 py-2.5 text-[14.5px] font-bold text-paper disabled:opacity-60"
             >
               {busy === "purge" ? t("demoPurging") : t("demoPurgeConfirm")}
             </button>
             <button
               type="button"
               onClick={() => setConfirmPurge(false)}
-              className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold"
+              className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold"
             >
               {t("cancel")}
             </button>
@@ -156,7 +156,7 @@ export function DemoTool({
             type="button"
             disabled={busy !== "" || !hasDemo}
             onClick={() => setConfirmPurge(true)}
-            className="mt-3 rounded-xl border-[1.5px] border-red px-5 py-2.5 text-[13.5px] font-bold text-red-dark transition-colors hover:bg-red hover:text-paper disabled:opacity-40"
+            className="mt-3 rounded-xl border-[1.5px] border-red px-5 py-2.5 text-[14.5px] font-bold text-red-dark transition-colors hover:bg-red hover:text-paper disabled:opacity-40"
           >
             {t("demoPurge")}
           </button>
@@ -165,13 +165,13 @@ export function DemoTool({
 
       {result ? (
         result.ok ? (
-          <p className="text-[13.5px] font-semibold text-sea" role="status">
+          <p className="text-[14.5px] font-semibold text-sea" role="status">
             {result.created
               ? t("demoCreated", result.created)
               : t("demoPurged", { count: result.purged?.users ?? 0 })}
           </p>
         ) : (
-          <p role="alert" className="text-[13.5px] font-semibold text-red-dark">
+          <p role="alert" className="text-[14.5px] font-semibold text-red-dark">
             {result.error === "no_event" ? t("demoNoEvent") : t("actionError")}
             {result.created && result.created.users > 0
               ? ` ${t("demoPartial", result.created)}`

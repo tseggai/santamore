@@ -50,7 +50,7 @@ export default async function AdminLayout({
     return (
       <div className="mx-auto max-w-md px-5 py-20">
         <h1 className="type-display text-3xl">{t("adminTitle")}</h1>
-        <p className="mt-5 rounded-brand border-[1.5px] border-dashed border-red bg-red/5 px-5 py-4 text-[14px] text-red-dark">
+        <p className="mt-5 rounded-brand border-[1.5px] border-dashed border-red bg-red/5 px-5 py-4 text-[15px] text-red-dark">
           {t("noAccess")}
         </p>
         <div className="mt-6">
@@ -74,7 +74,7 @@ export default async function AdminLayout({
         <>
           <Link
             href="/"
-            className="whitespace-nowrap rounded-[9px] px-3.5 py-2 text-[12.5px] font-medium text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper"
+            className="whitespace-nowrap rounded-[9px] px-3.5 py-2 text-[13.5px] font-medium text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper"
           >
             {t("viewSite")} ↗
           </Link>

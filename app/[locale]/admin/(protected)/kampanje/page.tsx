@@ -53,7 +53,7 @@ export default async function AdminCampaignsPage({
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("campaignsTitle")}</h1>
-      <p className="mt-1 text-[13px] text-ink/60">{t("campaignsHint")}</p>
+      <p className="mt-1 text-[14px] text-ink/60">{t("campaignsHint")}</p>
       <CampaignsManager
         locale={locale as Locale}
         campaigns={rows}

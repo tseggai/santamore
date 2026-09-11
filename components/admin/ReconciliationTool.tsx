@@ -115,12 +115,12 @@ export function ReconciliationTool({
   const money = (cents: number) => formatCents(cents, locale);
 
   const selectClass =
-    "mt-1 w-full rounded-[9px] border-[1.5px] border-line bg-paper px-2.5 py-2 text-[13.5px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-[9px] border-[1.5px] border-line bg-paper px-2.5 py-2 text-[14.5px] outline-none focus:border-sea";
 
   return (
     <section className="mt-10 rounded-brand border-[1.5px] border-line px-4 py-4">
-      <h2 className="text-[15px] font-bold">{t("uploadHeading")}</h2>
-      <p className="mt-1 text-[13px] text-ink/60">{t("uploadHint")}</p>
+      <h2 className="text-[16px] font-bold">{t("uploadHeading")}</h2>
+      <p className="mt-1 text-[14px] text-ink/60">{t("uploadHint")}</p>
 
       <label className="mt-3 inline-block">
         <span className="sr-only">{t("chooseFile")}</span>
@@ -128,18 +128,18 @@ export function ReconciliationTool({
           type="file"
           accept=".csv,text/csv"
           onChange={onFile}
-          className="text-[13.5px] file:mr-3 file:rounded-lg file:border-0 file:bg-sea file:px-4 file:py-2 file:font-semibold file:text-paper"
+          className="text-[14.5px] file:mr-3 file:rounded-lg file:border-0 file:bg-sea file:px-4 file:py-2 file:font-semibold file:text-paper"
         />
       </label>
 
       {rawRows ? (
         <>
-          <p className="mt-2 font-mono text-[12px] text-ink/60">
+          <p className="mt-2 font-mono text-[13px] text-ink/60">
             {t("statementRows", {
               count: hasHeader ? rawRows.length - 1 : rawRows.length,
             })}
           </p>
-          <label className="mt-3 flex items-center gap-2 text-[13.5px] font-semibold">
+          <label className="mt-3 flex items-center gap-2 text-[14.5px] font-semibold">
             <input
               type="checkbox"
               checked={hasHeader}
@@ -150,7 +150,7 @@ export function ReconciliationTool({
           </label>
 
           <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            <label className="text-[13px] font-semibold">
+            <label className="text-[14px] font-semibold">
               {t("colDate")}
               <select
                 value={dateColumn}
@@ -164,7 +164,7 @@ export function ReconciliationTool({
                 ))}
               </select>
             </label>
-            <label className="text-[13px] font-semibold">
+            <label className="text-[14px] font-semibold">
               {t("colAmount")}
               <select
                 value={amountColumn}
@@ -178,7 +178,7 @@ export function ReconciliationTool({
                 ))}
               </select>
             </label>
-            <fieldset className="text-[13px] font-semibold">
+            <fieldset className="text-[14px] font-semibold">
               <legend>{t("colDescription")}</legend>
               <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
                 {Array.from({ length: columnCount }, (_, index) => (
@@ -205,7 +205,7 @@ export function ReconciliationTool({
           <button
             type="button"
             onClick={propose}
-            className="mt-4 rounded-xl bg-sea px-5 py-2.5 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2"
+            className="mt-4 rounded-xl bg-sea px-5 py-2.5 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2"
           >
             {t("propose")}
           </button>
@@ -221,7 +221,7 @@ export function ReconciliationTool({
             return (
               <li
                 key={index}
-                className="rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[13.5px]"
+                className="rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[14.5px]"
               >
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <span className="font-mono tabular-nums text-ink/60">{row.dateText}</span>
@@ -233,7 +233,7 @@ export function ReconciliationTool({
 
                 {proposal.kind === "matched" ? (
                   <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-mist px-2.5 py-0.5 font-mono text-[11px] text-sea">
+                    <span className="rounded-full bg-mist px-2.5 py-0.5 font-mono text-[12px] text-sea">
                       {t("matchFound")}
                     </span>
                     <span>
@@ -243,7 +243,7 @@ export function ReconciliationTool({
                       </span>
                     </span>
                     {proposal.pledge.target === "registration" ? (
-                      <span className="rounded-full bg-sand px-2.5 py-0.5 font-mono text-[11px] text-ink/70">
+                      <span className="rounded-full bg-sand px-2.5 py-0.5 font-mono text-[12px] text-ink/70">
                         {t("targetFee")}
                       </span>
                     ) : null}
@@ -263,7 +263,7 @@ export function ReconciliationTool({
                             approveTarget(proposal.pledge, row.amountCents, approvedAtIso),
                           )
                         }
-                        className="rounded-lg bg-red px-3.5 py-1.5 text-[12.5px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
+                        className="rounded-lg bg-red px-3.5 py-1.5 text-[13.5px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
                       >
                         {proposal.amountMatches || row.amountCents === null
                           ? t("approve")
@@ -291,7 +291,7 @@ export function ReconciliationTool({
                           <span className="font-mono tabular-nums">
                             {money(candidate.amountCents)}
                           </span>
-                          <span className="font-mono text-[12px] tabular-nums text-ink/50">
+                          <span className="font-mono text-[13px] tabular-nums text-ink/50">
                             {candidate.createdAt.slice(0, 10)}
                           </span>
                           {state === "done" ? null : (
@@ -303,7 +303,7 @@ export function ReconciliationTool({
                                   approveTarget(candidate, row.amountCents, approvedAtIso),
                                 )
                               }
-                              className="rounded-lg border-[1.5px] border-line px-3 py-1 text-[12px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
+                              className="rounded-lg border-[1.5px] border-line px-3 py-1 text-[13px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
                             >
                               {t("approve")}
                             </button>
@@ -337,7 +337,7 @@ export function ReconciliationTool({
                             }),
                           )
                         }
-                        className="rounded-lg border-[1.5px] border-line px-3.5 py-1.5 text-[12.5px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-50"
+                        className="rounded-lg border-[1.5px] border-line px-3.5 py-1.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-50"
                       >
                         {t("createRow")}
                       </button>

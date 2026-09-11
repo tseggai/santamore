@@ -44,7 +44,7 @@ export function PerkProgressList({ rows, limit }: { rows: PerkProgressRow[]; lim
   const [open, setOpen] = useState(false);
 
   if (rows.length === 0) {
-    return <p className="mt-2 text-[13.5px] text-ink/60">{t("progressEmpty")}</p>;
+    return <p className="mt-2 text-[14.5px] text-ink/60">{t("progressEmpty")}</p>;
   }
   const visible = limit && !open ? rows.slice(0, limit) : rows;
 
@@ -69,12 +69,12 @@ export function PerkProgressList({ rows, limit }: { rows: PerkProgressRow[]; lim
               ? { text: t("progressNeedMore", { km: km(shortfall) }), tone: "text-red-dark" }
               : { text: t("progressNeedRun", { km: km(row.min_distance_m) }), tone: "text-ink/70" };
         return (
-          <li key={row.challenge_id} className="rounded-[11px] border-[1.5px] border-line px-4 py-3">
+          <li key={row.challenge_id} className="rounded-[11px] bg-paper px-4 py-3">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-              <span className="min-w-0 text-[14px] font-semibold">
+              <span className="min-w-0 text-[15px] font-semibold">
                 {row.reward_label} · {row.partner_name}
               </span>
-              <span className="font-mono text-[12.5px] tabular-nums text-ink/60">
+              <span className="font-mono text-[13.5px] tabular-nums text-ink/60">
                 {t("progressDays", { done, needed })} · {window}
               </span>
             </div>
@@ -84,7 +84,7 @@ export function PerkProgressList({ rows, limit }: { rows: PerkProgressRow[]; lim
               aria-valuemax={needed}
               aria-valuenow={done}
               aria-label={row.title}
-              className="mt-2 h-1.5 overflow-hidden rounded-full bg-line-soft"
+              className="mt-2 h-1.5 overflow-hidden rounded-full bg-mist-2"
             >
               <div
                 className={`h-full rounded-full transition-[width] motion-reduce:transition-none ${
@@ -93,8 +93,8 @@ export function PerkProgressList({ rows, limit }: { rows: PerkProgressRow[]; lim
                 style={{ width: `${Math.round((done / needed) * 100)}%` }}
               />
             </div>
-            <p className={`mt-2 text-[13px] font-semibold ${state.tone}`}>{state.text}</p>
-            <p className="mt-0.5 text-[12px] text-ink/55">
+            <p className={`mt-2 text-[14px] font-semibold ${state.tone}`}>{state.text}</p>
+            <p className="mt-0.5 text-[13px] text-ink/55">
               {row.title} · {km(row.min_distance_m)}
               {row.max_pace_s_per_km ? ` · ${t("progressPace", { pace: pace(row.max_pace_s_per_km) })}` : ""}
               {" · "}
@@ -109,7 +109,7 @@ export function PerkProgressList({ rows, limit }: { rows: PerkProgressRow[]; lim
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="mt-2 text-[13px] font-semibold text-sea underline underline-offset-2"
+        className="mt-2 text-[14px] font-semibold text-sea underline underline-offset-2"
       >
         {open ? t("showLess") : t("showAll", { count: rows.length })}
       </button>

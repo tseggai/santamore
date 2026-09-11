@@ -49,7 +49,7 @@ export default async function DonatePage({
     return (
       <div className="mx-auto max-w-xl px-5 py-20">
         <h1 className="type-display text-3xl">{t("payVerb")}</h1>
-        <p className="mt-5 rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[14px] text-sea">
+        <p className="mt-5 rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[15px] text-sea">
           {t("errServer")}
         </p>
       </div>

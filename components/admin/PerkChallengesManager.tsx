@@ -46,8 +46,8 @@ export interface PerkChallengeAdminRow {
 const SPORTS = ["Run", "TrailRun", "VirtualRun", "Walk", "Hike", "Ride", "Swim"] as const;
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-sea";
-const labelClass = "text-[12.5px] font-semibold";
+  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
+const labelClass = "text-[13.5px] font-semibold";
 
 function toDateInput(iso: string | null): string {
   return iso ? iso.slice(0, 10) : "";
@@ -209,7 +209,7 @@ function ChallengeForm({
             {SPORTS.map((sport) => (
               <label
                 key={sport}
-                className={`cursor-pointer rounded-full border-[1.5px] px-3 py-1 text-[12.5px] font-semibold ${
+                className={`cursor-pointer rounded-full border-[1.5px] px-3 py-1 text-[13.5px] font-semibold ${
                   sports.includes(sport) ? "border-ink bg-ink text-paper" : "border-line"
                 }`}
               >
@@ -239,7 +239,7 @@ function ChallengeForm({
         <div>
           <label htmlFor="pkWindow" className={labelClass}>{t("perkWindowDays")}</label>
           <input id="pkWindow" type="number" min={1} value={windowDays} onChange={(e) => setWindowDays(e.target.value)} disabled={Number(requiredDays) <= 1} placeholder="—" className={`${inputClass} font-mono disabled:opacity-50`} />
-          <p className="mt-1 text-[12px] text-ink/55">{t("perkWindowHint")}</p>
+          <p className="mt-1 text-[13px] text-ink/55">{t("perkWindowHint")}</p>
         </div>
         <div>
           <label htmlFor="pkPartnerUrl" className={labelClass}>{t("perkPartnerUrl")}</label>
@@ -284,35 +284,35 @@ function ChallengeForm({
             placeholder={challenge?.has_pin ? "••••" : "4–8"}
             className={`${inputClass} font-mono`}
           />
-          <p className="mt-1 text-[12px] text-ink/55">{t("perkPinHint")}</p>
+          <p className="mt-1 text-[13px] text-ink/55">{t("perkPinHint")}</p>
         </div>
         <div className="space-y-2 pt-1">
-          <label className="flex items-center gap-2 text-[13.5px]">
+          <label className="flex items-center gap-2 text-[14.5px]">
             <input type="checkbox" checked={allowManual} onChange={(e) => setAllowManual(e.target.checked)} className="h-4 w-4 accent-red" />
             {t("perkAllowManual")}
           </label>
-          <label className="flex items-center gap-2 text-[13.5px]">
+          <label className="flex items-center gap-2 text-[14.5px]">
             <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 accent-red" />
             {t("perkActive")}
           </label>
         </div>
       </div>
 
-      <p className="mt-4 rounded-[11px] bg-paper px-4 py-3 text-[13px] leading-relaxed text-ink/75">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/50">{t("perkRulePreview")}</span>
+      <p className="mt-4 rounded-[11px] bg-paper px-4 py-3 text-[14px] leading-relaxed text-ink/75">
+        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink/50">{t("perkRulePreview")}</span>
         <br />
         <PerkRule challenge={preview} />
       </p>
 
-      {state === "error" ? <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">{t("actionError")}</p> : null}
-      {state === "slug" ? <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">{t("evSlugTaken")}</p> : null}
-      {state === "invalid" ? <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">{t("perkInvalid")}</p> : null}
+      {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
+      {state === "slug" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evSlugTaken")}</p> : null}
+      {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("perkInvalid")}</p> : null}
 
       <div className="mt-4 flex gap-2">
-        <button type="submit" disabled={state === "busy"} className="rounded-xl bg-ink px-5 py-2.5 text-[13.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
+        <button type="submit" disabled={state === "busy"} className="rounded-xl bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
           {challenge ? t("evSave") : t("perkCreate")}
         </button>
-        <button type="button" onClick={onDone} className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea">
+        <button type="button" onClick={onDone} className="rounded-xl border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea">
           {t("cancel")}
         </button>
       </div>
@@ -358,22 +358,22 @@ export function PerkChallengesManager({
     <div className="mt-5 space-y-6">
       {/* Strava wiring */}
       <div className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3.5">
-        <p className="text-[13.5px] font-bold">{t("webhookHeading")}</p>
+        <p className="text-[14.5px] font-bold">{t("webhookHeading")}</p>
         {!webhook.configured ? (
-          <p className="mt-1 text-[13px] text-ink/65">{t("webhookUnconfigured")}</p>
+          <p className="mt-1 text-[14px] text-ink/65">{t("webhookUnconfigured")}</p>
         ) : (
           <>
-            <p className="mt-1 text-[13px] text-ink/65">
+            <p className="mt-1 text-[14px] text-ink/65">
               {registered ? t("webhookOk") : t("webhookMissing")}{" "}
-              <span className="font-mono text-[12px]">{webhook.expectedCallback}</span>
+              <span className="font-mono text-[13px]">{webhook.expectedCallback}</span>
               {webhook.error ? <span className="block text-red-dark">{webhook.error}</span> : null}
             </p>
             {!registered ? (
-              <button type="button" disabled={hookBusy} onClick={register} className="mt-2 rounded-lg border-[1.5px] border-line bg-paper px-3 py-1.5 text-[12.5px] font-semibold hover:border-sea hover:text-sea disabled:opacity-50">
+              <button type="button" disabled={hookBusy} onClick={register} className="mt-2 rounded-lg border-[1.5px] border-line bg-paper px-3 py-1.5 text-[13.5px] font-semibold hover:border-sea hover:text-sea disabled:opacity-50">
                 {hookBusy ? "…" : t("webhookRegister")}
               </button>
             ) : null}
-            {hookNotice ? <p className="mt-2 text-[12.5px] font-semibold text-sea">{hookNotice}</p> : null}
+            {hookNotice ? <p className="mt-2 text-[13.5px] font-semibold text-sea">{hookNotice}</p> : null}
           </>
         )}
       </div>
@@ -381,44 +381,44 @@ export function PerkChallengesManager({
       {open === "new" ? (
         <ChallengeForm challenge={null} onDone={() => setOpen("")} />
       ) : (
-        <button type="button" onClick={() => setOpen("new")} className="rounded-xl bg-red px-4 py-2.5 text-[13.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark">
+        <button type="button" onClick={() => setOpen("new")} className="rounded-xl bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark">
           + {t("perkNew")}
         </button>
       )}
 
       {challenges.length === 0 ? (
-        <p className="text-[13.5px] text-ink/60">{t("perkEmpty")}</p>
+        <p className="text-[14.5px] text-ink/60">{t("perkEmpty")}</p>
       ) : (
         <ul className="space-y-2">
           {challenges.map((challenge) => (
             <li key={challenge.id} className="rounded-brand border-[1.5px] border-line px-4 py-3.5">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div className="min-w-0 flex-1">
-                  <p className="flex flex-wrap items-center gap-2 text-[14.5px] font-bold">
+                  <p className="flex flex-wrap items-center gap-2 text-[15.5px] font-bold">
                     {challenge.is_active ? (
                       <Link href={`/izazovi/${challenge.slug}`} className="hover:underline">{challenge.title}</Link>
                     ) : (
                       challenge.title
                     )}
-                    <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${challenge.is_active ? "bg-sea text-paper" : "border border-line text-ink/60"}`}>
+                    <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${challenge.is_active ? "bg-sea text-paper" : "border border-line text-ink/60"}`}>
                       {challenge.is_active ? t("perkActiveBadge") : t("postDraft")}
                     </span>
                     {!challenge.has_pin ? (
-                      <span className="rounded-full border border-red px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-red-dark">{t("perkNoPin")}</span>
+                      <span className="rounded-full border border-red px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-red-dark">{t("perkNoPin")}</span>
                     ) : null}
                   </p>
-                  <p className="mt-0.5 text-[12.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-ink/60">
                     {challenge.partner_name} · {challenge.reward_label}
                   </p>
-                  <p className="mt-0.5 text-[12.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-ink/60">
                     <PerkRule challenge={challenge} />
                   </p>
-                  <p className="mt-0.5 font-mono text-[12px] tabular-nums text-ink/60">
+                  <p className="mt-0.5 font-mono text-[13px] tabular-nums text-ink/60">
                     {t("perkStats", { today: challenge.issued_today, issued: challenge.issued, redeemed: challenge.redeemed })}
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-1.5">
-                  <button type="button" onClick={() => setOpen(open === challenge.id ? "" : challenge.id)} className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea">
+                  <button type="button" onClick={() => setOpen(open === challenge.id ? "" : challenge.id)} className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea">
                     {t("evEdit")}
                   </button>
                   <button
@@ -426,7 +426,7 @@ export function PerkChallengesManager({
                     disabled={rowBusy === challenge.id || (!challenge.is_active && !challenge.has_pin)}
                     title={!challenge.is_active && !challenge.has_pin ? t("perkNoPin") : undefined}
                     onClick={() => toggleActive(challenge)}
-                    className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
+                    className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
                   >
                     {challenge.is_active ? t("perkPause") : t("perkResume")}
                   </button>

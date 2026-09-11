@@ -6,7 +6,7 @@ import { PerkProgressList, type PerkProgressRow } from "@/components/dashboard/P
 import { StravaPanel, type ConnectionInfo } from "@/components/dashboard/StravaPanel";
 import { WeeklyKmChart } from "@/components/dashboard/WeeklyKmChart";
 import { stravaConfig } from "@/lib/strava/api";
-import { localToday } from "@/lib/strava/sync";
+import { localToday, syncIfStale } from "@/lib/strava/sync";
 import { weeklyTotals } from "@/lib/strava/weeks";
 import { formatMetricValue } from "@/lib/metrics";
 import { createClient } from "@/lib/supabase/server";
@@ -75,6 +75,14 @@ export default async function StravaPage({
   const today = localToday();
   const monthFrom = shiftDay(today, -29);
   const trendFrom = shiftDay(today, -7 * WEEKS);
+
+  // Fresh numbers on open: a background sync when the last one is old.
+  const { data: meta } = await supabase
+    .from("strava_connections")
+    .select("last_sync_at")
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (meta) await syncIfStale(user.id, meta.last_sync_at);
 
   const [
     { data: connectionRow },
@@ -172,30 +180,31 @@ export default async function StravaPage({
   ] as const;
 
   const heading = (text: string, count?: number) => (
-    <h2 className="mt-8 flex items-baseline gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
+    <h2 className="flex items-baseline gap-2 type-eyebrow text-ink/60">
       {text}
       {count !== undefined && count > 0 ? <span className="text-ink/40">{count}</span> : null}
     </h2>
   );
+  const card = "rounded-brand bg-mist p-5";
 
   const awardItem = (award: AwardRow) => (
     <li key={award.code}>
       <Link
         href={`/r/${award.code}`}
-        className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-[11px] border-[1.5px] border-line px-4 py-3 transition-colors hover:border-sea"
+        className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-[11px] bg-paper px-4 py-3 transition-colors hover:bg-mist-2"
       >
         <span className="min-w-0 flex-1">
-          <span className="block text-[14px] font-semibold">
+          <span className="block text-[15px] font-semibold">
             {award.reward_label} · {award.partner_name}
           </span>
-          <span className="block text-[12.5px] text-ink/60">
+          <span className="block text-[13.5px] text-ink/60">
             {award.challenge_title} · {award.awarded_on}
             {award.status === "issued" ? ` · ${t("expiresOn", { date: award.expires_at.slice(0, 10) })}` : ""}
           </span>
         </span>
-        <span className="font-mono text-[13px] tabular-nums">{award.code}</span>
+        <span className="font-mono text-[14px] tabular-nums">{award.code}</span>
         <span
-          className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
+          className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
             award.status === "issued"
               ? "bg-sea text-paper"
               : award.status === "redeemed"
@@ -210,7 +219,7 @@ export default async function StravaPage({
   );
 
   const activityItem = (activity: ActivityRow) => (
-    <li key={activity.id} className="flex items-baseline gap-3 border-t border-line-soft py-2 text-[13px]">
+    <li key={activity.id} className="flex items-baseline gap-3 border-t-[0.5px] border-line py-2 text-[14px]">
       <span className="font-mono tabular-nums text-ink/60">{activity.started_on}</span>
       <span className="min-w-0 flex-1 truncate">
         {activity.name ?? activity.sport_type ?? "—"}
@@ -226,7 +235,7 @@ export default async function StravaPage({
           href={`https://www.strava.com/activities/${activity.external_id}`}
           target="_blank"
           rel="noopener"
-          className="shrink-0 text-[12px] font-semibold text-[#FC5200] underline underline-offset-2"
+          className="shrink-0 text-[13px] font-semibold text-[#FC5200] underline underline-offset-2"
         >
           {t("viewOnStrava")}
         </a>
@@ -237,10 +246,9 @@ export default async function StravaPage({
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("title")}</h1>
-      <p className="mt-2 text-[14px] leading-relaxed text-ink/65">{t("sub")}</p>
+      <p className="mt-2 text-[15px] leading-relaxed text-ink/65">{t("sub")}</p>
 
-      {/* connection: the hero only until it exists, a status strip after */}
-      <div className="mt-5">
+      <div className="mt-6 border-b-[0.5px] border-line pb-6">
         <StravaPanel
           locale={loc}
           connection={connection}
@@ -250,27 +258,29 @@ export default async function StravaPage({
         />
       </div>
 
-      {connection ? (
-        <>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {tiles.map((tile) => (
-              <div key={tile.label} className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3.5">
-                <p className="text-[12px] font-semibold text-ink/60">{tile.label}</p>
-                <p
-                  className={`mt-1 font-mono text-2xl tabular-nums ${
-                    tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-ink"
-                  }`}
-                >
-                  {tile.value}
-                </p>
-                <p className="mt-0.5 text-[11.5px] text-ink/50">{tile.sub}</p>
-              </div>
-            ))}
+      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {tiles.map((tile) => (
+          <div key={tile.label} className="rounded-brand bg-mist px-4 py-3.5">
+            <p className="text-[13px] font-semibold text-ink/60">{tile.label}</p>
+            <p
+              className={`mt-1 font-mono text-2xl tabular-nums ${
+                tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-ink"
+              }`}
+            >
+              {tile.value}
+            </p>
+            <p className="mt-0.5 text-[13px] text-ink/50">{tile.sub}</p>
           </div>
+        ))}
+      </div>
 
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <section className={card}>
           {heading(t("trendHeading"))}
           {activities.length === 0 ? (
-            <p className="mt-2 text-[13.5px] text-ink/60">{t("trendEmpty")}</p>
+            <p className="mt-2 text-[14.5px] text-ink/60">
+              {connection ? t("trendEmpty") : t("trendEmptyDisconnected")}
+            </p>
           ) : (
             <div className="mt-3 text-ink">
               <WeeklyKmChart
@@ -281,60 +291,64 @@ export default async function StravaPage({
               />
             </div>
           )}
-        </>
-      ) : null}
+        </section>
 
-      {heading(t("progressHeading"), progress.length)}
-      {progress.length === 0 ? (
-        <p className="mt-2 text-[13.5px] text-ink/60">
-          {t("progressEmpty")}{" "}
-          <Link href="/izazovi" className="font-semibold text-sea underline underline-offset-2">
-            {t("browseChallenges")}
-          </Link>
-        </p>
-      ) : (
-        <PerkProgressList rows={progress} limit={CHALLENGE_LIMIT} />
-      )}
+        <section className={card}>
+          {heading(t("progressHeading"), progress.length)}
+          {progress.length === 0 ? (
+            <p className="mt-2 text-[14.5px] text-ink/60">
+              {t("progressEmpty")}{" "}
+              <Link href="/izazovi" className="font-semibold text-sea underline underline-offset-2">
+                {t("browseChallenges")}
+              </Link>
+            </p>
+          ) : (
+            <PerkProgressList rows={progress} limit={CHALLENGE_LIMIT} />
+          )}
+        </section>
 
-      {heading(t("rewardsReadyHeading"), ready.length)}
-      {ready.length === 0 ? (
-        <p className="mt-2 text-[13.5px] text-ink/60">
-          {awards.length === 0 ? t("awardsEmpty") : t("rewardsNoneReady")}{" "}
-          {awards.length === 0 ? (
-            <Link href="/izazovi" className="font-semibold text-sea underline underline-offset-2">
-              {t("browseChallenges")}
-            </Link>
+        <section className={card}>
+          {heading(t("rewardsReadyHeading"), ready.length)}
+          {ready.length === 0 ? (
+            <p className="mt-2 text-[14.5px] text-ink/60">
+              {awards.length === 0 ? t("awardsEmpty") : t("rewardsNoneReady")}{" "}
+              {awards.length === 0 ? (
+                <Link href="/izazovi" className="font-semibold text-sea underline underline-offset-2">
+                  {t("browseChallenges")}
+                </Link>
+              ) : null}
+            </p>
+          ) : (
+            <Expandable
+              items={ready.map(awardItem)}
+              limit={REWARD_LIMIT}
+              moreLabel={t("showAll", { count: ready.length })}
+              lessLabel={t("showLess")}
+              className="mt-2 space-y-2"
+            />
+          )}
+          {past.length > 0 ? (
+            <details className="mt-3">
+              <summary className="cursor-pointer text-[14px] font-semibold text-ink/60 hover:text-sea">
+                {t("rewardsPastHeading", { count: past.length })}
+              </summary>
+              <Expandable
+                items={past.map(awardItem)}
+                limit={REWARD_LIMIT}
+                moreLabel={t("showAll", { count: past.length })}
+                lessLabel={t("showLess")}
+                className="mt-2 space-y-2"
+              />
+            </details>
           ) : null}
-        </p>
-      ) : (
-        <Expandable
-          items={ready.map(awardItem)}
-          limit={REWARD_LIMIT}
-          moreLabel={t("showAll", { count: ready.length })}
-          lessLabel={t("showLess")}
-          className="mt-2 space-y-2"
-        />
-      )}
-      {past.length > 0 ? (
-        <details className="mt-3">
-          <summary className="cursor-pointer text-[13px] font-semibold text-ink/60 hover:text-sea">
-            {t("rewardsPastHeading", { count: past.length })}
-          </summary>
-          <Expandable
-            items={past.map(awardItem)}
-            limit={REWARD_LIMIT}
-            moreLabel={t("showAll", { count: past.length })}
-            lessLabel={t("showLess")}
-            className="mt-2 space-y-2"
-          />
-        </details>
-      ) : null}
+        </section>
 
-      {connection ? (
-        <>
+        <section className={card}>
           {heading(t("activitiesHeading"), activities.length)}
           {activities.length === 0 ? (
-            <p className="mt-2 text-[13.5px] text-ink/60">{t("activitiesEmpty")}</p>
+            <p className="mt-2 text-[14.5px] text-ink/60">
+              {connection ? t("activitiesEmpty") : t("activitiesEmptyDisconnected")}
+            </p>
           ) : (
             <Expandable
               items={activities.map(activityItem)}
@@ -344,17 +358,17 @@ export default async function StravaPage({
               className="mt-2"
             />
           )}
-          <p className="mt-2 text-[12px] text-ink/50">{t("poweredBy")}</p>
-        </>
-      ) : null}
+          <p className="mt-3 text-[13px] text-ink/50">{t("poweredBy")}</p>
+        </section>
+      </div>
 
       {connection && (pageCount ?? 0) === 0 ? (
-        <div className="mt-8 rounded-brand bg-[#f3f6f7] px-5 py-4">
-          <p className="text-[14px] font-bold">{t("nurtureHeading")}</p>
-          <p className="mt-1 text-[13px] leading-relaxed text-ink/65">{t("nurtureBody")}</p>
+        <div className="mt-6 rounded-brand bg-sand px-5 py-4">
+          <p className="text-[15px] font-bold">{t("nurtureHeading")}</p>
+          <p className="mt-1 text-[14px] leading-relaxed text-ink/65">{t("nurtureBody")}</p>
           <Link
             href="/dashboard/stranice"
-            className="mt-3 inline-flex rounded-xl border-[1.5px] border-ink px-4 py-2 text-[13px] font-semibold transition-colors hover:border-sea hover:text-sea"
+            className="mt-3 inline-flex rounded-xl bg-ink px-4 py-2 text-[14px] font-semibold text-paper transition-opacity hover:opacity-90"
           >
             {t("nurtureCta")}
           </Link>

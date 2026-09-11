@@ -59,12 +59,12 @@ export function CreatePageForm({
   };
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[15px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
 
   return (
     <form onSubmit={submit} className="space-y-4">
       <div>
-        <label htmlFor="pageTitle" className="text-[13px] font-semibold">
+        <label htmlFor="pageTitle" className="text-[14px] font-semibold">
           {t("nameLabel")}
         </label>
         <input
@@ -78,11 +78,11 @@ export function CreatePageForm({
           onChange={(event) => setTitle(event.target.value)}
           className={inputClass}
         />
-        <p className="mt-1 text-[12.5px] text-ink/55">{t("nameHint")}</p>
+        <p className="mt-1 text-[13.5px] text-ink/55">{t("nameHint")}</p>
       </div>
       {events.length > 1 ? (
         <div>
-          <label htmlFor="pageEvent" className="text-[13px] font-semibold">
+          <label htmlFor="pageEvent" className="text-[14px] font-semibold">
             {t("eventLabel")}
           </label>
           <select
@@ -99,19 +99,19 @@ export function CreatePageForm({
           </select>
         </div>
       ) : events.length === 1 ? (
-        <p className="text-[13px] text-ink/65">
+        <p className="text-[14px] text-ink/65">
           {t("eventSingle", { name: events[0].name, date: events[0].dateLabel })}
         </p>
       ) : null}
       {state === "error" ? (
-        <p role="alert" className="text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="text-[14px] font-semibold text-red-dark">
           {t("actionError")}
         </p>
       ) : null}
       <button
         type="submit"
         disabled={state === "busy"}
-        className="w-full rounded-xl bg-red px-6 py-3.5 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+        className="w-full rounded-xl bg-red px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
       >
         {t("createSubmit")}
       </button>

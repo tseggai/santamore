@@ -67,20 +67,20 @@ export function ActivityLog({
   };
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3 py-2.5 font-mono text-[14px] tabular-nums outline-none focus:border-sea";
+    "mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3 py-2.5 font-mono text-[15px] tabular-nums outline-none focus:border-sea";
 
   return (
-    <div className="mt-6 rounded-brand border-[1.5px] border-line px-4 py-4">
+    <div className="mt-6 rounded-brand bg-mist px-4 py-4">
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-[14px] font-bold">{t("activityHeading")}</p>
-        <p className="font-mono text-[15px] font-medium tabular-nums text-sea">
+        <p className="text-[15px] font-bold">{t("activityHeading")}</p>
+        <p className="font-mono text-[16px] font-medium tabular-nums text-sea">
           {formatMetricValue(totals[metric], metric, locale)}
         </p>
       </div>
-      <p className="mt-1 text-[12.5px] text-ink/60">{t("activitySub")}</p>
+      <p className="mt-1 text-[13.5px] text-ink/60">{t("activitySub")}</p>
 
       <form onSubmit={submit} className="mt-3 flex flex-wrap items-end gap-2">
-        <label className="w-24 text-[12px] font-semibold">
+        <label className="w-24 text-[13px] font-semibold">
           {t("activityKm")}
           <input
             type="text"
@@ -90,7 +90,7 @@ export function ActivityLog({
             className={inputClass}
           />
         </label>
-        <label className="w-24 text-[12px] font-semibold">
+        <label className="w-24 text-[13px] font-semibold">
           {t("activityMinutes")}
           <input
             type="text"
@@ -100,7 +100,7 @@ export function ActivityLog({
             className={inputClass}
           />
         </label>
-        <label className="text-[12px] font-semibold">
+        <label className="text-[13px] font-semibold">
           {t("activityDate")}
           <input
             type="date"
@@ -112,13 +112,13 @@ export function ActivityLog({
         <button
           type="submit"
           disabled={state === "busy" || (km.trim() === "" && minutes.trim() === "")}
-          className="rounded-xl bg-sea px-4 py-2.5 text-[13px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
+          className="rounded-xl bg-sea px-4 py-2.5 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
         >
           {t("activitySubmit")}
         </button>
       </form>
       {state === "error" ? (
-        <p role="alert" className="mt-2 text-[12.5px] font-semibold text-red-dark">
+        <p role="alert" className="mt-2 text-[13.5px] font-semibold text-red-dark">
           {t("actionError")}
         </p>
       ) : null}
@@ -128,7 +128,7 @@ export function ActivityLog({
           {activities.slice(0, 8).map((activity) => (
             <li
               key={activity.id}
-              className="flex items-baseline justify-between gap-3 border-t border-line-soft py-2 text-[12.5px]"
+              className="flex items-baseline justify-between gap-3 border-t-[0.5px] border-line py-2 text-[13.5px]"
             >
               <span className="font-mono tabular-nums text-ink/60">
                 {activity.started_at.slice(0, 10)}
@@ -146,7 +146,7 @@ export function ActivityLog({
                 <button
                   type="button"
                   onClick={() => remove(activity.id)}
-                  className="text-[11.5px] font-semibold text-ink/50 transition-colors hover:text-red-dark"
+                  className="text-[12.5px] font-semibold text-ink/50 transition-colors hover:text-red-dark"
                 >
                   {t("activityDelete")}
                 </button>

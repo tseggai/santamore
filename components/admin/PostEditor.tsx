@@ -23,7 +23,7 @@ export interface EditablePost {
 type State = "idle" | "busy" | "done" | "error";
 
 const inputClass =
-  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[14px] outline-none focus:border-sea";
+  "mt-1 w-full rounded-[10px] border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 
 /** Markdown post editor — one row per locale, same slug links translations. */
 export function PostEditor({ post }: { post: EditablePost | null }) {
@@ -72,7 +72,7 @@ export function PostEditor({ post }: { post: EditablePost | null }) {
   return (
     <form onSubmit={submit} className="mt-4 grid max-w-2xl gap-3">
       <div className="grid gap-3 sm:grid-cols-3">
-        <label className="text-[13px] font-semibold">
+        <label className="text-[14px] font-semibold">
           {t("postLocale")}
           <select
             name="locale"
@@ -86,7 +86,7 @@ export function PostEditor({ post }: { post: EditablePost | null }) {
             ))}
           </select>
         </label>
-        <label className="text-[13px] font-semibold sm:col-span-2">
+        <label className="text-[14px] font-semibold sm:col-span-2">
           {t("postSlug")}
           <input
             name="slug"
@@ -97,7 +97,7 @@ export function PostEditor({ post }: { post: EditablePost | null }) {
           />
         </label>
       </div>
-      <label className="text-[13px] font-semibold">
+      <label className="text-[14px] font-semibold">
         {t("postTitle")}
         <input
           name="title"
@@ -108,7 +108,7 @@ export function PostEditor({ post }: { post: EditablePost | null }) {
           className={inputClass}
         />
       </label>
-      <label className="text-[13px] font-semibold">
+      <label className="text-[14px] font-semibold">
         {t("postExcerpt")}
         <textarea
           name="excerpt"
@@ -118,7 +118,7 @@ export function PostEditor({ post }: { post: EditablePost | null }) {
           className={inputClass}
         />
       </label>
-      <label className="text-[13px] font-semibold">
+      <label className="text-[14px] font-semibold">
         {t("postBody")}
         <textarea
           name="body"
@@ -126,12 +126,12 @@ export function PostEditor({ post }: { post: EditablePost | null }) {
           rows={14}
           maxLength={50000}
           defaultValue={post?.body_md ?? ""}
-          className={`${inputClass} font-mono text-[13px]`}
+          className={`${inputClass} font-mono text-[14px]`}
         />
       </label>
 
       <div>
-        <span className="text-[13px] font-semibold">{t("postCover")}</span>
+        <span className="text-[14px] font-semibold">{t("postCover")}</span>
         <label className="mt-1 block">
           <span className="sr-only">{t("postCover")}</span>
           <input
@@ -139,15 +139,15 @@ export function PostEditor({ post }: { post: EditablePost | null }) {
             accept="image/jpeg,image/png,image/webp"
             onChange={onCover}
             disabled={uploading}
-            className="text-[13.5px] file:mr-3 file:rounded-lg file:border-0 file:bg-sea file:px-4 file:py-2 file:font-semibold file:text-paper"
+            className="text-[14.5px] file:mr-3 file:rounded-lg file:border-0 file:bg-sea file:px-4 file:py-2 file:font-semibold file:text-paper"
           />
         </label>
         {coverPath ? (
-          <p className="mt-1 font-mono text-[12px] text-sea">{coverPath}</p>
+          <p className="mt-1 font-mono text-[13px] text-sea">{coverPath}</p>
         ) : null}
       </div>
 
-      <label className="flex items-center gap-2 text-[13.5px] font-semibold">
+      <label className="flex items-center gap-2 text-[14.5px] font-semibold">
         <input
           type="checkbox"
           name="published"
@@ -160,15 +160,15 @@ export function PostEditor({ post }: { post: EditablePost | null }) {
       <button
         type="submit"
         disabled={state === "busy" || uploading}
-        className="rounded-xl bg-sea px-5 py-3 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
+        className="rounded-xl bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
       >
         {t("postSave")}
       </button>
       {state === "done" ? (
-        <p className="text-[13px] font-semibold text-sea">{t("postSaved")}</p>
+        <p className="text-[14px] font-semibold text-sea">{t("postSaved")}</p>
       ) : null}
       {state === "error" ? (
-        <p role="alert" className="text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="text-[14px] font-semibold text-red-dark">
           {t("actionError")}
         </p>
       ) : null}

@@ -70,15 +70,15 @@ export default async function GalleryPage({
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-14">
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
         {t("eyebrow")}
       </p>
       <h1 className="type-display mt-3 text-4xl leading-[1.1] sm:text-5xl">{t("title")}</h1>
-      <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-ink/70">{t("sub")}</p>
+      <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-ink/70">{t("sub")}</p>
 
       <div className="mt-8">
         {images.length === 0 ? (
-          <p className="max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[12.5px] text-sea">
+          <p className="max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
             {t("empty")}
           </p>
         ) : (

@@ -13,7 +13,7 @@
   overflow: hidden;
   /* #f3f6f7 and no border — owner decision, 2026-09 (the prototype had the
      mist fill with an ink hairline). */
-  background: #f3f6f7;
+  background: #f1f5f6;
 }
 
 .fill {
@@ -82,7 +82,7 @@
 
 .raised {
   font-family: var(--font-display);
-  font-weight: 500; /* Cormorant's "light but legible" for a 36px money figure */
+  font-weight: 800; /* the display weight, for a 36px money figure */
   font-size: 36px;
   line-height: 1;
   letter-spacing: -0.01em;

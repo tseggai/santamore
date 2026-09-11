@@ -46,7 +46,7 @@ const shellStyle =
 const monoStyle =
   "font-family:'DM Mono',Menlo,Consolas,monospace;font-size:15px;letter-spacing:0.02em;";
 const boxStyle =
-  "background:#eaf1f2;border:1.5px dashed #0e3a46;border-radius:14px;padding:16px 18px;margin:18px 0;";
+  "background:#f1f5f6;border:1.5px dashed #0e3a46;border-radius:14px;padding:16px 18px;margin:18px 0;";
 
 function shell(title: string, bodyHtml: string): string {
   return `<div style="${shellStyle}">

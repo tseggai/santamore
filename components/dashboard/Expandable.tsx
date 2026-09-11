@@ -30,7 +30,7 @@ export function Expandable({
           type="button"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
-          className="mt-2 text-[13px] font-semibold text-sea underline underline-offset-2"
+          className="mt-2 text-[14px] font-semibold text-sea underline underline-offset-2"
         >
           {open ? lessLabel : moreLabel}
         </button>

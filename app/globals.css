@@ -15,7 +15,8 @@
   --color-paper: #ffffff;
   --color-sea: #0e3a46;
   --color-sea-2: #15505f;
-  --color-mist: #eaf1f2;
+  --color-mist: #f1f5f6; /* surface for boxes — no borders (owner decision 2026-09-11) */
+  --color-mist-2: #e3ebed; /* the same surface, one step deeper: hover, nested boxes */
   --color-sand: #f6f3ee;
 
   --color-line: rgba(54, 67, 75, 0.16);
@@ -26,9 +27,37 @@
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  --font-display: var(--font-display-face), Georgia, serif;
-  --font-body: var(--font-body-face), "Helvetica Neue", Helvetica, system-ui, sans-serif;
-  --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+  /* One family everywhere (owner decision 2026-09-11). Display, body and
+     figures are all Nunito, told apart by weight, size and tabular digits. */
+  --font-brand: var(--font-nunito), "Helvetica Neue", Helvetica, system-ui, sans-serif;
+  --font-display: var(--font-brand);
+  --font-body: var(--font-brand);
+  --font-sans: var(--font-brand);
+  --font-mono: var(--font-brand);
+
+  /* Type scale. Body copy is 16px; nothing that carries content goes below
+     14px — the smaller steps are for captions, eyebrows and fine print.
+     Line heights stay generous, headlines included. */
+  --text-xs: 13px;
+  --text-xs--line-height: 1.5;
+  --text-sm: 15px;
+  --text-sm--line-height: 1.55;
+  --text-base: 16px;
+  --text-base--line-height: 1.6;
+  --text-lg: 18px;
+  --text-lg--line-height: 1.55;
+  --text-xl: 21px;
+  --text-xl--line-height: 1.4;
+  --text-2xl: 28px;
+  --text-2xl--line-height: 1.25;
+  --text-3xl: 36px;
+  --text-3xl--line-height: 1.2;
+  --text-4xl: 46px;
+  --text-4xl--line-height: 1.15;
+  --text-5xl: 58px;
+  --text-5xl--line-height: 1.12;
+  --text-6xl: 70px;
+  --text-6xl--line-height: 1.1;
 
   --radius-brand: 14px;
 
@@ -44,12 +73,32 @@
   --container-7xl: 100rem;
 }
 
-/* Display type: big, light and elegant (Cormorant Garamond) — weight comes
-   from the face, not from bolding. */
+/* ── Type styles: the whole site's text is set from here ─────────────────
+   Display: big, heavy, rounded — magazine headlines with room to breathe.
+   Eyebrow: the small tracked caps above a heading.
+   Figure: money, references, distances — same face, tabular digits.
+   Caption: fine print and explanatory text, the only place under 14px. */
 @utility type-display {
   font-family: var(--font-display);
-  font-weight: 400;
-  letter-spacing: 0.005em;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+@utility type-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+@utility type-figure {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+@utility type-caption {
+  font-size: 13px;
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--color-ink) 60%, transparent);
 }
 
 @layer base {
@@ -59,9 +108,23 @@
 
   body {
     font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 500;
     color: var(--color-ink);
     background-color: var(--color-paper);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* Figures were a monospace face; now the brand face with tabular digits
+     and a firmer weight, so columns of money still align. */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+
+  h1, h2, h3, h4 {
+    line-height: 1.25;
   }
 
   :focus-visible {
@@ -86,14 +149,14 @@
    styled here. */
 @layer components {
   .prose-news {
-    font-size: 15px;
+    font-size: 17px;
     line-height: 1.7;
   }
   .prose-news h2 {
     font-family: var(--font-display);
-    font-weight: 300;
+    font-weight: 800;
     font-size: 1.7rem;
-    line-height: 1.2;
+    line-height: 1.25;
     margin-top: 2rem;
   }
   .prose-news h3 {
@@ -139,7 +202,7 @@
     margin-top: 0.9rem;
     width: 100%;
     border-collapse: collapse;
-    font-size: 13.5px;
+    font-size: 14.5px;
   }
   .prose-news th,
   .prose-news td {

@@ -38,7 +38,7 @@ export function CopyButton({
       type="button"
       onClick={copy}
       aria-live="polite"
-      className="rounded-lg border-[1.5px] border-line px-3 py-1.5 text-[12.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+      className="rounded-lg border-[1.5px] border-line px-3 py-1.5 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
     >
       {copied ? copiedLabel : label}
     </button>

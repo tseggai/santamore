@@ -45,14 +45,14 @@ export default async function AdminContentPage({
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("contentTitle")}</h1>
 
-      <h2 className="mt-6 text-[15px] font-bold">
+      <h2 className="mt-6 text-[16px] font-bold">
         {editing ? t("postEditHeading", { title: editing.title }) : t("postNewHeading")}
       </h2>
       {editing ? (
         <p className="mt-1">
           <Link
             href="/admin/sadrzaj"
-            className="text-[13px] font-semibold text-sea underline decoration-line underline-offset-2"
+            className="text-[14px] font-semibold text-sea underline decoration-line underline-offset-2"
           >
             {t("postNewInstead")}
           </Link>
@@ -62,24 +62,24 @@ export default async function AdminContentPage({
 
       {posts.length > 0 ? (
         <>
-          <h2 className="mt-10 text-[15px] font-bold">{t("postListHeading")}</h2>
+          <h2 className="mt-10 text-[16px] font-bold">{t("postListHeading")}</h2>
           <ul className="mt-3 space-y-1.5">
             {posts.map((post) => (
               <li key={post.id}>
                 <Link
                   href={`/admin/sadrzaj?post=${post.id}`}
-                  className="flex flex-wrap items-baseline gap-x-3 rounded-[10px] border-[1.5px] border-line px-3.5 py-2 text-[13.5px] transition-colors hover:border-sea"
+                  className="flex flex-wrap items-baseline gap-x-3 rounded-[10px] border-[1.5px] border-line px-3.5 py-2 text-[14.5px] transition-colors hover:border-sea"
                 >
-                  <span className="font-mono text-[11px] uppercase text-sea">
+                  <span className="font-mono text-[12px] uppercase text-sea">
                     {post.locale}
                   </span>
                   <span className="font-semibold">{post.title}</span>
-                  <span className="font-mono text-[12px] text-ink/45">/{post.slug}</span>
+                  <span className="font-mono text-[13px] text-ink/45">/{post.slug}</span>
                   <span
                     className={
                       post.published_at
-                        ? "ml-auto text-[12px] font-semibold text-sea"
-                        : "ml-auto text-[12px] text-ink/50"
+                        ? "ml-auto text-[13px] font-semibold text-sea"
+                        : "ml-auto text-[13px] text-ink/50"
                     }
                   >
                     {post.published_at ? t("postLive") : t("postDraft")}
@@ -91,8 +91,8 @@ export default async function AdminContentPage({
         </>
       ) : null}
 
-      <h2 className="mt-12 text-[15px] font-bold">{t("galleryHeading")}</h2>
-      <p className="mt-1 text-[13px] text-ink/60">{t("galleryHint")}</p>
+      <h2 className="mt-12 text-[16px] font-bold">{t("galleryHeading")}</h2>
+      <p className="mt-1 text-[14px] text-ink/60">{t("galleryHint")}</p>
       <GalleryManager items={gallery} events={events} />
     </div>
   );

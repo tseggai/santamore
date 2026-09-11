@@ -63,7 +63,7 @@ export function ConsoleShell({
         <Link href={homeHref} className="inline-block">
           <Image src={icon} alt="Santamore" className="h-14 w-auto" priority />
         </Link>
-        <span className="mt-3 inline-block rounded-full border border-paper/30 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/80">
+        <span className="mt-3 inline-block rounded-full border border-paper/30 px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-[0.18em] text-paper/80">
           {badge}
         </span>
       </div>
@@ -78,7 +78,7 @@ export function ConsoleShell({
       <header className={`flex items-center justify-between gap-3 px-4 py-3 text-paper md:hidden ${bg}`}>
         <Link href={homeHref} className="inline-flex items-center gap-2.5">
           <Image src={icon} alt="Santamore" className="h-9 w-auto" priority />
-          <span className="rounded-full border border-paper/30 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/80">
+          <span className="rounded-full border border-paper/30 px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-[0.18em] text-paper/80">
             {badge}
           </span>
         </Link>
@@ -115,12 +115,12 @@ export function ConsoleShell({
               type="button"
               onClick={() => setOpen(false)}
               aria-label={closeLabel}
-              className="flex h-10 w-10 items-center justify-center rounded-[9px] border border-paper/30 text-[20px] leading-none"
+              className="flex h-10 w-10 items-center justify-center rounded-[9px] border border-paper/30 text-[21px] leading-none"
             >
               ×
             </button>
           </div>
-          <span className="inline-block self-start rounded-full border border-paper/30 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.18em] text-paper/80">
+          <span className="inline-block self-start rounded-full border border-paper/30 px-2.5 py-0.5 font-mono text-[11px] uppercase tracking-[0.18em] text-paper/80">
             {badge}
           </span>
           {nav}

@@ -248,14 +248,14 @@ export function PageEditor({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span
-            className={`rounded-full px-2.5 py-1 font-mono text-[10.5px] uppercase tracking-[0.14em] ${
+            className={`rounded-full px-2.5 py-1 font-mono text-[11.5px] uppercase tracking-[0.14em] ${
               isActive ? "bg-sea text-paper" : "border-[1.5px] border-line text-ink/70"
             }`}
           >
             {isActive ? t("statusActive") : t("statusDraft")}
           </span>
           {dirty ? (
-            <span className="text-[12px] text-ink/55">{t("unsaved")}</span>
+            <span className="text-[13px] text-ink/55">{t("unsaved")}</span>
           ) : null}
         </div>
         <div className="flex gap-2">
@@ -263,7 +263,7 @@ export function PageEditor({
             type="button"
             disabled={busy !== ""}
             onClick={save}
-            className="rounded-xl border-[1.5px] border-line px-4 py-2 text-[13.5px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
+            className="rounded-xl border-[1.5px] border-line px-4 py-2 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
           >
             {t("save")}
           </button>
@@ -271,35 +271,35 @@ export function PageEditor({
             type="button"
             disabled={busy !== ""}
             onClick={togglePublish}
-            className="rounded-xl bg-red px-4 py-2 text-[13.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
+            className="rounded-xl bg-red px-4 py-2 text-[14.5px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60"
           >
             {isActive ? t("unpublish") : t("publish")}
           </button>
         </div>
       </div>
-      <p className="mt-2 text-[12.5px] text-ink/55">{t("editorHint")}</p>
+      <p className="mt-2 text-[13.5px] text-ink/55">{t("editorHint")}</p>
 
       {notice === "saved" ? (
-        <p className="mt-2 text-[13px] font-semibold text-sea">{t("saved")}</p>
+        <p className="mt-2 text-[14px] font-semibold text-sea">{t("saved")}</p>
       ) : null}
       {notice === "error" ? (
-        <p role="alert" className="mt-2 text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">
           {t("actionError")}
         </p>
       ) : null}
       {notice === "incomplete" ? (
-        <p role="alert" className="mt-2 text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">
           {t("publishBlocked")}
         </p>
       ) : null}
       {notice === "goal" ? (
-        <p role="alert" className="mt-2 text-[13px] font-semibold text-red-dark">
+        <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">
           {t("goalInvalid")}
         </p>
       ) : null}
 
       {/* the page itself — what a donor sees on /f/[slug], editable in place */}
-      <div className="mt-4 rounded-brand border-[1.5px] border-line p-5 sm:p-6">
+      <div className="mt-4 rounded-brand bg-mist p-5 sm:p-6">
         <header className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">
           <div className="shrink-0">
             <button
@@ -311,7 +311,7 @@ export function PageEditor({
             >
               <Avatar src={photoUrl} name={title} size={136} />
               <span
-                className={`absolute inset-0 flex items-center justify-center rounded-full bg-ink/55 text-[11px] font-bold uppercase tracking-wider text-paper transition-opacity ${
+                className={`absolute inset-0 flex items-center justify-center rounded-full bg-ink/55 text-[12px] font-bold uppercase tracking-wider text-paper transition-opacity ${
                   photoUrl
                     ? "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
                     : "opacity-100"
@@ -335,7 +335,7 @@ export function PageEditor({
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+            <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
               {tRunner("eyebrow")}
             </p>
 
@@ -372,7 +372,7 @@ export function PageEditor({
             />
 
             {/* context line: team picker lives where the team name shows */}
-            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[13.5px] text-ink/70">
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[14.5px] text-ink/70">
               <label htmlFor="fTeam" className="sr-only">
                 {t("teamLabel")}
               </label>
@@ -381,7 +381,7 @@ export function PageEditor({
                 id="fTeam"
                 value={teamPanel === "create" ? NEW_TEAM : teamId}
                 onChange={onTeamChange}
-                className="rounded-lg border-[1.5px] border-line bg-paper px-2 py-1 text-[13px] font-semibold text-ink outline-none focus:border-sea"
+                className="rounded-lg border-[1.5px] border-line bg-paper px-2 py-1 text-[14px] font-semibold text-ink outline-none focus:border-sea"
               >
                 <option value="">{t("noTeam")}</option>
                 {teams.map((team) => (
@@ -395,7 +395,7 @@ export function PageEditor({
                 <button
                   type="button"
                   onClick={() => setTeamPanel("edit")}
-                  className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[12px] font-semibold text-sea hover:bg-mist"
+                  className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[13px] font-semibold text-sea hover:bg-mist"
                 >
                   <PencilIcon className="h-3 w-3" />
                   {t("teamEdit")}
@@ -425,7 +425,7 @@ export function PageEditor({
 
             {/* the public actions, shown muted so the preview is honest */}
             <div aria-hidden className="pointer-events-none mt-4 flex items-center gap-2 opacity-50">
-              <span className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[15px] font-bold text-paper">
+              <span className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[16px] font-bold text-paper">
                 {tDonate("payVerb")}
               </span>
               <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border-[1.5px] border-line">
@@ -460,7 +460,7 @@ export function PageEditor({
               onDone={() => setEditing("")}
               view={
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 text-[12px] font-semibold ${
+                  className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 text-[13px] font-semibold ${
                     goalCents
                       ? "border-line bg-paper/90 text-ink"
                       : "border-red bg-paper text-red-dark"
@@ -471,7 +471,7 @@ export function PageEditor({
                 </span>
               }
               input={
-                <span className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-sea bg-paper px-3 py-1 text-[12px] font-semibold">
+                <span className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-sea bg-paper px-3 py-1 text-[13px] font-semibold">
                   <label htmlFor="fGoal">{t("goalLabel")}</label>
                   <input
                     id="fGoal"
@@ -492,7 +492,7 @@ export function PageEditor({
         </div>
 
         {/* story */}
-        <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
+        <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
           {tRunner("story")}
         </p>
         <Editable
@@ -504,11 +504,11 @@ export function PageEditor({
           className="mt-2 block"
           view={
             story.trim() ? (
-              <p className="whitespace-pre-line text-[15px] leading-relaxed text-ink/80">
+              <p className="whitespace-pre-line text-[16px] leading-relaxed text-ink/80">
                 {story}
               </p>
             ) : (
-              <p className="rounded-[11px] border-[1.5px] border-dashed border-line px-4 py-3 text-[14px] leading-relaxed text-ink/45">
+              <p className="rounded-[11px] bg-mist px-4 py-3 text-[15px] leading-relaxed text-ink/45">
                 {t("storyPlaceholder")}
               </p>
             )
@@ -528,9 +528,9 @@ export function PageEditor({
                   setStory(event.target.value);
                   touch();
                 }}
-                className={`${fieldInput} text-[15px] leading-relaxed`}
+                className={`${fieldInput} text-[16px] leading-relaxed`}
               />
-              <p className="mt-1 text-[12px] text-ink/50">{t("storyHint")}</p>
+              <p className="mt-1 text-[13px] text-ink/50">{t("storyHint")}</p>
             </>
           }
         />

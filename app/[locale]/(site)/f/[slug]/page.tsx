@@ -101,13 +101,13 @@ export default async function FundraiserPage({
           className="sm:mt-1"
         />
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+          <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
             {t("eyebrow")}
           </p>
           <h1 className="type-display mt-1 text-3xl leading-tight sm:text-4xl">
             {fundraiser.title}
           </h1>
-          <p className="mt-2 text-[13.5px] leading-relaxed text-ink/70">
+          <p className="mt-2 text-[14.5px] leading-relaxed text-ink/70">
             {fundraiser.team_name && fundraiser.team_slug ? (
               <>
                 {t("runsWith")}{" "}
@@ -125,7 +125,7 @@ export default async function FundraiserPage({
             <DonateButton
               request={{ kind: "fundraiser", slug: fundraiser.slug }}
               href={`/f/${fundraiser.slug}/podrzi`}
-              className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
+              className="inline-flex h-11 items-center rounded-xl bg-red px-7 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark"
             >
               {tDonate("payVerb")}
             </DonateButton>
@@ -151,21 +151,21 @@ export default async function FundraiserPage({
 
       {fundraiser.story ? (
         <>
-          <p className="mt-6 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
+          <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
             {t("story")}
           </p>
-          <p className="mt-2 whitespace-pre-line text-[15px] leading-relaxed text-ink/80">
+          <p className="mt-2 whitespace-pre-line text-[16px] leading-relaxed text-ink/80">
             {fundraiser.story}
           </p>
         </>
       ) : null}
 
       <div className="my-7 h-px bg-line-soft" />
-      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
         {t("donorWall")}
       </p>
       {wall.length === 0 ? (
-        <p className="mt-2 text-[13.5px] text-ink/60">{t("wallEmpty")}</p>
+        <p className="mt-2 text-[14.5px] text-ink/60">{t("wallEmpty")}</p>
       ) : null}
       <ul className="mt-2">
         {wall.map((donor) => (
@@ -175,16 +175,16 @@ export default async function FundraiserPage({
           >
             <span aria-hidden className="mt-[7px] h-[7px] w-[7px] shrink-0 rounded-full bg-red" />
             <span className="min-w-0 flex-1">
-              <span className="block text-[13.5px] font-semibold">
+              <span className="block text-[14.5px] font-semibold">
                 {donor.display_name ?? t("anonymous")}
               </span>
               {donor.message ? (
-                <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink/60">
+                <span className="mt-0.5 block text-[13.5px] leading-relaxed text-ink/60">
                   {donor.message}
                 </span>
               ) : null}
             </span>
-            <span className="shrink-0 font-mono text-[13px] font-medium tabular-nums">
+            <span className="shrink-0 font-mono text-[14px] font-medium tabular-nums">
               {formatCents(donor.amount_cents, locale as Locale, { trimWholeCents: true })}
             </span>
           </li>

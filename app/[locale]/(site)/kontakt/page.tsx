@@ -34,20 +34,20 @@ export default async function ContactPage({
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
       <h1 className="type-display text-4xl">{t("title")}</h1>
-      <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink/70">{t("sub")}</p>
+      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-ink/70">{t("sub")}</p>
 
       <div className="mt-8 grid gap-10 md:grid-cols-2">
         <div>
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+          <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
             {t("formHeading")}
           </p>
           <div className="mt-3">
             <InboundForm kind="contact" />
           </div>
         </div>
-        <div className="space-y-6 text-[14px] leading-relaxed">
+        <div className="space-y-6 text-[15px] leading-relaxed">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+            <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
               {tFooter("orgHeading")}
             </p>
             <p className="mt-2">{tFooter("orgName")}</p>
@@ -56,7 +56,7 @@ export default async function ContactPage({
             <p className="mt-1">{tFooter("email")}</p>
           </div>
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+            <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
               {t("bankHeading")}
             </p>
             {bank.iban ? (
@@ -69,7 +69,7 @@ export default async function ContactPage({
               <p className="mt-2 text-ink/70">{tFooter("iban")}</p>
             )}
           </div>
-          <p className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[12.5px] text-sea">
+          <p className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
             {t("mapNote")}
           </p>
         </div>

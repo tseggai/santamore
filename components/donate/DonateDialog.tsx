@@ -98,7 +98,7 @@ export function DonateProvider({ children }: { children: ReactNode }) {
             type="button"
             onClick={close}
             aria-label={t("close")}
-            className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border-[1.5px] border-line bg-paper text-[18px] leading-none text-ink/70 transition-colors hover:border-sea hover:text-sea"
+            className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border-[1.5px] border-line bg-paper text-[19px] leading-none text-ink/70 transition-colors hover:border-sea hover:text-sea"
           >
             ×
           </button>
@@ -115,14 +115,14 @@ export function DonateProvider({ children }: { children: ReactNode }) {
               <div className="px-5 py-10 sm:px-7">
                 <p
                   role="alert"
-                  className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[14px] text-sea"
+                  className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[15px] text-sea"
                 >
                   {t("errServer")}
                 </p>
               </div>
             ) : (
               <div className="px-5 py-10 sm:px-7" aria-busy>
-                <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+                <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
                   {t("payVerb")}
                 </p>
                 <div className="mt-4 h-8 w-2/3 animate-pulse rounded-md bg-mist motion-reduce:animate-none" />

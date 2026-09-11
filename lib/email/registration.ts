@@ -62,7 +62,7 @@ export async function buildRegistrationEmail(
   <h1 style="font-size:22px;line-height:1.25;">${escapeHtml(t("subject", { event: input.eventName }))}</h1>
   <p>${escapeHtml(t("greeting", { name: input.name }))}</p>
   <p>${escapeHtml(t("intro", { event: input.eventName }))}</p>
-  <div style="background:#eaf1f2;border:1.5px dashed #0e3a46;border-radius:14px;padding:16px 18px;margin:18px 0;">
+  <div style="background:#f1f5f6;border:1.5px dashed #0e3a46;border-radius:14px;padding:16px 18px;margin:18px 0;">
     ${rows
       .map(
         ([label, value]) =>

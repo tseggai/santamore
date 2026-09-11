@@ -72,7 +72,7 @@ export default async function AdminEventsPage({
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("eventsTitle")}</h1>
-      <p className="mt-1 text-[13px] text-ink/60">{t("eventsHint")}</p>
+      <p className="mt-1 text-[14px] text-ink/60">{t("eventsHint")}</p>
       <EventsManager
         events={rows}
         chapters={(chapters ?? []) as { id: string; name: string }[]}

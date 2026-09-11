@@ -50,32 +50,32 @@ export function LedgerTabs({
   const [view, setView] = useState<"out" | "in">("out");
 
   const pillClass =
-    "rounded-[5px] border border-line px-1.5 py-[3px] font-mono text-[9.5px] uppercase tracking-[0.05em] text-ink/60";
+    "rounded-[5px] border border-line px-1.5 py-[3px] font-mono text-[11px] uppercase tracking-[0.05em] text-ink/60";
 
   const list = (rows: LedgerRow[], empty: string) =>
     rows.length === 0 ? (
-      <p className="py-6 text-[13.5px] text-ink/60">{empty}</p>
+      <p className="py-6 text-[14.5px] text-ink/60">{empty}</p>
     ) : (
       <ul>
         {rows.map((row) => (
           <li key={row.id} className="border-b border-line-soft py-3 last:border-b-0">
             <div className="flex items-baseline justify-between gap-3">
               <span
-                className={`text-[13px] font-semibold leading-snug ${
+                className={`text-[14px] font-semibold leading-snug ${
                   row.correction ? "text-sea" : ""
                 }`}
               >
                 {row.correction ? `${t("correction")}: ` : ""}
                 {row.name ?? t("anonymous")}
               </span>
-              <span className="shrink-0 font-mono text-[13.5px] font-medium tabular-nums">
+              <span className="shrink-0 font-mono text-[14.5px] font-medium tabular-nums">
                 {row.correction
                   ? formatSignedCents(row.amountCents, locale)
                   : formatCents(row.amountCents, locale, { trimWholeCents: true })}
               </span>
             </div>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-              <span className="py-[3px] pr-1 font-mono text-[9.5px] uppercase tracking-[0.05em] text-ink/45">
+              <span className="py-[3px] pr-1 font-mono text-[11px] uppercase tracking-[0.05em] text-ink/45">
                 {displayDate(row.date)}
               </span>
               {row.attribution ? (
@@ -90,7 +90,7 @@ export function LedgerTabs({
                   href={doc.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-[5px] border border-sea bg-mist px-1.5 py-[3px] font-mono text-[9.5px] uppercase tracking-[0.05em] text-sea transition-opacity hover:opacity-75"
+                  className="rounded-[5px] border border-sea bg-mist px-1.5 py-[3px] font-mono text-[11px] uppercase tracking-[0.05em] text-sea transition-opacity hover:opacity-75"
                 >
                   {doc.label} ✓
                 </a>
@@ -112,7 +112,7 @@ export function LedgerTabs({
           type="button"
           aria-pressed={view === "in"}
           onClick={() => setView("in")}
-          className="px-3 py-2.5 text-[13px] font-semibold transition-colors aria-pressed:bg-ink aria-pressed:text-paper"
+          className="px-3 py-2.5 text-[14px] font-semibold transition-colors aria-pressed:bg-ink aria-pressed:text-paper"
         >
           {t("moneyIn")}
         </button>
@@ -120,7 +120,7 @@ export function LedgerTabs({
           type="button"
           aria-pressed={view === "out"}
           onClick={() => setView("out")}
-          className="px-3 py-2.5 text-[13px] font-semibold transition-colors aria-pressed:bg-ink aria-pressed:text-paper"
+          className="px-3 py-2.5 text-[14px] font-semibold transition-colors aria-pressed:bg-ink aria-pressed:text-paper"
         >
           {t("moneyOut")}
         </button>

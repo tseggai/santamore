@@ -174,7 +174,7 @@ export function DonateFlow({
       ) : (
         <span
           aria-hidden
-          className="type-display flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-ink bg-red text-[18px] font-bold text-paper"
+          className="type-display flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-full border-[1.5px] border-ink bg-red text-[19px] font-bold text-paper"
         >
           {campaign.title.trim().charAt(0).toUpperCase() || "S"}
         </span>
@@ -182,11 +182,11 @@ export function DonateFlow({
     ) : null;
 
   const inputClass =
-    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[15px] outline-none focus:border-sea";
+    "mt-1 w-full rounded-[11px] border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
   const primaryBtn =
-    "rounded-xl bg-red px-6 py-3.5 text-[15px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60";
+    "rounded-xl bg-red px-6 py-3.5 text-[16px] font-bold text-paper shadow-[0_2px_0_var(--color-red-dark)] transition-colors hover:bg-red-dark disabled:opacity-60";
   const secondaryBtn =
-    "rounded-xl border-[1.5px] border-line px-5 py-3 text-[14px] font-semibold transition-colors hover:border-sea hover:text-sea";
+    "rounded-xl border-[1.5px] border-line px-5 py-3 text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea";
   const chipClass = (selected: boolean) =>
     `rounded-[11px] border-[1.5px] px-1.5 py-3 text-center transition-colors ${
       selected
@@ -209,8 +209,8 @@ export function DonateFlow({
       className="flex w-full items-center gap-4 border-t border-line-soft py-3.5 text-left"
     >
       <span className="min-w-0 flex-1">
-        <span className="block text-[14.5px] font-semibold">{title}</span>
-        <span className="mt-0.5 block text-[12.5px] leading-relaxed text-ink/60">{desc}</span>
+        <span className="block text-[15.5px] font-semibold">{title}</span>
+        <span className="mt-0.5 block text-[13.5px] leading-relaxed text-ink/60">{desc}</span>
       </span>
       <span
         aria-hidden
@@ -234,20 +234,20 @@ export function DonateFlow({
       <button
         type="button"
         onClick={onClose}
-        className="inline-block text-[12.5px] font-semibold text-sea transition-colors hover:text-sea-2"
+        className="inline-block text-[13.5px] font-semibold text-sea transition-colors hover:text-sea-2"
       >
         ← {t("backToPage")}
       </button>
     ) : (
       <Link
         href={backPath}
-        className="inline-block text-[12.5px] font-semibold text-sea transition-colors hover:text-sea-2"
+        className="inline-block text-[13.5px] font-semibold text-sea transition-colors hover:text-sea-2"
       >
         ← {t("backToPage")}
       </Link>
     )
   ) : (
-    <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+    <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
       {tNav("donate")}
     </p>
   );
@@ -263,7 +263,7 @@ export function DonateFlow({
         <Heading className="type-display mt-3 text-3xl sm:text-4xl">
           {t("confTitle", { name: donorName })}
         </Heading>
-        <p className="mt-4 text-[15px] leading-relaxed text-ink/70">
+        <p className="mt-4 text-[16px] leading-relaxed text-ink/70">
           {t("confEmailNote")} {t("confLedgerNote")}
         </p>
         <div className="mt-6">
@@ -312,7 +312,7 @@ export function DonateFlow({
         <Heading className="type-display min-w-0 text-3xl sm:text-4xl">{campaign.title}</Heading>
       </div>
       {step === 1 && campaign.description ? (
-        <p className="mt-3 text-[14.5px] leading-relaxed text-ink/70">
+        <p className="mt-3 text-[15.5px] leading-relaxed text-ink/70">
           {campaign.description} {t("goal", { amount: money(campaign.goalCents) })}
         </p>
       ) : null}
@@ -325,7 +325,7 @@ export function DonateFlow({
           const badge = (
             <span
               aria-hidden
-              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-[11px] ${
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-[12px] ${
                 current
                   ? "bg-ink text-paper"
                   : done
@@ -338,7 +338,7 @@ export function DonateFlow({
           );
           const label = (
             <span
-              className={`hidden text-[12.5px] sm:inline ${
+              className={`hidden text-[13.5px] sm:inline ${
                 current ? "font-semibold text-ink" : done ? "text-sea" : "text-ink/50"
               }`}
             >
@@ -371,7 +371,7 @@ export function DonateFlow({
           );
         })}
       </ol>
-      <p className="mt-2 text-[13px] font-semibold sm:sr-only">{stepLabels[step]}</p>
+      <p className="mt-2 text-[14px] font-semibold sm:sr-only">{stepLabels[step]}</p>
 
       {step === 1 ? (
         <>
@@ -387,11 +387,11 @@ export function DonateFlow({
                   onClick={() => selectAmount(chip.amountCents)}
                   className={chipClass(selected)}
                 >
-                  <span className="block font-mono text-[17px] font-medium tabular-nums">
+                  <span className="block font-mono text-[18px] font-medium tabular-nums">
                     {money(chip.amountCents)}
                   </span>
                   <span
-                    className={`mt-0.5 block text-[11.5px] leading-tight ${
+                    className={`mt-0.5 block text-[12.5px] leading-tight ${
                       selected ? "text-ink/75" : "text-ink/50"
                     }`}
                   >
@@ -407,7 +407,7 @@ export function DonateFlow({
           </div>
 
           <label className="mt-3 flex items-center gap-2 rounded-[11px] border-[1.5px] border-line px-3.5 py-3 focus-within:border-sea">
-            <span aria-hidden className="font-mono text-[15px] text-ink/50">
+            <span aria-hidden className="font-mono text-[16px] text-ink/50">
               €
             </span>
             <span className="sr-only">{t("customAmount")}</span>
@@ -417,11 +417,11 @@ export function DonateFlow({
               placeholder={t("customAmount")}
               value={customText}
               onChange={(event) => onCustomInput(event.target.value)}
-              className="w-full bg-transparent font-mono text-[15px] tabular-nums outline-none placeholder:font-sans placeholder:text-ink/40"
+              className="w-full bg-transparent font-mono text-[16px] tabular-nums outline-none placeholder:font-sans placeholder:text-ink/40"
             />
           </label>
           {errors.amountCents ? (
-            <p role="alert" className="mt-1.5 text-[12.5px] font-semibold text-red-dark">
+            <p role="alert" className="mt-1.5 text-[13.5px] font-semibold text-red-dark">
               {t("errAmount")}
             </p>
           ) : null}
@@ -443,7 +443,7 @@ export function DonateFlow({
       {step === 2 ? (
         <div className="mt-5 space-y-3">
           <div>
-            <label htmlFor="donorName" className="text-[13px] font-semibold">
+            <label htmlFor="donorName" className="text-[14px] font-semibold">
               {t("nameLabel")}
             </label>
             <input
@@ -456,13 +456,13 @@ export function DonateFlow({
               className={inputClass}
             />
             {errors.name ? (
-              <p role="alert" className="mt-1 text-[12.5px] font-semibold text-red-dark">
+              <p role="alert" className="mt-1 text-[13.5px] font-semibold text-red-dark">
                 {t("errName")}
               </p>
             ) : null}
           </div>
           <div>
-            <label htmlFor="donorEmail" className="text-[13px] font-semibold">
+            <label htmlFor="donorEmail" className="text-[14px] font-semibold">
               {t("emailLabel")}
             </label>
             <input
@@ -474,14 +474,14 @@ export function DonateFlow({
               className={inputClass}
             />
             {errors.email ? (
-              <p role="alert" className="mt-1 text-[12.5px] font-semibold text-red-dark">
+              <p role="alert" className="mt-1 text-[13.5px] font-semibold text-red-dark">
                 {t("errEmail")}
               </p>
             ) : null}
-            <p className="mt-1 text-[12px] text-ink/55">{t("emailHint")}</p>
+            <p className="mt-1 text-[13px] text-ink/55">{t("emailHint")}</p>
           </div>
           <div>
-            <label htmlFor="donorMessage" className="text-[13px] font-semibold">
+            <label htmlFor="donorMessage" className="text-[14px] font-semibold">
               {t("messageLabel")}
             </label>
             <textarea
@@ -492,7 +492,7 @@ export function DonateFlow({
               className={inputClass}
             />
             {errors.message ? (
-              <p role="alert" className="mt-1 text-[12.5px] font-semibold text-red-dark">
+              <p role="alert" className="mt-1 text-[13.5px] font-semibold text-red-dark">
                 {t("errMessage")}
               </p>
             ) : null}
@@ -503,7 +503,7 @@ export function DonateFlow({
       {step === 3 ? (
         <>
           {/* what they chose, editable by stepping back */}
-          <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 rounded-brand bg-sand px-4 py-3.5 text-[13.5px]">
+          <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 rounded-brand bg-sand px-4 py-3.5 text-[14.5px]">
             <dt className="text-ink/60">{t("summaryGift")}</dt>
             <dd className="text-right font-mono font-medium tabular-nums">
               {money(totalCents)}
@@ -515,7 +515,7 @@ export function DonateFlow({
             </dd>
           </dl>
 
-          <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
+          <p className="mt-6 font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
             {t("paymentMethod")}
           </p>
           <div className={`mt-3 grid gap-2 ${cardRailEnabled ? "grid-cols-2" : ""}`}>
@@ -526,8 +526,8 @@ export function DonateFlow({
                 disabled
                 className="rounded-[11px] border-[1.5px] border-line px-3 py-3 text-left opacity-50"
               >
-                <span className="block text-[14.5px] font-semibold">{t("railCard")}</span>
-                <span className="block text-[12px] text-ink/60">{t("railCardSub")}</span>
+                <span className="block text-[15.5px] font-semibold">{t("railCard")}</span>
+                <span className="block text-[13px] text-ink/60">{t("railCardSub")}</span>
               </button>
             ) : null}
             <button
@@ -535,8 +535,8 @@ export function DonateFlow({
               aria-pressed
               className="rounded-[11px] border-2 border-ink bg-ink px-3 py-3 text-left text-paper"
             >
-              <span className="block text-[14.5px] font-semibold">{t("railSepa")}</span>
-              <span className="block text-[12px] text-paper/70">{t("railSepaSub")}</span>
+              <span className="block text-[15.5px] font-semibold">{t("railSepa")}</span>
+              <span className="block text-[13px] text-paper/70">{t("railSepaSub")}</span>
             </button>
           </div>
 
@@ -552,14 +552,14 @@ export function DonateFlow({
           </div>
 
           <div className="mt-6 flex items-baseline justify-between border-t-[1.5px] border-ink pt-4">
-            <span className="text-[13.5px] font-semibold">{t("totalToday")}</span>
-            <span className="font-mono text-[19px] font-medium tabular-nums">
+            <span className="text-[14.5px] font-semibold">{t("totalToday")}</span>
+            <span className="font-mono text-[20px] font-medium tabular-nums">
               {formatCents(totalCents, locale)}
               {monthly ? t("perMonth") : null}
             </span>
           </div>
           {serverError ? (
-            <p role="alert" className="mt-3 text-[13px] font-semibold text-red-dark">
+            <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">
               {t("errServer")}
             </p>
           ) : null}
@@ -573,7 +573,7 @@ export function DonateFlow({
             ← {t("back")}
           </button>
         ) : (
-          <span className="font-mono text-[13px] tabular-nums text-ink/60">
+          <span className="font-mono text-[14px] tabular-nums text-ink/60">
             {money(totalCents)}
             {monthly ? t("perMonth") : null}
           </span>
@@ -597,7 +597,7 @@ export function DonateFlow({
         )}
       </div>
       {step === 3 ? (
-        <p className="mt-3 text-center text-[12px] leading-relaxed text-ink/55">
+        <p className="mt-3 text-center text-[13px] leading-relaxed text-ink/55">
           {t("secureNote")}
         </p>
       ) : null}

@@ -178,9 +178,9 @@ export default async function AdminDonationsPage({
 
   const table = (rows: DonationRow[], mode: "pending" | "approved" | "search") => (
     <div className="mt-3 overflow-x-auto">
-      <table className="w-full min-w-[560px] border-collapse text-[13.5px]">
+      <table className="w-full min-w-[560px] border-collapse text-[14.5px]">
         <thead>
-          <tr className="border-b border-line text-left font-mono text-[10.5px] uppercase tracking-[0.12em] text-sea">
+          <tr className="border-b border-line text-left font-mono text-[11.5px] uppercase tracking-[0.12em] text-sea">
             <th className="py-2 pr-3">{t("table.date")}</th>
             <th className="py-2 pr-3">{t("table.amount")}</th>
             <th className="py-2 pr-3">{t("table.donor")}</th>
@@ -199,19 +199,19 @@ export default async function AdminDonationsPage({
                 <td className="py-2.5 pr-3 font-mono tabular-nums">
                   {money(row.amount_cents)}
                   {row.is_recurring ? (
-                    <span className="ml-1 text-[11px] text-ink/50">
+                    <span className="ml-1 text-[12px] text-ink/50">
                       {t("table.monthly")}
                     </span>
                   ) : null}
                   {row.rail === "cash" ? (
-                    <span className="ml-1 text-[11px] text-ink/50">{t("railCash")}</span>
+                    <span className="ml-1 text-[12px] text-ink/50">{t("railCash")}</span>
                   ) : null}
                   {mode === "search" ? (
                     <span
                       className={
                         row.status === "refunded"
-                          ? "ml-1 text-[11px] font-semibold text-red-dark"
-                          : "ml-1 text-[11px] text-ink/50"
+                          ? "ml-1 text-[12px] font-semibold text-red-dark"
+                          : "ml-1 text-[12px] text-ink/50"
                       }
                     >
                       {t(`status.${row.status}`)}
@@ -221,7 +221,7 @@ export default async function AdminDonationsPage({
                 <td className="py-2.5 pr-3">
                   {row.donor_name ?? "—"}
                   {row.donor_email ? (
-                    <span className="block text-[12px] text-ink/50">{row.donor_email}</span>
+                    <span className="block text-[13px] text-ink/50">{row.donor_email}</span>
                   ) : null}
                 </td>
                 <td className="py-2.5 pr-3">{page?.title ?? "—"}</td>
@@ -264,33 +264,33 @@ export default async function AdminDonationsPage({
           name="q"
           defaultValue={query}
           placeholder={t("searchPlaceholder")}
-          className="w-full max-w-sm rounded-[10px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[14px] outline-none focus:border-sea"
+          className="w-full max-w-sm rounded-[10px] border-[1.5px] border-line bg-paper px-3.5 py-2.5 text-[15px] outline-none focus:border-sea"
         />
         <button
           type="submit"
-          className="rounded-xl bg-sea px-4 py-2.5 text-[13.5px] font-bold text-paper transition-colors hover:bg-sea-2"
+          className="rounded-xl bg-sea px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-sea-2"
         >
           {t("searchButton")}
         </button>
       </form>
       {query ? (
         results.length === 0 ? (
-          <p className="mt-3 text-[13.5px] text-ink/60">{t("searchEmpty")}</p>
+          <p className="mt-3 text-[14.5px] text-ink/60">{t("searchEmpty")}</p>
         ) : (
           table(results, "search")
         )
       ) : null}
 
-      <h2 className="mt-8 text-[15px] font-bold">{t("pendingHeading")}</h2>
+      <h2 className="mt-8 text-[16px] font-bold">{t("pendingHeading")}</h2>
       {pending.length === 0 ? (
-        <p className="mt-2 text-[13.5px] text-ink/60">{t("noPending")}</p>
+        <p className="mt-2 text-[14.5px] text-ink/60">{t("noPending")}</p>
       ) : (
         table(pending, "pending")
       )}
 
       <ReconciliationTool locale={locale as Locale} pledges={targets} />
 
-      <h2 className="mt-12 text-[15px] font-bold">{t("approvedHeading")}</h2>
+      <h2 className="mt-12 text-[16px] font-bold">{t("approvedHeading")}</h2>
       {approved.length > 0 ? table(approved, "approved") : null}
     </div>
   );

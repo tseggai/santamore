@@ -37,19 +37,19 @@ export function DisbursementRowActions({
       {!isPublished ? (
         confirmPublish ? (
           <>
-            <span className="text-[12px] text-ink/60">{t("disbPublishWarn")}</span>
+            <span className="text-[13px] text-ink/60">{t("disbPublishWarn")}</span>
             <button
               type="button"
               disabled={state === "busy"}
               onClick={() => run(() => publishDisbursement({ disbursementId }))}
-              className="rounded-lg bg-red px-3 py-1.5 text-[12px] font-bold text-paper hover:bg-red-dark disabled:opacity-50"
+              className="rounded-lg bg-red px-3 py-1.5 text-[13px] font-bold text-paper hover:bg-red-dark disabled:opacity-50"
             >
               {t("disbPublishConfirm")}
             </button>
             <button
               type="button"
               onClick={() => setConfirmPublish(false)}
-              className="text-[12px] font-semibold text-ink/60 hover:text-ink"
+              className="text-[13px] font-semibold text-ink/60 hover:text-ink"
             >
               {t("cancel")}
             </button>
@@ -58,7 +58,7 @@ export function DisbursementRowActions({
           <button
             type="button"
             onClick={() => setConfirmPublish(true)}
-            className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea"
+            className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea"
           >
             {t("disbPublish")}
           </button>
@@ -69,13 +69,13 @@ export function DisbursementRowActions({
           type="button"
           disabled={state === "busy"}
           onClick={() => run(() => markDisbursementPaid({ disbursementId }))}
-          className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[12px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
+          className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
         >
           {t("disbMarkPaid")}
         </button>
       ) : null}
       {state === "error" ? (
-        <span role="alert" className="text-[12px] font-semibold text-red-dark">
+        <span role="alert" className="text-[13px] font-semibold text-red-dark">
           {t("actionError")}
         </span>
       ) : null}
