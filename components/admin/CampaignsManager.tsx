@@ -341,7 +341,7 @@ function CampaignForm({
           {t("campPublic")}
         </label>
       </div>
-      <p className="mt-2 text-[13px] text-ink/55">{t("campAmountsHint")}</p>
+      <p className="mt-2 text-[13px] text-black/55">{t("campAmountsHint")}</p>
 
       {state === "error" ? (
         <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">
@@ -412,7 +412,7 @@ export function CampaignsManager({
       )}
 
       {campaigns.length === 0 ? (
-        <p className="text-[14.5px] text-ink/60">{t("campEmpty")}</p>
+        <p className="text-[14.5px] text-black/60">{t("campEmpty")}</p>
       ) : (
         <ul className="space-y-2">
           {campaigns.map((campaign) => (
@@ -431,13 +431,13 @@ export function CampaignsManager({
                       className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
                         campaign.is_public
                           ? "bg-sea text-paper"
-                          : "border border-line text-ink/60"
+                          : "border border-line text-black/60"
                       }`}
                     >
                       {campaign.is_public ? t("campPublicBadge") : t("postDraft")}
                     </span>
                   </p>
-                  <p className="mt-0.5 text-[13.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-black/60">
                     <span className="font-mono">{campaign.payment_reference}</span>
                     {" · "}
                     {t("campRaised", { amount: money(campaign.raised_cents) })}

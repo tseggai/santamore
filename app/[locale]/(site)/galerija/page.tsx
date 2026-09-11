@@ -74,7 +74,7 @@ export default async function GalleryPage({
         {t("eyebrow")}
       </p>
       <h1 className="type-display mt-3 text-4xl leading-[1.1] sm:text-5xl">{t("title")}</h1>
-      <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-ink/70">{t("sub")}</p>
+      <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-black/70">{t("sub")}</p>
 
       <div className="mt-8">
         {images.length === 0 ? (

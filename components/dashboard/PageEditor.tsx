@@ -239,7 +239,7 @@ export function PageEditor({
     router.refresh();
   };
 
-  const linkClass = "font-semibold text-ink underline decoration-line underline-offset-[3px]";
+  const linkClass = "font-semibold text-black underline decoration-black/30 underline-offset-[3px]";
   const fieldInput =
     "w-full rounded-lg border-[1.5px] border-sea bg-paper px-3 py-2 outline-none";
 
@@ -250,13 +250,13 @@ export function PageEditor({
         <div className="flex items-center gap-2">
           <span
             className={`rounded-full px-2.5 py-1 font-mono text-[11.5px] uppercase tracking-[0.14em] ${
-              isActive ? "bg-sea text-paper" : "border-[1.5px] border-line text-ink/70"
+              isActive ? "bg-sea text-paper" : "border-[1.5px] border-line text-black/70"
             }`}
           >
             {isActive ? t("statusActive") : t("statusDraft")}
           </span>
           {dirty ? (
-            <span className="text-[13px] text-ink/55">{t("unsaved")}</span>
+            <span className="text-[13px] text-black/55">{t("unsaved")}</span>
           ) : null}
         </div>
         <div className="flex gap-2">
@@ -278,7 +278,7 @@ export function PageEditor({
           </button>
         </div>
       </div>
-      <p className="mt-2 text-[13.5px] text-ink/55">{t("editorHint")}</p>
+      <p className="mt-2 text-[13.5px] text-black/55">{t("editorHint")}</p>
 
       {notice === "saved" ? (
         <p className="mt-2 text-[14px] font-semibold text-sea">{t("saved")}</p>
@@ -336,7 +336,7 @@ export function PageEditor({
           </div>
 
           <div className="min-w-0 flex-1">
-            <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
+            <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
               {tRunner("eyebrow")}
             </p>
 
@@ -348,7 +348,7 @@ export function PageEditor({
               className="mt-1 inline-block max-w-full"
               view={
                 <h1 className="type-display text-3xl leading-tight sm:text-4xl">
-                  {title.trim() || <span className="text-ink/35">{t("namePlaceholder")}</span>}
+                  {title.trim() || <span className="text-black/35">{t("namePlaceholder")}</span>}
                 </h1>
               }
               input={
@@ -373,7 +373,7 @@ export function PageEditor({
             />
 
             {/* context line: team picker lives where the team name shows */}
-            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[14.5px] text-ink/70">
+            <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1.5 text-[14.5px] text-black/70">
               <label htmlFor="fTeam" className="sr-only">
                 {t("teamLabel")}
               </label>
@@ -382,7 +382,7 @@ export function PageEditor({
                 id="fTeam"
                 value={teamPanel === "create" ? NEW_TEAM : teamId}
                 onChange={onTeamChange}
-                className="rounded-lg border-[1.5px] border-line bg-paper px-2 py-1 text-[14px] font-semibold text-ink outline-none focus:border-sea"
+                className="rounded-lg border-[1.5px] border-line bg-paper px-2 py-1 text-[14px] font-semibold text-black outline-none focus:border-sea"
               >
                 <option value="">{t("noTeam")}</option>
                 {teams.map((team) => (
@@ -480,7 +480,7 @@ export function PageEditor({
                 <span
                   className={`inline-flex items-center gap-1.5 rounded-full border-[1.5px] px-3 py-1.5 text-[13px] font-semibold ${
                     goalCents
-                      ? "border-line bg-paper/90 text-ink"
+                      ? "border-line bg-paper/90 text-black"
                       : "border-red bg-paper text-red-dark"
                   }`}
                 >
@@ -510,7 +510,7 @@ export function PageEditor({
         </div>
 
         {/* story */}
-        <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+        <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-black/60">
           {tRunner("story")}
         </p>
         <Editable
@@ -522,11 +522,11 @@ export function PageEditor({
           className="mt-2 block"
           view={
             story.trim() ? (
-              <p className="whitespace-pre-line text-[16px] leading-relaxed text-ink/80">
+              <p className="whitespace-pre-line text-[16px] leading-relaxed text-black/80">
                 {story}
               </p>
             ) : (
-              <p className="rounded-lg bg-mist px-4 py-3 text-[15px] leading-relaxed text-ink/45">
+              <p className="rounded-lg bg-mist px-4 py-3 text-[15px] leading-relaxed text-black/45">
                 {t("storyPlaceholder")}
               </p>
             )
@@ -548,7 +548,7 @@ export function PageEditor({
                 }}
                 className={`${fieldInput} text-[16px] leading-relaxed`}
               />
-              <p className="mt-1 text-[13px] text-ink/50">{t("storyHint")}</p>
+              <p className="mt-1 text-[13px] text-black/50">{t("storyHint")}</p>
             </>
           }
         />

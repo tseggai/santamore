@@ -97,11 +97,11 @@ export default async function HomePage({
         <h1 className="type-display mt-3 max-w-3xl text-4xl leading-[1.08] sm:text-6xl">
           {t("title")}
         </h1>
-        <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-ink/70">
+        <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-black/70">
           {t("sub")}
         </p>
         <p className="mt-6 font-mono text-[14px] text-sea">
-          <span className="type-display text-3xl tabular-nums">{money(receivedCents)}</span>{" "}
+          <span className="font-mono text-3xl font-extrabold tabular-nums">{money(receivedCents)}</span>{" "}
           {t("liveTotal")}
         </p>
         <div className="mt-7 flex flex-wrap gap-3">
@@ -131,7 +131,7 @@ export default async function HomePage({
         {content.triad.map((item) => (
           <div key={item.big}>
             <p className="type-display text-5xl text-red">{item.big}</p>
-            <p className="mt-2 max-w-xs text-[14.5px] leading-relaxed text-ink/70">
+            <p className="mt-2 max-w-xs text-[14.5px] leading-relaxed text-black/70">
               {item.label}
             </p>
           </div>
@@ -146,7 +146,7 @@ export default async function HomePage({
             <div key={step.title} className="rounded-brand border-[1.5px] border-line px-5 py-4">
               <span className="font-mono text-[12px] text-red">0{index + 1}</span>
               <p className="type-display mt-1 text-xl">{step.title}</p>
-              <p className="mt-2 text-[14px] leading-relaxed text-ink/65">{step.desc}</p>
+              <p className="mt-2 text-[14px] leading-relaxed text-black/65">{step.desc}</p>
             </div>
           ))}
         </div>
@@ -197,7 +197,7 @@ export default async function HomePage({
         </ul>
         <Link
           href="/transparentnost"
-          className="mt-4 inline-block text-[14.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+          className="mt-4 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
         >
           {content.fundsCta}
         </Link>
@@ -251,7 +251,7 @@ export default async function HomePage({
           </div>
           <Link
             href="/galerija"
-            className="mt-3 inline-block text-[14.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+            className="mt-3 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
           >
             {t("galleryCta")}
           </Link>
@@ -286,7 +286,7 @@ export default async function HomePage({
         </p>
         <Link
           href="/partneri"
-          className="mt-3 inline-block text-[14.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+          className="mt-3 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
         >
           {t("partnersCta")}
         </Link>
@@ -303,7 +303,7 @@ export default async function HomePage({
       {/* 11 — newsletter + monthly donor club */}
       <section className="border-t border-line-soft py-12">
         <p className={eyebrowClass}>{t("newsletterHeading")}</p>
-        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-ink/70">
+        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-black/70">
           {t("newsletterSub")}
         </p>
         <div className="mt-4">

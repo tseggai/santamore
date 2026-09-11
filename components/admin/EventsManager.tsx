@@ -12,6 +12,7 @@ export interface EventListRow extends EventFormValues {
   id: string;
   registrations: number;
   pages: number;
+  going: number;
 }
 
 /**
@@ -65,7 +66,7 @@ export function EventsManager({
       )}
 
       {events.length === 0 ? (
-        <p className="text-[14.5px] text-ink/60">{t("regNoEvents")}</p>
+        <p className="text-[14.5px] text-black/60">{t("regNoEvents")}</p>
       ) : (
         <ul className="space-y-2">
           {events.map((event) => (
@@ -87,23 +88,23 @@ export function EventsManager({
                       className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
                         event.is_published
                           ? "bg-sea text-paper"
-                          : "border border-line text-ink/60"
+                          : "border border-line text-black/60"
                       }`}
                     >
                       {event.is_published ? t("postLive") : t("postDraft")}
                     </span>
-                    <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink/60">
+                    <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-black/60">
                       {event.kind === "challenge" ? t("evKindChallenge") : t("evKindRace")}
                     </span>
                   </p>
-                  <p className="mt-0.5 text-[13.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-black/60">
                     <span className="font-mono tabular-nums">{dateLabels[event.id]}</span>
                     {event.venue ? <> · {event.venue}</> : null}
                     {" · "}
                     <span className="font-mono">/dogadjaji/{event.slug}</span>
                   </p>
-                  <p className="mt-0.5 text-[13.5px] text-ink/60">
-                    {t("evCounts", { registrations: event.registrations, pages: event.pages })}
+                  <p className="mt-0.5 text-[13.5px] text-black/60">
+                    {t("evCounts", { registrations: event.registrations, pages: event.pages, going: event.going })}
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-1.5">

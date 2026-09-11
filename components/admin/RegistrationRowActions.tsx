@@ -74,7 +74,7 @@ export function RegistrationRowActions({
           type="button"
           disabled={cancelState === "busy"}
           onClick={cancel}
-          className="rounded-lg px-2 py-1 text-[13px] font-semibold text-ink/50 hover:text-red-dark disabled:opacity-40"
+          className="rounded-lg px-2 py-1 text-[13px] font-semibold text-black/50 hover:text-red-dark disabled:opacity-40"
         >
           {t("regCancel")}
         </button>

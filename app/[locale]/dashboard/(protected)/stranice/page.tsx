@@ -192,12 +192,12 @@ export default async function PagesHubPage({
 
   const single = pages.length === 1;
   const iconBtn =
-    "inline-flex h-10 w-10 items-center justify-center rounded-lg bg-paper text-ink transition-colors hover:bg-mist-2 hover:text-sea";
+    "inline-flex h-10 w-10 items-center justify-center rounded-lg bg-paper text-black transition-colors hover:bg-mist-2 hover:text-sea";
 
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{single ? t("title") : t("navPages")}</h1>
-      <p className="mt-2 text-[15px] leading-relaxed text-ink/65">
+      <p className="mt-2 text-[15px] leading-relaxed text-black/65">
         {pages.length === 0 ? t("hubEmptySub") : t("pagesSub")}
       </p>
 
@@ -223,7 +223,7 @@ export default async function PagesHubPage({
                         <span className={`font-bold ${single ? "text-[20px]" : "text-[16px]"}`}>{page.title}</span>
                         <span
                           className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
-                            live ? "bg-sea text-paper" : "bg-paper text-ink/60"
+                            live ? "bg-sea text-paper" : "bg-paper text-black/60"
                           }`}
                         >
                           {live ? t("statusActiveShort") : t("statusDraftShort")}
@@ -261,13 +261,13 @@ export default async function PagesHubPage({
                         ) : null}
                       </span>
                     </div>
-                    <p className="mt-1 text-[14px] text-ink/60">
+                    <p className="mt-1 text-[14px] text-black/60">
                       {event?.name ?? "—"}
                       {event?.starts_at ? ` · ${dateFormat.format(new Date(event.starts_at))}` : ""}
                       {team ? (
                         <>
                           {" · "}
-                          <Link href={`/t/${team.slug}`} className="font-semibold text-ink/80 hover:text-sea">
+                          <Link href={`/t/${team.slug}`} className="font-semibold text-black/80 hover:text-sea">
                             {team.name}
                           </Link>
                         </>
@@ -277,10 +277,10 @@ export default async function PagesHubPage({
                       <span className="font-mono text-[16px] tabular-nums">
                         {money(raised)}
                         {page.goal_cents ? (
-                          <span className="text-[13.5px] font-medium text-ink/50"> / {money(page.goal_cents)}</span>
+                          <span className="text-[13.5px] font-medium text-black/50"> / {money(page.goal_cents)}</span>
                         ) : null}
                       </span>
-                      <span className="text-[13.5px] text-ink/55">
+                      <span className="text-[13.5px] text-black/55">
                         {totals?.donor_count ?? 0} {tRunner("donors")}
                         {page.goal_cents ? ` · ${pct}%` : ""}
                       </span>
@@ -306,13 +306,13 @@ export default async function PagesHubPage({
 
       <section id="timovi" className="mt-8 scroll-mt-6 border-t-[0.5px] border-line pt-6">
         <h2 className="text-[16px] font-bold">{t("navTeams")}</h2>
-        <p className="mt-1 text-[14.5px] leading-relaxed text-ink/65">{t("teamsSub")}</p>
+        <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("teamsSub")}</p>
         <TeamsManager teams={myTeams} events={teamEventChoices} />
       </section>
 
       <section className="mt-8 border-t-[0.5px] border-line pt-6">
         <h2 className="text-[16px] font-bold">{pages.length === 0 ? t("createHeading") : t("createAnotherHeading")}</h2>
-        <p className="mt-1 text-[14.5px] leading-relaxed text-ink/65">
+        <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">
           {choices.length === 0 ? t("createNoEvents") : t("createSub")}
         </p>
         {choices.length > 0 ? (

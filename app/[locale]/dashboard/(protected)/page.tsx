@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { Avatar } from "@/components/Avatar";
 import { DonateButton } from "@/components/donate/DonateButton";
+import { ShareButton } from "@/components/ShareButton";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
@@ -41,7 +42,7 @@ export default async function DashboardOverviewPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("dashboard");
+  const [t, tDonate] = await Promise.all([getTranslations("dashboard"), getTranslations("donate")]);
 
   const supabase = await createClient();
   const {
@@ -123,15 +124,11 @@ export default async function DashboardOverviewPage({
         : raised === 0
           ? { text: t("nextActionSelf"), href: `/f/${pages[0].slug}/podrzi`, donateSlug: pages[0].slug }
           : { text: t("nudgeShare"), href: "/dashboard/stranice", donateSlug: null };
-  const nextClass =
-    "group mt-6 block rounded-lg bg-ink px-6 py-6 text-paper transition-opacity hover:opacity-95 sm:px-8 sm:py-7";
+  const nextClass = "mt-5 block rounded-lg bg-ink px-4 py-3.5 text-paper transition-opacity hover:opacity-90";
   const nextBody = (
     <>
-      <span className="type-eyebrow block text-red">{t("nextHeading")}</span>
-      <span className="type-display mt-2 block max-w-2xl text-xl text-paper sm:text-2xl">{nextAction.text}</span>
-      <span className="mt-4 inline-flex items-center gap-2 rounded-lg bg-paper px-4 py-2 text-[15px] font-bold text-ink transition-colors group-hover:bg-mist">
-        {t("nextGo")} →
-      </span>
+      <span className="block text-[15px] font-bold">{t("nextHeading")}</span>
+      <span className="mt-1 block text-[14.5px] leading-relaxed text-paper/70">{nextAction.text}</span>
     </>
   );
 
@@ -142,23 +139,29 @@ export default async function DashboardOverviewPage({
     { label: t("statRewards"), value: String(rewardsReady), tone: "red" },
   ] as const;
 
-  const quickActions = [
-    { href: "/dashboard/stranice", label: pages.length === 0 ? t("qaNewPage") : t("navPages") },
-    { href: "/dashboard/strava", label: connection ? t("qaRewards") : t("qaStrava") },
-    { href: "/dogadjaji", label: t("qaEvents") },
-    { href: "/dashboard/donacije", label: t("qaGiving") },
-  ];
+  // Quick actions are verbs: things a runner does, not places they go.
+  const livePage = pages.find((page) => page.status === "active") ?? null;
+  const captainedTeam = (teamRows ?? [])[0] ?? null;
+  const inviteEvent = nextEvent ?? (livePage ? eventById.get(livePage.event_id) : undefined);
+  const invitePath = captainedTeam
+    ? `/${locale}/t/${captainedTeam.slug}`
+    : inviteEvent
+      ? `/${locale}/dogadjaji/${inviteEvent.slug}`
+      : `/${locale}/prikupljaci`;
+  const inviteTitle = captainedTeam?.name ?? inviteEvent?.name ?? "Santamore";
+  const actionClass =
+    "rounded-lg bg-mist px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea";
 
   return (
     <div className="py-8">
-      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
         {t("consoleBadge")}
       </p>
       <h1 className="type-display mt-2 text-3xl">
         {t("welcome", { name: profile?.full_name?.split(" ")[0] ?? "" }).trim()}
       </h1>
       {nextEvent && daysLeft !== null ? (
-        <p className="mt-1 text-[14.5px] text-ink/60">
+        <p className="mt-1 text-[14.5px] text-black/60">
           {t("daysLeft", { count: daysLeft })} · {nextEvent.name}
         </p>
       ) : null}
@@ -166,10 +169,10 @@ export default async function DashboardOverviewPage({
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map((tile) => (
           <div key={tile.label} className="rounded-brand bg-mist px-4 py-3.5">
-            <p className="text-[13px] font-semibold text-ink/60">{tile.label}</p>
+            <p className="text-[13px] font-semibold text-black/60">{tile.label}</p>
             <p
               className={`mt-1 font-mono text-2xl tabular-nums ${
-                tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-ink"
+                tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-black"
               }`}
             >
               {tile.value}
@@ -196,15 +199,45 @@ export default async function DashboardOverviewPage({
       <section className="mt-8">
         <h2 className="text-[16px] font-bold">{t("quickActions")}</h2>
         <div className="mt-3 flex flex-wrap gap-2">
-          {quickActions.map((action) => (
-            <Link
-              key={action.href + action.label}
-              href={action.href}
-              className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
-            >
-              {action.label}
+          {livePage ? (
+            <ShareButton
+              title={livePage.title}
+              path={`/${locale}/f/${livePage.slug}`}
+              text={t("shareMessageShort", { title: livePage.title })}
+              label={t("qaSharePage")}
+              copiedLabel={tDonate("copied")}
+              className={actionClass}
+            />
+          ) : (
+            <Link href="/dashboard/stranice" className={actionClass}>
+              {t("qaNewPage")}
             </Link>
-          ))}
+          )}
+          <DonateButton
+            request={livePage ? { kind: "fundraiser", slug: livePage.slug } : { kind: "campaign" }}
+            href={livePage ? `/f/${livePage.slug}/podrzi` : "/podrzi"}
+            className={actionClass}
+          >
+            {livePage ? t("qaGiveOwn") : t("qaDonate")}
+          </DonateButton>
+          <ShareButton
+            title={inviteTitle}
+            path={invitePath}
+            text={t("inviteMessage", { name: inviteTitle })}
+            label={t("qaInvite")}
+            copiedLabel={tDonate("copied")}
+            className={actionClass}
+          />
+          {pages.length > 0 ? (
+            <Link href={`/dashboard/stranice/${pages[0].slug}#gotovina`} className={actionClass}>
+              {t("qaCash")}
+            </Link>
+          ) : null}
+          {!connection ? (
+            <Link href="/dashboard/strava" className={actionClass}>
+              {t("qaStrava")}
+            </Link>
+          ) : null}
         </div>
       </section>
 
@@ -216,7 +249,7 @@ export default async function DashboardOverviewPage({
           </Link>
         </div>
         {pages.length === 0 ? (
-          <p className="mt-2 text-[14.5px] text-ink/60">{t("pagesEmpty")}</p>
+          <p className="mt-2 text-[14.5px] text-black/60">{t("pagesEmpty")}</p>
         ) : (
           <ul className="mt-3 space-y-2">
             {pages.map((page) => {
@@ -238,13 +271,13 @@ export default async function DashboardOverviewPage({
                         {page.title}
                         <span
                           className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
-                            page.status === "active" ? "bg-sea text-paper" : "border border-line text-ink/60"
+                            page.status === "active" ? "bg-sea text-paper" : "border border-line text-black/60"
                           }`}
                         >
                           {page.status === "active" ? t("statusActiveShort") : t("statusDraftShort")}
                         </span>
                       </span>
-                      <span className="block text-[13.5px] text-ink/60">
+                      <span className="block text-[13.5px] text-black/60">
                         {event?.name ?? "—"}
                         {event?.starts_at ? ` · ${dateFormat.format(new Date(event.starts_at))}` : ""}
                       </span>
@@ -255,7 +288,7 @@ export default async function DashboardOverviewPage({
                     <span className="shrink-0 text-right font-mono text-[14px] tabular-nums">
                       {money(totals?.raised_cents ?? 0)}
                       {page.goal_cents ? (
-                        <span className="block text-[12px] text-ink/50">/ {money(page.goal_cents)}</span>
+                        <span className="block text-[12px] text-black/50">/ {money(page.goal_cents)}</span>
                       ) : null}
                     </span>
                   </Link>
@@ -275,7 +308,7 @@ export default async function DashboardOverviewPage({
             </Link>
           </div>
           {(teamRows ?? []).length === 0 ? (
-            <p className="mt-2 text-[14.5px] text-ink/60">{t("teamsEmpty")}</p>
+            <p className="mt-2 text-[14.5px] text-black/60">{t("teamsEmpty")}</p>
           ) : (
             <ul className="mt-3 space-y-1.5">
               {(teamRows ?? []).map((team) => (
@@ -283,7 +316,7 @@ export default async function DashboardOverviewPage({
                   <Link href={`/t/${team.slug}`} className="font-semibold hover:text-sea">
                     {team.name}
                   </Link>
-                  <span className="text-ink/50"> · {eventById.get(team.event_id)?.name ?? "—"}</span>
+                  <span className="text-black/50"> · {eventById.get(team.event_id)?.name ?? "—"}</span>
                 </li>
               ))}
             </ul>
@@ -292,10 +325,10 @@ export default async function DashboardOverviewPage({
         <section>
           <h2 className="text-[16px] font-bold">{t("registrationsHeading")}</h2>
           {(regRows ?? []).length === 0 ? (
-            <p className="mt-2 text-[14.5px] text-ink/60">
+            <p className="mt-2 text-[14.5px] text-black/60">
               {t("registrationsEmpty")}{" "}
-              <Link href="/dogadjaji" className="font-semibold text-sea underline underline-offset-2">
-                {t("qaEvents")}
+              <Link href="/dashboard/dogadjaji" className="font-semibold text-sea underline underline-offset-2">
+                {t("navEvents")}
               </Link>
             </p>
           ) : (
@@ -311,7 +344,7 @@ export default async function DashboardOverviewPage({
                     ) : (
                       <span>—</span>
                     )}
-                    <span className={registration.status === "confirmed" ? "text-sea" : "text-ink/55"}>
+                    <span className={registration.status === "confirmed" ? "text-sea" : "text-black/55"}>
                       {registration.status === "confirmed" ? t("regConfirmed") : t("regPending")}
                     </span>
                   </li>

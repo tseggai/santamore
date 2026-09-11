@@ -133,7 +133,7 @@ function SponsorForm({
           {t("spInKind")}
         </label>
       </div>
-      <p className="mt-2 text-[13px] text-ink/55">{t("spOpsNote")}</p>
+      <p className="mt-2 text-[13px] text-black/55">{t("spOpsNote")}</p>
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("goalInvalidAdmin")}</p> : null}
       <div className="mt-4 flex gap-2">
@@ -176,7 +176,7 @@ export function SponsorsManager({
         </button>
       )}
       {sponsors.length === 0 ? (
-        <p className="text-[14.5px] text-ink/60">{t("spEmpty")}</p>
+        <p className="text-[14.5px] text-black/60">{t("spEmpty")}</p>
       ) : (
         <ul className="space-y-2">
           {sponsors.map((sponsor) => (
@@ -186,13 +186,13 @@ export function SponsorsManager({
                   <p className="flex flex-wrap items-center gap-2 text-[15.5px] font-bold">
                     {sponsor.name}
                     <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
-                      sponsor.status === "active" || sponsor.status === "signed" ? "bg-sea text-paper" : "border border-line text-ink/60"
+                      sponsor.status === "active" || sponsor.status === "signed" ? "bg-sea text-paper" : "border border-line text-black/60"
                     }`}>
                       {t(`spStatusValue.${sponsor.status}`)}
                     </span>
-                    {sponsor.tier ? <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-ink/60">{sponsor.tier}</span> : null}
+                    {sponsor.tier ? <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-black/60">{sponsor.tier}</span> : null}
                   </p>
-                  <p className="mt-0.5 text-[13.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-black/60">
                     {sponsor.amount_cents ? (
                       <span className="font-mono tabular-nums">
                         {formatCents(sponsor.amount_cents, locale, { trimWholeCents: true })}

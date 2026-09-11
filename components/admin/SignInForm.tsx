@@ -95,7 +95,7 @@ export function SignInForm({
             <label htmlFor="adminCode" className="text-[14px] font-semibold">
               {t("codeLabel")}
             </label>
-            <p className="mt-0.5 text-[13.5px] text-ink/60">{t("codeHint")}</p>
+            <p className="mt-0.5 text-[13.5px] text-black/60">{t("codeHint")}</p>
             <input
               id="adminCode"
               type="text"
@@ -146,7 +146,7 @@ export function SignInForm({
             {detail?.rateLimited ? t("linkRateLimited") : t("linkError")}
           </p>
           {detail?.message ? (
-            <p className="mt-0.5 font-mono text-[12.5px] text-ink/55">{detail.message}</p>
+            <p className="mt-0.5 font-mono text-[12.5px] text-black/55">{detail.message}</p>
           ) : null}
         </div>
       ) : null}

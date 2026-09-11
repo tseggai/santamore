@@ -101,21 +101,21 @@ export default async function AdminRegistrationsPage({
 
       {selectedEvent ? (
         <>
-          <p className="mt-4 text-[14.5px] text-ink/65">
+          <p className="mt-4 text-[14.5px] text-black/65">
             {t("regSummary", { total: rows.length, confirmed })}
           </p>
           <p className="mt-1">
             <a
               href={`/api/admin/registrations?event=${selectedEvent.id}`}
               download
-              className="text-[14px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+              className="text-[14px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
             >
               {t("regCsv")}
             </a>
           </p>
 
           {rows.length === 0 ? (
-            <p className="mt-6 text-[14.5px] text-ink/60">{t("regEmpty")}</p>
+            <p className="mt-6 text-[14.5px] text-black/60">{t("regEmpty")}</p>
           ) : (
             <div className="mt-4 overflow-x-auto">
               <table className="w-full min-w-[760px] border-collapse text-[14px]">
@@ -137,7 +137,7 @@ export default async function AdminRegistrationsPage({
                       <td className="py-2.5 pr-3 font-semibold">
                         {one(row.profile)?.full_name ?? "—"}
                         {row.tier_label ? (
-                          <span className="block text-[12.5px] font-normal text-ink/50">
+                          <span className="block text-[12.5px] font-normal text-black/50">
                             {row.tier_label}
                           </span>
                         ) : null}
@@ -163,8 +163,8 @@ export default async function AdminRegistrationsPage({
                             row.status === "confirmed"
                               ? "font-semibold text-sea"
                               : row.status === "cancelled"
-                                ? "text-ink/40 line-through"
-                                : "text-ink/60"
+                                ? "text-black/40 line-through"
+                                : "text-black/60"
                           }
                         >
                           {t(`regStatusValue.${row.status}`)}
@@ -185,7 +185,7 @@ export default async function AdminRegistrationsPage({
           )}
         </>
       ) : (
-        <p className="mt-6 text-[14.5px] text-ink/60">{t("regNoEvents")}</p>
+        <p className="mt-6 text-[14.5px] text-black/60">{t("regNoEvents")}</p>
       )}
     </div>
   );

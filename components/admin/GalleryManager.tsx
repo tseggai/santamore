@@ -191,7 +191,7 @@ export function GalleryManager({
                     className="aspect-[4/3] w-full rounded-[8px] object-cover"
                   />
                 ) : null}
-                <p className="mt-1 truncate text-[12.5px] text-ink/60">
+                <p className="mt-1 truncate text-[12.5px] text-black/60">
                   {item.caption ?? "—"}
                 </p>
                 <div className="mt-1 flex items-center gap-1.5">
@@ -207,7 +207,7 @@ export function GalleryManager({
                     type="button"
                     disabled={rowBusy === item.id}
                     onClick={() => remove(item)}
-                    className="rounded-lg px-1.5 py-0.5 text-[12.5px] font-semibold text-ink/50 hover:text-red-dark disabled:opacity-40"
+                    className="rounded-lg px-1.5 py-0.5 text-[12.5px] font-semibold text-black/50 hover:text-red-dark disabled:opacity-40"
                   >
                     {t("galleryDelete")}
                   </button>

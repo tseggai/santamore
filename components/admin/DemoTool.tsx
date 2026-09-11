@@ -69,14 +69,14 @@ export function DemoTool({
         ).map(([key, value]) => (
           <div key={key} className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3">
             <p className="font-mono text-2xl tabular-nums">{value}</p>
-            <p className="mt-0.5 text-[13px] font-semibold text-ink/60">{t(key)}</p>
+            <p className="mt-0.5 text-[13px] font-semibold text-black/60">{t(key)}</p>
           </div>
         ))}
       </div>
 
       <form onSubmit={generate} className="rounded-brand border-[1.5px] border-line p-4 sm:p-5">
         <h2 className="text-[16px] font-bold">{t("demoGenerateHeading")}</h2>
-        <p className="mt-1 text-[14px] text-ink/60">{t("demoGenerateHint")}</p>
+        <p className="mt-1 text-[14px] text-black/60">{t("demoGenerateHint")}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           <div>
             <label htmlFor="demoTeams" className="text-[13.5px] font-semibold">
@@ -132,7 +132,7 @@ export function DemoTool({
 
       <div className="rounded-brand border-[1.5px] border-dashed border-red bg-red/5 p-4 sm:p-5">
         <h2 className="text-[16px] font-bold text-red-dark">{t("demoPurgeHeading")}</h2>
-        <p className="mt-1 text-[14px] text-ink/70">{t("demoPurgeHint")}</p>
+        <p className="mt-1 text-[14px] text-black/70">{t("demoPurgeHint")}</p>
         {confirmPurge ? (
           <div className="mt-3 flex gap-2">
             <button

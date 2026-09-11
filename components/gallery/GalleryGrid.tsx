@@ -112,7 +112,7 @@ export function GalleryGrid({
               className={
                 filter === f.slug
                   ? "rounded-full bg-sea px-4 py-1.5 text-[13.5px] font-semibold text-paper"
-                  : "rounded-full border-[1.5px] border-line px-4 py-1.5 text-[13.5px] font-semibold text-ink/70 hover:border-sea hover:text-sea"
+                  : "rounded-full border-[1.5px] border-line px-4 py-1.5 text-[13.5px] font-semibold text-black/70 hover:border-sea hover:text-sea"
               }
             >
               {f.label}

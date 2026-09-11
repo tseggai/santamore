@@ -66,10 +66,10 @@ export default async function CampaignsIndexPage({
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
       <h1 className="type-display text-4xl">{t("title")}</h1>
-      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-ink/70">{t("sub")}</p>
+      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-black/70">{t("sub")}</p>
 
       {campaigns.length === 0 ? (
-        <p className="mt-8 text-[15px] text-ink/60">{t("empty")}</p>
+        <p className="mt-8 text-[15px] text-black/60">{t("empty")}</p>
       ) : (
         <ul className="mt-8 space-y-3">
           {campaigns.map((campaign) => {
@@ -85,13 +85,13 @@ export default async function CampaignsIndexPage({
                 >
                   <span className="flex flex-wrap items-baseline justify-between gap-2">
                     <span className="type-display text-2xl">{campaign.title}</span>
-                    <span className="font-mono text-[13px] tabular-nums text-ink/60">
+                    <span className="font-mono text-[13px] tabular-nums text-black/60">
                       {campaign.starts_at ? dateFormat.format(new Date(campaign.starts_at)) : null}
                       {campaign.chapter_name ? <> · {campaign.chapter_name}</> : null}
                     </span>
                   </span>
                   {campaign.beneficiary_summary ? (
-                    <span className="mt-1 block text-[14.5px] leading-relaxed text-ink/70">
+                    <span className="mt-1 block text-[14.5px] leading-relaxed text-black/70">
                       {campaign.beneficiary_summary}
                     </span>
                   ) : null}
@@ -100,11 +100,11 @@ export default async function CampaignsIndexPage({
                       {money(campaign.raised_cents)}
                     </span>
                     {campaign.goal_cents ? (
-                      <span className="text-[13.5px] text-ink/60">
+                      <span className="text-[13.5px] text-black/60">
                         {t("ofGoal", { goal: money(campaign.goal_cents) })}
                       </span>
                     ) : null}
-                    <span className="text-[13.5px] text-ink/60">
+                    <span className="text-[13.5px] text-black/60">
                       · <span className="font-mono tabular-nums">{campaign.donor_count}</span>{" "}
                       {t("donors")}
                     </span>

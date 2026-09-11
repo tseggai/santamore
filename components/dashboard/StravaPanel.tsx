@@ -131,7 +131,7 @@ export function StravaPanel({
             <span className="min-w-0 truncate text-[16px]">
               <span className="font-bold">{connection.athleteName ?? t("connectedHeading")}</span>
               {connection.athleteName ? (
-                <span className="text-ink/55"> {t("onStrava")}</span>
+                <span className="text-black/55"> {t("onStrava")}</span>
               ) : null}
             </span>
           </p>
@@ -163,7 +163,7 @@ export function StravaPanel({
       {/* row 2: freshness and the manual sync, or what connecting does */}
       {connection ? (
         <div className="mt-3 flex flex-wrap items-center gap-3">
-          <span className="text-[14px] text-ink/60">
+          <span className="text-[14px] text-black/60">
             {connection.lastSyncAt
               ? t("lastSync", { date: connection.lastSyncAt.slice(0, 16).replace("T", " ") })
               : t("connectedSince", { date: connection.connectedAt.slice(0, 10) })}
@@ -171,19 +171,19 @@ export function StravaPanel({
           <button type="button" disabled={busy !== ""} onClick={sync} className={ghostBtn}>
             {busy === "sync" ? t("syncing") : t("syncNow")}
           </button>
-          <span className="text-[13px] text-ink/50">{t("autoSyncNote")}</span>
+          <span className="text-[13px] text-black/50">{t("autoSyncNote")}</span>
         </div>
       ) : (
-        <p className="mt-3 text-[15px] leading-relaxed text-ink/65">
+        <p className="mt-3 text-[15px] leading-relaxed text-black/65">
           {configured ? t("connectSub") : t("statusUnconfigured")}
           {!configured && isStaff ? (
-            <span className="mt-1 block font-mono text-[13px] text-ink/70">{t("unconfiguredStaffHint")}</span>
+            <span className="mt-1 block font-mono text-[13px] text-black/70">{t("unconfiguredStaffHint")}</span>
           ) : null}
         </p>
       )}
 
       {connection && !connection.scope.includes("activity:read_all") ? (
-        <p className="mt-3 rounded-lg bg-mist px-4 py-3 text-[14px] text-ink/70">
+        <p className="mt-3 rounded-lg bg-mist px-4 py-3 text-[14px] text-black/70">
           {t("scopePartialHint")}{" "}
           <a href={connectHref} className="font-semibold text-sea underline underline-offset-2">
             {t("reconnect")}
@@ -204,10 +204,10 @@ export function StravaPanel({
         />
         <span>
           <span className="font-semibold">{t("shareLabel")}</span>
-          <span className="mt-0.5 block text-[13.5px] leading-relaxed text-ink/60">{t("shareHint")}</span>
+          <span className="mt-0.5 block text-[13.5px] leading-relaxed text-black/60">{t("shareHint")}</span>
         </span>
       </label>
-      <p className="mt-3 text-[13px] leading-relaxed text-ink/50">
+      <p className="mt-3 text-[13px] leading-relaxed text-black/50">
         {connection ? t("disconnectHint") : t("privacyNote")}
       </p>
 

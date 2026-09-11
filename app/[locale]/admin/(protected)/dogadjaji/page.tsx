@@ -35,13 +35,21 @@ export default async function AdminEventsPage({
   const t = await getTranslations("admin");
   const supabase = await createClient();
 
-  const [{ data: events }, { data: chapters }, { data: campaigns }, { data: regs }, { data: pages }] =
+  const [
+    { data: events },
+    { data: chapters },
+    { data: campaigns },
+    { data: regs },
+    { data: pages },
+    { data: rsvps },
+  ] =
     await Promise.all([
       supabase.from("events").select("*").order("starts_at", { ascending: false }).limit(200),
       supabase.from("chapters").select("id, name").order("name"),
       supabase.from("campaigns").select("id, title").order("title"),
       supabase.from("registrations").select("event_id").limit(10_000),
       supabase.from("fundraisers").select("event_id").limit(10_000),
+      supabase.from("event_rsvps").select("event_id").eq("status", "going").limit(10_000),
     ]);
 
   const regCount = new Map<string, number>();
@@ -50,6 +58,8 @@ export default async function AdminEventsPage({
   for (const row of pages ?? []) {
     pageCount.set(row.event_id, (pageCount.get(row.event_id) ?? 0) + 1);
   }
+  const goingCount = new Map<string, number>();
+  for (const row of rsvps ?? []) goingCount.set(row.event_id, (goingCount.get(row.event_id) ?? 0) + 1);
 
   const dateFormat = new Intl.DateTimeFormat(htmlLang(locale as Locale), {
     day: "numeric",
@@ -63,6 +73,7 @@ export default async function AdminEventsPage({
       ...event,
       registrations: regCount.get(event.id) ?? 0,
       pages: pageCount.get(event.id) ?? 0,
+      going: goingCount.get(event.id) ?? 0,
     }),
   );
   const dateLabels = Object.fromEntries(
@@ -72,7 +83,7 @@ export default async function AdminEventsPage({
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("eventsTitle")}</h1>
-      <p className="mt-1 text-[14px] text-ink/60">{t("eventsHint")}</p>
+      <p className="mt-1 text-[14px] text-black/60">{t("eventsHint")}</p>
       <EventsManager
         events={rows}
         chapters={(chapters ?? []) as { id: string; name: string }[]}

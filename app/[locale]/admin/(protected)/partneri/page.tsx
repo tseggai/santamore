@@ -27,7 +27,7 @@ export default async function AdminSponsorsPage({
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("sponsorsTitle")}</h1>
-      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-ink/60">{t("sponsorsHint")}</p>
+      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("sponsorsHint")}</p>
       <SponsorsManager
         locale={locale as Locale}
         sponsors={(sponsors ?? []) as SponsorRow[]}

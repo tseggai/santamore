@@ -38,7 +38,7 @@ export default function Header() {
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-semibold text-ink/80 hover:text-sea"
+              className="text-sm font-semibold text-black/80 hover:text-sea"
             >
               {t(`nav.${item.key}`)}
             </Link>
@@ -48,7 +48,7 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="hidden text-sm font-semibold text-ink/80 hover:text-sea sm:inline"
+            className="hidden text-sm font-semibold text-black/80 hover:text-sea sm:inline"
           >
             {t("nav.myPage")}
           </Link>

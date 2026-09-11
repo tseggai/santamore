@@ -57,11 +57,11 @@ export function GivingList({ donations }: { donations: MyDonation[] }) {
             ? "bg-sea text-paper"
             : donation.status === "pending"
               ? "border border-red text-red-dark"
-              : "border border-line text-ink/50";
+              : "border border-line text-black/50";
         return (
           <li key={donation.id} className="rounded-lg bg-mist px-4 py-3">
             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="font-mono text-[13.5px] tabular-nums text-ink/60">{donation.entry_date}</span>
+              <span className="font-mono text-[13.5px] tabular-nums text-black/60">{donation.entry_date}</span>
               <span className="min-w-0 flex-1 text-[15px] font-semibold">
                 {target ? (
                   <Link href={target.href} className="hover:text-sea">
@@ -71,7 +71,7 @@ export function GivingList({ donations }: { donations: MyDonation[] }) {
                   "Santamore"
                 )}
                 {donation.event_name ? (
-                  <span className="font-normal text-ink/50"> · {donation.event_name}</span>
+                  <span className="font-normal text-black/50"> · {donation.event_name}</span>
                 ) : null}
               </span>
               <span className="font-mono text-[15px] font-medium tabular-nums">{money(donation.amount_cents)}</span>
@@ -79,7 +79,7 @@ export function GivingList({ donations }: { donations: MyDonation[] }) {
                 {t(`status.${donation.status}`)}
               </span>
             </div>
-            <p className="mt-1 text-[13.5px] text-ink/60">
+            <p className="mt-1 text-[13.5px] text-black/60">
               {t(`rail.${donation.rail}`)}
               {donation.is_recurring ? ` · ${t("monthly")}` : ""}
               {donation.fee_covered_cents > 0

@@ -32,7 +32,7 @@ export function OverviewChart({
   const peak = days.reduce((best, d) => (d.cents > best.cents ? d : best), days[0]);
 
   if (max === 0) {
-    return <p className="mt-3 text-[14.5px] text-ink/55">{labels.empty}</p>;
+    return <p className="mt-3 text-[14.5px] text-black/55">{labels.empty}</p>;
   }
 
   return (
@@ -59,13 +59,13 @@ export function OverviewChart({
           </div>
         ))}
       </div>
-      <div className="mt-1.5 flex justify-between font-mono text-[11.5px] text-ink/45">
+      <div className="mt-1.5 flex justify-between font-mono text-[11.5px] text-black/45">
         <span>{label(days[0].date)}</span>
         <span>{label(days[days.length - 1].date)}</span>
       </div>
-      <p className="mt-2 text-[13.5px] text-ink/60">
+      <p className="mt-2 text-[13.5px] text-black/60">
         {labels.peak}:{" "}
-        <span className="font-mono tabular-nums text-ink">{money(peak.cents)}</span> ·{" "}
+        <span className="font-mono tabular-nums text-black">{money(peak.cents)}</span> ·{" "}
         {label(peak.date)}
       </p>
 

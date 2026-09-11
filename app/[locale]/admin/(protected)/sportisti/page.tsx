@@ -62,25 +62,25 @@ export default async function AdminAthletesPage({
     { label: t("athTileAwards"), value: String(athletes.reduce((n, a) => n + a.awards_total, 0)) },
   ];
 
-  const th = "px-3 py-2 text-left font-mono text-[11px] font-normal uppercase tracking-[0.14em] text-ink/60";
+  const th = "px-3 py-2 text-left font-mono text-[11px] font-normal uppercase tracking-[0.14em] text-black/60";
   const td = "px-3 py-2.5 align-top";
 
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("athletesTitle")}</h1>
-      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-ink/60">{t("athletesHint")}</p>
+      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("athletesHint")}</p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {tiles.map((tile) => (
           <div key={tile.label} className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3">
-            <p className="text-[13px] font-semibold text-ink/60">{tile.label}</p>
+            <p className="text-[13px] font-semibold text-black/60">{tile.label}</p>
             <p className="mt-1 font-mono text-xl tabular-nums">{tile.value}</p>
           </div>
         ))}
       </div>
 
       {athletes.length === 0 ? (
-        <p className="mt-6 text-[14.5px] text-ink/60">{t("athletesEmpty")}</p>
+        <p className="mt-6 text-[14.5px] text-black/60">{t("athletesEmpty")}</p>
       ) : (
         <div className="mt-6 overflow-x-auto rounded-brand border-[1.5px] border-line">
           <table className="w-full min-w-[880px] border-collapse text-[14px]">
@@ -102,7 +102,7 @@ export default async function AdminAthletesPage({
                   <td className={td}>
                     <span className="block font-semibold">{a.full_name?.trim() || a.email || a.user_id.slice(0, 8)}</span>
                     {a.full_name?.trim() && a.email ? (
-                      <span className="block text-[13px] text-ink/55">{a.email}</span>
+                      <span className="block text-[13px] text-black/55">{a.email}</span>
                     ) : null}
                     <a
                       href={`https://www.strava.com/athletes/${a.athlete_id}`}
@@ -113,20 +113,20 @@ export default async function AdminAthletesPage({
                       {t("athViewOnStrava")}
                     </a>
                   </td>
-                  <td className={`${td} font-mono tabular-nums text-ink/70`}>{a.connected_at.slice(0, 10)}</td>
-                  <td className={`${td} font-mono tabular-nums text-ink/70`}>
+                  <td className={`${td} font-mono tabular-nums text-black/70`}>{a.connected_at.slice(0, 10)}</td>
+                  <td className={`${td} font-mono tabular-nums text-black/70`}>
                     {a.last_sync_at ? a.last_sync_at.slice(0, 16).replace("T", " ") : "—"}
                   </td>
-                  <td className={`${td} font-mono tabular-nums text-ink/70`}>{a.last_activity_on ?? "—"}</td>
+                  <td className={`${td} font-mono tabular-nums text-black/70`}>{a.last_activity_on ?? "—"}</td>
                   <td className={`${td} text-right font-mono tabular-nums`}>
                     {a.activities_30d} · {km(a.distance_30d_m)}
-                    <span className="block text-[12.5px] text-ink/50">
+                    <span className="block text-[12.5px] text-black/50">
                       {t("athTotal", { n: a.activities_total })}
                     </span>
                   </td>
                   <td className={`${td} text-right font-mono tabular-nums`}>
                     {a.awards_total}
-                    <span className="block text-[12.5px] text-ink/50">
+                    <span className="block text-[12.5px] text-black/50">
                       {t("athRedeemed", { n: a.awards_redeemed })}
                     </span>
                   </td>

@@ -90,7 +90,7 @@ export default function LocaleSwitcher({
         className={`inline-flex items-center gap-1.5 rounded-lg border-[1.5px] px-2 py-1.5 transition-colors ${
           dark
             ? "border-paper/30 text-paper hover:border-paper"
-            : "border-line text-ink/80 hover:border-sea hover:text-sea"
+            : "border-line text-black/80 hover:border-sea hover:text-sea"
         }`}
       >
         <Flag locale={locale} className="h-[14px] w-[21px] rounded-[2px]" />
@@ -127,7 +127,7 @@ export default function LocaleSwitcher({
                 role="menuitem"
                 aria-current={active ? "true" : undefined}
                 onClick={() => setOpen(false)}
-                className={`flex items-center gap-2.5 px-3 py-2 text-[14px] text-ink transition-colors hover:bg-mist focus-visible:bg-mist ${
+                className={`flex items-center gap-2.5 px-3 py-2 text-[14px] text-black transition-colors hover:bg-mist focus-visible:bg-mist ${
                   active ? "font-semibold" : ""
                 }`}
               >

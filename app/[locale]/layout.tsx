@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { routing, htmlLang } from "@/i18n/routing";
-import { brandFont } from "@/lib/fonts";
+import { brandFont, displayFont } from "@/lib/fonts";
 import { siteOrigin } from "@/lib/site";
 import { CookieConsent } from "@/components/CookieConsent";
 import "../globals.css";
@@ -54,9 +54,9 @@ export default async function LocaleLayout({
   return (
     <html
       lang={htmlLang(locale)}
-      className={brandFont.variable}
+      className={`${brandFont.variable} ${displayFont.variable}`}
     >
-      <body className="flex min-h-screen flex-col bg-paper text-ink">
+      <body className="flex min-h-screen flex-col bg-paper text-black">
         <NextIntlClientProvider>
           {children}
           <CookieConsent domain={process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN ?? null} />

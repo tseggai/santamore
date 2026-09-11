@@ -7,7 +7,7 @@ export default function NotFoundPage() {
   return (
     <div className="mx-auto max-w-3xl px-5 py-20">
       <h1 className="type-display text-4xl">{t("title")}</h1>
-      <p className="mt-4 text-[16px] text-ink/70">{t("body")}</p>
+      <p className="mt-4 text-[16px] text-black/70">{t("body")}</p>
       <Link
         href="/"
         className="mt-8 inline-block rounded-lg border-[1.5px] border-line px-5 py-3 text-sm font-semibold hover:border-sea hover:text-sea"

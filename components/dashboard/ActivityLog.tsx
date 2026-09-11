@@ -77,7 +77,7 @@ export function ActivityLog({
           {formatMetricValue(totals[metric], metric, locale)}
         </p>
       </div>
-      <p className="mt-1 text-[13.5px] text-ink/60">{t("activitySub")}</p>
+      <p className="mt-1 text-[13.5px] text-black/60">{t("activitySub")}</p>
 
       <form onSubmit={submit} className="mt-3 flex flex-wrap items-end gap-2">
         <label className="w-24 text-[13px] font-semibold">
@@ -130,7 +130,7 @@ export function ActivityLog({
               key={activity.id}
               className="flex items-baseline justify-between gap-3 border-t-[0.5px] border-line py-2 text-[13.5px]"
             >
-              <span className="font-mono tabular-nums text-ink/60">
+              <span className="font-mono tabular-nums text-black/60">
                 {activity.started_at.slice(0, 10)}
               </span>
               <span className="flex-1 font-mono tabular-nums">
@@ -146,7 +146,7 @@ export function ActivityLog({
                 <button
                   type="button"
                   onClick={() => remove(activity.id)}
-                  className="text-[12.5px] font-semibold text-ink/50 transition-colors hover:text-red-dark"
+                  className="text-[12.5px] font-semibold text-black/50 transition-colors hover:text-red-dark"
                 >
                   {t("activityDelete")}
                 </button>

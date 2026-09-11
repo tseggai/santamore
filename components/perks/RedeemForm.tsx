@@ -29,7 +29,7 @@ export function RedeemForm({ code }: { code: string }) {
   return (
     <form onSubmit={submit} className="rounded-brand border-[1.5px] border-ink bg-sand p-5">
       <p className="text-[15px] font-bold">{t("redeemHeading")}</p>
-      <p className="mt-1 text-[13.5px] leading-relaxed text-ink/65">{t("redeemHint")}</p>
+      <p className="mt-1 text-[13.5px] leading-relaxed text-black/65">{t("redeemHint")}</p>
       <div className="mt-3 flex gap-2">
         <label htmlFor="redeemPin" className="sr-only">
           {t("pinLabel")}

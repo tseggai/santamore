@@ -27,7 +27,7 @@ export default async function RunnerSignInPage({
         Santamore
       </p>
       <h1 className="type-display mt-3 text-3xl">{t("signInTitle")}</h1>
-      <p className="mt-3 text-[15px] leading-relaxed text-ink/65">{t("signInSub")}</p>
+      <p className="mt-3 text-[15px] leading-relaxed text-black/65">{t("signInSub")}</p>
       {error ? (
         <p
           role="alert"

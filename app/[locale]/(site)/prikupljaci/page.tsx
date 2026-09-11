@@ -109,7 +109,7 @@ export default async function FundraisersDirectoryPage({
 
   return (
     <div className="mx-auto max-w-xl px-5 py-12">
-      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
         {board?.event.name ?? "Santamore"}
       </p>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
@@ -122,7 +122,7 @@ export default async function FundraisersDirectoryPage({
           {t("myPageCta")}
         </Link>
       </div>
-      <p className="mt-2 text-[14.5px] text-ink/65">
+      <p className="mt-2 text-[14.5px] text-black/65">
         <span className="font-mono tabular-nums">{board?.activeCount ?? 0}</span>{" "}
         {t("activeFundraisers")} ·{" "}
         <span className="font-mono tabular-nums">

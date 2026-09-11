@@ -51,7 +51,7 @@ export default async function AdminMessagesPage({
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("messagesTitle")}</h1>
-      <p className="mt-1 text-[14px] text-ink/60">{t("messagesHint")}</p>
+      <p className="mt-1 text-[14px] text-black/60">{t("messagesHint")}</p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {[null, ...KINDS].map((kindOption) => {
@@ -63,7 +63,7 @@ export default async function AdminMessagesPage({
               className={
                 selected
                   ? "rounded-full bg-sea px-4 py-1.5 text-[13.5px] font-semibold text-paper"
-                  : "rounded-full border-[1.5px] border-line px-4 py-1.5 text-[13.5px] font-semibold text-ink/70 hover:border-sea hover:text-sea"
+                  : "rounded-full border-[1.5px] border-line px-4 py-1.5 text-[13.5px] font-semibold text-black/70 hover:border-sea hover:text-sea"
               }
             >
               {kindOption ? t(`msgKind.${kindOption}`) : t("msgKindAll")}
@@ -73,7 +73,7 @@ export default async function AdminMessagesPage({
       </div>
 
       {rows.length === 0 ? (
-        <p className="mt-6 text-[14.5px] text-ink/60">{t("messagesEmpty")}</p>
+        <p className="mt-6 text-[14.5px] text-black/60">{t("messagesEmpty")}</p>
       ) : (
         <ul className="mt-5 space-y-2">
           {rows.map((row) => (
@@ -89,18 +89,18 @@ export default async function AdminMessagesPage({
                 {row.email ? (
                   <a
                     href={`mailto:${row.email}`}
-                    className="text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+                    className="text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
                   >
                     {row.email}
                   </a>
                 ) : null}
                 {row.phone ? <span className="font-mono">{row.phone}</span> : null}
-                <span className="ml-auto font-mono text-[12.5px] tabular-nums text-ink/45">
+                <span className="ml-auto font-mono text-[12.5px] tabular-nums text-black/45">
                   {dateFormat.format(new Date(row.created_at))} · {row.locale}
                 </span>
               </div>
               {row.message ? (
-                <p className="mt-1.5 whitespace-pre-wrap leading-relaxed text-ink/80">
+                <p className="mt-1.5 whitespace-pre-wrap leading-relaxed text-black/80">
                   {row.message}
                 </p>
               ) : null}

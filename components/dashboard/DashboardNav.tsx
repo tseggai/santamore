@@ -8,6 +8,7 @@ import { Link } from "@/i18n/navigation";
 const ITEMS = [
   { href: "/dashboard", key: "navOverview", exact: true },
   { href: "/dashboard/stranice", key: "navPages", exact: false },
+  { href: "/dashboard/dogadjaji", key: "navEvents", exact: false },
   { href: "/dashboard/strava", key: "navStrava", exact: false },
   { href: "/dashboard/donacije", key: "navGiving", exact: false },
 ] as const;

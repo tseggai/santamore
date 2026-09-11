@@ -25,7 +25,7 @@ export function ShareButton({
   variant?: "primary" | "ghost" | "icon";
   /** Pre-written message for the share sheet (WhatsApp, Viber…); the copy fallback still copies the bare URL. */
   text?: string;
-  /** Icon variant only: replaces the default surface classes. */
+  /** Replaces the variant's default classes. */
   className?: string;
 }) {
   const [copied, setCopied] = useState(false);
@@ -53,7 +53,7 @@ export function ShareButton({
           onClick={share}
           aria-label={label}
           title={label}
-          className={className ?? "inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mist text-ink transition-colors hover:bg-mist-2 hover:text-sea"}
+          className={className ?? "inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mist text-black transition-colors hover:bg-mist-2 hover:text-sea"}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
             <path
@@ -87,7 +87,7 @@ export function ShareButton({
       : "block w-full rounded-lg border-[1.5px] border-line px-6 py-3 text-center text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea";
 
   return (
-    <button type="button" onClick={share} aria-live="polite" className={buttonClass}>
+    <button type="button" onClick={share} aria-live="polite" className={className ?? buttonClass}>
       {copied ? copiedLabel : label}
     </button>
   );

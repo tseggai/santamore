@@ -72,7 +72,7 @@ export function DonationActions({
           <button
             type="button"
             onClick={() => setReasonOpen(false)}
-            className="text-[13px] font-semibold text-ink/60 hover:text-ink"
+            className="text-[13px] font-semibold text-black/60 hover:text-black"
           >
             {t("cancel")}
           </button>

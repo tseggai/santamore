@@ -60,7 +60,7 @@ export function PreviewFrame({
       </div>
       {open ? (
         <div className="mt-3">
-          <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.14em] text-ink/50">
+          <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.14em] text-black/50">
             {t("previewNote")}
           </p>
           <div

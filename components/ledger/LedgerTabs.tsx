@@ -50,11 +50,11 @@ export function LedgerTabs({
   const [view, setView] = useState<"out" | "in">("out");
 
   const pillClass =
-    "rounded-[5px] border border-line px-1.5 py-[3px] font-mono text-[11px] uppercase tracking-[0.05em] text-ink/60";
+    "rounded-[5px] border border-line px-1.5 py-[3px] font-mono text-[11px] uppercase tracking-[0.05em] text-black/60";
 
   const list = (rows: LedgerRow[], empty: string) =>
     rows.length === 0 ? (
-      <p className="py-6 text-[14.5px] text-ink/60">{empty}</p>
+      <p className="py-6 text-[14.5px] text-black/60">{empty}</p>
     ) : (
       <ul>
         {rows.map((row) => (
@@ -75,7 +75,7 @@ export function LedgerTabs({
               </span>
             </div>
             <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-              <span className="py-[3px] pr-1 font-mono text-[11px] uppercase tracking-[0.05em] text-ink/45">
+              <span className="py-[3px] pr-1 font-mono text-[11px] uppercase tracking-[0.05em] text-black/45">
                 {displayDate(row.date)}
               </span>
               {row.attribution ? (

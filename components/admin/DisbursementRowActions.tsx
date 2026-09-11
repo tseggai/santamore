@@ -37,7 +37,7 @@ export function DisbursementRowActions({
       {!isPublished ? (
         confirmPublish ? (
           <>
-            <span className="text-[13px] text-ink/60">{t("disbPublishWarn")}</span>
+            <span className="text-[13px] text-black/60">{t("disbPublishWarn")}</span>
             <button
               type="button"
               disabled={state === "busy"}
@@ -49,7 +49,7 @@ export function DisbursementRowActions({
             <button
               type="button"
               onClick={() => setConfirmPublish(false)}
-              className="text-[13px] font-semibold text-ink/60 hover:text-ink"
+              className="text-[13px] font-semibold text-black/60 hover:text-black"
             >
               {t("cancel")}
             </button>

@@ -23,20 +23,20 @@ export function LegalPage({ doc, locale }: { doc: LegalDoc; locale: Locale }) {
         {DRAFT_BANNER[locale]}
       </p>
       <h1 className="type-display mt-8 text-4xl">{doc.title}</h1>
-      <p className="mt-3 text-[15.5px] leading-relaxed text-ink/80">{doc.intro}</p>
+      <p className="mt-3 text-[15.5px] leading-relaxed text-black/80">{doc.intro}</p>
       {doc.sections.map((section) => (
         <section key={section.heading}>
           <h2 className="type-display mt-8 text-2xl">{section.heading}</h2>
           {section.paragraphs.map((paragraph) => (
             <p
               key={paragraph}
-              className="mt-3 text-[15.5px] leading-relaxed text-ink/80"
+              className="mt-3 text-[15.5px] leading-relaxed text-black/80"
             >
               {paragraph}
             </p>
           ))}
           {section.bullets ? (
-            <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[15.5px] leading-relaxed text-ink/80">
+            <ul className="mt-3 list-disc space-y-1.5 pl-5 text-[15.5px] leading-relaxed text-black/80">
               {section.bullets.map((bullet) => (
                 <li key={bullet}>{bullet}</li>
               ))}
