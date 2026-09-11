@@ -146,14 +146,14 @@ export default async function AdminOverviewPage({
             key={tile.label}
             className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3.5"
           >
-            <p className="text-[13px] font-semibold text-ink/60">{tile.label}</p>
+            <p className="text-[13px] font-semibold text-black/60">{tile.label}</p>
             <p
               className={`mt-1 font-mono text-2xl tabular-nums ${
                 tile.tone === "red"
                   ? "text-red-dark"
                   : tile.tone === "sea"
                     ? "text-sea"
-                    : "text-ink"
+                    : "text-black"
               }`}
             >
               {tile.value}
@@ -166,7 +166,7 @@ export default async function AdminOverviewPage({
       <section className="mt-8">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-[16px] font-bold">{t("chartHeading")}</h2>
-          <p className="font-mono text-[14px] tabular-nums text-ink/60">
+          <p className="font-mono text-[14px] tabular-nums text-black/60">
             {t("chartTotal", { amount: money(data.chartTotal) })}
           </p>
         </div>
@@ -195,12 +195,12 @@ export default async function AdminOverviewPage({
             >
               <p
                 className={`font-mono text-2xl tabular-nums ${
-                  queue.count > 0 ? "text-red-dark" : "text-ink/40"
+                  queue.count > 0 ? "text-red-dark" : "text-black/40"
                 }`}
               >
                 {queue.count}
               </p>
-              <p className="mt-1 text-[13.5px] font-semibold text-ink/70">{queue.label}</p>
+              <p className="mt-1 text-[13.5px] font-semibold text-black/70">{queue.label}</p>
             </Link>
           ))}
         </div>
@@ -216,9 +216,9 @@ export default async function AdminOverviewPage({
           >
             <p className="font-mono text-xl tabular-nums">
               {data.regConfirmed}
-              <span className="text-ink/40"> / {data.regTotal}</span>
+              <span className="text-black/40"> / {data.regTotal}</span>
             </p>
-            <p className="mt-1 text-[13.5px] font-semibold text-ink/70">
+            <p className="mt-1 text-[13.5px] font-semibold text-black/70">
               {t("stateRegistrations")}
             </p>
           </Link>
@@ -228,12 +228,12 @@ export default async function AdminOverviewPage({
           >
             <p className="font-mono text-xl tabular-nums">
               {data.pageCounts.active}
-              <span className="text-ink/40">
+              <span className="text-black/40">
                 {" "}
                 / {data.pageCounts.active + data.pageCounts.draft + data.pageCounts.hidden}
               </span>
             </p>
-            <p className="mt-1 text-[13.5px] font-semibold text-ink/70">
+            <p className="mt-1 text-[13.5px] font-semibold text-black/70">
               {t("statePages", {
                 draft: data.pageCounts.draft,
                 hidden: data.pageCounts.hidden,

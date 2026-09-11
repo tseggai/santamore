@@ -11,7 +11,8 @@
 
   --color-red: #f35353;
   --color-red-dark: #d93b3b;
-  --color-ink: #36434b; /* slate; softened from #0b0b0c by owner request */
+  --color-ink: #36434b; /* slate — dark SURFACES only (rails, bands, buttons) */
+  --color-black: #000000; /* text, and every text tint (black/60 …) — owner decision 2026-09-11 */
   --color-paper: #ffffff;
   --color-sea: #0e3a46;
   --color-sea-2: #15505f;
@@ -19,18 +20,18 @@
   --color-mist-2: #e3ebed; /* the same surface, one step deeper: hover, nested boxes */
   --color-sand: #f6f3ee;
 
-  --color-line: rgba(54, 67, 75, 0.16);
-  --color-line-soft: rgba(54, 67, 75, 0.09);
+  --color-line: rgba(0, 0, 0, 0.14);
+  --color-line-soft: rgba(0, 0, 0, 0.08);
 
   --color-white: #ffffff;
-  --color-black: #000000;
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  /* One family everywhere (owner decision 2026-09-11). Display, body and
-     figures are all Nunito, told apart by weight, size and tabular digits. */
+  /* Nunito for body, UI and figures; Cinzel Decorative for display
+     (owner decision 2026-09-11). Cinzel has no Cyrillic — the stack falls
+     through to Nunito for those glyphs. */
   --font-brand: var(--font-nunito), "Helvetica Neue", Helvetica, system-ui, sans-serif;
-  --font-display: var(--font-brand);
+  --font-display: var(--font-cinzel), var(--font-brand);
   --font-body: var(--font-brand);
   --font-sans: var(--font-brand);
   --font-mono: var(--font-brand);
@@ -74,15 +75,15 @@
 }
 
 /* ── Type styles: the whole site's text is set from here ─────────────────
-   Display: big, heavy, rounded — magazine headlines with room to breathe.
+   Display: Cinzel Decorative capitals with room to breathe.
    Eyebrow: the small tracked caps above a heading.
    Figure: money, references, distances — same face, tabular digits.
    Caption: fine print and explanatory text, the only place under 14px. */
 @utility type-display {
   font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: -0.015em;
-  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
 }
 @utility type-eyebrow {
   font-size: 12px;
@@ -98,7 +99,7 @@
 @utility type-caption {
   font-size: 13px;
   line-height: 1.5;
-  color: color-mix(in srgb, var(--color-ink) 60%, transparent);
+  color: color-mix(in srgb, var(--color-black) 60%, transparent);
 }
 
 @layer base {
@@ -111,7 +112,7 @@
     font-size: 16px;
     line-height: 1.6;
     font-weight: 500;
-    color: var(--color-ink);
+    color: var(--color-black);
     background-color: var(--color-paper);
     -webkit-font-smoothing: antialiased;
   }
@@ -154,7 +155,7 @@
   }
   .prose-news h2 {
     font-family: var(--font-display);
-    font-weight: 800;
+    font-weight: 400;
     font-size: 1.7rem;
     line-height: 1.25;
     margin-top: 2rem;
@@ -188,7 +189,7 @@
   .prose-news blockquote {
     border-left: 3px solid var(--color-red);
     padding-left: 1rem;
-    color: rgba(54, 67, 75, 0.75);
+    color: rgba(0, 0, 0, 0.72);
     margin-top: 0.9rem;
   }
   .prose-news code {

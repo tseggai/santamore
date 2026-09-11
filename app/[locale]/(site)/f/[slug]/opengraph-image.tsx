@@ -3,7 +3,7 @@ import { hasLocale } from "next-intl";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 import { formatCents } from "@/lib/money";
-import { OG_FONT_FAMILY, ogFonts } from "@/lib/og-fonts";
+import { OG_DISPLAY_FAMILY, OG_FONT_FAMILY, ogFonts } from "@/lib/og-fonts";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { routing, type Locale } from "@/i18n/routing";
 
@@ -84,9 +84,10 @@ export default async function OpengraphImage({
             style={{
               display: "flex",
               marginTop: 28,
-              fontSize: 72,
+              fontFamily: OG_DISPLAY_FAMILY,
+              fontSize: 60,
               fontWeight: 700,
-              lineHeight: 1.05,
+              lineHeight: 1.15,
               maxWidth: 780,
             }}
           >

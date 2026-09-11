@@ -28,8 +28,8 @@ export default async function VolunteerPage({
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
       <h1 className="type-display text-4xl">{t("title")}</h1>
-      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-ink/70">{t("sub")}</p>
-      <ul className="mt-6 max-w-xl space-y-2 text-[15px] leading-relaxed text-ink/80">
+      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-black/70">{t("sub")}</p>
+      <ul className="mt-6 max-w-xl space-y-2 text-[15px] leading-relaxed text-black/80">
         {[1, 2, 3].map((n) => (
           <li key={n} className="flex gap-2.5">
             <span aria-hidden className="mt-[8px] h-[6px] w-[6px] shrink-0 rounded-full bg-red" />

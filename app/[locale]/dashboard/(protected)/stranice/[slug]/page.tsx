@@ -185,7 +185,7 @@ export default async function EditPagePage({
 
       <section id="gotovina" className="mt-10 scroll-mt-6 rounded-brand bg-mist p-5">
         <h2 className="text-[16px] font-bold">{t("logCash")}</h2>
-        <p className="mt-1 text-[14.5px] leading-relaxed text-ink/65">{t("cashSub")}</p>
+        <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("cashSub")}</p>
         <div className="mt-4">
           <CashForm fundraiserId={mine.id} />
         </div>
@@ -196,12 +196,12 @@ export default async function EditPagePage({
                 key={row.id}
                 className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t-[0.5px] border-line py-2.5 text-[14.5px]"
               >
-                <span className="font-mono tabular-nums text-ink/60">{row.created_at.slice(0, 10)}</span>
+                <span className="font-mono tabular-nums text-black/60">{row.created_at.slice(0, 10)}</span>
                 <span className="min-w-0 flex-1">
                   <span className="font-semibold">{row.donor_name ?? tRunner("anonymous")}</span>
-                  {row.message ? <span className="text-ink/55"> · {row.message}</span> : null}
+                  {row.message ? <span className="text-black/55"> · {row.message}</span> : null}
                 </span>
-                <span className={`text-[13.5px] ${row.status === "approved" ? "text-sea" : "text-ink/50"}`}>
+                <span className={`text-[13.5px] ${row.status === "approved" ? "text-sea" : "text-black/50"}`}>
                   {row.status === "approved" ? t("cashConfirmed") : t("cashAwaiting")}
                 </span>
                 <span className="font-mono font-medium tabular-nums">{money(row.amount_cents)}</span>

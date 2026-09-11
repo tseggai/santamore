@@ -53,7 +53,7 @@ export function ShareButton({
           onClick={share}
           aria-label={label}
           title={label}
-          className={className ?? "inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mist text-ink transition-colors hover:bg-mist-2 hover:text-sea"}
+          className={className ?? "inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mist text-black transition-colors hover:bg-mist-2 hover:text-sea"}
         >
           <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
             <path

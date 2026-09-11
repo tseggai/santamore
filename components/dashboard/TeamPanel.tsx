@@ -114,7 +114,7 @@ export function TeamPanel({
       <p className="text-[15px] font-bold">
         {mode === "create" ? t("teamCreateHeading") : t("teamEditHeading")}
       </p>
-      <p className="mt-1 text-[13.5px] leading-relaxed text-ink/65">{t("teamCreateSub")}</p>
+      <p className="mt-1 text-[13.5px] leading-relaxed text-black/65">{t("teamCreateSub")}</p>
 
       <div className="mt-4 flex items-start gap-4">
         <button

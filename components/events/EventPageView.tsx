@@ -63,7 +63,7 @@ export function EventPageView({
         {event.kind === "challenge" ? t("kindChallenge") : t("kindRace")}
       </p>
       <h1 className="type-display mt-2 text-4xl">{event.name || "…"}</h1>
-      <p className="mt-3 text-[15.5px] text-ink/70">
+      <p className="mt-3 text-[15.5px] text-black/70">
         {fmt(event.starts_at)}
         {event.ends_at ? <> — {fmt(event.ends_at)}</> : null}
         {event.venue ? <> · {event.venue}</> : null}
@@ -138,14 +138,14 @@ export function EventPageView({
       <p className="mt-10 text-[14.5px]">
         <Link
           href="/prikupljaci"
-          className="font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+          className="font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
         >
           {t("moneyBoardLink")}
         </Link>
         {" · "}
         <Link
           href="/uslovi-ucesca"
-          className="font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+          className="font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
         >
           {t("termsLink")}
         </Link>

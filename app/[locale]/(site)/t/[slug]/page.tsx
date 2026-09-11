@@ -99,16 +99,16 @@ export default async function TeamPage({
       <header className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">
         <Avatar src={photo} name={team.name} size={136} priority className="sm:mt-1" />
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
+          <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
             {t("teamEyebrow")}
           </p>
           <h1 className="type-display mt-1 text-3xl leading-tight sm:text-4xl">{team.name}</h1>
-          <p className="mt-2 text-[14.5px] leading-relaxed text-ink/70">
+          <p className="mt-2 text-[14.5px] leading-relaxed text-black/70">
             {t("memberCount", { count: team.member_count })}
             {" · "}
             <Link
               href={`/dogadjaji/${team.event_slug}`}
-              className="font-semibold text-ink underline decoration-line underline-offset-[3px] transition-colors hover:text-sea"
+              className="font-semibold text-black underline decoration-black/30 underline-offset-[3px] transition-colors hover:text-sea"
             >
               {team.event_name}
             </Link>
@@ -141,10 +141,10 @@ export default async function TeamPage({
           />
         ) : (
           <div className="rounded-brand bg-mist px-5 py-5">
-            <span className="type-display block text-4xl tabular-nums">
+            <span className="font-mono block text-4xl font-extrabold tabular-nums">
               {formatCents(team.raised_cents, locale as Locale, { trimWholeCents: true })}
             </span>
-            <span className="mt-1 block text-[13.5px] text-ink/70">
+            <span className="mt-1 block text-[13.5px] text-black/70">
               {t("teamRaisedBy", { count: team.member_count })} ·{" "}
               <span className="font-mono tabular-nums">{team.donor_count}</span>{" "}
               {tRunner("donors")}
@@ -155,20 +155,20 @@ export default async function TeamPage({
 
       {team.description ? (
         <>
-          <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+          <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-black/60">
             {t("teamAbout")}
           </p>
-          <p className="mt-2 whitespace-pre-line text-[16px] leading-relaxed text-ink/80">
+          <p className="mt-2 whitespace-pre-line text-[16px] leading-relaxed text-black/80">
             {team.description}
           </p>
         </>
       ) : null}
 
       <div className="my-7 h-px bg-line-soft" />
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-black/60">
         {t("teamMembers")}
       </p>
-      <p className="mt-1 text-[13.5px] text-ink/55">{t("teamMembersHint")}</p>
+      <p className="mt-1 text-[13.5px] text-black/55">{t("teamMembersHint")}</p>
       <LeaderboardList
         locale={locale as Locale}
         emptyLabel={t("emptyIndividuals")}

@@ -39,7 +39,7 @@ export default async function HowPage({
       <h1 className="type-display mt-3 text-4xl leading-[1.1] sm:text-5xl">
         {content.heroTitle}
       </h1>
-      <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-ink/70">
+      <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-black/70">
         {content.heroLead}
       </p>
 
@@ -77,7 +77,7 @@ export default async function HowPage({
             </div>
           ))}
         </div>
-        <p className="mt-4 text-[14.5px] leading-relaxed text-ink/65">{content.fundsNote}</p>
+        <p className="mt-4 text-[14.5px] leading-relaxed text-black/65">{content.fundsNote}</p>
       </section>
 
       {/* 70 / 20 / 10 */}
@@ -88,7 +88,7 @@ export default async function HowPage({
           {content.split.map((part) => (
             <div key={part.pct}>
               <p className="type-display text-5xl text-red">{part.pct}</p>
-              <p className="mt-1 text-[14.5px] leading-relaxed text-ink/70">{part.label}</p>
+              <p className="mt-1 text-[14.5px] leading-relaxed text-black/70">{part.label}</p>
             </div>
           ))}
         </div>
@@ -96,7 +96,7 @@ export default async function HowPage({
           {content.splitReasons.map((reason) => (
             <div key={reason.title}>
               <p className="text-[15px] font-semibold">{reason.title}</p>
-              <p className="mt-0.5 max-w-2xl text-[14.5px] leading-relaxed text-ink/65">
+              <p className="mt-0.5 max-w-2xl text-[14.5px] leading-relaxed text-black/65">
                 {reason.desc}
               </p>
             </div>
@@ -136,7 +136,7 @@ export default async function HowPage({
         </div>
         <Link
           href="/o-nama"
-          className="mt-5 inline-block text-[14.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+          className="mt-5 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
         >
           {content.decideCta}
         </Link>

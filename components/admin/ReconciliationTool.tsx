@@ -120,7 +120,7 @@ export function ReconciliationTool({
   return (
     <section className="mt-10 rounded-brand border-[1.5px] border-line px-4 py-4">
       <h2 className="text-[16px] font-bold">{t("uploadHeading")}</h2>
-      <p className="mt-1 text-[14px] text-ink/60">{t("uploadHint")}</p>
+      <p className="mt-1 text-[14px] text-black/60">{t("uploadHint")}</p>
 
       <label className="mt-3 inline-block">
         <span className="sr-only">{t("chooseFile")}</span>
@@ -134,7 +134,7 @@ export function ReconciliationTool({
 
       {rawRows ? (
         <>
-          <p className="mt-2 font-mono text-[13px] text-ink/60">
+          <p className="mt-2 font-mono text-[13px] text-black/60">
             {t("statementRows", {
               count: hasHeader ? rawRows.length - 1 : rawRows.length,
             })}
@@ -224,11 +224,11 @@ export function ReconciliationTool({
                 className="rounded-lg border-[1.5px] border-line px-3.5 py-3 text-[14.5px]"
               >
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <span className="font-mono tabular-nums text-ink/60">{row.dateText}</span>
+                  <span className="font-mono tabular-nums text-black/60">{row.dateText}</span>
                   <span className="font-mono font-medium tabular-nums">
                     {row.amountCents !== null ? money(row.amountCents) : row.amountText}
                   </span>
-                  <span className="min-w-0 flex-1 truncate text-ink/60">{row.description}</span>
+                  <span className="min-w-0 flex-1 truncate text-black/60">{row.description}</span>
                 </div>
 
                 {proposal.kind === "matched" ? (
@@ -243,7 +243,7 @@ export function ReconciliationTool({
                       </span>
                     </span>
                     {proposal.pledge.target === "registration" ? (
-                      <span className="rounded-full bg-sand px-2.5 py-0.5 font-mono text-[12px] text-ink/70">
+                      <span className="rounded-full bg-sand px-2.5 py-0.5 font-mono text-[12px] text-black/70">
                         {t("targetFee")}
                       </span>
                     ) : null}
@@ -285,13 +285,13 @@ export function ReconciliationTool({
                           <span>
                             {candidate.donorName ?? "—"}
                             {candidate.donorEmail ? (
-                              <span className="text-ink/50"> · {candidate.donorEmail}</span>
+                              <span className="text-black/50"> · {candidate.donorEmail}</span>
                             ) : null}
                           </span>
                           <span className="font-mono tabular-nums">
                             {money(candidate.amountCents)}
                           </span>
-                          <span className="font-mono text-[13px] tabular-nums text-ink/50">
+                          <span className="font-mono text-[13px] tabular-nums text-black/50">
                             {candidate.createdAt.slice(0, 10)}
                           </span>
                           {state === "done" ? null : (
@@ -346,7 +346,7 @@ export function ReconciliationTool({
                 ) : null}
 
                 {proposal.kind === "no-reference" ? (
-                  <p className="mt-2 text-ink/50">{t("noReference")}</p>
+                  <p className="mt-2 text-black/50">{t("noReference")}</p>
                 ) : null}
 
                 {state === "error" ? (

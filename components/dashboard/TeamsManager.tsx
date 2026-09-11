@@ -47,7 +47,7 @@ export function TeamsManager({
   return (
     <div className="mt-5 space-y-6">
       {teams.length === 0 ? (
-        <p className="text-[14.5px] text-ink/60">{t("teamsEmpty")}</p>
+        <p className="text-[14.5px] text-black/60">{t("teamsEmpty")}</p>
       ) : (
         <ul className="space-y-2">
           {teams.map((team) => (
@@ -58,7 +58,7 @@ export function TeamsManager({
                   <Link href={`/t/${team.slug}`} className="block text-[15px] font-semibold hover:text-sea">
                     {team.name}
                   </Link>
-                  <span className="block text-[13.5px] text-ink/60">
+                  <span className="block text-[13.5px] text-black/60">
                     {team.eventName} · {t("memberCountShort", { count: team.memberCount })} ·{" "}
                     <span className="font-mono tabular-nums">{team.raisedLabel}</span>
                   </span>
@@ -81,9 +81,9 @@ export function TeamsManager({
 
       <section className="border-t-[0.5px] border-line pt-6">
         <h2 className="text-[16px] font-bold">{t("teamCreateHeading")}</h2>
-        <p className="mt-1 text-[14.5px] leading-relaxed text-ink/65">{t("teamCreateSub")}</p>
+        <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("teamCreateSub")}</p>
         {events.length === 0 ? (
-          <p className="mt-3 text-[14.5px] text-ink/60">{t("createNoEvents")}</p>
+          <p className="mt-3 text-[14.5px] text-black/60">{t("createNoEvents")}</p>
         ) : open === "new" ? (
           <>
             <div className="mt-4">
@@ -103,9 +103,9 @@ export function TeamsManager({
                 ))}
               </select>
               {chosen?.fundraiserId ? (
-                <p className="mt-1 text-[13.5px] text-ink/55">{t("teamJoinsPage")}</p>
+                <p className="mt-1 text-[13.5px] text-black/55">{t("teamJoinsPage")}</p>
               ) : (
-                <p className="mt-1 text-[13.5px] text-ink/55">{t("teamNoPageYet")}</p>
+                <p className="mt-1 text-[13.5px] text-black/55">{t("teamNoPageYet")}</p>
               )}
             </div>
             <TeamPanel

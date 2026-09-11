@@ -210,7 +210,7 @@ export function DonateFlow({
     >
       <span className="min-w-0 flex-1">
         <span className="block text-[15.5px] font-semibold">{title}</span>
-        <span className="mt-0.5 block text-[13.5px] leading-relaxed text-ink/60">{desc}</span>
+        <span className="mt-0.5 block text-[13.5px] leading-relaxed text-black/60">{desc}</span>
       </span>
       <span
         aria-hidden
@@ -263,7 +263,7 @@ export function DonateFlow({
         <Heading className="type-display mt-3 text-3xl sm:text-4xl">
           {t("confTitle", { name: donorName })}
         </Heading>
-        <p className="mt-4 text-[16px] leading-relaxed text-ink/70">
+        <p className="mt-4 text-[16px] leading-relaxed text-black/70">
           {t("confEmailNote")} {t("confLedgerNote")}
         </p>
         <div className="mt-6">
@@ -312,7 +312,7 @@ export function DonateFlow({
         <Heading className="type-display min-w-0 text-3xl sm:text-4xl">{campaign.title}</Heading>
       </div>
       {step === 1 && campaign.description ? (
-        <p className="mt-3 text-[15.5px] leading-relaxed text-ink/70">
+        <p className="mt-3 text-[15.5px] leading-relaxed text-black/70">
           {campaign.description} {t("goal", { amount: money(campaign.goalCents) })}
         </p>
       ) : null}
@@ -330,7 +330,7 @@ export function DonateFlow({
                   ? "bg-ink text-paper"
                   : done
                     ? "bg-sea text-paper"
-                    : "border-[1.5px] border-line text-ink/50"
+                    : "border-[1.5px] border-line text-black/50"
               }`}
             >
               {done ? "✓" : n}
@@ -339,7 +339,7 @@ export function DonateFlow({
           const label = (
             <span
               className={`hidden text-[13.5px] sm:inline ${
-                current ? "font-semibold text-ink" : done ? "text-sea" : "text-ink/50"
+                current ? "font-semibold text-black" : done ? "text-sea" : "text-black/50"
               }`}
             >
               {stepLabels[n]}
@@ -392,7 +392,7 @@ export function DonateFlow({
                   </span>
                   <span
                     className={`mt-0.5 block text-[12.5px] leading-tight ${
-                      selected ? "text-ink/75" : "text-ink/50"
+                      selected ? "text-black/75" : "text-black/50"
                     }`}
                   >
                     {monthly
@@ -407,7 +407,7 @@ export function DonateFlow({
           </div>
 
           <label className="mt-3 flex items-center gap-2 rounded-lg border-[1.5px] border-line px-3.5 py-3 focus-within:border-sea">
-            <span aria-hidden className="font-mono text-[16px] text-ink/50">
+            <span aria-hidden className="font-mono text-[16px] text-black/50">
               €
             </span>
             <span className="sr-only">{t("customAmount")}</span>
@@ -417,7 +417,7 @@ export function DonateFlow({
               placeholder={t("customAmount")}
               value={customText}
               onChange={(event) => onCustomInput(event.target.value)}
-              className="w-full bg-transparent font-mono text-[16px] tabular-nums outline-none placeholder:font-sans placeholder:text-ink/40"
+              className="w-full bg-transparent font-mono text-[16px] tabular-nums outline-none placeholder:font-sans placeholder:text-black/40"
             />
           </label>
           {errors.amountCents ? (
@@ -478,7 +478,7 @@ export function DonateFlow({
                 {t("errEmail")}
               </p>
             ) : null}
-            <p className="mt-1 text-[13px] text-ink/55">{t("emailHint")}</p>
+            <p className="mt-1 text-[13px] text-black/55">{t("emailHint")}</p>
           </div>
           <div>
             <label htmlFor="donorMessage" className="text-[14px] font-semibold">
@@ -504,12 +504,12 @@ export function DonateFlow({
         <>
           {/* what they chose, editable by stepping back */}
           <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 rounded-brand bg-sand px-4 py-3.5 text-[14.5px]">
-            <dt className="text-ink/60">{t("summaryGift")}</dt>
+            <dt className="text-black/60">{t("summaryGift")}</dt>
             <dd className="text-right font-mono font-medium tabular-nums">
               {money(totalCents)}
               {monthly ? t("perMonth") : null}
             </dd>
-            <dt className="text-ink/60">{t("summaryFrom")}</dt>
+            <dt className="text-black/60">{t("summaryFrom")}</dt>
             <dd className="truncate text-right font-semibold">
               {anonymous ? t("summaryAnonymous", { name: donorName }) : donorName}
             </dd>
@@ -527,7 +527,7 @@ export function DonateFlow({
                 className="rounded-lg border-[1.5px] border-line px-3 py-3 text-left opacity-50"
               >
                 <span className="block text-[15.5px] font-semibold">{t("railCard")}</span>
-                <span className="block text-[13px] text-ink/60">{t("railCardSub")}</span>
+                <span className="block text-[13px] text-black/60">{t("railCardSub")}</span>
               </button>
             ) : null}
             <button
@@ -573,7 +573,7 @@ export function DonateFlow({
             ← {t("back")}
           </button>
         ) : (
-          <span className="font-mono text-[14px] tabular-nums text-ink/60">
+          <span className="font-mono text-[14px] tabular-nums text-black/60">
             {money(totalCents)}
             {monthly ? t("perMonth") : null}
           </span>
@@ -597,7 +597,7 @@ export function DonateFlow({
         )}
       </div>
       {step === 3 ? (
-        <p className="mt-3 text-center text-[13px] leading-relaxed text-ink/55">
+        <p className="mt-3 text-center text-[13px] leading-relaxed text-black/55">
           {t("secureNote")}
         </p>
       ) : null}

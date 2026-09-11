@@ -78,7 +78,7 @@ export function CreatePageForm({
           onChange={(event) => setTitle(event.target.value)}
           className={inputClass}
         />
-        <p className="mt-1 text-[13.5px] text-ink/55">{t("nameHint")}</p>
+        <p className="mt-1 text-[13.5px] text-black/55">{t("nameHint")}</p>
       </div>
       {events.length > 1 ? (
         <div>
@@ -99,7 +99,7 @@ export function CreatePageForm({
           </select>
         </div>
       ) : events.length === 1 ? (
-        <p className="text-[14px] text-ink/65">
+        <p className="text-[14px] text-black/65">
           {t("eventSingle", { name: events[0].name, date: events[0].dateLabel })}
         </p>
       ) : null}

@@ -239,7 +239,7 @@ function ChallengeForm({
         <div>
           <label htmlFor="pkWindow" className={labelClass}>{t("perkWindowDays")}</label>
           <input id="pkWindow" type="number" min={1} value={windowDays} onChange={(e) => setWindowDays(e.target.value)} disabled={Number(requiredDays) <= 1} placeholder="—" className={`${inputClass} font-mono disabled:opacity-50`} />
-          <p className="mt-1 text-[13px] text-ink/55">{t("perkWindowHint")}</p>
+          <p className="mt-1 text-[13px] text-black/55">{t("perkWindowHint")}</p>
         </div>
         <div>
           <label htmlFor="pkPartnerUrl" className={labelClass}>{t("perkPartnerUrl")}</label>
@@ -284,7 +284,7 @@ function ChallengeForm({
             placeholder={challenge?.has_pin ? "••••" : "4–8"}
             className={`${inputClass} font-mono`}
           />
-          <p className="mt-1 text-[13px] text-ink/55">{t("perkPinHint")}</p>
+          <p className="mt-1 text-[13px] text-black/55">{t("perkPinHint")}</p>
         </div>
         <div className="space-y-2 pt-1">
           <label className="flex items-center gap-2 text-[14.5px]">
@@ -298,8 +298,8 @@ function ChallengeForm({
         </div>
       </div>
 
-      <p className="mt-4 rounded-lg bg-paper px-4 py-3 text-[14px] leading-relaxed text-ink/75">
-        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink/50">{t("perkRulePreview")}</span>
+      <p className="mt-4 rounded-lg bg-paper px-4 py-3 text-[14px] leading-relaxed text-black/75">
+        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-black/50">{t("perkRulePreview")}</span>
         <br />
         <PerkRule challenge={preview} />
       </p>
@@ -360,10 +360,10 @@ export function PerkChallengesManager({
       <div className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3.5">
         <p className="text-[14.5px] font-bold">{t("webhookHeading")}</p>
         {!webhook.configured ? (
-          <p className="mt-1 text-[14px] text-ink/65">{t("webhookUnconfigured")}</p>
+          <p className="mt-1 text-[14px] text-black/65">{t("webhookUnconfigured")}</p>
         ) : (
           <>
-            <p className="mt-1 text-[14px] text-ink/65">
+            <p className="mt-1 text-[14px] text-black/65">
               {registered ? t("webhookOk") : t("webhookMissing")}{" "}
               <span className="font-mono text-[13px]">{webhook.expectedCallback}</span>
               {webhook.error ? <span className="block text-red-dark">{webhook.error}</span> : null}
@@ -387,7 +387,7 @@ export function PerkChallengesManager({
       )}
 
       {challenges.length === 0 ? (
-        <p className="text-[14.5px] text-ink/60">{t("perkEmpty")}</p>
+        <p className="text-[14.5px] text-black/60">{t("perkEmpty")}</p>
       ) : (
         <ul className="space-y-2">
           {challenges.map((challenge) => (
@@ -400,20 +400,20 @@ export function PerkChallengesManager({
                     ) : (
                       challenge.title
                     )}
-                    <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${challenge.is_active ? "bg-sea text-paper" : "border border-line text-ink/60"}`}>
+                    <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${challenge.is_active ? "bg-sea text-paper" : "border border-line text-black/60"}`}>
                       {challenge.is_active ? t("perkActiveBadge") : t("postDraft")}
                     </span>
                     {!challenge.has_pin ? (
                       <span className="rounded-full border border-red px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-red-dark">{t("perkNoPin")}</span>
                     ) : null}
                   </p>
-                  <p className="mt-0.5 text-[13.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-black/60">
                     {challenge.partner_name} · {challenge.reward_label}
                   </p>
-                  <p className="mt-0.5 text-[13.5px] text-ink/60">
+                  <p className="mt-0.5 text-[13.5px] text-black/60">
                     <PerkRule challenge={challenge} />
                   </p>
-                  <p className="mt-0.5 font-mono text-[13px] tabular-nums text-ink/60">
+                  <p className="mt-0.5 font-mono text-[13px] tabular-nums text-black/60">
                     {t("perkStats", { today: challenge.issued_today, issued: challenge.issued, redeemed: challenge.redeemed })}
                   </p>
                 </div>

@@ -57,7 +57,7 @@ export default async function EventRegistrationPage({
           {event.name}
         </p>
         <h1 className="type-display mt-2 text-3xl">{t("signInTitle")}</h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-ink/65">{t("signInSub")}</p>
+        <p className="mt-3 text-[15px] leading-relaxed text-black/65">{t("signInSub")}</p>
         <div className="mt-6">
           <SignInForm
             locale={locale as Locale}
@@ -94,14 +94,14 @@ export default async function EventRegistrationPage({
             ? t("confirmedTitle")
             : t("registeredTitle")}
         </h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-ink/70">
+        <p className="mt-3 text-[15px] leading-relaxed text-black/70">
           {registration.distance ? <>{registration.distance} · </> : null}
           {registration.tier_label}
           {registration.shirt_size ? <> · {registration.shirt_size}</> : null}
         </p>
         {pendingPayment ? (
           <>
-            <p className="mt-4 text-[15px] leading-relaxed text-ink/70">
+            <p className="mt-4 text-[15px] leading-relaxed text-black/70">
               {t("payInstructions")}
             </p>
             <div className="mt-4">
@@ -113,7 +113,7 @@ export default async function EventRegistrationPage({
                 monthly={false}
               />
             </div>
-            <p className="mt-3 text-[13.5px] leading-relaxed text-ink/60">
+            <p className="mt-3 text-[13.5px] leading-relaxed text-black/60">
               {t("opsNote")}
             </p>
           </>

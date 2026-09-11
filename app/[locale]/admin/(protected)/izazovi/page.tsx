@@ -69,7 +69,7 @@ export default async function AdminChallengesPage() {
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("perksTitle")}</h1>
-      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-ink/60">{t("perksHint")}</p>
+      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("perksHint")}</p>
       <PerkChallengesManager challenges={rows} webhook={webhook} />
     </div>
   );

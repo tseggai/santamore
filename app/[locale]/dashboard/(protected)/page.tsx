@@ -129,7 +129,7 @@ export default async function DashboardOverviewPage({
     <>
       <span className="type-eyebrow block text-red">{t("nextHeading")}</span>
       <span className="type-display mt-2 block max-w-2xl text-xl text-paper sm:text-2xl">{nextAction.text}</span>
-      <span className="mt-4 inline-flex items-center gap-2 rounded-lg bg-paper px-4 py-2 text-[15px] font-bold text-ink transition-colors group-hover:bg-mist">
+      <span className="mt-4 inline-flex items-center gap-2 rounded-lg bg-paper px-4 py-2 text-[15px] font-bold text-black transition-colors group-hover:bg-mist">
         {t("nextGo")} →
       </span>
     </>
@@ -151,14 +151,14 @@ export default async function DashboardOverviewPage({
 
   return (
     <div className="py-8">
-      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
         {t("consoleBadge")}
       </p>
       <h1 className="type-display mt-2 text-3xl">
         {t("welcome", { name: profile?.full_name?.split(" ")[0] ?? "" }).trim()}
       </h1>
       {nextEvent && daysLeft !== null ? (
-        <p className="mt-1 text-[14.5px] text-ink/60">
+        <p className="mt-1 text-[14.5px] text-black/60">
           {t("daysLeft", { count: daysLeft })} · {nextEvent.name}
         </p>
       ) : null}
@@ -166,10 +166,10 @@ export default async function DashboardOverviewPage({
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map((tile) => (
           <div key={tile.label} className="rounded-brand bg-mist px-4 py-3.5">
-            <p className="text-[13px] font-semibold text-ink/60">{tile.label}</p>
+            <p className="text-[13px] font-semibold text-black/60">{tile.label}</p>
             <p
               className={`mt-1 font-mono text-2xl tabular-nums ${
-                tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-ink"
+                tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-black"
               }`}
             >
               {tile.value}
@@ -216,7 +216,7 @@ export default async function DashboardOverviewPage({
           </Link>
         </div>
         {pages.length === 0 ? (
-          <p className="mt-2 text-[14.5px] text-ink/60">{t("pagesEmpty")}</p>
+          <p className="mt-2 text-[14.5px] text-black/60">{t("pagesEmpty")}</p>
         ) : (
           <ul className="mt-3 space-y-2">
             {pages.map((page) => {
@@ -238,13 +238,13 @@ export default async function DashboardOverviewPage({
                         {page.title}
                         <span
                           className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
-                            page.status === "active" ? "bg-sea text-paper" : "border border-line text-ink/60"
+                            page.status === "active" ? "bg-sea text-paper" : "border border-line text-black/60"
                           }`}
                         >
                           {page.status === "active" ? t("statusActiveShort") : t("statusDraftShort")}
                         </span>
                       </span>
-                      <span className="block text-[13.5px] text-ink/60">
+                      <span className="block text-[13.5px] text-black/60">
                         {event?.name ?? "—"}
                         {event?.starts_at ? ` · ${dateFormat.format(new Date(event.starts_at))}` : ""}
                       </span>
@@ -255,7 +255,7 @@ export default async function DashboardOverviewPage({
                     <span className="shrink-0 text-right font-mono text-[14px] tabular-nums">
                       {money(totals?.raised_cents ?? 0)}
                       {page.goal_cents ? (
-                        <span className="block text-[12px] text-ink/50">/ {money(page.goal_cents)}</span>
+                        <span className="block text-[12px] text-black/50">/ {money(page.goal_cents)}</span>
                       ) : null}
                     </span>
                   </Link>
@@ -275,7 +275,7 @@ export default async function DashboardOverviewPage({
             </Link>
           </div>
           {(teamRows ?? []).length === 0 ? (
-            <p className="mt-2 text-[14.5px] text-ink/60">{t("teamsEmpty")}</p>
+            <p className="mt-2 text-[14.5px] text-black/60">{t("teamsEmpty")}</p>
           ) : (
             <ul className="mt-3 space-y-1.5">
               {(teamRows ?? []).map((team) => (
@@ -283,7 +283,7 @@ export default async function DashboardOverviewPage({
                   <Link href={`/t/${team.slug}`} className="font-semibold hover:text-sea">
                     {team.name}
                   </Link>
-                  <span className="text-ink/50"> · {eventById.get(team.event_id)?.name ?? "—"}</span>
+                  <span className="text-black/50"> · {eventById.get(team.event_id)?.name ?? "—"}</span>
                 </li>
               ))}
             </ul>
@@ -292,7 +292,7 @@ export default async function DashboardOverviewPage({
         <section>
           <h2 className="text-[16px] font-bold">{t("registrationsHeading")}</h2>
           {(regRows ?? []).length === 0 ? (
-            <p className="mt-2 text-[14.5px] text-ink/60">
+            <p className="mt-2 text-[14.5px] text-black/60">
               {t("registrationsEmpty")}{" "}
               <Link href="/dogadjaji" className="font-semibold text-sea underline underline-offset-2">
                 {t("qaEvents")}
@@ -311,7 +311,7 @@ export default async function DashboardOverviewPage({
                     ) : (
                       <span>—</span>
                     )}
-                    <span className={registration.status === "confirmed" ? "text-sea" : "text-ink/55"}>
+                    <span className={registration.status === "confirmed" ? "text-sea" : "text-black/55"}>
                       {registration.status === "confirmed" ? t("regConfirmed") : t("regPending")}
                     </span>
                   </li>

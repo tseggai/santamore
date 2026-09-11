@@ -19,18 +19,22 @@ async function load(url: URL): Promise<ArrayBuffer> {
 }
 
 export async function ogFonts(): Promise<OgFont[]> {
-  const [dmRegular, dmBold, notoRegular, notoBold] = await Promise.all([
+  const [dmRegular, dmBold, notoRegular, notoBold, cinzel] = await Promise.all([
     load(new URL("../assets/fonts/Nunito-Regular.ttf", import.meta.url)),
     load(new URL("../assets/fonts/Nunito-Bold.ttf", import.meta.url)),
     load(new URL("../assets/fonts/NotoSans-Regular.ttf", import.meta.url)),
     load(new URL("../assets/fonts/NotoSans-Bold.ttf", import.meta.url)),
+    load(new URL("../assets/fonts/CinzelDecorative-700.ttf", import.meta.url)),
   ]);
   return [
     { name: "Nunito", data: dmRegular, weight: 400, style: "normal" },
     { name: "Nunito", data: dmBold, weight: 700, style: "normal" },
     { name: "Noto Sans", data: notoRegular, weight: 400, style: "normal" },
     { name: "Noto Sans", data: notoBold, weight: 700, style: "normal" },
+    { name: "Cinzel Decorative", data: cinzel, weight: 700, style: "normal" },
   ];
 }
 
 export const OG_FONT_FAMILY = '"Nunito", "Noto Sans"';
+/** Headlines on the cards; Nunito/Noto backfill anything Cinzel lacks (Cyrillic). */
+export const OG_DISPLAY_FAMILY = '"Cinzel Decorative", "Nunito", "Noto Sans"';

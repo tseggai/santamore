@@ -86,7 +86,7 @@ export default async function FundraiserPage({
 
   const photo = fundraiserPhotoUrl(fundraiser.photo_path);
   const linkClass =
-    "font-semibold text-ink underline decoration-line underline-offset-[3px] transition-colors hover:text-sea";
+    "font-semibold text-black underline decoration-black/30 underline-offset-[3px] transition-colors hover:text-sea";
 
   return (
     <div className="mx-auto max-w-xl px-5 py-10">
@@ -101,13 +101,13 @@ export default async function FundraiserPage({
           className="sm:mt-1"
         />
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
+          <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
             {t("eyebrow")}
           </p>
           <h1 className="type-display mt-1 text-3xl leading-tight sm:text-4xl">
             {fundraiser.title}
           </h1>
-          <p className="mt-2 text-[14.5px] leading-relaxed text-ink/70">
+          <p className="mt-2 text-[14.5px] leading-relaxed text-black/70">
             {fundraiser.team_name && fundraiser.team_slug ? (
               <>
                 {t("runsWith")}{" "}
@@ -151,21 +151,21 @@ export default async function FundraiserPage({
 
       {fundraiser.story ? (
         <>
-          <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+          <p className="mt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-black/60">
             {t("story")}
           </p>
-          <p className="mt-2 whitespace-pre-line text-[16px] leading-relaxed text-ink/80">
+          <p className="mt-2 whitespace-pre-line text-[16px] leading-relaxed text-black/80">
             {fundraiser.story}
           </p>
         </>
       ) : null}
 
       <div className="my-7 h-px bg-line-soft" />
-      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-black/60">
         {t("donorWall")}
       </p>
       {wall.length === 0 ? (
-        <p className="mt-2 text-[14.5px] text-ink/60">{t("wallEmpty")}</p>
+        <p className="mt-2 text-[14.5px] text-black/60">{t("wallEmpty")}</p>
       ) : null}
       <ul className="mt-2">
         {wall.map((donor) => (
@@ -179,7 +179,7 @@ export default async function FundraiserPage({
                 {donor.display_name ?? t("anonymous")}
               </span>
               {donor.message ? (
-                <span className="mt-0.5 block text-[13.5px] leading-relaxed text-ink/60">
+                <span className="mt-0.5 block text-[13.5px] leading-relaxed text-black/60">
                   {donor.message}
                 </span>
               ) : null}

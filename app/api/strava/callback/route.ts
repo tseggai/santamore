@@ -53,20 +53,28 @@ export async function GET(request: Request) {
       .maybeSingle();
     if (taken) return back("taken");
 
-    const { error } = await service.from("strava_connections").upsert(
-      {
-        user_id: user.id,
-        athlete_id: tokens.athlete.id,
-        access_token: tokens.access_token,
-        refresh_token: tokens.refresh_token,
-        expires_at: new Date(tokens.expires_at * 1000).toISOString(),
-        scope: tokens.scope ?? url.searchParams.get("scope") ?? "",
-        share_public: state.sharePublic,
-        athlete_name: athleteName(tokens.athlete),
-        athlete_avatar_url: athleteAvatar(tokens.athlete),
-      },
-      { onConflict: "user_id" },
-    );
+    const row = {
+      user_id: user.id,
+      athlete_id: tokens.athlete.id,
+      access_token: tokens.access_token,
+      refresh_token: tokens.refresh_token,
+      expires_at: new Date(tokens.expires_at * 1000).toISOString(),
+      scope: tokens.scope ?? url.searchParams.get("scope") ?? "",
+      share_public: state.sharePublic,
+    };
+    const profile = {
+      athlete_name: athleteName(tokens.athlete),
+      athlete_avatar_url: athleteAvatar(tokens.athlete),
+    };
+    let { error } = await service
+      .from("strava_connections")
+      .upsert({ ...row, ...profile }, { onConflict: "user_id" });
+    // PGRST204 / 42703: the profile columns (migration 0015) are not there
+    // yet — the connection itself must still succeed.
+    if (error && (error.code === "PGRST204" || error.code === "42703")) {
+      console.warn("[strava] profile columns missing — apply migration 0015");
+      ({ error } = await service.from("strava_connections").upsert(row, { onConflict: "user_id" }));
+    }
     if (error) {
       console.error("[strava] connection upsert failed:", error.code);
       return back("error");

@@ -182,9 +182,9 @@ export default async function StravaPage({
   ] as const;
 
   const heading = (text: string, count?: number) => (
-    <h2 className="flex items-baseline gap-2 type-eyebrow text-ink/60">
+    <h2 className="flex items-baseline gap-2 type-eyebrow text-black/60">
       {text}
-      {count !== undefined && count > 0 ? <span className="text-ink/40">{count}</span> : null}
+      {count !== undefined && count > 0 ? <span className="text-black/40">{count}</span> : null}
     </h2>
   );
   const card = "rounded-brand bg-mist p-5";
@@ -199,7 +199,7 @@ export default async function StravaPage({
           <span className="block text-[15px] font-semibold">
             {award.reward_label} · {award.partner_name}
           </span>
-          <span className="block text-[13.5px] text-ink/60">
+          <span className="block text-[13.5px] text-black/60">
             {award.challenge_title} · {award.awarded_on}
             {award.status === "issued" ? ` · ${t("expiresOn", { date: award.expires_at.slice(0, 10) })}` : ""}
           </span>
@@ -211,7 +211,7 @@ export default async function StravaPage({
               ? "bg-sea text-paper"
               : award.status === "redeemed"
                 ? "bg-mist text-sea"
-                : "border border-line text-ink/50"
+                : "border border-line text-black/50"
           }`}
         >
           {t(`awardStatus.${award.status}`)}
@@ -222,11 +222,11 @@ export default async function StravaPage({
 
   const activityItem = (activity: ActivityRow) => (
     <li key={activity.id} className="flex items-baseline gap-3 border-t-[0.5px] border-line py-2 text-[14px]">
-      <span className="font-mono tabular-nums text-ink/60">{activity.started_on}</span>
+      <span className="font-mono tabular-nums text-black/60">{activity.started_on}</span>
       <span className="min-w-0 flex-1 truncate">
         {activity.name ?? activity.sport_type ?? "—"}
-        <span className="text-ink/50"> · {activity.sport_type}</span>
-        {activity.is_manual ? <span className="text-ink/50"> · {t("manualEntry")}</span> : null}
+        <span className="text-black/50"> · {activity.sport_type}</span>
+        {activity.is_manual ? <span className="text-black/50"> · {t("manualEntry")}</span> : null}
       </span>
       <span className="font-mono tabular-nums">
         {km(activity.distance_m)}
@@ -248,7 +248,7 @@ export default async function StravaPage({
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("title")}</h1>
-      <p className="mt-2 text-[15px] leading-relaxed text-ink/65">{t("sub")}</p>
+      <p className="mt-2 text-[15px] leading-relaxed text-black/65">{t("sub")}</p>
 
       <div className="mt-6 border-b-[0.5px] border-line pb-6">
         <StravaPanel
@@ -263,15 +263,15 @@ export default async function StravaPage({
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map((tile) => (
           <div key={tile.label} className="rounded-brand bg-mist px-4 py-3.5">
-            <p className="text-[13px] font-semibold text-ink/60">{tile.label}</p>
+            <p className="text-[13px] font-semibold text-black/60">{tile.label}</p>
             <p
               className={`mt-1 font-mono text-2xl tabular-nums ${
-                tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-ink"
+                tile.tone === "red" ? "text-red-dark" : tile.tone === "sea" ? "text-sea" : "text-black"
               }`}
             >
               {tile.value}
             </p>
-            <p className="mt-0.5 text-[13px] text-ink/50">{tile.sub}</p>
+            <p className="mt-0.5 text-[13px] text-black/50">{tile.sub}</p>
           </div>
         ))}
       </div>
@@ -280,11 +280,11 @@ export default async function StravaPage({
         <section className={card}>
           {heading(t("trendHeading"))}
           {activities.length === 0 ? (
-            <p className="mt-2 text-[14.5px] text-ink/60">
+            <p className="mt-2 text-[14.5px] text-black/60">
               {connection ? t("trendEmpty") : t("trendEmptyDisconnected")}
             </p>
           ) : (
-            <div className="mt-3 text-ink">
+            <div className="mt-3 text-black">
               <WeeklyKmChart
                 weeks={weeks}
                 weekLabel={weekLabel}
@@ -298,7 +298,7 @@ export default async function StravaPage({
         <section className={card}>
           {heading(t("progressHeading"), progress.length)}
           {progress.length === 0 ? (
-            <p className="mt-2 text-[14.5px] text-ink/60">
+            <p className="mt-2 text-[14.5px] text-black/60">
               {t("progressEmpty")}{" "}
               <Link href="/izazovi" className="font-semibold text-sea underline underline-offset-2">
                 {t("browseChallenges")}
@@ -312,7 +312,7 @@ export default async function StravaPage({
         <section className={card}>
           {heading(t("rewardsReadyHeading"), ready.length)}
           {ready.length === 0 ? (
-            <p className="mt-2 text-[14.5px] text-ink/60">
+            <p className="mt-2 text-[14.5px] text-black/60">
               {awards.length === 0 ? t("awardsEmpty") : t("rewardsNoneReady")}{" "}
               {awards.length === 0 ? (
                 <Link href="/izazovi" className="font-semibold text-sea underline underline-offset-2">
@@ -331,7 +331,7 @@ export default async function StravaPage({
           )}
           {past.length > 0 ? (
             <details className="mt-3">
-              <summary className="cursor-pointer text-[14px] font-semibold text-ink/60 hover:text-sea">
+              <summary className="cursor-pointer text-[14px] font-semibold text-black/60 hover:text-sea">
                 {t("rewardsPastHeading", { count: past.length })}
               </summary>
               <Expandable
@@ -348,7 +348,7 @@ export default async function StravaPage({
         <section className={card}>
           {heading(t("activitiesHeading"), activities.length)}
           {activities.length === 0 ? (
-            <p className="mt-2 text-[14.5px] text-ink/60">
+            <p className="mt-2 text-[14.5px] text-black/60">
               {connection ? t("activitiesEmpty") : t("activitiesEmptyDisconnected")}
             </p>
           ) : (
@@ -360,14 +360,14 @@ export default async function StravaPage({
               className="mt-2"
             />
           )}
-          <p className="mt-3 text-[13px] text-ink/50">{t("poweredBy")}</p>
+          <p className="mt-3 text-[13px] text-black/50">{t("poweredBy")}</p>
         </section>
       </div>
 
       {connection && (pageCount ?? 0) === 0 ? (
         <div className="mt-6 rounded-brand bg-sand px-5 py-4">
           <p className="text-[15px] font-bold">{t("nurtureHeading")}</p>
-          <p className="mt-1 text-[14px] leading-relaxed text-ink/65">{t("nurtureBody")}</p>
+          <p className="mt-1 text-[14px] leading-relaxed text-black/65">{t("nurtureBody")}</p>
           <Link
             href="/dashboard/stranice"
             className="mt-3 inline-flex rounded-lg bg-ink px-4 py-2 text-[14px] font-semibold text-paper transition-opacity hover:opacity-90"

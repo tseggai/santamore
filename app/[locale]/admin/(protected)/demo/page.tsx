@@ -40,7 +40,7 @@ export default async function AdminDemoPage() {
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("demoTitle")}</h1>
-      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-ink/60">{t("demoHint")}</p>
+      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("demoHint")}</p>
       <DemoTool counts={counts} />
     </div>
   );

@@ -58,11 +58,11 @@ export function CookieConsent({ domain }: { domain: string | null }) {
       className="fixed inset-x-0 bottom-0 z-40 border-t-[1.5px] border-ink bg-paper px-5 py-4"
     >
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
-        <p className="max-w-xl text-[14px] leading-relaxed text-ink/80">
+        <p className="max-w-xl text-[14px] leading-relaxed text-black/80">
           {t("text")}{" "}
           <Link
             href="/kolacici"
-            className="font-semibold text-sea underline decoration-line underline-offset-2"
+            className="font-semibold text-sea underline decoration-black/30 underline-offset-2"
           >
             {t("policy")}
           </Link>

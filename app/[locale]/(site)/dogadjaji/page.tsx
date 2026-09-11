@@ -59,7 +59,7 @@ export default async function EventsIndexPage({
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
       <h1 className="type-display text-4xl">{t("title")}</h1>
-      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-ink/70">{t("sub")}</p>
+      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-black/70">{t("sub")}</p>
 
       <ul className="mt-7 space-y-3">
         {events.map((event) => (
@@ -70,11 +70,11 @@ export default async function EventsIndexPage({
             >
               <span className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="type-display text-xl">{event.name}</span>
-                <span className="font-mono text-[13px] tabular-nums text-ink/60">
+                <span className="font-mono text-[13px] tabular-nums text-black/60">
                   {dateFormat.format(new Date(event.starts_at))}
                 </span>
               </span>
-              <span className="mt-1 block text-[14px] text-ink/60">
+              <span className="mt-1 block text-[14px] text-black/60">
                 {event.kind === "challenge" ? t("kindChallenge") : t("kindRace")}
                 {event.venue ? <> · {event.venue}</> : null}
               </span>
@@ -92,19 +92,19 @@ export default async function EventsIndexPage({
               <tr key={`${row.month}-${row.name}`} className="border-b border-line-soft">
                 <td
                   className={`w-16 py-2.5 pr-3 font-mono text-[12px] ${
-                    row.flagship ? "font-medium text-red" : "text-ink/50"
+                    row.flagship ? "font-medium text-red" : "text-black/50"
                   }`}
                 >
                   {row.month}
                 </td>
                 <td className="py-2.5 pr-3 font-semibold">{row.name}</td>
-                <td className="py-2.5 text-ink/60">{row.who}</td>
+                <td className="py-2.5 text-black/60">{row.who}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p className="mt-3 text-[13.5px] leading-relaxed text-ink/60">{calendar.note}</p>
+      <p className="mt-3 text-[13.5px] leading-relaxed text-black/60">{calendar.note}</p>
     </div>
   );
 }

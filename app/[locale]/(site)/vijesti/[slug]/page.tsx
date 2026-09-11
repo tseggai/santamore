@@ -77,7 +77,7 @@ export default async function NewsPostPage({
 
   return (
     <article className="mx-auto max-w-3xl px-5 py-14">
-      <p className="font-mono text-[12.5px] text-ink/55">
+      <p className="font-mono text-[12.5px] text-black/55">
         {dateFormat.format(new Date(post.published_at))}
       </p>
       <h1 className="type-display mt-2 text-4xl leading-[1.1] sm:text-5xl">{post.title}</h1>

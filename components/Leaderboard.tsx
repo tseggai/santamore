@@ -39,7 +39,7 @@ export function LeaderboardList({
 }) {
   const top = entries[0]?.raisedCents || 1;
   if (entries.length === 0 && emptyLabel) {
-    return <p className="mt-4 text-[14.5px] text-ink/60">{emptyLabel}</p>;
+    return <p className="mt-4 text-[14.5px] text-black/60">{emptyLabel}</p>;
   }
   return (
     <ol className="mt-1.5">
@@ -53,7 +53,7 @@ export function LeaderboardList({
             >
               <span
                 className={`w-[22px] shrink-0 text-right font-mono text-[14px] ${
-                  rank <= 3 ? "font-medium text-red" : "text-ink/40"
+                  rank <= 3 ? "font-medium text-red" : "text-black/40"
                 }`}
               >
                 {rank}
@@ -124,7 +124,7 @@ export function Leaderboard({
           {t("teams")}
         </button>
       </div>
-      <p className="mt-2 text-[13.5px] text-ink/55">
+      <p className="mt-2 text-[13.5px] text-black/55">
         {view === "individuals" ? t("individualsHint") : t("teamsHint")}
       </p>
       {view === "individuals" ? (

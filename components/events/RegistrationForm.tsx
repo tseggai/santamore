@@ -129,7 +129,7 @@ export function RegistrationForm({
 
       {/* waiver: summary + link to the full terms, acceptance recorded with
           its version */}
-      <div className="max-h-44 space-y-2 overflow-y-auto rounded-brand border-[1.5px] border-line bg-sand px-4 py-3 text-[13.5px] leading-relaxed text-ink/75">
+      <div className="max-h-44 space-y-2 overflow-y-auto rounded-brand border-[1.5px] border-line bg-sand px-4 py-3 text-[13.5px] leading-relaxed text-black/75">
         <p>{t("waiver1")}</p>
         <p>{t("waiver2")}</p>
         <p>{t("waiver3")}</p>

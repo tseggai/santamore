@@ -199,19 +199,19 @@ export default async function AdminDonationsPage({
                 <td className="py-2.5 pr-3 font-mono tabular-nums">
                   {money(row.amount_cents)}
                   {row.is_recurring ? (
-                    <span className="ml-1 text-[12px] text-ink/50">
+                    <span className="ml-1 text-[12px] text-black/50">
                       {t("table.monthly")}
                     </span>
                   ) : null}
                   {row.rail === "cash" ? (
-                    <span className="ml-1 text-[12px] text-ink/50">{t("railCash")}</span>
+                    <span className="ml-1 text-[12px] text-black/50">{t("railCash")}</span>
                   ) : null}
                   {mode === "search" ? (
                     <span
                       className={
                         row.status === "refunded"
                           ? "ml-1 text-[12px] font-semibold text-red-dark"
-                          : "ml-1 text-[12px] text-ink/50"
+                          : "ml-1 text-[12px] text-black/50"
                       }
                     >
                       {t(`status.${row.status}`)}
@@ -221,7 +221,7 @@ export default async function AdminDonationsPage({
                 <td className="py-2.5 pr-3">
                   {row.donor_name ?? "—"}
                   {row.donor_email ? (
-                    <span className="block text-[13px] text-ink/50">{row.donor_email}</span>
+                    <span className="block text-[13px] text-black/50">{row.donor_email}</span>
                   ) : null}
                 </td>
                 <td className="py-2.5 pr-3">{page?.title ?? "—"}</td>
@@ -275,7 +275,7 @@ export default async function AdminDonationsPage({
       </form>
       {query ? (
         results.length === 0 ? (
-          <p className="mt-3 text-[14.5px] text-ink/60">{t("searchEmpty")}</p>
+          <p className="mt-3 text-[14.5px] text-black/60">{t("searchEmpty")}</p>
         ) : (
           table(results, "search")
         )
@@ -283,7 +283,7 @@ export default async function AdminDonationsPage({
 
       <h2 className="mt-8 text-[16px] font-bold">{t("pendingHeading")}</h2>
       {pending.length === 0 ? (
-        <p className="mt-2 text-[14.5px] text-ink/60">{t("noPending")}</p>
+        <p className="mt-2 text-[14.5px] text-black/60">{t("noPending")}</p>
       ) : (
         table(pending, "pending")
       )}

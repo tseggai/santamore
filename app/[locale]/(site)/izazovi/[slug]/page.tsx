@@ -58,7 +58,7 @@ export default async function ChallengePage({
 
   return (
     <div className="mx-auto max-w-xl px-5 py-12">
-      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
         {challenge.partner_url ? (
           <a href={challenge.partner_url} rel="noopener" target="_blank" className="underline underline-offset-2 hover:text-sea">
             {challenge.partner_name} ↗
@@ -79,9 +79,9 @@ export default async function ChallengePage({
       </div>
 
       <div className="mt-5 rounded-brand bg-mist px-5 py-5">
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">{t("reward")}</p>
+        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-black/60">{t("reward")}</p>
         <p className="type-display mt-1 text-3xl">{challenge.reward_label}</p>
-        <p className="mt-3 text-[15px] leading-relaxed text-ink/80">
+        <p className="mt-3 text-[15px] leading-relaxed text-black/80">
           <PerkRule challenge={challenge} />
         </p>
         {left !== null ? (
@@ -90,7 +90,7 @@ export default async function ChallengePage({
           </p>
         ) : null}
         {challenge.starts_at || challenge.ends_at ? (
-          <p className="mt-1 text-[13.5px] text-ink/60">
+          <p className="mt-1 text-[13.5px] text-black/60">
             {challenge.starts_at ? dateFormat.format(new Date(challenge.starts_at)) : "…"}
             {" — "}
             {challenge.ends_at ? dateFormat.format(new Date(challenge.ends_at)) : "…"}
@@ -99,12 +99,12 @@ export default async function ChallengePage({
       </div>
 
       {challenge.description ? (
-        <p className="mt-5 whitespace-pre-line text-[16px] leading-relaxed text-ink/80">
+        <p className="mt-5 whitespace-pre-line text-[16px] leading-relaxed text-black/80">
           {challenge.description}
         </p>
       ) : null}
 
-      <p className="mt-6 text-[14.5px] leading-relaxed text-ink/70">{t("noPageNeeded")}</p>
+      <p className="mt-6 text-[14.5px] leading-relaxed text-black/70">{t("noPageNeeded")}</p>
       <ol className="mt-3 space-y-2">
         {(["step1", "step2", "step3"] as const).map((step, index) => (
           <li key={step} className="flex gap-3 text-[14.5px] leading-relaxed">
@@ -122,7 +122,7 @@ export default async function ChallengePage({
           {t("connectCta")}
         </Link>
       </div>
-      <p className="mt-4 text-[13px] text-ink/50">{t("poweredBy")}</p>
+      <p className="mt-4 text-[13px] text-black/50">{t("poweredBy")}</p>
     </div>
   );
 }

@@ -61,14 +61,14 @@ export default async function AdminDisbursementsPage({
           className="rounded-lg border-[1.5px] border-line px-3.5 py-2.5 text-[14.5px]"
         >
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <span className="font-mono tabular-nums text-ink/60">
+            <span className="font-mono tabular-nums text-black/60">
               {day(row.published_at ?? row.decided_at)}
             </span>
             <span className="font-semibold">{row.beneficiary_label}</span>
             <span className="font-mono font-medium tabular-nums">
               {money(row.amount_cents)}
             </span>
-            <span className="text-[13px] text-ink/50">
+            <span className="text-[13px] text-black/50">
               {one(row.chapter)?.name ?? "—"}
               {row.category ? ` · ${row.category}` : ""}
               {row.committee_decision_ref ? ` · ${row.committee_decision_ref}` : ""}
@@ -122,21 +122,21 @@ export default async function AdminDisbursementsPage({
 
       <h2 className="mt-6 text-[16px] font-bold">{t("disbNewHeading")}</h2>
       {chapters.length === 0 ? (
-        <p className="mt-2 text-[14.5px] text-ink/60">{t("disbNoChapters")}</p>
+        <p className="mt-2 text-[14.5px] text-black/60">{t("disbNoChapters")}</p>
       ) : (
         <DisbursementForm chapters={chapters} />
       )}
 
       <h2 className="mt-10 text-[16px] font-bold">{t("disbDraftHeading")}</h2>
       {drafts.length === 0 ? (
-        <p className="mt-2 text-[14.5px] text-ink/60">{t("disbDraftEmpty")}</p>
+        <p className="mt-2 text-[14.5px] text-black/60">{t("disbDraftEmpty")}</p>
       ) : (
         list(drafts, false)
       )}
 
       <h2 className="mt-10 text-[16px] font-bold">{t("disbPublishedHeading")}</h2>
       {published.length === 0 ? (
-        <p className="mt-2 text-[14.5px] text-ink/60">{t("disbPublishedEmpty")}</p>
+        <p className="mt-2 text-[14.5px] text-black/60">{t("disbPublishedEmpty")}</p>
       ) : (
         list(published, true)
       )}

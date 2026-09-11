@@ -74,15 +74,15 @@ export default async function AwardPage({
 
   return (
     <div className="mx-auto max-w-md px-5 py-12">
-      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
+      <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
         {award.partner_name}
       </p>
       <h1 className="type-display mt-1 text-3xl">{award.reward_label}</h1>
-      <p className="mt-2 text-[15px] text-ink/70">
+      <p className="mt-2 text-[15px] text-black/70">
         {t("awardFor", { name: award.participant_name ?? t("someone") })} ·{" "}
         <Link
           href={`/izazovi/${award.challenge_slug}`}
-          className="font-semibold text-ink underline decoration-line underline-offset-[3px]"
+          className="font-semibold text-black underline decoration-black/30 underline-offset-[3px]"
         >
           {award.challenge_title}
         </Link>
@@ -96,7 +96,7 @@ export default async function AwardPage({
           <QrImage value={url} alt={t("qrAlt")} size={220} />
         </div>
         <p className="mt-3 font-mono text-[23px] tracking-[0.2em]">{award.code}</p>
-        <p className="mt-2 text-center text-[13.5px] text-ink/60">
+        <p className="mt-2 text-center text-[13.5px] text-black/60">
           {t("earnedOn", { date: dateFormat.format(new Date(award.awarded_on)) })}
           {" · "}
           {award.status === "redeemed" && award.redeemed_at
@@ -120,7 +120,7 @@ export default async function AwardPage({
           variant="ghost"
         />
       </div>
-      <p className="mt-4 text-[13px] leading-relaxed text-ink/50">{t("awardNote")}</p>
+      <p className="mt-4 text-[13px] leading-relaxed text-black/50">{t("awardNote")}</p>
     </div>
   );
 }

@@ -85,7 +85,7 @@ export function SepaPanel({
             {qrPayload ? (
               <figure className="shrink-0">
                 <EpcQrCode payload={qrPayload} alt={t("qrCaption")} />
-                <figcaption className="mt-1.5 max-w-[148px] text-[12px] leading-snug text-ink/60">
+                <figcaption className="mt-1.5 max-w-[148px] text-[12px] leading-snug text-black/60">
                   {t("qrCaption")}
                 </figcaption>
               </figure>
@@ -100,16 +100,16 @@ export function SepaPanel({
                   copiedLabel={t("copied")}
                 />
               </div>
-              <p className="mt-2 text-[13.5px] leading-relaxed text-ink/70">{t("sepaNote")}</p>
+              <p className="mt-2 text-[13.5px] leading-relaxed text-black/70">{t("sepaNote")}</p>
               {monthly ? (
-                <p className="mt-2 text-[13.5px] leading-relaxed text-ink/70">
+                <p className="mt-2 text-[13.5px] leading-relaxed text-black/70">
                   {t("standingOrderNote")}
                 </p>
               ) : null}
             </div>
           </div>
 
-          <p className="mt-3 border-t border-line-soft pt-3 text-[13.5px] leading-relaxed text-ink/70">
+          <p className="mt-3 border-t border-line-soft pt-3 text-[13.5px] leading-relaxed text-black/70">
             {t("whatNext")} {t("qrManualNote")}
           </p>
         </>

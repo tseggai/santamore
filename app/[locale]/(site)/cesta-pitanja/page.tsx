@@ -39,7 +39,7 @@ export default async function FaqPage({
       <h1 className="type-display mt-3 text-4xl leading-[1.1] sm:text-5xl">
         {content.heroTitle}
       </h1>
-      <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-ink/70">
+      <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-black/70">
         {content.heroLead}
       </p>
 
@@ -59,13 +59,13 @@ export default async function FaqPage({
                 +
               </span>
             </summary>
-            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-ink/75">
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-black/75">
               {item.a}
             </p>
             {item.link ? (
               <Link
                 href={item.link.href}
-                className="mt-2 inline-block text-[14.5px] font-semibold text-sea underline decoration-line underline-offset-2 hover:text-sea-2"
+                className="mt-2 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
               >
                 {item.link.label} →
               </Link>

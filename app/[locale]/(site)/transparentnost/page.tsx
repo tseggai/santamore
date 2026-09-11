@@ -212,7 +212,7 @@ export default async function LedgerPage({
             {money(opsCents)}
           </span>
         </div>
-        <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink/60">{t("fundsNote")}</p>
+        <p className="mt-1.5 text-[12.5px] leading-relaxed text-black/60">{t("fundsNote")}</p>
       </div>
 
       <LedgerTabs locale={locale as Locale} moneyIn={moneyIn} moneyOut={moneyOut} />
@@ -236,7 +236,7 @@ export default async function LedgerPage({
         </a>
       </div>
 
-      <p className="mt-5 text-[12.5px] leading-relaxed text-ink/60">{t("footNote")}</p>
+      <p className="mt-5 text-[12.5px] leading-relaxed text-black/60">{t("footNote")}</p>
     </div>
   );
 }

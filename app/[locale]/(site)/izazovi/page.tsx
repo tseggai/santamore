@@ -59,7 +59,7 @@ export default async function ChallengesIndexPage({
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
       <h1 className="type-display text-4xl">{t("title")}</h1>
-      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-ink/70">{t("sub")}</p>
+      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-black/70">{t("sub")}</p>
 
       <ol className="mt-6 grid gap-3 sm:grid-cols-3">
         {(["step1", "step2", "step3"] as const).map((step, index) => (
@@ -71,7 +71,7 @@ export default async function ChallengesIndexPage({
       </ol>
 
       {challenges.length === 0 ? (
-        <p className="mt-8 text-[15px] text-ink/60">{t("empty")}</p>
+        <p className="mt-8 text-[15px] text-black/60">{t("empty")}</p>
       ) : (
         <ul className="mt-8 space-y-3">
           {challenges.map((challenge) => {
@@ -85,7 +85,7 @@ export default async function ChallengesIndexPage({
                   href={`/izazovi/${challenge.slug}`}
                   className="block rounded-brand border-[1.5px] border-line px-5 py-4 transition-colors hover:border-sea"
                 >
-                  <span className="font-mono text-[12px] uppercase tracking-[0.16em] text-ink/60">
+                  <span className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
                     {challenge.partner_name}
                   </span>
                   <span className="mt-1 flex flex-wrap items-baseline justify-between gap-2">
@@ -94,7 +94,7 @@ export default async function ChallengesIndexPage({
                       {challenge.reward_label}
                     </span>
                   </span>
-                  <span className="mt-2 block text-[14.5px] leading-relaxed text-ink/70">
+                  <span className="mt-2 block text-[14.5px] leading-relaxed text-black/70">
                     <PerkRule challenge={challenge} />
                   </span>
                   {left !== null ? (
@@ -109,13 +109,13 @@ export default async function ChallengesIndexPage({
         </ul>
       )}
 
-      <div className="mt-10 rounded-brand border-[1.5px] border-dashed border-line px-5 py-4 text-[14.5px] leading-relaxed text-ink/70">
+      <div className="mt-10 rounded-brand border-[1.5px] border-dashed border-line px-5 py-4 text-[14.5px] leading-relaxed text-black/70">
         {t("noPageNeeded")} {t("howNote")}{" "}
         <Link href="/dashboard/strava" className="font-semibold text-sea underline underline-offset-2">
           {t("connectCta")}
         </Link>
       </div>
-      <p className="mt-4 text-[13px] text-ink/50">{t("poweredBy")}</p>
+      <p className="mt-4 text-[13px] text-black/50">{t("poweredBy")}</p>
     </div>
   );
 }
