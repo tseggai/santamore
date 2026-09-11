@@ -336,7 +336,9 @@
     "pagePickerLabel": "Страница",
     "shareDraftWarning": "Эта страница ещё черновик — опубликуйте её перед репостом.",
     "navGiving": "Мои пожертвования",
-    "qaGiving": "Мои пожертвования"
+    "qaGiving": "Мои пожертвования",
+    "menuOpen": "Открыть меню",
+    "menuClose": "Закрыть меню"
   },
   "email": {
     "instructions": {
@@ -745,7 +747,9 @@
     "athTileActive": "Бегали за 7 дней",
     "athTileActivities": "Активности, 30 дней",
     "athTileKm": "Дистанция, 30 дней",
-    "athTileAwards": "Выдано наград"
+    "athTileAwards": "Выдано наград",
+    "menuOpen": "Открыть меню",
+    "menuClose": "Закрыть меню"
   },
   "forms": {
     "nameLabel": "Имя и фамилия",

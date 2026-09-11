@@ -335,7 +335,9 @@
     "pagePickerLabel": "Stranica",
     "shareDraftWarning": "Ova stranica je još nacrt — objavi je prije dijeljenja.",
     "navGiving": "Moje donacije",
-    "qaGiving": "Moje donacije"
+    "qaGiving": "Moje donacije",
+    "menuOpen": "Otvori meni",
+    "menuClose": "Zatvori meni"
   },
   "email": {
     "instructions": {
@@ -744,7 +746,9 @@
     "athTileActive": "Trčali zadnjih 7 dana",
     "athTileActivities": "Aktivnosti, 30 dana",
     "athTileKm": "Distanca, 30 dana",
-    "athTileAwards": "Izdate nagrade"
+    "athTileAwards": "Izdate nagrade",
+    "menuOpen": "Otvori meni",
+    "menuClose": "Zatvori meni"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

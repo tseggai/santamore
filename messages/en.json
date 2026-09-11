@@ -335,7 +335,9 @@
     "pagePickerLabel": "Page",
     "shareDraftWarning": "This page is still a draft — publish it before sharing.",
     "navGiving": "My giving",
-    "qaGiving": "My giving"
+    "qaGiving": "My giving",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu"
   },
   "email": {
     "instructions": {
@@ -744,7 +746,9 @@
     "athTileActive": "Ran in last 7 days",
     "athTileActivities": "Activities, 30 days",
     "athTileKm": "Distance, 30 days",
-    "athTileAwards": "Rewards issued"
+    "athTileAwards": "Rewards issued",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu"
   },
   "forms": {
     "nameLabel": "Full name",

@@ -15,18 +15,18 @@ const ITEMS = [
   { href: "/dashboard/donacije", key: "navGiving", exact: false },
 ] as const;
 
-/** Runner console nav: vertical in the sidebar (desktop), scrollable row on mobile. */
+/** Runner console nav: one vertical list, in the desktop rail and the phone drawer alike. */
 export function DashboardNav() {
   const t = useTranslations("dashboard");
   const pathname = usePathname().replace(/^\/(me|en|ru)(?=\/|$)/, "");
 
   return (
     <nav aria-label={t("title")} className="min-w-0">
-      <ul className="flex gap-1 overflow-x-auto md:flex-col md:gap-0.5 md:overflow-visible">
+      <ul className="flex flex-col gap-0.5">
         {ITEMS.map((item) => {
           const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
           return (
-            <li key={item.href} className="shrink-0">
+            <li key={item.href}>
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
