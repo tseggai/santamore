@@ -12,7 +12,9 @@ const TOKEN_URL = "https://www.strava.com/api/v3/oauth/token";
 const DEAUTHORIZE_URL = "https://www.strava.com/oauth/deauthorize";
 const API = "https://www.strava.com/api/v3";
 
-export const STRAVA_SCOPE = "read,activity:read";
+// activity:read_all: private runs count too (owner decision 2026-09-11); what
+// becomes public is still governed solely by the runner's share_public flag.
+export const STRAVA_SCOPE = "read,activity:read_all";
 
 export interface StravaTokens {
   access_token: string;
@@ -42,7 +44,7 @@ export function authorizeUrl(redirectUri: string, state: string): string {
   return `${AUTHORIZE_URL}?${params}`;
 }
 
-class StravaError extends Error {
+export class StravaError extends Error {
   constructor(
     message: string,
     public status: number,

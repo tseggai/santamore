@@ -38,6 +38,22 @@ well. The allow-list is therefore not optional.
 The "Magic Link" email template must contain `{{ .Token }}` so the 6-digit
 code reaches the inbox for people whose mail scanner consumes the link.
 
+### Custom SMTP (required before real sign-ups)
+
+Supabase's built-in mailer sends only a handful of auth emails per hour and
+only to project team members. Authentication → **Emails** → **SMTP
+Settings** tab (older dashboards: Project Settings → Authentication):
+
+| Field | Value |
+|---|---|
+| Host | `smtp.resend.com` |
+| Port | `465` |
+| Username | `resend` |
+| Password | the Resend API key (the same one as `RESEND_API_KEY`) |
+| Sender | an address on a domain verified in Resend, e.g. `[[PLACEHOLDER: no-reply@santamore.me]]` |
+
+Then raise the per-hour email limit under Authentication → Rate Limits.
+
 ## 4. Strava → My API Application
 
 | Field | Value |

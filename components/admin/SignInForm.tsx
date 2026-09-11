@@ -30,6 +30,8 @@ export function SignInForm({
   const [state, setState] = useState<
     "idle" | "sending" | "sent" | "error" | "verifying" | "codeError"
   >("idle");
+  /** What Supabase actually said — the owner needs it to fix the project. */
+  const [detail, setDetail] = useState<{ rateLimited: boolean; message: string } | null>(null);
 
   const inputClass =
     "mt-1 w-full rounded-[11px] border-[1.5px] border-line px-3.5 py-3 text-[15px] outline-none focus:border-sea";
@@ -47,8 +49,17 @@ export function SignInForm({
           shouldCreateUser: allowSignup,
         },
       });
-      setState(error ? "error" : "sent");
-    } catch {
+      if (error) {
+        const rateLimited =
+          error.status === 429 || /rate limit|after \d+ seconds/i.test(error.message);
+        setDetail({ rateLimited, message: error.message });
+        setState("error");
+        return;
+      }
+      setDetail(null);
+      setState("sent");
+    } catch (caught) {
+      setDetail({ rateLimited: false, message: caught instanceof Error ? caught.message : "" });
       setState("error");
     }
   };
@@ -130,9 +141,14 @@ export function SignInForm({
         />
       </div>
       {state === "error" ? (
-        <p role="alert" className="text-[13px] font-semibold text-red-dark">
-          {t("linkError")}
-        </p>
+        <div role="alert" className="text-[13px] text-red-dark">
+          <p className="font-semibold">
+            {detail?.rateLimited ? t("linkRateLimited") : t("linkError")}
+          </p>
+          {detail?.message ? (
+            <p className="mt-0.5 font-mono text-[11.5px] text-ink/55">{detail.message}</p>
+          ) : null}
+        </div>
       ) : null}
       <button
         type="submit"

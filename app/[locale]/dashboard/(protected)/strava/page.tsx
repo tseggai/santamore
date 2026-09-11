@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { PerkProgressList, type PerkProgressRow } from "@/components/dashboard/PerkProgressList";
 import { StravaPanel, type ConnectionInfo } from "@/components/dashboard/StravaPanel";
 import { stravaConfig } from "@/lib/strava/api";
 import { formatMetricValue } from "@/lib/metrics";
@@ -53,11 +54,17 @@ export default async function StravaPage({
   } = await supabase.auth.getUser();
   if (!user) notFound();
 
-  const [{ data: connectionRow }, { data: awardRows }, { data: activityRows }, { data: profile }] =
+  const [
+    { data: connectionRow },
+    { data: awardRows },
+    { data: activityRows },
+    { data: profile },
+    { data: progressRows },
+  ] =
     await Promise.all([
       supabase
         .from("strava_connections")
-        .select("athlete_id, share_public, connected_at, last_sync_at")
+        .select("athlete_id, share_public, connected_at, last_sync_at, scope")
         .eq("user_id", user.id)
         .maybeSingle(),
       supabase
@@ -74,7 +81,9 @@ export default async function StravaPage({
         .order("started_at", { ascending: false })
         .limit(10),
       supabase.from("profiles").select("role").eq("id", user.id).maybeSingle(),
+      supabase.rpc("my_perk_progress"),
     ]);
+  const progress = (progressRows ?? []) as PerkProgressRow[];
   const { count: pageCount } = await supabase
     .from("fundraisers")
     .select("id", { count: "exact", head: true })
@@ -93,6 +102,7 @@ export default async function StravaPage({
         sharePublic: connectionRow.share_public,
         connectedAt: connectionRow.connected_at,
         lastSyncAt: connectionRow.last_sync_at,
+        scope: connectionRow.scope ?? "",
       }
     : null;
 
@@ -122,6 +132,15 @@ export default async function StravaPage({
             {t("nurtureCta")}
           </Link>
         </div>
+      ) : null}
+
+      {connection ? (
+        <>
+          <h2 className="mt-8 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">
+            {t("progressHeading")}
+          </h2>
+          <PerkProgressList rows={progress} />
+        </>
       ) : null}
 
       <h2 className="mt-8 font-mono text-[10px] uppercase tracking-[0.16em] text-ink/60">

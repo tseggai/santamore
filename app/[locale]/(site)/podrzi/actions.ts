@@ -1,10 +1,26 @@
 "use server";
 
+import { z } from "zod";
+
+import { loadDonateTarget } from "@/lib/donate/target";
+import type { DonateTargetData } from "@/lib/donate/types";
 import { buildInstructionsEmail } from "@/lib/email/donation";
 import { sendEmail } from "@/lib/email/send";
 import { getOrgBankDetails, hasBankDetails } from "@/lib/org";
 import { donationPledgeSchema } from "@/lib/schemas/donation";
 import { createServiceClient } from "@/lib/supabase/admin";
+
+const donateRequestSchema = z.object({
+  kind: z.enum(["campaign", "fundraiser"]),
+  slug: z.string().trim().min(1).max(100).optional(),
+});
+
+/** What the donate overlay loads when it opens; public data only. */
+export async function fetchDonateTarget(input: unknown): Promise<DonateTargetData | null> {
+  const parsed = donateRequestSchema.safeParse(input);
+  if (!parsed.success) return null;
+  return loadDonateTarget(parsed.data);
+}
 
 export interface PledgeResult {
   ok: boolean;

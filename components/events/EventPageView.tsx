@@ -3,14 +3,12 @@
 import { useLocale, useTranslations } from "next-intl";
 
 import { LeaderboardList, type LeaderboardEntry } from "@/components/Leaderboard";
+import type { EventTier } from "@/lib/events";
 import { formatCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, type Locale } from "@/i18n/routing";
 
-export interface EventTier {
-  label: string;
-  amount_cents: number;
-}
+export type { EventTier };
 
 export interface EventView {
   slug: string;
@@ -23,21 +21,6 @@ export interface EventView {
   registration_closes_at: string | null;
   distances: string[];
   tiers: EventTier[];
-}
-
-export function parseTiers(value: unknown): EventTier[] {
-  if (!Array.isArray(value)) return [];
-  return value.flatMap((entry) =>
-    typeof entry?.label === "string" &&
-    typeof entry?.amount_cents === "number" &&
-    Number.isInteger(entry.amount_cents)
-      ? [{ label: entry.label, amount_cents: entry.amount_cents }]
-      : [],
-  );
-}
-
-export function parseDistances(value: unknown): string[] {
-  return Array.isArray(value) ? value.filter((d): d is string => typeof d === "string") : [];
 }
 
 /**
