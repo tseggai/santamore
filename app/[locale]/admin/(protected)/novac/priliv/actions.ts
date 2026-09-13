@@ -66,7 +66,7 @@ export async function approvePledge(input: unknown): Promise<ActionResult> {
   if (error) return { ok: false };
 
   await sendReceiptFor(donationId);
-  revalidatePath("/[locale]/admin/donacije", "page");
+  revalidatePath("/[locale]/admin/novac", "layout");
   return { ok: true };
 }
 
@@ -92,7 +92,7 @@ export async function refundDonation(input: unknown): Promise<ActionResult> {
   });
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/donacije", "page");
+  revalidatePath("/[locale]/admin/novac", "layout");
   return { ok: true };
 }
 
@@ -153,7 +153,7 @@ export async function approveRegistrationFee(input: unknown): Promise<ActionResu
     .single();
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/donacije", "page");
+  revalidatePath("/[locale]/admin/novac", "layout");
   revalidatePath("/[locale]/admin/prijave", "page");
   return { ok: true };
 }
@@ -209,6 +209,6 @@ export async function createDonationFromStatement(
   });
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/donacije", "page");
+  revalidatePath("/[locale]/admin/novac", "layout");
   return { ok: true };
 }

@@ -41,7 +41,7 @@ export function SignInForm({
     setState("sending");
     try {
       const supabase = createClient();
-      const target = nextPath ?? `/${locale}/admin/donacije`;
+      const target = nextPath ?? `/${locale}/admin`;
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -78,7 +78,7 @@ export function SignInForm({
         setState("codeError");
         return;
       }
-      window.location.href = nextPath ?? `/${locale}/admin/donacije`;
+      window.location.href = nextPath ?? `/${locale}/admin`;
     } catch {
       setState("codeError");
     }

@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { approvePledge } from "@/app/[locale]/admin/(protected)/donacije/actions";
+import { approvePledge } from "@/app/[locale]/admin/(protected)/novac/priliv/actions";
 
 /** One-click hand-in confirmation for a pending cash row (brief §10). */
 export function ConfirmCashButton({ donationId }: { donationId: string }) {

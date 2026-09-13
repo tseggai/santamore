@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 
-import { createDisbursement } from "@/app/[locale]/admin/(protected)/isplate/actions";
+import { createDisbursement } from "@/app/[locale]/admin/(protected)/novac/odliv/actions";
 import { parseEurosToCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/client";
 
