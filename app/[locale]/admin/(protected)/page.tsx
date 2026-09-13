@@ -124,11 +124,11 @@ export default async function AdminOverviewPage({
 
   const queues = [
     {
-      href: "/admin/donacije",
+      href: "/admin/novac/priliv",
       label: t("queuePendingDonations"),
       count: data.pendingDonations,
     },
-    { href: "/admin/donacije", label: t("queueFees"), count: data.feeQueue },
+    { href: "/admin/novac/priliv", label: t("queueFees"), count: data.feeQueue },
     { href: "/admin/poruke", label: t("queueMessages"), count: data.inboundWeek },
   ] as const;
 
@@ -144,7 +144,7 @@ export default async function AdminOverviewPage({
         {statTiles.map((tile) => (
           <div
             key={tile.label}
-            className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3.5"
+            className="rounded-lg bg-mist px-4 py-3.5"
           >
             <p className="text-[13px] font-semibold text-black/60">{tile.label}</p>
             <p
@@ -191,7 +191,7 @@ export default async function AdminOverviewPage({
             <Link
               key={`${queue.href}-${index}`}
               href={queue.href}
-              className="rounded-brand border-[1.5px] border-line px-4 py-3.5 transition-colors hover:border-sea"
+              className="rounded-lg bg-mist px-4 py-3.5 transition-colors hover:bg-mist-2"
             >
               <p
                 className={`font-mono text-2xl tabular-nums ${
@@ -212,7 +212,7 @@ export default async function AdminOverviewPage({
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Link
             href="/admin/prijave"
-            className="rounded-brand border-[1.5px] border-line px-4 py-3.5 transition-colors hover:border-sea"
+            className="rounded-lg bg-mist px-4 py-3.5 transition-colors hover:bg-mist-2"
           >
             <p className="font-mono text-xl tabular-nums">
               {data.regConfirmed}
@@ -223,8 +223,8 @@ export default async function AdminOverviewPage({
             </p>
           </Link>
           <Link
-            href="/admin/prikupljaci"
-            className="rounded-brand border-[1.5px] border-line px-4 py-3.5 transition-colors hover:border-sea"
+            href="/admin/clanovi"
+            className="rounded-lg bg-mist px-4 py-3.5 transition-colors hover:bg-mist-2"
           >
             <p className="font-mono text-xl tabular-nums">
               {data.pageCounts.active}

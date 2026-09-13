@@ -7,7 +7,7 @@ import { useState } from "react";
 import {
   refundDonation,
   resendReceipt,
-} from "@/app/[locale]/admin/(protected)/donacije/actions";
+} from "@/app/[locale]/admin/(protected)/novac/priliv/actions";
 
 type State = "idle" | "busy" | "done" | "error";
 

@@ -67,7 +67,7 @@ export default async function NewsIndexPage({
       <p className="mt-4 max-w-2xl text-[16px] leading-relaxed text-black/70">{t("sub")}</p>
 
       {posts.length === 0 ? (
-        <p className="mt-8 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
+        <p className="mt-8 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13.5px] text-sea">
           {t("empty")}
         </p>
       ) : (
@@ -78,7 +78,7 @@ export default async function NewsIndexPage({
               <li key={post.slug}>
                 <Link
                   href={`/vijesti/${post.slug}`}
-                  className="flex gap-4 rounded-brand border-[1.5px] border-line p-4 transition-colors hover:border-sea"
+                  className="flex gap-4 rounded-brand bg-mist p-4 transition-colors hover:bg-mist-2"
                 >
                   {cover ? (
                     <Image

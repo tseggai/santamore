@@ -81,7 +81,7 @@ export default async function CampaignsIndexPage({
               <li key={campaign.slug}>
                 <Link
                   href={`/kampanje/${campaign.slug}`}
-                  className="block rounded-brand border-[1.5px] border-line px-5 py-4 transition-colors hover:border-sea"
+                  className="block rounded-brand bg-mist px-5 py-4 transition-colors hover:bg-mist-2"
                 >
                   <span className="flex flex-wrap items-baseline justify-between gap-2">
                     <span className="type-display text-2xl">{campaign.title}</span>

@@ -115,19 +115,19 @@ export default async function HomePage({
           {nextEvent ? (
             <Link
               href={`/dogadjaji/${nextEvent.slug}`}
-              className="rounded-lg border-[1.5px] border-line px-6 py-3.5 text-[15.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+              className="rounded-lg bg-mist px-6 py-3.5 text-[15.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
             >
               {t("ctaRegister")}
             </Link>
           ) : null}
         </div>
-        <p className="mt-8 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13px] text-sea">
+        <p className="mt-8 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13px] text-sea">
           {t("heroPhotoNote")}
         </p>
       </section>
 
       {/* 2 — last year: the only honest track-record claim */}
-      <section className="grid gap-6 border-t border-line-soft py-12 sm:grid-cols-3">
+      <section className="grid gap-6 border-t-[0.5px] border-line py-12 sm:grid-cols-3">
         {content.triad.map((item) => (
           <div key={item.big}>
             <p className="type-display text-5xl text-red">{item.big}</p>
@@ -139,11 +139,11 @@ export default async function HomePage({
       </section>
 
       {/* 3 — how it works */}
-      <section className="border-t border-line-soft py-12">
+      <section className="border-t-[0.5px] border-line py-12">
         <p className={eyebrowClass}>{t("howHeading")}</p>
         <div className="mt-5 grid gap-6 sm:grid-cols-3">
           {content.steps.map((step, index) => (
-            <div key={step.title} className="rounded-brand border-[1.5px] border-line px-5 py-4">
+            <div key={step.title} className="rounded-brand bg-mist px-5 py-4">
               <span className="font-mono text-[12px] text-red">0{index + 1}</span>
               <p className="type-display mt-1 text-xl">{step.title}</p>
               <p className="mt-2 text-[14px] leading-relaxed text-black/65">{step.desc}</p>
@@ -154,7 +154,7 @@ export default async function HomePage({
 
       {/* 4 — next event with countdown */}
       {nextEvent ? (
-        <section className="border-t border-line-soft py-12">
+        <section className="border-t-[0.5px] border-line py-12">
           <div className="flex flex-wrap items-center justify-between gap-5 rounded-brand bg-sea px-6 py-6 text-paper">
             <div>
               <p className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-paper/70">
@@ -185,7 +185,7 @@ export default async function HomePage({
       ) : null}
 
       {/* 5 — the two funds, four lines, → ledger */}
-      <section className="border-t border-line-soft py-12">
+      <section className="border-t-[0.5px] border-line py-12">
         <p className={eyebrowClass}>{t("fundsHeading")}</p>
         <ul className="mt-4 max-w-2xl space-y-2">
           {content.funds.map((line) => (
@@ -205,7 +205,7 @@ export default async function HomePage({
 
       {/* 6 — live leaderboard preview */}
       {board.length > 0 ? (
-        <section className="border-t border-line-soft py-12">
+        <section className="border-t-[0.5px] border-line py-12">
           <p className={eyebrowClass}>{tLb("title")}</p>
           <div className="max-w-xl">
             <LeaderboardList
@@ -222,7 +222,7 @@ export default async function HomePage({
           </div>
           <Link
             href="/dashboard"
-            className="mt-4 inline-block rounded-lg border-[1.5px] border-line px-5 py-3 text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea"
+            className="mt-4 inline-block rounded-lg bg-mist px-5 py-3 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
           >
             {tLb("cta")}
           </Link>
@@ -231,7 +231,7 @@ export default async function HomePage({
 
       {/* 7 — gallery strip (renders once photos with consent exist) */}
       {gallery.length > 0 ? (
-        <section className="border-t border-line-soft py-12">
+        <section className="border-t-[0.5px] border-line py-12">
           <p className={eyebrowClass}>{t("galleryHeading")}</p>
           <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
             {gallery.map((item) => {
@@ -244,7 +244,7 @@ export default async function HomePage({
                   alt={item.caption ?? ""}
                   width={280}
                   height={200}
-                  className="h-[180px] w-[250px] shrink-0 rounded-brand border-[1.5px] border-line object-cover"
+                  className="h-[180px] w-[250px] shrink-0 rounded-brand bg-mist object-cover"
                 />
               );
             })}
@@ -260,13 +260,13 @@ export default async function HomePage({
 
       {/* 8 — chapters */}
       {chapters.length > 0 ? (
-        <section className="border-t border-line-soft py-12">
+        <section className="border-t-[0.5px] border-line py-12">
           <p className={eyebrowClass}>{t("chaptersHeading")}</p>
           <div className="mt-4 flex flex-wrap gap-3">
             {chapters.map((chapter) => (
               <div
                 key={chapter.slug}
-                className="rounded-brand border-[1.5px] border-line px-5 py-3.5"
+                className="rounded-brand bg-mist px-5 py-3.5"
               >
                 <p className="text-[15.5px] font-semibold">{chapter.name}</p>
                 <p className="mt-0.5 font-mono text-[13.5px] tabular-nums text-sea">
@@ -279,9 +279,9 @@ export default async function HomePage({
       ) : null}
 
       {/* 9 — partner wall (placeholder until real, consented logos exist) */}
-      <section className="border-t border-line-soft py-12">
+      <section className="border-t-[0.5px] border-line py-12">
         <p className={eyebrowClass}>{t("partnersHeading")}</p>
-        <p className="mt-4 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
+        <p className="mt-4 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13.5px] text-sea">
           {t("partnersNote")}
         </p>
         <Link
@@ -293,15 +293,15 @@ export default async function HomePage({
       </section>
 
       {/* 10 — beneficiary story (needs a real story with consent) */}
-      <section className="border-t border-line-soft py-12">
+      <section className="border-t-[0.5px] border-line py-12">
         <p className={eyebrowClass}>{t("storyHeading")}</p>
-        <p className="mt-4 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
+        <p className="mt-4 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13.5px] text-sea">
           {t("storyNote")}
         </p>
       </section>
 
       {/* 11 — newsletter + monthly donor club */}
-      <section className="border-t border-line-soft py-12">
+      <section className="border-t-[0.5px] border-line py-12">
         <p className={eyebrowClass}>{t("newsletterHeading")}</p>
         <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-black/70">
           {t("newsletterSub")}

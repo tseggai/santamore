@@ -44,7 +44,7 @@ export default async function AboutPage({
         {content.heroLead}
       </p>
 
-      <section className="mt-12 border-t border-line-soft pt-10">
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
         <p className={eyebrowClass}>{content.storyHeading}</p>
         <div className="mt-4 space-y-4">
           {content.story.map((paragraph) => (
@@ -55,7 +55,7 @@ export default async function AboutPage({
         </div>
       </section>
 
-      <section className="mt-12 border-t border-line-soft pt-10">
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
         <p className={eyebrowClass}>{content.nameHeading}</p>
         <div className="mt-4 space-y-4">
           {content.name.map((paragraph) => (
@@ -66,14 +66,14 @@ export default async function AboutPage({
         </div>
       </section>
 
-      <section className="mt-12 border-t border-line-soft pt-10">
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
         <p className={eyebrowClass}>{content.structureHeading}</p>
         <p className="mt-4 max-w-2xl text-[16px] leading-relaxed">
           {content.structureLead}
         </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {content.roles.map((role) => (
-            <div key={role.name} className="rounded-brand border-[1.5px] border-line px-5 py-4">
+            <div key={role.name} className="rounded-brand bg-mist px-5 py-4">
               <p className="font-mono text-[12px] uppercase tracking-[0.14em] text-red">
                 {role.name}
               </p>
@@ -101,7 +101,7 @@ export default async function AboutPage({
         </Link>
       </section>
 
-      <p className="mt-10 max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13px] text-sea">
+      <p className="mt-10 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13px] text-sea">
         {content.peopleNote}
       </p>
     </div>

@@ -93,12 +93,12 @@ export function DonateProvider({ children }: { children: ReactNode }) {
         }}
         className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-end justify-center bg-transparent p-0 backdrop:bg-ink/55 open:flex sm:items-center sm:p-4"
       >
-        <div className="relative flex max-h-[100dvh] w-full max-w-[600px] flex-col rounded-t-lg border-[1.5px] border-ink bg-paper shadow-[0_24px_60px_rgba(14,58,70,0.25)] sm:max-h-[calc(100dvh-2rem)] sm:rounded-lg">
+        <div className="relative flex max-h-[100dvh] w-full max-w-[600px] flex-col rounded-t-lg bg-paper shadow-[0_24px_60px_rgba(14,58,70,0.25)] sm:max-h-[calc(100dvh-2rem)] sm:rounded-lg">
           <button
             type="button"
             onClick={close}
             aria-label={t("close")}
-            className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border-[1.5px] border-line bg-paper text-[19px] leading-none text-black/70 transition-colors hover:border-sea hover:text-sea"
+            className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-mist bg-paper text-[19px] leading-none text-black/70 transition-colors hover:bg-mist-2 hover:text-sea"
           >
             ×
           </button>
@@ -115,7 +115,7 @@ export function DonateProvider({ children }: { children: ReactNode }) {
               <div className="px-5 py-10 sm:px-7">
                 <p
                   role="alert"
-                  className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[15px] text-sea"
+                  className="rounded-brand bg-mist px-5 py-4 text-[15px] text-sea"
                 >
                   {t("errServer")}
                 </p>

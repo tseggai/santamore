@@ -59,7 +59,7 @@ export function InboundForm({
     return (
       <p
         role="status"
-        className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[15px] text-sea"
+        className="rounded-brand bg-mist px-5 py-4 text-[15px] text-sea"
       >
         {t(`success_${kind}`)}
       </p>

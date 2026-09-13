@@ -66,7 +66,7 @@ export default async function EventsIndexPage({
           <li key={event.slug}>
             <Link
               href={`/dogadjaji/${event.slug}`}
-              className="block rounded-brand border-[1.5px] border-line px-5 py-4 transition-colors hover:border-sea"
+              className="block rounded-brand bg-mist px-5 py-4 transition-colors hover:bg-mist-2"
             >
               <span className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="type-display text-xl">{event.name}</span>
@@ -89,7 +89,7 @@ export default async function EventsIndexPage({
         <table className="w-full min-w-[480px] border-collapse text-[14px]">
           <tbody>
             {calendar.rows.map((row) => (
-              <tr key={`${row.month}-${row.name}`} className="border-b border-line-soft">
+              <tr key={`${row.month}-${row.name}`} className="border-b-[0.5px] border-line">
                 <td
                   className={`w-16 py-2.5 pr-3 font-mono text-[12px] ${
                     row.flagship ? "font-medium text-red" : "text-black/50"

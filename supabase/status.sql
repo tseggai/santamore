@@ -49,6 +49,8 @@ select * from (values
   ('20260913000018_supporters',
      to_regclass('public.supporters') is not null),
   ('20260913000019_staff_members',
-     to_regclass('public.v_staff_members') is not null)
+     to_regclass('public.v_staff_members') is not null),
+  ('20260913000020_supporter_logos',
+     exists (select 1 from storage.buckets where id = 'supporter-logos'))
 ) as m (migration, applied)
 order by migration;

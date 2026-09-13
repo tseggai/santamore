@@ -33,7 +33,7 @@ export default async function BeneficiaryApplicationPage({
       {/* The three-step promise, straight from the team guide. */}
       <ol className="mt-6 grid max-w-2xl gap-3 sm:grid-cols-3">
         {[1, 2, 3].map((n) => (
-          <li key={n} className="rounded-brand border-[1.5px] border-line px-4 py-3.5">
+          <li key={n} className="rounded-brand bg-mist px-4 py-3.5">
             <span className="font-mono text-[12px] text-red">0{n}</span>
             <span className="mt-1 block text-[14px] font-semibold leading-snug">
               {t(`step${n}Title`)}

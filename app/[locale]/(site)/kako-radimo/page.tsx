@@ -44,7 +44,7 @@ export default async function HowPage({
       </p>
 
       {/* the two funds, side by side — the core promise */}
-      <section className="mt-12 border-t border-line-soft pt-10">
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
         <p className={eyebrowClass}>{content.fundsHeading}</p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {content.funds.map((fund, index) => (
@@ -52,8 +52,8 @@ export default async function HowPage({
               key={fund.name}
               className={
                 index === 0
-                  ? "rounded-brand border-[1.5px] border-red px-5 py-5"
-                  : "rounded-brand border-[1.5px] border-line px-5 py-5"
+                  ? "rounded-lg bg-red/8 px-5 py-5"
+                  : "rounded-lg bg-mist px-5 py-5"
               }
             >
               <p className="type-display text-2xl">{fund.name}</p>
@@ -81,7 +81,7 @@ export default async function HowPage({
       </section>
 
       {/* 70 / 20 / 10 */}
-      <section className="mt-12 border-t border-line-soft pt-10">
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
         <p className={eyebrowClass}>{content.splitHeading}</p>
         <p className="mt-4 max-w-2xl text-[16px] leading-relaxed">{content.splitLead}</p>
         <div className="mt-5 grid gap-4 sm:grid-cols-3">
@@ -125,7 +125,7 @@ export default async function HowPage({
       </section>
 
       {/* who decides */}
-      <section className="mt-12 border-t border-line-soft pt-10">
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
         <p className={eyebrowClass}>{content.decideHeading}</p>
         <div className="mt-4 space-y-4">
           {content.decide.map((paragraph) => (

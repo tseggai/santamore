@@ -55,7 +55,7 @@ export function CookieConsent({ domain }: { domain: string | null }) {
     <div
       role="region"
       aria-label={t("label")}
-      className="fixed inset-x-0 bottom-0 z-40 border-t-[1.5px] border-ink bg-paper px-5 py-4"
+      className="fixed inset-x-0 bottom-0 z-40 border-t-[0.5px] border-line bg-paper px-5 py-4"
     >
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3">
         <p className="max-w-xl text-[14px] leading-relaxed text-black/80">
@@ -71,14 +71,14 @@ export function CookieConsent({ domain }: { domain: string | null }) {
           <button
             type="button"
             onClick={() => decide("rejected")}
-            className="rounded-lg border-[1.5px] border-ink px-5 py-2.5 text-[14.5px] font-bold hover:bg-mist"
+            className="rounded-lg bg-mist px-5 py-2.5 text-[14.5px] font-bold hover:bg-mist"
           >
             {t("reject")}
           </button>
           <button
             type="button"
             onClick={() => decide("accepted")}
-            className="rounded-lg border-[1.5px] border-ink bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper hover:opacity-90"
+            className="rounded-lg bg-mist bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper hover:opacity-90"
           >
             {t("accept")}
           </button>

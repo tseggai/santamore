@@ -69,7 +69,7 @@ export default async function ContactPage({
               <p className="mt-2 text-black/70">{tFooter("iban")}</p>
             )}
           </div>
-          <p className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
+          <p className="rounded-brand bg-mist px-4 py-3 text-[13.5px] text-sea">
             {t("mapNote")}
           </p>
         </div>

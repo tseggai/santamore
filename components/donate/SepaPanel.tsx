@@ -52,7 +52,7 @@ export function SepaPanel({
   const valueClass = "font-mono text-[16px] font-medium tabular-nums break-all";
 
   return (
-    <div className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-4">
+    <div className="rounded-brand bg-mist px-4 py-4">
       {bankReady ? (
         <>
           <div className="flex flex-wrap items-end justify-between gap-2">
@@ -109,7 +109,7 @@ export function SepaPanel({
             </div>
           </div>
 
-          <p className="mt-3 border-t border-line-soft pt-3 text-[13.5px] leading-relaxed text-black/70">
+          <p className="mt-3 border-t-[0.5px] border-line pt-3 text-[13.5px] leading-relaxed text-black/70">
             {t("whatNext")} {t("qrManualNote")}
           </p>
         </>

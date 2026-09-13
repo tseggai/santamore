@@ -7,7 +7,7 @@ import { useState } from "react";
 import {
   markDisbursementPaid,
   publishDisbursement,
-} from "@/app/[locale]/admin/(protected)/isplate/actions";
+} from "@/app/[locale]/admin/(protected)/novac/odliv/actions";
 
 type State = "idle" | "busy" | "error";
 

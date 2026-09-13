@@ -43,7 +43,7 @@ export async function createDisbursement(input: unknown): Promise<ActionResult> 
   });
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/isplate", "page");
+  revalidatePath("/[locale]/admin/novac", "layout");
   return { ok: true };
 }
 
@@ -64,7 +64,7 @@ export async function publishDisbursement(input: unknown): Promise<ActionResult>
     .single();
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/isplate", "page");
+  revalidatePath("/[locale]/admin/novac", "layout");
   revalidatePath("/[locale]/transparentnost", "page");
   return { ok: true };
 }
@@ -84,7 +84,7 @@ export async function markDisbursementPaid(input: unknown): Promise<ActionResult
     .single();
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/isplate", "page");
+  revalidatePath("/[locale]/admin/novac", "layout");
   revalidatePath("/[locale]/transparentnost", "page");
   return { ok: true };
 }

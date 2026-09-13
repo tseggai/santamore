@@ -18,7 +18,7 @@ export function LegalPage({ doc, locale }: { doc: LegalDoc; locale: Locale }) {
     <div className="mx-auto max-w-3xl px-5 py-14">
       <p
         role="note"
-        className="rounded-brand border-[1.5px] border-dashed border-red bg-red/5 px-4 py-3 text-[14px] font-semibold text-red-dark"
+        className="rounded-brand bg-red/8 px-4 py-3 text-[14px] font-semibold text-red-dark"
       >
         {DRAFT_BANNER[locale]}
       </p>

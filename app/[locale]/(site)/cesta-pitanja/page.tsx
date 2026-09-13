@@ -48,7 +48,7 @@ export default async function FaqPage({
           // Native disclosure: keyboard accessible for free, no JS.
           <details
             key={item.q}
-            className="group rounded-brand border-[1.5px] border-line px-5 py-4 open:border-sea"
+            className="group rounded-brand bg-mist px-5 py-4 open:border-sea"
           >
             <summary className="flex cursor-pointer list-none items-baseline justify-between gap-4 text-[16px] font-semibold [&::-webkit-details-marker]:hidden">
               {item.q}

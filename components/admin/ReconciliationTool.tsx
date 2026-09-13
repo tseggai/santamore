@@ -7,7 +7,7 @@ import {
   approvePledge,
   approveRegistrationFee,
   createDonationFromStatement,
-} from "@/app/[locale]/admin/(protected)/donacije/actions";
+} from "@/app/[locale]/admin/(protected)/novac/priliv/actions";
 import { parseCsv } from "@/lib/csv";
 import { formatCents } from "@/lib/money";
 import {

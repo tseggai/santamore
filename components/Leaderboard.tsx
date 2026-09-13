@@ -46,7 +46,7 @@ export function LeaderboardList({
       {entries.map((entry, index) => {
         const rank = index + 1;
         return (
-          <li key={entry.slug} className="border-b border-line-soft last:border-b-0">
+          <li key={entry.slug} className="border-b-[0.5px] border-line last:border-b-0">
             <Link
               href={entry.href}
               className="flex items-center gap-3 py-3 transition-colors hover:text-sea"
@@ -105,7 +105,7 @@ export function Leaderboard({
       <div
         role="group"
         aria-label={t("title")}
-        className="mt-4 grid grid-cols-2 overflow-hidden rounded-lg border-[1.5px] border-ink"
+        className="mt-4 grid grid-cols-2 overflow-hidden rounded-lg bg-mist"
       >
         <button
           type="button"

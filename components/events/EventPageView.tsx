@@ -98,7 +98,7 @@ export function EventPageView({
           {event.distances.map((distance) => (
             <span
               key={distance}
-              className="rounded-full border-[1.5px] border-line px-3 py-1 font-mono text-[13px] tabular-nums"
+              className="rounded-full bg-mist px-3 py-1 font-mono text-[13px] tabular-nums"
             >
               {distance}
             </span>
@@ -115,7 +115,7 @@ export function EventPageView({
             {event.tiers.map((tier) => (
               <li
                 key={tier.label}
-                className="flex items-baseline justify-between gap-3 border-b border-line-soft py-2 text-[14.5px] last:border-b-0"
+                className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-2 text-[14.5px] last:border-b-0"
               >
                 <span>{tier.label}</span>
                 <span className="font-mono font-medium tabular-nums">
@@ -139,13 +139,13 @@ export function EventPageView({
         ) : null}
         <Link
           href={`/dashboard?event=${event.slug}`}
-          className="inline-flex h-12 items-center rounded-lg border-[1.5px] border-ink px-6 text-[15.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+          className="inline-flex h-12 items-center rounded-lg bg-mist px-6 text-[15.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
         >
           {t("fundraiseCta")}
         </Link>
       </div>
       {registrationState !== "open" ? (
-        <p className="mt-4 rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[14.5px] text-sea">
+        <p className="mt-4 rounded-brand bg-mist px-4 py-3 text-[14.5px] text-sea">
           {registrationState === "before"
             ? t("registrationOpens", { date: fmt(event.registration_opens_at) })
             : t("registrationClosed")}

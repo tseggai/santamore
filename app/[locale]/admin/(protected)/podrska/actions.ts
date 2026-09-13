@@ -27,6 +27,8 @@ const supporterSchema = z.object({
   contactPhone: z.string().trim().max(40).nullable(),
   notes: z.string().trim().max(2000).nullable(),
   isActive: z.boolean(),
+  /** Object path in the supporter-logos bucket; undefined leaves it as is. */
+  logoPath: z.string().trim().max(300).nullable().optional(),
 });
 
 export async function saveSupporter(input: unknown): Promise<SupporterActionResult> {
@@ -42,6 +44,7 @@ export async function saveSupporter(input: unknown): Promise<SupporterActionResu
     contact_phone: data.contactPhone,
     notes: data.notes,
     is_active: data.isActive,
+    ...(data.logoPath !== undefined ? { logo_path: data.logoPath } : {}),
   };
   const { data: saved, error } = data.id
     ? await supabase.from("supporters").update(row).eq("id", data.id).select("id, name").single()

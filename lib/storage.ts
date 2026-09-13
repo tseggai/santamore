@@ -11,6 +11,10 @@ export function fundraiserPhotoUrl(path: string | null): string | null {
   return publicStorageUrl("fundraiser-photos", path);
 }
 
+export function supporterLogoUrl(path: string | null): string | null {
+  return publicStorageUrl("supporter-logos", path);
+}
+
 /** Ledger documentation is public by design (brief §11). */
 export function disbursementDocUrl(path: string | null): string | null {
   return publicStorageUrl("disbursement-docs", path);

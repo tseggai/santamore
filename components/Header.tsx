@@ -18,7 +18,7 @@ export default function Header() {
   const t = useTranslations();
 
   return (
-    <header className="border-b-[1.5px] border-ink bg-paper">
+    <header className="border-b-[0.5px] border-line bg-paper">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-paper focus:px-3 focus:py-2"
