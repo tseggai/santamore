@@ -19,6 +19,7 @@ export interface PerkChallengeAdminRow {
   id: string;
   slug: string;
   partner_name: string;
+  event_id: string | null;
   title: string;
   description: string | null;
   reward_label: string;
@@ -60,9 +61,11 @@ function fromDateInput(value: string, endOfDay: boolean): string | null {
 
 function ChallengeForm({
   challenge,
+  events,
   onDone,
 }: {
   challenge: PerkChallengeAdminRow | null;
+  events: { id: string; name: string }[];
   onDone: () => void;
 }) {
   const t = useTranslations("admin");
@@ -88,6 +91,7 @@ function ChallengeForm({
     challenge?.window_days ? String(challenge.window_days) : "7",
   );
   const [partnerUrl, setPartnerUrl] = useState(challenge?.partner_url ?? "");
+  const [eventId, setEventId] = useState(challenge?.event_id ?? "");
   const [allowManual, setAllowManual] = useState(challenge?.allow_manual ?? false);
   const [perUser, setPerUser] = useState(String(challenge?.per_user_daily_cap ?? 1));
   const [dailyCap, setDailyCap] = useState(challenge?.daily_cap ? String(challenge.daily_cap) : "5");
@@ -126,6 +130,7 @@ function ChallengeForm({
       id: challenge?.id,
       slug: slug || slugify(title),
       partnerName: partner,
+      eventId: eventId || null,
       title,
       description: description.trim() || null,
       rewardLabel: reward,
@@ -246,6 +251,16 @@ function ChallengeForm({
           <input id="pkPartnerUrl" type="url" value={partnerUrl} onChange={(e) => setPartnerUrl(e.target.value)} placeholder="https://" className={inputClass} />
         </div>
         <div>
+          <label htmlFor="pkEvent" className={labelClass}>{t("perkEvent")}</label>
+          <select id="pkEvent" value={eventId} onChange={(e) => setEventId(e.target.value)} className={inputClass}>
+            <option value="">{t("perkEventNone")}</option>
+            {events.map((event) => (
+              <option key={event.id} value={event.id}>{event.name}</option>
+            ))}
+          </select>
+          <p className="mt-1 text-[13px] text-black/55">{t("perkEventHint")}</p>
+        </div>
+        <div>
           <label htmlFor="pkElev" className={labelClass}>{t("perkMinElev")}</label>
           <input id="pkElev" type="number" min={0} value={minElev} onChange={(e) => setMinElev(e.target.value)} className={`${inputClass} font-mono`} />
         </div>
@@ -322,9 +337,11 @@ function ChallengeForm({
 
 export function PerkChallengesManager({
   challenges,
+  events,
   webhook,
 }: {
   challenges: PerkChallengeAdminRow[];
+  events: { id: string; name: string }[];
   webhook: WebhookStatus;
 }) {
   const t = useTranslations("admin");
@@ -379,7 +396,7 @@ export function PerkChallengesManager({
       </div>
 
       {open === "new" ? (
-        <ChallengeForm challenge={null} onDone={() => setOpen("")} />
+        <ChallengeForm events={events} challenge={null} onDone={() => setOpen("")} />
       ) : (
         <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
           + {t("perkNew")}
@@ -434,7 +451,7 @@ export function PerkChallengesManager({
               </div>
               {open === challenge.id ? (
                 <div className="mt-3">
-                  <ChallengeForm challenge={challenge} onDone={() => setOpen("")} />
+                  <ChallengeForm events={events} challenge={challenge} onDone={() => setOpen("")} />
                 </div>
               ) : null}
             </li>

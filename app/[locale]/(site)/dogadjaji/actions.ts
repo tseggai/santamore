@@ -16,7 +16,11 @@ const registerSchema = z.object({
   shirtSize: z.enum(["XS", "S", "M", "L", "XL", "XXL"]).nullable(),
   /** Empty when the event is free (no price tiers). */
   tierLabel: z.string().trim().max(100),
-  waiverAccepted: z.literal(true),
+  /** Required for races and challenges; a gathering has no waiver. */
+  waiverAccepted: z.boolean(),
+  participantName: z.string().trim().min(2).max(120),
+  participantEmail: z.string().trim().email().max(120),
+  participantPhone: z.string().trim().max(40).default(""),
   locale: z.enum(["me", "en", "ru"]),
 });
 
@@ -43,9 +47,11 @@ export interface RegisterResult {
 }
 
 /**
- * Register the signed-in user for an event: waiver recorded, per-registration
- * SEPA reference minted server-side, entry fee owed to the Operations Fund.
- * Idempotent per (event, user) — an existing registration just returns ok.
+ * Register a participant for an event under the signed-in account — the
+ * account holder or someone they register (a child, a friend). Waiver
+ * recorded where the event needs one, per-registration SEPA reference
+ * minted server-side, entry fee owed to the Operations Fund; a free tier
+ * confirms on the spot. Idempotent per (event, account, participant email).
  */
 export async function registerForEvent(input: unknown): Promise<RegisterResult> {
   const parsed = registerSchema.safeParse(input);
@@ -63,11 +69,13 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     const { data: event } = await service
       .from("events")
       .select(
-        "id, name, is_published, distances, price_tiers, capacity, registration_opens_at, registration_closes_at",
+        "id, name, kind, is_published, distances, price_tiers, capacity, registration_opens_at, registration_closes_at, offers_shirts",
       )
       .eq("slug", data.eventSlug)
       .maybeSingle();
     if (!event?.is_published) return { ok: false, error: "server" };
+    if (event.kind !== "social" && !data.waiverAccepted) return { ok: false, error: "invalid" };
+    const shirtSize = event.offers_shirts ? data.shirtSize : null;
 
     const now = Date.now();
     if (
@@ -98,6 +106,8 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
       .select("id")
       .eq("event_id", event.id)
       .eq("user_id", user.id)
+      .eq("participant_email", data.participantEmail.toLowerCase())
+      .neq("status", "cancelled")
       .maybeSingle();
     if (existing) return { ok: true };
 
@@ -120,23 +130,20 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
         event_id: event.id,
         user_id: user.id,
         distance: data.distance,
-        shirt_size: data.shirtSize,
+        shirt_size: shirtSize,
         tier_label: tier?.label ?? null,
         amount_due_cents: tier?.amount_cents ?? 0,
         payment_reference: reference,
-        waiver_signed_at: new Date().toISOString(),
-        waiver_version: WAIVER_VERSION,
-        status: "pending",
+        waiver_signed_at: event.kind === "social" ? null : new Date().toISOString(),
+        waiver_version: event.kind === "social" ? null : WAIVER_VERSION,
+        participant_name: data.participantName,
+        participant_email: data.participantEmail.toLowerCase(),
+        participant_phone: data.participantPhone || null,
+        // Nothing to pay → the place is confirmed right away.
+        status: (tier?.amount_cents ?? 0) === 0 ? "confirmed" : "pending",
       });
       if (!error) inserted = true;
-      else if (
-        error.code === "23505" &&
-        `${error.message} ${error.details ?? ""}`.includes("event_id")
-      ) {
-        // Double-submit race: the other request won unique(event_id, user_id).
-        // The user IS registered — idempotent success, not a reference retry.
-        return { ok: true };
-      } else if (error.code !== "23505" && error.code !== "P0001") {
+      else if (error.code !== "23505" && error.code !== "P0001") {
         console.error("[events] registration failed:", error.code);
         return { ok: false, error: "server" };
       }
@@ -144,18 +151,13 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     if (!inserted) return { ok: false, error: "server" };
 
     // Best effort — a failed email must never lose the registration.
-    if (user.email) {
+    {
       try {
-        const { data: profile } = await service
-          .from("profiles")
-          .select("full_name")
-          .eq("id", user.id)
-          .maybeSingle();
         await sendEmail(
           await buildRegistrationEmail({
             locale: data.locale,
-            name: profile?.full_name?.trim() || user.email,
-            email: user.email,
+            name: data.participantName,
+            email: data.participantEmail,
             eventName: event.name,
             distance: data.distance,
             tierLabel: tier?.label ?? null,

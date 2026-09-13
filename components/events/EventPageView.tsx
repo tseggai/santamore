@@ -10,10 +10,27 @@ import { htmlLang, type Locale } from "@/i18n/routing";
 
 export type { EventTier };
 
+export interface EventPerk {
+  slug: string;
+  partner_name: string;
+  reward_label: string;
+  title: string;
+}
+
+export interface EventSponsor {
+  id: string;
+  name: string;
+  website: string | null;
+}
+
 export interface EventView {
   slug: string;
   name: string;
-  kind: "race" | "challenge";
+  kind: "race" | "challenge" | "social";
+  description?: string | null;
+  /** Partner rewards attached to this challenge (public view). */
+  perks?: EventPerk[];
+  sponsors?: EventSponsor[];
   starts_at: string | null;
   ends_at: string | null;
   venue: string | null;
@@ -60,7 +77,7 @@ export function EventPageView({
   return (
     <div className={`mx-auto max-w-3xl px-5 py-14 ${preview ? "pointer-events-none select-none" : ""}`}>
       <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
-        {event.kind === "challenge" ? t("kindChallenge") : t("kindRace")}
+        {event.kind === "challenge" ? t("kindChallenge") : event.kind === "social" ? t("kindSocial") : t("kindRace")}
       </p>
       <h1 className="type-display mt-2 text-4xl">{event.name || "…"}</h1>
       <p className="mt-3 text-[15.5px] text-black/70">
@@ -68,6 +85,13 @@ export function EventPageView({
         {event.ends_at ? <> — {fmt(event.ends_at)}</> : null}
         {event.venue ? <> · {event.venue}</> : null}
       </p>
+
+      {event.description ? (
+        <div className="mt-6 max-w-2xl">
+          <p className="type-eyebrow text-sea/80">{t("aboutHeading")}</p>
+          <p className="mt-2 whitespace-pre-line text-[16px] leading-relaxed text-black/80">{event.description}</p>
+        </div>
+      ) : null}
 
       {event.distances.length > 0 ? (
         <div className="mt-4 flex flex-wrap gap-2">
@@ -126,6 +150,39 @@ export function EventPageView({
             ? t("registrationOpens", { date: fmt(event.registration_opens_at) })
             : t("registrationClosed")}
         </p>
+      ) : null}
+
+      {event.perks && event.perks.length > 0 ? (
+        <div className="mt-10">
+          <h2 className="type-display text-2xl">{t("rewardsHeading")}</h2>
+          <ul className="mt-3 space-y-2">
+            {event.perks.map((perk) => (
+              <li key={perk.slug} className="rounded-lg bg-mist px-4 py-3">
+                <Link href={`/izazovi/${perk.slug}`} className="block text-[15px] font-bold hover:text-sea">
+                  {perk.reward_label} · {perk.partner_name}
+                </Link>
+                <span className="block text-[13.5px] text-black/60">{perk.title}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {event.sponsors && event.sponsors.length > 0 ? (
+        <div className="mt-10">
+          <p className="type-eyebrow text-sea/80">{t("sponsorsHeading")}</p>
+          <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-semibold">
+            {event.sponsors.map((sponsor) => (
+              <li key={sponsor.id}>
+                {sponsor.website ? (
+                  <a href={sponsor.website} target="_blank" rel="noopener" className="hover:text-sea">{sponsor.name}</a>
+                ) : (
+                  sponsor.name
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
 
       {event.kind === "challenge" && challengeEntries.length > 0 ? (
