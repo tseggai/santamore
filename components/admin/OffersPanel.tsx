@@ -4,13 +4,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import {
-  registerStravaWebhook,
-  savePerkChallenge,
-  setPerkChallengeActive,
-  type PerkActionResult,
-  type WebhookStatus,
-} from "@/app/[locale]/admin/(protected)/izazovi/actions";
+import { savePerkChallenge, setPerkChallengeActive } from "@/app/[locale]/admin/(protected)/izazovi/actions";
+import { saveSupporter } from "@/app/[locale]/admin/(protected)/podrska/actions";
 import { PerkRule, formatPace } from "@/components/perks/PerkRule";
 import { slugify } from "@/lib/slug";
 import { Link } from "@/i18n/navigation";
@@ -19,6 +14,7 @@ export interface PerkChallengeAdminRow {
   id: string;
   slug: string;
   partner_name: string;
+  supporter_id: string | null;
   event_id: string | null;
   title: string;
   description: string | null;
@@ -59,20 +55,31 @@ function fromDateInput(value: string, endOfDay: boolean): string | null {
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }
 
-function ChallengeForm({
+/**
+ * One offer on a challenge: which supporter gives what, for which runs,
+ * and the PIN they redeem with. Saved as a perk_challenges row bound to
+ * the event.
+ */
+export function OfferForm({
+  eventId,
+  eventName,
   challenge,
-  events,
+  supporters: initialSupporters,
   onDone,
 }: {
+  eventId: string;
+  eventName: string;
   challenge: PerkChallengeAdminRow | null;
-  events: { id: string; name: string }[];
+  supporters: { id: string; name: string }[];
   onDone: () => void;
 }) {
   const t = useTranslations("admin");
   const tPerks = useTranslations("perks");
   const router = useRouter();
-  const [partner, setPartner] = useState(challenge?.partner_name ?? "");
-  const [title, setTitle] = useState(challenge?.title ?? "");
+  const [supporters, setSupporters] = useState(initialSupporters);
+  const [supporterId, setSupporterId] = useState(challenge?.supporter_id ?? initialSupporters[0]?.id ?? "");
+  const [newSupporter, setNewSupporter] = useState<string | null>(null);
+  const [title, setTitle] = useState(challenge?.title ?? eventName);
   const [slug, setSlug] = useState(challenge?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(Boolean(challenge));
   const [description, setDescription] = useState(challenge?.description ?? "");
@@ -91,7 +98,6 @@ function ChallengeForm({
     challenge?.window_days ? String(challenge.window_days) : "7",
   );
   const [partnerUrl, setPartnerUrl] = useState(challenge?.partner_url ?? "");
-  const [eventId, setEventId] = useState(challenge?.event_id ?? "");
   const [allowManual, setAllowManual] = useState(challenge?.allow_manual ?? false);
   const [perUser, setPerUser] = useState(String(challenge?.per_user_daily_cap ?? 1));
   const [dailyCap, setDailyCap] = useState(challenge?.daily_cap ? String(challenge.daily_cap) : "5");
@@ -121,7 +127,7 @@ function ChallengeForm({
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!Number.isFinite(minDistanceM) || sports.length === 0 || Number.isNaN(paceS)) {
+    if (!Number.isFinite(minDistanceM) || sports.length === 0 || Number.isNaN(paceS) || !supporterId) {
       setState("invalid");
       return;
     }
@@ -129,8 +135,8 @@ function ChallengeForm({
     const result = await savePerkChallenge({
       id: challenge?.id,
       slug: slug || slugify(title),
-      partnerName: partner,
-      eventId: eventId || null,
+      supporterId,
+      eventId,
       title,
       description: description.trim() || null,
       rewardLabel: reward,
@@ -165,11 +171,44 @@ function ChallengeForm({
     );
 
   return (
-    <form onSubmit={submit} className="rounded-brand border-[1.5px] border-line bg-mist/40 p-4 sm:p-5">
+    <form onSubmit={submit} className="rounded-lg bg-mist p-4 sm:p-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="pkPartner" className={labelClass}>{t("perkPartner")}</label>
-          <input id="pkPartner" type="text" required value={partner} onChange={(e) => setPartner(e.target.value)} className={inputClass} />
+          <label htmlFor="pkSupporter" className={labelClass}>{t("perkSupporter")}</label>
+          {newSupporter === null ? (
+            <>
+              <select id="pkSupporter" required value={supporterId} onChange={(e) => setSupporterId(e.target.value)} className={inputClass}>
+                <option value="">—</option>
+                {supporters.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+              <button type="button" onClick={() => setNewSupporter("")} className="mt-1.5 text-[13.5px] font-semibold text-sea underline underline-offset-2">
+                {t("suNewInline")}
+              </button>
+            </>
+          ) : (
+            <div className="mt-1 flex gap-2">
+              <input type="text" value={newSupporter} onChange={(e) => setNewSupporter(e.target.value)} placeholder={t("suName")} aria-label={t("suName")} className={`${inputClass} mt-0`} />
+              <button
+                type="button"
+                onClick={async () => {
+                  const name = (newSupporter ?? "").trim();
+                  if (name.length < 2) return;
+                  const result = await saveSupporter({ name, website: null, contactName: null, contactEmail: null, contactPhone: null, notes: null, isActive: true }).catch(() => ({ ok: false as const }));
+                  if (result.ok && "supporter" in result && result.supporter) {
+                    setSupporters((list) => [...list, result.supporter!]);
+                    setSupporterId(result.supporter.id);
+                    setNewSupporter(null);
+                  } else {
+                    setState("error");
+                  }
+                }}
+                className="shrink-0 rounded-lg bg-ink px-3 py-2 text-[14px] font-bold text-paper"
+              >
+                {t("evChapterCreate")}
+              </button>
+              <button type="button" onClick={() => setNewSupporter(null)} className="shrink-0 rounded-lg bg-paper px-3 py-2 text-[14px] font-semibold">{t("cancel")}</button>
+            </div>
+          )}
         </div>
         <div>
           <label htmlFor="pkReward" className={labelClass}>{t("perkReward")}</label>
@@ -251,16 +290,6 @@ function ChallengeForm({
           <input id="pkPartnerUrl" type="url" value={partnerUrl} onChange={(e) => setPartnerUrl(e.target.value)} placeholder="https://" className={inputClass} />
         </div>
         <div>
-          <label htmlFor="pkEvent" className={labelClass}>{t("perkEvent")}</label>
-          <select id="pkEvent" value={eventId} onChange={(e) => setEventId(e.target.value)} className={inputClass}>
-            <option value="">{t("perkEventNone")}</option>
-            {events.map((event) => (
-              <option key={event.id} value={event.id}>{event.name}</option>
-            ))}
-          </select>
-          <p className="mt-1 text-[13px] text-black/55">{t("perkEventHint")}</p>
-        </div>
-        <div>
           <label htmlFor="pkElev" className={labelClass}>{t("perkMinElev")}</label>
           <input id="pkElev" type="number" min={0} value={minElev} onChange={(e) => setMinElev(e.target.value)} className={`${inputClass} font-mono`} />
         </div>
@@ -335,20 +364,21 @@ function ChallengeForm({
   );
 }
 
-export function PerkChallengesManager({
+/** The offers on one challenge event: list, pause/resume, edit, add. */
+export function OffersPanel({
+  eventId,
+  eventName,
   challenges,
-  events,
-  webhook,
+  supporters,
 }: {
+  eventId: string;
+  eventName: string;
   challenges: PerkChallengeAdminRow[];
-  events: { id: string; name: string }[];
-  webhook: WebhookStatus;
+  supporters: { id: string; name: string }[];
 }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [open, setOpen] = useState<"" | "new" | string>("");
-  const [hookBusy, setHookBusy] = useState(false);
-  const [hookNotice, setHookNotice] = useState("");
   const [rowBusy, setRowBusy] = useState<string | null>(null);
 
   const toggleActive = async (challenge: PerkChallengeAdminRow) => {
@@ -358,57 +388,22 @@ export function PerkChallengesManager({
     router.refresh();
   };
 
-  const registered = webhook.subscriptions.some((s) => s.callback_url === webhook.expectedCallback);
-
-  const register = async () => {
-    setHookBusy(true);
-    setHookNotice("");
-    const result = await registerStravaWebhook().catch(
-      (): PerkActionResult => ({ ok: false, error: "server" }),
-    );
-    setHookBusy(false);
-    setHookNotice(result.ok ? t("webhookRegistered") : `${t("actionError")} ${result.message ?? ""}`.trim());
-    router.refresh();
-  };
-
   return (
-    <div className="mt-5 space-y-6">
-      {/* Strava wiring */}
-      <div className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3.5">
-        <p className="text-[14.5px] font-bold">{t("webhookHeading")}</p>
-        {!webhook.configured ? (
-          <p className="mt-1 text-[14px] text-black/65">{t("webhookUnconfigured")}</p>
-        ) : (
-          <>
-            <p className="mt-1 text-[14px] text-black/65">
-              {registered ? t("webhookOk") : t("webhookMissing")}{" "}
-              <span className="font-mono text-[13px]">{webhook.expectedCallback}</span>
-              {webhook.error ? <span className="block text-red-dark">{webhook.error}</span> : null}
-            </p>
-            {!registered ? (
-              <button type="button" disabled={hookBusy} onClick={register} className="mt-2 rounded-lg border-[1.5px] border-line bg-paper px-3 py-1.5 text-[13.5px] font-semibold hover:border-sea hover:text-sea disabled:opacity-50">
-                {hookBusy ? "…" : t("webhookRegister")}
-              </button>
-            ) : null}
-            {hookNotice ? <p className="mt-2 text-[13.5px] font-semibold text-sea">{hookNotice}</p> : null}
-          </>
-        )}
-      </div>
-
+    <div className="space-y-3">
       {open === "new" ? (
-        <ChallengeForm events={events} challenge={null} onDone={() => setOpen("")} />
+        <OfferForm eventId={eventId} eventName={eventName} challenge={null} supporters={supporters} onDone={() => setOpen("")} />
       ) : (
         <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
-          + {t("perkNew")}
+          + {t("offerNew")}
         </button>
       )}
 
       {challenges.length === 0 ? (
-        <p className="text-[14.5px] text-black/60">{t("perkEmpty")}</p>
+        <p className="text-[14.5px] text-black/60">{t("offerEmpty")}</p>
       ) : (
         <ul className="space-y-2">
           {challenges.map((challenge) => (
-            <li key={challenge.id} className="rounded-brand border-[1.5px] border-line px-4 py-3.5">
+            <li key={challenge.id} className="rounded-lg bg-paper px-4 py-3.5">
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div className="min-w-0 flex-1">
                   <p className="flex flex-wrap items-center gap-2 text-[15.5px] font-bold">
@@ -417,7 +412,7 @@ export function PerkChallengesManager({
                     ) : (
                       challenge.title
                     )}
-                    <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${challenge.is_active ? "bg-sea text-paper" : "border border-line text-black/60"}`}>
+                    <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${challenge.is_active ? "bg-sea text-paper" : "bg-mist text-black/60"}`}>
                       {challenge.is_active ? t("perkActiveBadge") : t("postDraft")}
                     </span>
                     {!challenge.has_pin ? (
@@ -435,7 +430,7 @@ export function PerkChallengesManager({
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-1.5">
-                  <button type="button" onClick={() => setOpen(open === challenge.id ? "" : challenge.id)} className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea">
+                  <button type="button" onClick={() => setOpen(open === challenge.id ? "" : challenge.id)} className="rounded-lg bg-mist px-2.5 py-1 text-[13px] font-semibold hover:bg-mist-2">
                     {t("evEdit")}
                   </button>
                   <button
@@ -443,7 +438,7 @@ export function PerkChallengesManager({
                     disabled={rowBusy === challenge.id || (!challenge.is_active && !challenge.has_pin)}
                     title={!challenge.is_active && !challenge.has_pin ? t("perkNoPin") : undefined}
                     onClick={() => toggleActive(challenge)}
-                    className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
+                    className="rounded-lg bg-mist px-2.5 py-1 text-[13px] font-semibold hover:bg-mist-2 disabled:opacity-40"
                   >
                     {challenge.is_active ? t("perkPause") : t("perkResume")}
                   </button>
@@ -451,7 +446,7 @@ export function PerkChallengesManager({
               </div>
               {open === challenge.id ? (
                 <div className="mt-3">
-                  <ChallengeForm events={events} challenge={challenge} onDone={() => setOpen("")} />
+                  <OfferForm eventId={eventId} eventName={eventName} challenge={challenge} supporters={supporters} onDone={() => setOpen("")} />
                 </div>
               ) : null}
             </li>

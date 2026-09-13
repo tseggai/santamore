@@ -45,6 +45,8 @@ select * from (values
   ('20260911000017_events_v2',
      exists (select 1 from information_schema.columns
               where table_schema = 'public' and table_name = 'events'
-                and column_name = 'offers_shirts'))
+                and column_name = 'offers_shirts')),
+  ('20260913000018_supporters',
+     to_regclass('public.supporters') is not null)
 ) as m (migration, applied)
 order by migration;
