@@ -33,6 +33,7 @@ interface ChallengeRow {
   ends_at: string | null;
   is_active: boolean;
   redeem_pin_hash: string | null;
+  event_id: string | null;
 }
 
 /** Partner perks: define the rule and the reward, set the partner's PIN, watch redemptions. */
@@ -40,9 +41,10 @@ export default async function AdminChallengesPage() {
   const t = await getTranslations("admin");
   const supabase = await createClient();
 
-  const [{ data: challenges }, { data: awards }, webhook] = await Promise.all([
+  const [{ data: challenges }, { data: awards }, { data: events }, webhook] = await Promise.all([
     supabase.from("perk_challenges").select("*").order("created_at", { ascending: false }),
     supabase.from("perk_awards").select("challenge_id, status, awarded_on").limit(20_000),
+    supabase.from("events").select("id, name").eq("kind", "challenge").order("starts_at", { ascending: false }),
     stravaWebhookStatus(),
   ]);
 
@@ -70,7 +72,7 @@ export default async function AdminChallengesPage() {
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("perksTitle")}</h1>
       <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("perksHint")}</p>
-      <PerkChallengesManager challenges={rows} webhook={webhook} />
+      <PerkChallengesManager challenges={rows} events={(events ?? []) as { id: string; name: string }[]} webhook={webhook} />
     </div>
   );
 }

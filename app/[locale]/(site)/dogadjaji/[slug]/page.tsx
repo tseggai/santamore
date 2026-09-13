@@ -27,8 +27,9 @@ interface PublicEvent {
   registration_closes_at: string | null;
   distances: unknown;
   price_tiers: unknown;
-  kind: "race" | "challenge";
+  kind: "race" | "challenge" | "social";
   challenge_metric: ChallengeMetric | null;
+  description: string | null;
 }
 
 async function fetchEvent(slug: string) {
@@ -67,6 +68,13 @@ export default async function EventPage({
 
   const event = await fetchEvent(slug);
   if (!event) notFound();
+
+  // What hangs off the event: partner rewards on a challenge, sponsors.
+  const extras = await createClient();
+  const [{ data: perkRows }, { data: sponsorRows }] = await Promise.all([
+    extras.from("v_public_perk_challenges").select("slug, partner_name, reward_label, title").eq("event_slug", slug),
+    extras.from("v_public_sponsors").select("id, name, website").eq("event_slug", slug),
+  ]);
 
   // Challenge standings, ranked by the event's declared metric.
   let challengeEntries: LeaderboardEntry[] = [];
@@ -122,6 +130,9 @@ export default async function EventPage({
     registration_closes_at: event.registration_closes_at,
     distances: parseDistances(event.distances),
     tiers: parseTiers(event.price_tiers),
+    description: event.description,
+    perks: (perkRows ?? []) as EventView["perks"],
+    sponsors: (sponsorRows ?? []) as EventView["sponsors"],
   };
 
   return (

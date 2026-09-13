@@ -50,6 +50,8 @@ const challengeSchema = z.object({
   isActive: z.boolean(),
   /** Set or reset the partner's PIN; empty = leave as is. */
   pin: z.string().regex(/^([0-9]{4,8})?$/),
+  /** The challenge event this reward belongs to, if any. */
+  eventId: z.string().uuid().nullable().default(null),
 });
 
 export async function savePerkChallenge(input: unknown): Promise<PerkActionResult> {
@@ -73,6 +75,7 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
     required_days: data.requiredDays,
     window_days: data.requiredDays > 1 ? data.windowDays : null,
     partner_url: data.partnerUrl,
+    event_id: data.eventId,
     allow_manual: data.allowManual,
     per_user_daily_cap: data.perUserDailyCap,
     daily_cap: data.dailyCap,

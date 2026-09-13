@@ -94,7 +94,7 @@ export function EventsManager({
                       {event.is_published ? t("postLive") : t("postDraft")}
                     </span>
                     <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-black/60">
-                      {event.kind === "challenge" ? t("evKindChallenge") : t("evKindRace")}
+                      {t(`evKind_${event.kind}`)}
                     </span>
                   </p>
                   <p className="mt-0.5 text-[13.5px] text-black/60">

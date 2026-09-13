@@ -10,7 +10,7 @@ interface EventRow {
   id: string;
   name: string;
   slug: string;
-  kind: "race" | "challenge";
+  kind: "race" | "challenge" | "social";
   challenge_metric: string | null;
   chapter_id: string;
   campaign_id: string | null;
@@ -23,6 +23,8 @@ interface EventRow {
   distances: unknown;
   price_tiers: unknown;
   is_published: boolean;
+  description: string | null;
+  offers_shirts: boolean;
 }
 
 /** Brief §4: /admin/dogadjaji — create and edit events. Staff session; RLS enforces. */

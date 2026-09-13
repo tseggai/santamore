@@ -28,7 +28,7 @@ const eventSchema = z
     id: z.string().uuid().optional(),
     name: z.string().trim().min(2).max(120),
     slug: z.string().trim().min(1).max(100),
-    kind: z.enum(["race", "challenge"]),
+    kind: z.enum(["race", "challenge", "social"]),
     challengeMetric: z
       .enum(["distance_m", "moving_time_s", "activity_count", "elevation_m"])
       .nullable(),
@@ -43,6 +43,8 @@ const eventSchema = z
     distances: z.array(z.string().trim().min(1).max(40)).max(20),
     priceTiers: z.array(tierSchema).max(20),
     isPublished: z.boolean(),
+    description: z.string().trim().max(4000).nullable(),
+    offersShirts: z.boolean(),
   })
   .refine((data) => data.kind !== "challenge" || data.challengeMetric !== null, {
     message: "a challenge needs a metric",
@@ -76,6 +78,10 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
     distances: data.distances,
     price_tiers: data.priceTiers,
     is_published: data.isPublished,
+    description: data.description,
+    offers_shirts: data.kind === "social" ? false : data.offersShirts,
+    // Gatherings have no distances, however the form was driven.
+    ...(data.kind !== "race" ? { distances: [] } : {}),
   };
 
   const supabase = await createClient();
@@ -113,4 +119,38 @@ export async function setEventPublished(input: unknown): Promise<EventActionResu
   revalidatePath("/[locale]/admin/dogadjaji", "page");
   revalidatePath("/[locale]/dogadjaji", "layout");
   return { ok: true };
+}
+
+/**
+ * A new chapter from the event form. Fund splits are copied from the first
+ * existing chapter — there is no split editor yet, and inventing ratios
+ * would be exactly the kind of number we never make up.
+ */
+export async function createChapter(
+  input: unknown,
+): Promise<EventActionResult & { chapter?: { id: string; name: string } }> {
+  const parsed = z.object({ name: z.string().trim().min(2).max(80) }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const supabase = await createClient();
+  const { data: model } = await supabase
+    .from("chapters")
+    .select("split_local_bp, split_national_bp, split_solidarity_bp")
+    .order("name")
+    .limit(1)
+    .maybeSingle();
+  if (!model) return { ok: false, error: "server" };
+  const slug = slugify(parsed.data.name, "");
+  if (!slug) return { ok: false, error: "invalid" };
+  const { data, error } = await supabase
+    .from("chapters")
+    .insert({ name: parsed.data.name, slug, ...model })
+    .select("id, name")
+    .single();
+  if (error) {
+    if (error.code === "23505") return { ok: false, error: "slug" };
+    console.error("[admin] chapter create failed:", error.code);
+    return { ok: false, error: "server" };
+  }
+  revalidatePath("/[locale]/admin", "layout");
+  return { ok: true, chapter: data };
 }
