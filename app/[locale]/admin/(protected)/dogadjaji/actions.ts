@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { MAX_CENTS } from "@/lib/money";
+import { generatePaymentReference } from "@/lib/references";
 import { slugify } from "@/lib/slug";
 import { createClient } from "@/lib/supabase/server";
 
@@ -14,6 +15,8 @@ import { createClient } from "@/lib/supabase/server";
 export interface EventActionResult {
   ok: boolean;
   error?: "invalid" | "slug" | "server";
+  /** The saved event, so a new one can stay open for offers. */
+  id?: string;
 }
 
 const isoDate = z.string().datetime({ offset: true });
@@ -85,19 +88,64 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
   };
 
   const supabase = await createClient();
-  const { error } = data.id
+  const { data: saved, error } = data.id
     ? await supabase.from("events").update(row).eq("id", data.id).select("id").single()
     : await supabase.from("events").insert(row).select("id").single();
-  if (error) {
-    if (error.code === "23505") return { ok: false, error: "slug" };
-    console.error("[admin] event save failed:", error.code);
+  if (error || !saved) {
+    if (error?.code === "23505") return { ok: false, error: "slug" };
+    console.error("[admin] event save failed:", error?.code);
     return { ok: false, error: "server" };
   }
 
   revalidatePath("/[locale]/admin/dogadjaji", "page");
   revalidatePath("/[locale]/dogadjaji", "layout");
   revalidatePath("/[locale]", "page");
-  return { ok: true };
+  return { ok: true, id: saved.id };
+}
+
+/**
+ * A cause created from the event form: title, goal, chapter — public from
+ * the start so the event's pages can take money. Description and
+ * beneficiary summary stay empty for staff to fill in on the Causes screen.
+ */
+export async function createCauseInline(
+  input: unknown,
+): Promise<EventActionResult & { cause?: { id: string; name: string } }> {
+  const parsed = z
+    .object({
+      title: z.string().trim().min(2).max(120),
+      goalCents: z.number().int().min(0).max(MAX_CENTS).nullable(),
+      chapterId: z.string().uuid(),
+    })
+    .safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const slug = slugify(parsed.data.title, "");
+  if (!slug) return { ok: false, error: "invalid" };
+  const supabase = await createClient();
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const { data, error } = await supabase
+      .from("campaigns")
+      .insert({
+        title: parsed.data.title,
+        slug: attempt === 0 ? slug : `${slug}-${Math.random().toString(36).slice(2, 6)}`,
+        chapter_id: parsed.data.chapterId,
+        goal_cents: parsed.data.goalCents,
+        is_public: true,
+        payment_reference: generatePaymentReference(),
+      })
+      .select("id, title")
+      .single();
+    if (!error && data) {
+      revalidatePath("/[locale]/admin", "layout");
+      revalidatePath("/[locale]/kampanje", "layout");
+      return { ok: true, cause: { id: data.id, name: data.title } };
+    }
+    if (error && error.code !== "23505") {
+      console.error("[admin] cause create failed:", error.code);
+      return { ok: false, error: "server" };
+    }
+  }
+  return { ok: false, error: "slug" };
 }
 
 /** Publish / unpublish without touching anything else. */

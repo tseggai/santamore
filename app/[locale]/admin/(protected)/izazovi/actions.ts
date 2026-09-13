@@ -29,7 +29,7 @@ const SPORTS = ["Run", "TrailRun", "VirtualRun", "Walk", "Hike", "Ride", "Swim"]
 const challengeSchema = z.object({
   id: z.string().uuid().optional(),
   slug: z.string().trim().min(1).max(100),
-  partnerName: z.string().trim().min(2).max(120),
+  supporterId: z.string().uuid(),
   title: z.string().trim().min(2).max(120),
   description: z.string().trim().max(2000).nullable(),
   rewardLabel: z.string().trim().min(1).max(120),
@@ -50,8 +50,8 @@ const challengeSchema = z.object({
   isActive: z.boolean(),
   /** Set or reset the partner's PIN; empty = leave as is. */
   pin: z.string().regex(/^([0-9]{4,8})?$/),
-  /** The challenge event this reward belongs to, if any. */
-  eventId: z.string().uuid().nullable().default(null),
+  /** The challenge event this offer belongs to. */
+  eventId: z.string().uuid(),
 });
 
 export async function savePerkChallenge(input: unknown): Promise<PerkActionResult> {
@@ -61,9 +61,18 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
   const slug = slugify(data.slug, "");
   if (!slug) return { ok: false, error: "invalid" };
 
+  const supabase = await createClient();
+  const { data: supporter } = await supabase
+    .from("supporters")
+    .select("name, website")
+    .eq("id", data.supporterId)
+    .maybeSingle();
+  if (!supporter) return { ok: false, error: "invalid" };
+
   const row = {
     slug,
-    partner_name: data.partnerName,
+    supporter_id: data.supporterId,
+    partner_name: supporter.name,
     title: data.title,
     description: data.description,
     reward_label: data.rewardLabel,
@@ -74,7 +83,7 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
     max_pace_s_per_km: data.maxPaceSPerKm,
     required_days: data.requiredDays,
     window_days: data.requiredDays > 1 ? data.windowDays : null,
-    partner_url: data.partnerUrl,
+    partner_url: data.partnerUrl ?? supporter.website,
     event_id: data.eventId,
     allow_manual: data.allowManual,
     per_user_daily_cap: data.perUserDailyCap,
@@ -85,7 +94,6 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
     is_active: data.isActive,
   };
 
-  const supabase = await createClient();
   const { data: saved, error } = data.id
     ? await supabase.from("perk_challenges").update(row).eq("id", data.id).select("id").single()
     : await supabase.from("perk_challenges").insert(row).select("id").single();

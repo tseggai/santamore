@@ -6,6 +6,9 @@ import { useState } from "react";
 
 import { setEventPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
 import { EventForm, type EventFormValues, type Option } from "@/components/admin/EventForm";
+import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
+import { StravaWebhookPanel } from "@/components/admin/StravaWebhookPanel";
+import type { WebhookStatus } from "@/app/[locale]/admin/(protected)/izazovi/actions";
 import { Link } from "@/i18n/navigation";
 
 export interface EventListRow extends EventFormValues {
@@ -13,6 +16,7 @@ export interface EventListRow extends EventFormValues {
   registrations: number;
   pages: number;
   going: number;
+  offers: PerkChallengeAdminRow[];
 }
 
 /**
@@ -24,11 +28,15 @@ export function EventsManager({
   events,
   chapters,
   campaigns,
+  supporters,
+  webhook,
   dateLabels,
 }: {
   events: EventListRow[];
   chapters: Option[];
   campaigns: Option[];
+  supporters: Option[];
+  webhook: WebhookStatus;
   /** Pre-formatted starts_at per event id (server-side Intl). */
   dateLabels: Record<string, string>;
 }) {
@@ -48,12 +56,15 @@ export function EventsManager({
 
   return (
     <div className="mt-5 space-y-4">
+      <StravaWebhookPanel webhook={webhook} />
       {open === "new" ? (
         <EventForm
           event={null}
           chapters={chapters}
           campaigns={campaigns}
+          supporters={supporters}
           onDone={() => setOpen("")}
+          onCreated={(id) => setOpen(id)}
         />
       ) : (
         <button
@@ -131,6 +142,8 @@ export function EventsManager({
                     event={event}
                     chapters={chapters}
                     campaigns={campaigns}
+                    supporters={supporters}
+                    offers={event.offers}
                     onDone={() => setOpen("")}
                   />
                 </div>
