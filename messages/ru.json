@@ -854,7 +854,15 @@
     "moneyDisbursementsCount": "зарегистрированных выплат",
     "moneyLedgerLink": "Открыть публичный реестр",
     "suLogo": "Логотип",
-    "suLogoHint": "Лучше квадратный; до 2 МБ."
+    "suLogoHint": "Лучше квадратный; до 2 МБ.",
+    "panelClose": "Закрыть",
+    "suLogoChoose": "Выбрать логотип",
+    "suLogoReplace": "Заменить логотип",
+    "suLogoRemove": "Удалить",
+    "spEditTitle": "Изменить спонсорство",
+    "postNew": "Новая запись",
+    "galleryAdd": "Добавить фото",
+    "disbNew": "Новая выплата"
   },
   "forms": {
     "nameLabel": "Имя и фамилия",

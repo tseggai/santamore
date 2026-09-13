@@ -5,9 +5,9 @@ import {
   type EventOption,
   type GalleryAdminItem,
 } from "@/components/admin/GalleryManager";
-import { PostEditor, type EditablePost } from "@/components/admin/PostEditor";
+import { PostsManager } from "@/components/admin/PostsManager";
+import type { EditablePost } from "@/components/admin/PostEditor";
 import { createClient } from "@/lib/supabase/server";
-import { Link } from "@/i18n/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -39,57 +39,13 @@ export default async function AdminContentPage({
   const posts = (postsData ?? []) as EditablePost[];
   const gallery = (galleryData ?? []) as GalleryAdminItem[];
   const events = (eventsData ?? []) as EventOption[];
-  const editing = posts.find((candidate) => candidate.id === postId) ?? null;
 
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("contentTitle")}</h1>
 
-      <h2 className="mt-6 text-[16px] font-bold">
-        {editing ? t("postEditHeading", { title: editing.title }) : t("postNewHeading")}
-      </h2>
-      {editing ? (
-        <p className="mt-1">
-          <Link
-            href="/admin/sadrzaj"
-            className="text-[14px] font-semibold text-sea underline decoration-black/30 underline-offset-2"
-          >
-            {t("postNewInstead")}
-          </Link>
-        </p>
-      ) : null}
-      <PostEditor key={editing?.id ?? "new"} post={editing} />
-
-      {posts.length > 0 ? (
-        <>
-          <h2 className="mt-10 text-[16px] font-bold">{t("postListHeading")}</h2>
-          <ul className="mt-3 space-y-1.5">
-            {posts.map((post) => (
-              <li key={post.id}>
-                <Link
-                  href={`/admin/sadrzaj?post=${post.id}`}
-                  className="flex flex-wrap items-baseline gap-x-3 rounded-lg border-[1.5px] border-line px-3.5 py-2 text-[14.5px] transition-colors hover:border-sea"
-                >
-                  <span className="font-mono text-[12px] uppercase text-sea">
-                    {post.locale}
-                  </span>
-                  <span className="font-semibold">{post.title}</span>
-                  <span className="font-mono text-[13px] text-black/45">/{post.slug}</span>
-                  <span
-                    className={
-                      post.published_at
-                        ? "ml-auto text-[13px] font-semibold text-sea"
-                        : "ml-auto text-[13px] text-black/50"
-                    }
-                  >
-                    {post.published_at ? t("postLive") : t("postDraft")}
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : null}
+      <h2 className="mt-6 text-[16px] font-bold">{t("postListHeading")}</h2>
+      <PostsManager posts={posts} initialPostId={postId} />
 
       <h2 className="mt-12 text-[16px] font-bold">{t("galleryHeading")}</h2>
       <p className="mt-1 text-[14px] text-black/60">{t("galleryHint")}</p>

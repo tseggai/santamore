@@ -356,7 +356,7 @@ export function OfferForm({
         <button type="submit" disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
           {challenge ? t("evSave") : t("perkCreate")}
         </button>
-        <button type="button" onClick={onDone} className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea">
+        <button type="button" onClick={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
           {t("cancel")}
         </button>
       </div>

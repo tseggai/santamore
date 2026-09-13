@@ -236,7 +236,7 @@ export function EventForm({
   const section = "mt-6 border-t-[0.5px] border-line pt-5";
 
   return (
-    <form onSubmit={submit} className="rounded-lg bg-mist p-4 sm:p-5">
+    <form onSubmit={submit}>
       {/* 1 — what kind of event; everything below follows from it */}
       <p className={labelClass}>{t("evKind")}</p>
       <div className="mt-2 grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label={t("evKind")}>

@@ -853,7 +853,15 @@
     "moneyDisbursementsCount": "disbursements recorded",
     "moneyLedgerLink": "See the public ledger",
     "suLogo": "Logo",
-    "suLogoHint": "Square works best; up to 2 MB."
+    "suLogoHint": "Square works best; up to 2 MB.",
+    "panelClose": "Close",
+    "suLogoChoose": "Choose logo",
+    "suLogoReplace": "Replace logo",
+    "suLogoRemove": "Remove",
+    "spEditTitle": "Edit sponsorship",
+    "postNew": "New post",
+    "galleryAdd": "Add photos",
+    "disbNew": "New disbursement"
   },
   "forms": {
     "nameLabel": "Full name",

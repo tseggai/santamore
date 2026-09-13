@@ -26,7 +26,7 @@ const inputClass =
   "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 
 /** Markdown post editor — one row per locale, same slug links translations. */
-export function PostEditor({ post }: { post: EditablePost | null }) {
+export function PostEditor({ post, onSaved }: { post: EditablePost | null; onSaved?: () => void }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [state, setState] = useState<State>("idle");
@@ -66,11 +66,14 @@ export function PostEditor({ post }: { post: EditablePost | null }) {
       published: form.get("published") === "on",
     }).catch(() => ({ ok: false }));
     setState(result.ok ? "done" : "error");
-    if (result.ok) router.refresh();
+    if (result.ok) {
+      router.refresh();
+      onSaved?.();
+    }
   };
 
   return (
-    <form onSubmit={submit} className="mt-4 grid max-w-2xl gap-3">
+    <form onSubmit={submit} className="grid gap-3">
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="text-[14px] font-semibold">
           {t("postLocale")}

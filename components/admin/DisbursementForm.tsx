@@ -23,7 +23,7 @@ const inputClass =
  * disbursement-docs bucket (staff-only write policy) before the insert, so
  * the row is born with its proof attached.
  */
-export function DisbursementForm({ chapters }: { chapters: ChapterOption[] }) {
+export function DisbursementForm({ chapters, onDone }: { chapters: ChapterOption[]; onDone?: () => void }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [state, setState] = useState<State>("idle");
@@ -74,13 +74,14 @@ export function DisbursementForm({ chapters }: { chapters: ChapterOption[] }) {
       setState("idle");
       (event.target as HTMLFormElement).reset?.();
       router.refresh();
+      onDone?.();
     } else {
       setState("error");
     }
   };
 
   return (
-    <form onSubmit={submit} className="mt-4 grid max-w-xl gap-3">
+    <form onSubmit={submit} className="grid gap-3">
       <label className="text-[14px] font-semibold">
         {t("disbChapter")}
         <select name="chapter" required className={inputClass}>

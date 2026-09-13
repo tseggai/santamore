@@ -221,3 +221,15 @@
     margin-top: 1.5rem;
   }
 }
+
+/* Console slide-over (components/console/SidePanel.tsx). */
+@keyframes panel-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
