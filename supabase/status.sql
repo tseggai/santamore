@@ -47,6 +47,8 @@ select * from (values
               where table_schema = 'public' and table_name = 'events'
                 and column_name = 'offers_shirts')),
   ('20260913000018_supporters',
-     to_regclass('public.supporters') is not null)
+     to_regclass('public.supporters') is not null),
+  ('20260913000019_staff_members',
+     to_regclass('public.v_staff_members') is not null)
 ) as m (migration, applied)
 order by migration;
