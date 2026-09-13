@@ -115,7 +115,9 @@ export function EventsManager({
                     <span className="font-mono">/dogadjaji/{event.slug}</span>
                   </p>
                   <p className="mt-0.5 text-[13.5px] text-black/60">
-                    {t("evCounts", { registrations: event.registrations, pages: event.pages, going: event.going })}
+                    <Link href={`/admin/prijave?event=${event.id}`} className="font-semibold text-sea underline underline-offset-2">
+                      {t("evCounts", { registrations: event.registrations, pages: event.pages, going: event.going })}
+                    </Link>
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-1.5">

@@ -8,11 +8,9 @@ import { Link } from "@/i18n/navigation";
 const ITEMS = [
   { href: "/admin", key: "navOverview", exact: true },
   { href: "/admin/donacije", key: "navDonations", exact: false },
-  { href: "/admin/prijave", key: "navRegistrations", exact: false },
-  { href: "/admin/prikupljaci", key: "navFundraisers", exact: false },
+  { href: "/admin/clanovi", key: "navMembers", exact: false },
   { href: "/admin/dogadjaji", key: "navEvents", exact: false },
   { href: "/admin/kampanje", key: "navCampaigns", exact: false },
-  { href: "/admin/sportisti", key: "navAthletes", exact: false },
   { href: "/admin/podrska", key: "navSupporters", exact: false },
   { href: "/admin/isplate", key: "navDisbursements", exact: false },
   { href: "/admin/sadrzaj", key: "navContent", exact: false },
