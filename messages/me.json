@@ -851,7 +851,9 @@
     "moneyApprovedPending": "Odobreno, još neisplaćeno",
     "moneySponsorCash": "Sponzorski novac (potpisano i aktivno)",
     "moneyDisbursementsCount": "evidentiranih isplata",
-    "moneyLedgerLink": "Vidi javni registar"
+    "moneyLedgerLink": "Vidi javni registar",
+    "suLogo": "Logo",
+    "suLogoHint": "Najbolje kvadratni; do 2 MB."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

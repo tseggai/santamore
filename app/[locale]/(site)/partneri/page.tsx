@@ -4,10 +4,51 @@ import { setRequestLocale } from "next-intl/server";
 
 import { InboundForm } from "@/components/forms/InboundForm";
 import { partnersContent } from "@/content/site/partners";
+import { supporterLogoUrl } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/server";
+import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
+// Live supporters on every request.
+export const dynamic = "force-dynamic";
+
+interface SupporterRow {
+  id: string;
+  name: string;
+  slug: string;
+  logo_path: string | null;
+  website: string | null;
+}
+
+interface SponsorshipRow {
+  supporter_slug: string | null;
+  tier: string | null;
+  is_in_kind: boolean;
+}
+
+interface OfferRow {
+  slug: string;
+  supporter_slug: string | null;
+  reward_label: string;
+  title: string;
+}
+
+async function loadSupporters() {
+  try {
+    const supabase = await createClient();
+    const [{ data: supporters }, { data: sponsorships }, { data: offers }] = await Promise.all([
+      supabase.from("v_public_supporters").select("id, name, slug, logo_path, website").order("name"),
+      supabase.from("v_public_sponsors").select("supporter_slug, tier, is_in_kind"),
+      supabase.from("v_public_perk_challenges").select("slug, supporter_slug, reward_label, title"),
+    ]);
+    return {
+      supporters: (supporters ?? []) as SupporterRow[],
+      sponsorships: (sponsorships ?? []) as SponsorshipRow[],
+      offers: (offers ?? []) as OfferRow[],
+    };
+  } catch {
+    return { supporters: [], sponsorships: [], offers: [] };
+  }
 }
 
 export async function generateMetadata({
@@ -32,6 +73,11 @@ export default async function PartnersPage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const content = partnersContent[locale as Locale];
+  const { supporters, sponsorships, offers } = await loadSupporters();
+  // Only supporters with something public to show: a signed deal or a live offer.
+  const shown = supporters.filter(
+    (su) => sponsorships.some((d) => d.supporter_slug === su.slug) || offers.some((o) => o.supporter_slug === su.slug),
+  );
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-14">
@@ -55,8 +101,65 @@ export default async function PartnersPage({
         </div>
       </section>
 
+      {/* who is already behind us — from the supporters record */}
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
+        <p className={eyebrowClass}>{content.supportersHeading}</p>
+        <p className="mt-3 max-w-2xl text-[15.5px] leading-relaxed text-black/70">{content.supportersLead}</p>
+        {shown.length === 0 ? (
+          <p className="mt-4 text-[15px] text-black/60">{content.supportersEmpty}</p>
+        ) : (
+          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
+            {shown.map((su) => {
+              const deals = sponsorships.filter((d) => d.supporter_slug === su.slug);
+              const theirOffers = offers.filter((o) => o.supporter_slug === su.slug);
+              const logo = supporterLogoUrl(su.logo_path);
+              return (
+                <li key={su.id} className="flex gap-4 rounded-lg bg-mist p-4">
+                  {logo ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- public bucket, arbitrary sizes
+                    <img src={logo} alt="" className="h-16 w-16 shrink-0 rounded-lg bg-paper object-contain" />
+                  ) : (
+                    <span aria-hidden className="type-display flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-paper text-[22px] text-sea">
+                      {su.name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-[16px] font-bold">
+                      {su.website ? (
+                        <a href={su.website} target="_blank" rel="noopener" className="hover:text-sea">{su.name}</a>
+                      ) : (
+                        su.name
+                      )}
+                    </p>
+                    {deals.length > 0 ? (
+                      <p className="mt-0.5 text-[14px] text-black/65">
+                        {content.sponsorLabel}
+                        {deals.some((d) => d.tier) ? ` · ${[...new Set(deals.map((d) => d.tier).filter(Boolean))].join(", ")}` : ""}
+                        {deals.every((d) => d.is_in_kind) ? ` · ${content.inKindLabel}` : ""}
+                      </p>
+                    ) : null}
+                    {theirOffers.length > 0 ? (
+                      <ul className="mt-1 space-y-0.5 text-[14px]">
+                        {theirOffers.map((offer) => (
+                          <li key={offer.slug}>
+                            <span className="text-black/55">{content.offersLabel}: </span>
+                            <Link href={`/izazovi/${offer.slug}`} className="font-semibold text-sea underline underline-offset-2">
+                              {offer.reward_label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
       {/* tier sheet */}
-      <section className="mt-12 border-t border-line-soft pt-10">
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
         <p className={eyebrowClass}>{content.tiersHeading}</p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">
           {content.tiers.map((tier) => (
@@ -64,8 +167,8 @@ export default async function PartnersPage({
               key={tier.name}
               className={
                 tier.flagship
-                  ? "rounded-brand border-[1.5px] border-red px-5 py-5 sm:col-span-2"
-                  : "rounded-brand border-[1.5px] border-line px-5 py-5"
+                  ? "rounded-lg bg-red/8 px-5 py-5 sm:col-span-2"
+                  : "rounded-lg bg-mist px-5 py-5"
               }
             >
               <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -81,7 +184,7 @@ export default async function PartnersPage({
       </section>
 
       {/* what a sponsor actually gets */}
-      <section className="mt-12 border-t border-line-soft pt-10">
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
         <p className={eyebrowClass}>{content.deliverHeading}</p>
         <p className="mt-4 max-w-2xl text-[16px] leading-relaxed">{content.deliverLead}</p>
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
@@ -96,7 +199,7 @@ export default async function PartnersPage({
       </section>
 
       {/* enquiry */}
-      <section className="mt-12 border-t border-line-soft pt-10">
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
         <p className={eyebrowClass}>{content.formHeading}</p>
         <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-black/70">
           {content.formLead}

@@ -25,6 +25,12 @@ export interface PartnersContent {
   deliver: { title: string; desc: string }[];
   formHeading: string;
   formLead: string;
+  supportersHeading: string;
+  supportersLead: string;
+  supportersEmpty: string;
+  sponsorLabel: string;
+  inKindLabel: string;
+  offersLabel: string;
 }
 
 export const partnersContent: Record<Locale, PartnersContent> = {
@@ -98,6 +104,12 @@ export const partnersContent: Record<Locale, PartnersContent> = {
         desc: "Isporuči ovo četvoro bez požurivanja i sljedeći razgovor je formalnost.",
       },
     ],
+    supportersHeading: "Ko nas podržava",
+    supportersLead: "Organizacije iza događaja i izazova — novcem, robom ili ponudom za trkače.",
+    supportersEmpty: "Prvi partneri se objavljuju ovdje čim potpišemo.",
+    sponsorLabel: "Sponzor",
+    inKindLabel: "u robi",
+    offersLabel: "Ponuda za trkače",
     formHeading: "Postanite partner",
     formLead:
       "Ostavite kontakt i javljamo se u roku od dva radna dana — sa nivoima, kalendarom i primjerom izvještaja.",
@@ -172,6 +184,12 @@ export const partnersContent: Record<Locale, PartnersContent> = {
         desc: "Deliver these four without being asked and next year's conversation is a formality.",
       },
     ],
+    supportersHeading: "Who supports us",
+    supportersLead: "The organisations behind the events and challenges — with money, in kind, or an offer for runners.",
+    supportersEmpty: "The first partners appear here as soon as we sign.",
+    sponsorLabel: "Sponsor",
+    inKindLabel: "in kind",
+    offersLabel: "Offer for runners",
     formHeading: "Become a partner",
     formLead:
       "Leave your details and we reply within two working days — with the tiers, the calendar and a sample report.",
@@ -246,6 +264,12 @@ export const partnersContent: Record<Locale, PartnersContent> = {
         desc: "Доставьте эти четыре без напоминания — и разговор в следующем году будет формальностью.",
       },
     ],
+    supportersHeading: "Кто нас поддерживает",
+    supportersLead: "Организации за событиями и челленджами — деньгами, натурой или предложением для бегунов.",
+    supportersEmpty: "Первые партнёры появятся здесь, как только подпишем.",
+    sponsorLabel: "Спонсор",
+    inKindLabel: "натурой",
+    offersLabel: "Предложение для бегунов",
     formHeading: "Стать партнёром",
     formLead:
       "Оставьте контакты — ответим в течение двух рабочих дней: уровни, календарь и пример отчёта.",

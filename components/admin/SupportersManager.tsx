@@ -6,7 +6,10 @@ import { useState, type FormEvent } from "react";
 
 import { saveSponsorship, saveSupporter } from "@/app/[locale]/admin/(protected)/podrska/actions";
 import type { Option } from "@/components/admin/EventForm";
+import { downscaleToJpeg } from "@/lib/images";
 import { formatCents, parseEurosToCents } from "@/lib/money";
+import { supporterLogoUrl } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
@@ -20,6 +23,7 @@ export interface SupporterRow {
   contact_phone: string | null;
   notes: string | null;
   is_active: boolean;
+  logo_path: string | null;
 }
 
 export interface SponsorshipRow {
@@ -68,7 +72,28 @@ export function SupporterForm({
   const [contactPhone, setContactPhone] = useState(supporter?.contact_phone ?? "");
   const [notes, setNotes] = useState(supporter?.notes ?? "");
   const [active, setActive] = useState(supporter?.is_active ?? true);
+  const [logoPath, setLogoPath] = useState<string | null | undefined>(undefined);
+  const [logoBusy, setLogoBusy] = useState(false);
   const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
+  const currentLogo = logoPath === undefined ? (supporter?.logo_path ?? null) : logoPath;
+
+  // Logos go straight to the public bucket under the supporter's id; the
+  // path is saved with the form. Only for an existing record (it needs the id).
+  const uploadLogo = async (file: File) => {
+    if (!supporter) return;
+    setLogoBusy(true);
+    try {
+      const blob = await downscaleToJpeg(file);
+      const path = `${supporter.id}/logo-${Date.now()}.jpg`;
+      const { error } = await createClient().storage.from("supporter-logos").upload(path, blob, { contentType: "image/jpeg" });
+      if (error) throw error;
+      setLogoPath(path);
+    } catch {
+      setState("error");
+    } finally {
+      setLogoBusy(false);
+    }
+  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -82,6 +107,7 @@ export function SupporterForm({
       contactPhone: contactPhone.trim() || null,
       notes: notes.trim() || null,
       isActive: active,
+      ...(logoPath !== undefined ? { logoPath } : {}),
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       router.refresh();
@@ -119,6 +145,21 @@ export function SupporterForm({
           <label htmlFor="suNotes" className={labelClass}>{t("suNotes")}</label>
           <textarea id="suNotes" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} className={inputClass} />
         </div>
+        {supporter ? (
+          <div className="flex items-center gap-3 sm:col-span-2">
+            {currentLogo ? (
+              // eslint-disable-next-line @next/next/no-img-element -- public bucket, arbitrary sizes
+              <img src={supporterLogoUrl(currentLogo) ?? ""} alt="" className="h-14 w-14 rounded-lg bg-paper object-contain" />
+            ) : (
+              <span className="flex h-14 w-14 items-center justify-center rounded-lg bg-paper text-[20px] font-bold text-black/40">{name.charAt(0).toUpperCase()}</span>
+            )}
+            <label className="text-[14px] font-semibold">
+              <span className="block">{t("suLogo")}</span>
+              <input type="file" accept="image/*" disabled={logoBusy} onChange={(e) => e.target.files?.[0] && uploadLogo(e.target.files[0])} className="mt-1 block text-[13.5px]" />
+              <span className="block text-[13px] font-normal text-black/55">{logoBusy ? t("photoUploading") : t("suLogoHint")}</span>
+            </label>
+          </div>
+        ) : null}
         <label className="flex items-center gap-2 text-[14.5px] sm:col-span-2">
           <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 accent-red" />
           {t("suActive")}
@@ -127,7 +168,7 @@ export function SupporterForm({
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
       <div className="mt-4 flex gap-2">
-        <button type="submit" disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
+        <button type="submit" disabled={state === "busy" || logoBusy} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
           {supporter ? t("evSave") : t("suCreate")}
         </button>
         <button type="button" onClick={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">

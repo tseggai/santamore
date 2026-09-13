@@ -852,7 +852,9 @@
     "moneyApprovedPending": "Одобрено, ещё не выплачено",
     "moneySponsorCash": "Спонсорские деньги (подписано и активно)",
     "moneyDisbursementsCount": "зарегистрированных выплат",
-    "moneyLedgerLink": "Открыть публичный реестр"
+    "moneyLedgerLink": "Открыть публичный реестр",
+    "suLogo": "Логотип",
+    "suLogoHint": "Лучше квадратный; до 2 МБ."
   },
   "forms": {
     "nameLabel": "Имя и фамилия",

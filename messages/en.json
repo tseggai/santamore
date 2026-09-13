@@ -851,7 +851,9 @@
     "moneyApprovedPending": "Approved, not yet disbursed",
     "moneySponsorCash": "Sponsorship cash (signed and active)",
     "moneyDisbursementsCount": "disbursements recorded",
-    "moneyLedgerLink": "See the public ledger"
+    "moneyLedgerLink": "See the public ledger",
+    "suLogo": "Logo",
+    "suLogoHint": "Square works best; up to 2 MB."
   },
   "forms": {
     "nameLabel": "Full name",
