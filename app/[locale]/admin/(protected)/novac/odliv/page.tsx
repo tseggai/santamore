@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
-import { DisbursementForm, type ChapterOption } from "@/components/admin/DisbursementForm";
+import type { ChapterOption } from "@/components/admin/DisbursementForm";
+import { DisbursementPanel } from "@/components/admin/DisbursementPanel";
 import { DisbursementRowActions } from "@/components/admin/DisbursementRowActions";
 import { formatCents } from "@/lib/money";
 import { disbursementDocUrl } from "@/lib/storage";
@@ -120,11 +121,10 @@ export default async function AdminDisbursementsPage({
     <div className="py-8">
       <h2 className="text-[18px] font-bold">{t("disbursementsTitle")}</h2>
 
-      <h2 className="mt-6 text-[16px] font-bold">{t("disbNewHeading")}</h2>
       {chapters.length === 0 ? (
         <p className="mt-2 text-[14.5px] text-black/60">{t("disbNoChapters")}</p>
       ) : (
-        <DisbursementForm chapters={chapters} />
+        <DisbursementPanel chapters={chapters} />
       )}
 
       <h2 className="mt-10 text-[16px] font-bold">{t("disbDraftHeading")}</h2>

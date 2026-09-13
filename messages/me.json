@@ -853,7 +853,15 @@
     "moneyDisbursementsCount": "evidentiranih isplata",
     "moneyLedgerLink": "Vidi javni registar",
     "suLogo": "Logo",
-    "suLogoHint": "Najbolje kvadratni; do 2 MB."
+    "suLogoHint": "Najbolje kvadratni; do 2 MB.",
+    "panelClose": "Zatvori",
+    "suLogoChoose": "Izaberi logo",
+    "suLogoReplace": "Zamijeni logo",
+    "suLogoRemove": "Ukloni",
+    "spEditTitle": "Uredi sponzorstvo",
+    "postNew": "Nova objava",
+    "galleryAdd": "Dodaj fotografije",
+    "disbNew": "Nova isplata"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

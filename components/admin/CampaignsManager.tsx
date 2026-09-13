@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 
 import { saveCampaign } from "@/app/[locale]/admin/(protected)/kampanje/actions";
 import type { Option } from "@/components/admin/EventForm";
+import { SidePanel } from "@/components/console/SidePanel";
 import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import { CampaignPageView } from "@/components/campaigns/CampaignPageView";
 import { formatCents, parseEurosToCents } from "@/lib/money";
@@ -177,10 +178,7 @@ function CampaignForm({
   };
 
   return (
-    <form
-      onSubmit={submit}
-      className="rounded-brand border-[1.5px] border-line bg-mist/40 p-4 sm:p-5"
-    >
+    <form onSubmit={submit}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label htmlFor="cTitle" className={labelClass}>
@@ -374,7 +372,7 @@ function CampaignForm({
         <button
           type="button"
           onClick={onDone}
-          className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
+          className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2"
         >
           {t("cancel")}
         </button>
@@ -395,21 +393,26 @@ export function CampaignsManager({
 }) {
   const t = useTranslations("admin");
   const [open, setOpen] = useState<"" | "new" | string>("");
+  const openCampaign = campaigns.find((candidate) => candidate.id === open) ?? null;
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
 
   return (
     <div className="mt-5 space-y-4">
-      {open === "new" ? (
-        <CampaignForm campaign={null} chapters={chapters} onDone={() => setOpen("")} />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setOpen("new")}
-          className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark"
-        >
-          + {t("campNew")}
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={() => setOpen("new")}
+        className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark"
+      >
+        + {t("campNew")}
+      </button>
+      <SidePanel
+        open={open !== ""}
+        title={open === "new" ? t("campNew") : (openCampaign?.title ?? "")}
+        onClose={() => setOpen("")}
+        wide
+      >
+        <CampaignForm key={open} campaign={openCampaign} chapters={chapters} onDone={() => setOpen("")} />
+      </SidePanel>
 
       {campaigns.length === 0 ? (
         <p className="text-[14.5px] text-black/60">{t("campEmpty")}</p>
@@ -448,21 +451,12 @@ export function CampaignsManager({
                 </div>
                 <button
                   type="button"
-                  onClick={() => setOpen(open === campaign.id ? "" : campaign.id)}
+                  onClick={() => setOpen(campaign.id)}
                   className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea"
                 >
                   {t("evEdit")}
                 </button>
               </div>
-              {open === campaign.id ? (
-                <div className="mt-3">
-                  <CampaignForm
-                    campaign={campaign}
-                    chapters={chapters}
-                    onDone={() => setOpen("")}
-                  />
-                </div>
-              ) : null}
             </li>
           ))}
         </ul>

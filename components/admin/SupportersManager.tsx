@@ -2,12 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
 import { saveSponsorship, saveSupporter } from "@/app/[locale]/admin/(protected)/podrska/actions";
 import type { Option } from "@/components/admin/EventForm";
 import { downscaleToJpeg } from "@/lib/images";
 import { formatCents, parseEurosToCents } from "@/lib/money";
+import { SidePanel } from "@/components/console/SidePanel";
 import { supporterLogoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 import { Link } from "@/i18n/navigation";
@@ -74,17 +75,18 @@ export function SupporterForm({
   const [active, setActive] = useState(supporter?.is_active ?? true);
   const [logoPath, setLogoPath] = useState<string | null | undefined>(undefined);
   const [logoBusy, setLogoBusy] = useState(false);
+  const logoInput = useRef<HTMLInputElement>(null);
+  // A new supporter has no id yet; its logo lives under a fresh folder.
+  const [logoFolder] = useState(() => supporter?.id ?? `new-${crypto.randomUUID()}`);
   const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
   const currentLogo = logoPath === undefined ? (supporter?.logo_path ?? null) : logoPath;
 
-  // Logos go straight to the public bucket under the supporter's id; the
-  // path is saved with the form. Only for an existing record (it needs the id).
+  // Logos go straight to the public bucket; the path is saved with the form.
   const uploadLogo = async (file: File) => {
-    if (!supporter) return;
     setLogoBusy(true);
     try {
-      const blob = await downscaleToJpeg(file);
-      const path = `${supporter.id}/logo-${Date.now()}.jpg`;
+      const blob = await downscaleToJpeg(file, 800);
+      const path = `${logoFolder}/logo-${Date.now()}.jpg`;
       const { error } = await createClient().storage.from("supporter-logos").upload(path, blob, { contentType: "image/jpeg" });
       if (error) throw error;
       setLogoPath(path);
@@ -119,7 +121,7 @@ export function SupporterForm({
   };
 
   return (
-    <form onSubmit={submit} className="rounded-lg bg-mist p-4 sm:p-5">
+    <form onSubmit={submit}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="suName" className={labelClass}>{t("suName")}</label>
@@ -145,21 +147,40 @@ export function SupporterForm({
           <label htmlFor="suNotes" className={labelClass}>{t("suNotes")}</label>
           <textarea id="suNotes" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} className={inputClass} />
         </div>
-        {supporter ? (
-          <div className="flex items-center gap-3 sm:col-span-2">
-            {currentLogo ? (
-              // eslint-disable-next-line @next/next/no-img-element -- public bucket, arbitrary sizes
-              <img src={supporterLogoUrl(currentLogo) ?? ""} alt="" className="h-14 w-14 rounded-lg bg-paper object-contain" />
-            ) : (
-              <span className="flex h-14 w-14 items-center justify-center rounded-lg bg-paper text-[20px] font-bold text-black/40">{name.charAt(0).toUpperCase()}</span>
-            )}
-            <label className="text-[14px] font-semibold">
-              <span className="block">{t("suLogo")}</span>
-              <input type="file" accept="image/*" disabled={logoBusy} onChange={(e) => e.target.files?.[0] && uploadLogo(e.target.files[0])} className="mt-1 block text-[13.5px]" />
-              <span className="block text-[13px] font-normal text-black/55">{logoBusy ? t("photoUploading") : t("suLogoHint")}</span>
-            </label>
+        <div className="flex items-center gap-3 sm:col-span-2">
+          {currentLogo ? (
+            // eslint-disable-next-line @next/next/no-img-element -- public bucket, arbitrary sizes
+            <img src={supporterLogoUrl(currentLogo) ?? ""} alt="" className="h-14 w-14 rounded-lg bg-paper object-contain" />
+          ) : (
+            <span className="flex h-14 w-14 items-center justify-center rounded-lg bg-paper text-[20px] font-bold text-black/40">{name.charAt(0).toUpperCase() || "?"}</span>
+          )}
+          <div className="text-[14px] font-semibold">
+            <span className="block">{t("suLogo")}</span>
+            <input
+              ref={logoInput}
+              id="suLogoFile"
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                e.target.value = "";
+                if (file) void uploadLogo(file);
+              }}
+            />
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <button type="button" disabled={logoBusy} onClick={() => logoInput.current?.click()} className="rounded-lg bg-paper px-3 py-1.5 text-[13.5px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-60">
+                {logoBusy ? t("photoUploading") : currentLogo ? t("suLogoReplace") : t("suLogoChoose")}
+              </button>
+              {currentLogo ? (
+                <button type="button" disabled={logoBusy} onClick={() => setLogoPath(null)} className="text-[13px] font-semibold text-black/60 underline underline-offset-2 hover:text-sea">
+                  {t("suLogoRemove")}
+                </button>
+              ) : null}
+            </div>
+            <span className="mt-1 block text-[13px] font-normal text-black/55">{t("suLogoHint")}</span>
           </div>
-        ) : null}
+        </div>
         <label className="flex items-center gap-2 text-[14.5px] sm:col-span-2">
           <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 accent-red" />
           {t("suActive")}
@@ -234,7 +255,7 @@ function SponsorshipForm({
   };
 
   return (
-    <form onSubmit={submit} className="rounded-lg bg-paper p-4">
+    <form onSubmit={submit}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="spTier" className={labelClass}>{t("spTier")}</label>
@@ -283,7 +304,7 @@ function SponsorshipForm({
         <button type="submit" disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
           {sponsorship ? t("evSave") : t("spCreate")}
         </button>
-        <button type="button" onClick={onDone} className="rounded-lg bg-mist px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
+        <button type="button" onClick={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
           {t("cancel")}
         </button>
       </div>
@@ -316,13 +337,32 @@ export function SupportersManager({
 
   return (
     <div className="mt-5 space-y-4">
-      {open === "new" ? (
-        <SupporterForm supporter={null} onDone={() => setOpen("")} />
-      ) : (
-        <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
-          + {t("suNew")}
-        </button>
-      )}
+      <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
+        + {t("suNew")}
+      </button>
+      <SidePanel
+        open={open !== ""}
+        title={open === "new" ? t("suNew") : (supporters.find((s) => s.id === open)?.name ?? "")}
+        onClose={() => setOpen("")}
+      >
+        <SupporterForm key={open} supporter={supporters.find((s) => s.id === open) ?? null} onDone={() => setOpen("")} />
+      </SidePanel>
+      <SidePanel
+        open={dealOpen !== ""}
+        title={dealOpen.startsWith("new:") ? t("spNew") : t("spEditTitle")}
+        onClose={() => setDealOpen("")}
+      >
+        {dealOpen.startsWith("new:") ? (
+          <SponsorshipForm key={dealOpen} supporterId={dealOpen.slice(4)} sponsorship={null} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setDealOpen("")} />
+        ) : (
+          (() => {
+            const deal = sponsorships.find((d) => d.id === dealOpen);
+            return deal?.supporter_id ? (
+              <SponsorshipForm key={dealOpen} supporterId={deal.supporter_id} sponsorship={deal} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setDealOpen("")} />
+            ) : null;
+          })()
+        )}
+      </SidePanel>
       {supporters.length === 0 ? (
         <p className="text-[14.5px] text-black/60">{t("suEmpty")}</p>
       ) : (
@@ -354,17 +394,11 @@ export function SupportersManager({
                     </p>
                   </div>
                   <div className="flex shrink-0 gap-1.5">
-                    <button type="button" onClick={() => setOpen(open === supporter.id ? "" : supporter.id)} className={ghost}>{t("evEdit")}</button>
-                    <button type="button" onClick={() => setDealOpen(dealOpen === `new:${supporter.id}` ? "" : `new:${supporter.id}`)} className={ghost}>+ {t("spNew")}</button>
+                    <button type="button" onClick={() => setOpen(supporter.id)} className={ghost}>{t("evEdit")}</button>
+                    <button type="button" onClick={() => setDealOpen(`new:${supporter.id}`)} className={ghost}>+ {t("spNew")}</button>
                   </div>
                 </div>
 
-                {open === supporter.id ? (
-                  <div className="mt-3"><SupporterForm supporter={supporter} onDone={() => setOpen("")} /></div>
-                ) : null}
-                {dealOpen === `new:${supporter.id}` ? (
-                  <div className="mt-3"><SponsorshipForm supporterId={supporter.id} sponsorship={null} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setDealOpen("")} /></div>
-                ) : null}
 
                 {deals.length > 0 ? (
                   <ul className="mt-3 space-y-1.5">
@@ -388,13 +422,10 @@ export function SupportersManager({
                             {deal.campaign_id && deal.event_id ? " · " : ""}
                             {deal.event_id ? eventName.get(deal.event_id) : null}
                           </span>
-                          <button type="button" onClick={() => setDealOpen(dealOpen === deal.id ? "" : deal.id)} className="ml-auto text-[13px] font-semibold text-sea underline underline-offset-2">
+                          <button type="button" onClick={() => setDealOpen(deal.id)} className="ml-auto text-[13px] font-semibold text-sea underline underline-offset-2">
                             {t("evEdit")}
                           </button>
                         </div>
-                        {dealOpen === deal.id ? (
-                          <div className="mt-2"><SponsorshipForm supporterId={supporter.id} sponsorship={deal} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setDealOpen("")} /></div>
-                        ) : null}
                       </li>
                     ))}
                   </ul>

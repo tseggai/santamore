@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import { setEventPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
 import { EventForm, type EventFormValues, type Option } from "@/components/admin/EventForm";
+import { SidePanel } from "@/components/console/SidePanel";
 import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
 import { StravaWebhookPanel } from "@/components/admin/StravaWebhookPanel";
 import type { WebhookStatus } from "@/app/[locale]/admin/(protected)/izazovi/actions";
@@ -44,6 +45,7 @@ export function EventsManager({
   const router = useRouter();
   const [open, setOpen] = useState<"" | "new" | string>("");
   const [busy, setBusy] = useState<string | null>(null);
+  const openEvent = events.find((candidate) => candidate.id === open) ?? null;
 
   const togglePublished = async (event: EventListRow) => {
     setBusy(event.id);
@@ -57,24 +59,30 @@ export function EventsManager({
   return (
     <div className="mt-5 space-y-4">
       <StravaWebhookPanel webhook={webhook} />
-      {open === "new" ? (
+      <button
+        type="button"
+        onClick={() => setOpen("new")}
+        className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark"
+      >
+        + {t("evNew")}
+      </button>
+      <SidePanel
+        open={open !== ""}
+        title={open === "new" ? t("evNew") : (openEvent?.name ?? "")}
+        onClose={() => setOpen("")}
+        wide
+      >
         <EventForm
-          event={null}
+          key={open}
+          event={openEvent}
           chapters={chapters}
           campaigns={campaigns}
           supporters={supporters}
+          offers={openEvent?.offers}
           onDone={() => setOpen("")}
           onCreated={(id) => setOpen(id)}
         />
-      ) : (
-        <button
-          type="button"
-          onClick={() => setOpen("new")}
-          className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark"
-        >
-          + {t("evNew")}
-        </button>
-      )}
+      </SidePanel>
 
       {events.length === 0 ? (
         <p className="text-[14.5px] text-black/60">{t("regNoEvents")}</p>
@@ -123,7 +131,7 @@ export function EventsManager({
                 <div className="flex shrink-0 gap-1.5">
                   <button
                     type="button"
-                    onClick={() => setOpen(open === event.id ? "" : event.id)}
+                    onClick={() => setOpen(event.id)}
                     className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea"
                   >
                     {t("evEdit")}
@@ -138,18 +146,6 @@ export function EventsManager({
                   </button>
                 </div>
               </div>
-              {open === event.id ? (
-                <div className="mt-3">
-                  <EventForm
-                    event={event}
-                    chapters={chapters}
-                    campaigns={campaigns}
-                    supporters={supporters}
-                    offers={event.offers}
-                    onDone={() => setOpen("")}
-                  />
-                </div>
-              ) : null}
             </li>
           ))}
         </ul>

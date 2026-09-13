@@ -10,6 +10,7 @@ import {
   deleteGalleryItem,
   setGalleryPublished,
 } from "@/app/[locale]/admin/(protected)/sadrzaj/actions";
+import { SidePanel } from "@/components/console/SidePanel";
 import { downscaleToJpeg } from "@/lib/images";
 import { galleryImageUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -50,6 +51,7 @@ export function GalleryManager({
   const [uploading, setUploading] = useState(false);
   const [state, setState] = useState<State>("idle");
   const [rowBusy, setRowBusy] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
   const onFiles = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = [...(event.target.files ?? [])];
@@ -92,6 +94,7 @@ export function GalleryManager({
       setState("idle");
       (event.target as HTMLFormElement).reset?.();
       router.refresh();
+      setOpen(false);
     } else {
       setState("error");
     }
@@ -115,7 +118,15 @@ export function GalleryManager({
 
   return (
     <div className="mt-4">
-      <form onSubmit={submit} className="grid max-w-xl gap-3">
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark"
+      >
+        + {t("galleryAdd")}
+      </button>
+      <SidePanel open={open} title={t("galleryAdd")} onClose={() => setOpen(false)}>
+      <form onSubmit={submit} className="grid gap-3">
         <label className="block">
           <span className="text-[14px] font-semibold">{t("galleryFiles")}</span>
           <input
@@ -170,6 +181,7 @@ export function GalleryManager({
           </p>
         ) : null}
       </form>
+      </SidePanel>
 
       {items.length > 0 ? (
         <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
