@@ -196,11 +196,11 @@ export default async function LedgerPage({
       </div>
 
       {/* the two funds — the core promise, most legible thing on the page */}
-      <div className="mt-3 rounded-brand border-[1.5px] border-ink px-4 py-4">
+      <div className="mt-3 rounded-brand bg-mist px-4 py-4">
         <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
           {t("twoFunds")}
         </p>
-        <div className="flex items-baseline justify-between gap-3 border-b border-line-soft py-2 text-[13.5px]">
+        <div className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-2 text-[13.5px]">
           <span>{t("impactFund")}</span>
           <span className="whitespace-nowrap font-mono text-[14px] font-medium text-red">
             {t("impactFundValue")}
@@ -223,14 +223,14 @@ export default async function LedgerPage({
         <a
           href="/api/ledger/in"
           download
-          className="rounded-lg border-[1.5px] border-line px-3 py-1.5 transition-colors hover:border-sea hover:text-sea"
+          className="rounded-lg bg-mist px-3 py-1.5 transition-colors hover:bg-mist-2 hover:text-sea"
         >
           {t("downloadIn")}
         </a>
         <a
           href="/api/ledger/out"
           download
-          className="rounded-lg border-[1.5px] border-line px-3 py-1.5 transition-colors hover:border-sea hover:text-sea"
+          className="rounded-lg bg-mist px-3 py-1.5 transition-colors hover:bg-mist-2 hover:text-sea"
         >
           {t("downloadOut")}
         </a>

@@ -130,7 +130,7 @@ export function GalleryGrid({
                 lastTriggerRef.current = event.currentTarget;
                 setOpenIndex(index);
               }}
-              className="group block w-full overflow-hidden rounded-brand border-[1.5px] border-line focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sea"
+              className="group block w-full overflow-hidden rounded-brand bg-mist focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sea"
               aria-label={image.caption ?? image.eventName ?? undefined}
             >
               <Image

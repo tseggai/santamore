@@ -88,7 +88,7 @@ export default async function NewsPostPage({
           width={1200}
           height={675}
           priority
-          className="mt-6 w-full rounded-brand border-[1.5px] border-line object-cover"
+          className="mt-6 w-full rounded-brand bg-mist object-cover"
         />
       ) : null}
 
@@ -98,7 +98,7 @@ export default async function NewsPostPage({
 
       <Link
         href="/vijesti"
-        className="mt-10 inline-block rounded-lg border-[1.5px] border-line px-5 py-3 text-sm font-semibold hover:border-sea hover:text-sea"
+        className="mt-10 inline-block rounded-lg bg-mist px-5 py-3 text-sm font-semibold hover:bg-mist-2 hover:text-sea"
       >
         ← {t("backToIndex")}
       </Link>

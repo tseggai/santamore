@@ -88,7 +88,7 @@ export default async function AwardPage({
         </Link>
       </p>
 
-      <div className="mt-5 flex flex-col items-center rounded-brand border-[1.5px] border-line p-5">
+      <div className="mt-5 flex flex-col items-center rounded-brand bg-mist p-5">
         <span className={`rounded-full px-3 py-1 font-mono text-[12px] uppercase tracking-[0.14em] ${tone}`}>
           {t(`awardStatus.${award.status}`)}
         </span>

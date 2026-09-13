@@ -84,7 +84,7 @@ export function ShareButton({
   const buttonClass =
     variant === "primary"
       ? "block w-full rounded-lg bg-red px-6 py-3.5 text-center text-[16px] font-bold text-paper transition-colors hover:bg-red-dark"
-      : "block w-full rounded-lg border-[1.5px] border-line px-6 py-3 text-center text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea";
+      : "block w-full rounded-lg bg-mist px-6 py-3 text-center text-[15px] font-semibold transition-colors hover:bg-mist-2";
 
   return (
     <button type="button" onClick={share} aria-live="polite" className={className ?? buttonClass}>

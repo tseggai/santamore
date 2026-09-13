@@ -110,7 +110,7 @@ export function CampaignPageView({
         </DonateButton>
         <Link
           href="/transparentnost"
-          className="inline-flex h-12 items-center rounded-lg border-[1.5px] border-line px-5 text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea"
+          className="inline-flex h-12 items-center rounded-lg bg-mist px-5 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
         >
           {t("ledgerLink")}
         </Link>
@@ -128,7 +128,7 @@ export function CampaignPageView({
       ) : null}
 
       {campaign.beneficiary_summary ? (
-        <div className="mt-6 rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4">
+        <div className="mt-6 rounded-brand bg-mist px-5 py-4">
           <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea">
             {t("beneficiary")}
           </p>
@@ -149,7 +149,7 @@ export function CampaignPageView({
               <li key={event.slug}>
                 <Link
                   href={`/dogadjaji/${event.slug}`}
-                  className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg border-[1.5px] border-line px-4 py-3 transition-colors hover:border-sea"
+                  className="flex flex-wrap items-baseline justify-between gap-2 rounded-lg bg-mist px-4 py-3 transition-colors hover:bg-mist-2"
                 >
                   <span className="text-[15px] font-semibold">{event.name}</span>
                   <span className="font-mono text-[13px] tabular-nums text-black/60">

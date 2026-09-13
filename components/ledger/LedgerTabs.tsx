@@ -58,7 +58,7 @@ export function LedgerTabs({
     ) : (
       <ul>
         {rows.map((row) => (
-          <li key={row.id} className="border-b border-line-soft py-3 last:border-b-0">
+          <li key={row.id} className="border-b-[0.5px] border-line py-3 last:border-b-0">
             <div className="flex items-baseline justify-between gap-3">
               <span
                 className={`text-[14px] font-semibold leading-snug ${
@@ -106,7 +106,7 @@ export function LedgerTabs({
       <div
         role="group"
         aria-label={t("title")}
-        className="mt-5 grid grid-cols-2 overflow-hidden rounded-lg border-[1.5px] border-ink"
+        className="mt-5 grid grid-cols-2 overflow-hidden rounded-lg bg-mist"
       >
         <button
           type="button"

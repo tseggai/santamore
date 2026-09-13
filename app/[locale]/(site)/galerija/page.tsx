@@ -78,7 +78,7 @@ export default async function GalleryPage({
 
       <div className="mt-8">
         {images.length === 0 ? (
-          <p className="max-w-xl rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-4 py-3 text-[13.5px] text-sea">
+          <p className="max-w-xl rounded-brand bg-mist px-4 py-3 text-[13.5px] text-sea">
             {t("empty")}
           </p>
         ) : (

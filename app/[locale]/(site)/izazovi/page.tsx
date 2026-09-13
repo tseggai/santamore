@@ -83,7 +83,7 @@ export default async function ChallengesIndexPage({
               <li key={challenge.id}>
                 <Link
                   href={`/izazovi/${challenge.slug}`}
-                  className="block rounded-brand border-[1.5px] border-line px-5 py-4 transition-colors hover:border-sea"
+                  className="block rounded-brand bg-mist px-5 py-4 transition-colors hover:bg-mist-2"
                 >
                   <span className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
                     {challenge.partner_name}
@@ -109,7 +109,7 @@ export default async function ChallengesIndexPage({
         </ul>
       )}
 
-      <div className="mt-10 rounded-brand border-[1.5px] border-dashed border-line px-5 py-4 text-[14.5px] leading-relaxed text-black/70">
+      <div className="mt-10 rounded-brand bg-mist px-5 py-4 text-[14.5px] leading-relaxed text-black/70">
         {t("noPageNeeded")} {t("howNote")}{" "}
         <Link href="/dashboard/strava" className="font-semibold text-sea underline underline-offset-2">
           {t("connectCta")}

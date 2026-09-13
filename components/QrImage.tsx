@@ -35,7 +35,7 @@ export function QrImage({ value, alt, size = 200 }: { value: string; alt: string
       height={size}
       alt={alt}
       style={{ width: size, height: size }}
-      className="rounded-lg border-[1.5px] border-line bg-paper"
+      className="rounded-lg bg-mist bg-paper"
     />
   );
 }

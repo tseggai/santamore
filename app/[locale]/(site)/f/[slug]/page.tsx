@@ -171,7 +171,7 @@ export default async function FundraiserPage({
         {wall.map((donor) => (
           <li
             key={donor.id}
-            className="flex items-start gap-3 border-b border-line-soft py-3 last:border-b-0"
+            className="flex items-start gap-3 border-b-[0.5px] border-line py-3 last:border-b-0"
           >
             <span aria-hidden className="mt-[7px] h-[7px] w-[7px] shrink-0 rounded-full bg-red" />
             <span className="min-w-0 flex-1">

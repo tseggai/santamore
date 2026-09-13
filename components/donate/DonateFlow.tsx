@@ -186,12 +186,12 @@ export function DonateFlow({
   const primaryBtn =
     "rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60";
   const secondaryBtn =
-    "rounded-lg border-[1.5px] border-line px-5 py-3 text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea";
+    "rounded-lg bg-mist px-5 py-3 text-[15px] font-semibold transition-colors hover:bg-mist-2";
   const chipClass = (selected: boolean) =>
-    `rounded-lg border-[1.5px] px-1.5 py-3 text-center transition-colors ${
+    `rounded-lg px-1.5 py-3 text-center transition-colors ${
       selected
-        ? "border-red bg-red/[0.07] shadow-[inset_0_0_0_0.5px_var(--color-red)]"
-        : "border-line hover:border-sea"
+        ? "bg-red/10 text-red-dark"
+        : "bg-mist hover:bg-mist-2"
     }`;
 
   const switchRow = (
@@ -206,7 +206,7 @@ export function DonateFlow({
       id={id}
       aria-pressed={pressed}
       onClick={onToggle}
-      className="flex w-full items-center gap-4 border-t border-line-soft py-3.5 text-left"
+      className="flex w-full items-center gap-4 border-t-[0.5px] border-line py-3.5 text-left"
     >
       <span className="min-w-0 flex-1">
         <span className="block text-[15.5px] font-semibold">{title}</span>
@@ -330,7 +330,7 @@ export function DonateFlow({
                   ? "bg-ink text-paper"
                   : done
                     ? "bg-sea text-paper"
-                    : "border-[1.5px] border-line text-black/50"
+                    : "bg-mist text-black/50"
               }`}
             >
               {done ? "✓" : n}
@@ -406,7 +406,7 @@ export function DonateFlow({
             })}
           </div>
 
-          <label className="mt-3 flex items-center gap-2 rounded-lg border-[1.5px] border-line px-3.5 py-3 focus-within:border-sea">
+          <label className="mt-3 flex items-center gap-2 rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-3 focus-within:border-sea">
             <span aria-hidden className="font-mono text-[16px] text-black/50">
               €
             </span>
@@ -427,7 +427,7 @@ export function DonateFlow({
           ) : null}
 
           {/* monthly, anonymity (the fee toggle joins with the card rail in Task 4) */}
-          <div className="mt-6 border-b border-line-soft">
+          <div className="mt-6 border-b-[0.5px] border-line">
             {switchRow("swMonthly", monthly, toggleMonthly, t("monthlyTitle"), t("monthlyDesc"))}
             {switchRow(
               "swAnon",
@@ -524,7 +524,7 @@ export function DonateFlow({
                 type="button"
                 aria-pressed={false}
                 disabled
-                className="rounded-lg border-[1.5px] border-line px-3 py-3 text-left opacity-50"
+                className="rounded-lg bg-mist px-3 py-3 text-left opacity-50"
               >
                 <span className="block text-[15.5px] font-semibold">{t("railCard")}</span>
                 <span className="block text-[13px] text-black/60">{t("railCardSub")}</span>
@@ -551,7 +551,7 @@ export function DonateFlow({
             />
           </div>
 
-          <div className="mt-6 flex items-baseline justify-between border-t-[1.5px] border-ink pt-4">
+          <div className="mt-6 flex items-baseline justify-between border-t-[0.5px] border-line pt-4">
             <span className="text-[14.5px] font-semibold">{t("totalToday")}</span>
             <span className="font-mono text-[20px] font-medium tabular-nums">
               {formatCents(totalCents, locale)}
