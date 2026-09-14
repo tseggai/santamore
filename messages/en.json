@@ -139,7 +139,6 @@
     "confTitle": "Thank you, {name}!",
     "confEmailNote": "We've emailed you these transfer details.",
     "confLedgerNote": "Once we match your transfer, your gift appears in the public ledger.",
-    "confShare": "Share this campaign",
     "confStartOwn": "Or start your own fundraising page",
     "backToPage": "Back to the page",
     "stepAmount": "Amount",
@@ -152,7 +151,9 @@
     "summaryGift": "Your gift",
     "summaryFrom": "From",
     "summaryAnonymous": "{name} (anonymous in public)",
-    "emailHint": "For the transfer details and your receipt only. Never shown publicly."
+    "emailHint": "For the transfer details and your receipt only. Never shown publicly.",
+    "confShareFundraiser": "Share this fundraiser",
+    "confShareCause": "Share this cause"
   },
   "runner": {
     "team": "Team",
