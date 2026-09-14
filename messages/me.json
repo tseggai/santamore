@@ -197,7 +197,9 @@
     "viewLabel": "Prikaz",
     "viewGrid": "Mreža",
     "viewList": "Lista",
-    "noMatch": "Nema nikoga sa tim imenom."
+    "noMatch": "Nema nikoga sa tim imenom.",
+    "allCauses": "Svi ciljevi",
+    "pickCause": "Cilj"
   },
   "ledger": {
     "eyebrow": "Javni registar · ažurirano automatski",

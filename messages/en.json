@@ -197,7 +197,9 @@
     "viewLabel": "View",
     "viewGrid": "Grid",
     "viewList": "List",
-    "noMatch": "Nobody by that name."
+    "noMatch": "Nobody by that name.",
+    "allCauses": "All causes",
+    "pickCause": "Cause"
   },
   "ledger": {
     "eyebrow": "Public ledger · updates automatically",
