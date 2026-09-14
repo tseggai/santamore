@@ -28,15 +28,15 @@ export interface TeamOption {
 export function TeamPanel({
   mode,
   team,
-  eventId,
+  causeId,
   joinFundraiserId = null,
   onDone,
   onCancel,
 }: {
   mode: "create" | "edit";
   team?: TeamOption;
-  /** Create mode: the event the team belongs to. */
-  eventId?: string;
+  /** Create mode: the cause the team raises for. */
+  causeId?: string;
   /** Create mode: join with this page right away. */
   joinFundraiserId?: string | null;
   onDone: (team: TeamOption) => void;
@@ -88,7 +88,7 @@ export function TeamPanel({
     const payload = { name, description, photoPath };
     const result =
       mode === "create"
-        ? await createTeam({ ...payload, eventId: eventId ?? "", joinFundraiserId }).catch(
+        ? await createTeam({ ...payload, causeId: causeId ?? "", joinFundraiserId }).catch(
             () => ({ ok: false as const }),
           )
         : await updateTeam({ ...payload, teamId: team!.id }).catch(() => ({

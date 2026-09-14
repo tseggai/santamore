@@ -28,8 +28,8 @@ interface EditorFundraiser {
   photoPath: string | null;
   status: "draft" | "active" | "hidden";
   teamId: string | null;
-  eventId: string;
-  eventName: string;
+  causeId: string;
+  causeTitle: string;
 }
 
 const NEW_TEAM = "__new__";
@@ -403,13 +403,13 @@ export function PageEditor({
                 </button>
               ) : null}
               <span>·</span>
-              <span className={linkClass}>{fundraiser.eventName}</span>
+              <span className={linkClass}>{fundraiser.causeTitle}</span>
             </div>
 
             {teamPanel === "create" ? (
               <TeamPanel
                 mode="create"
-                eventId={fundraiser.eventId}
+                causeId={fundraiser.causeId}
                 joinFundraiserId={fundraiser.id}
                 onDone={onTeamDone}
                 onCancel={() => setTeamPanel("")}

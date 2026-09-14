@@ -15,7 +15,7 @@ import {
   TEAM_DESCRIPTIONS,
   TEAM_NAMES,
 } from "@/lib/demo/pools";
-import { gradientPng } from "@/lib/demo/png";
+import { demoPersonAvatar, demoTeamAvatar } from "@/lib/demo/avatar";
 import { generatePaymentReference } from "@/lib/references";
 import { slugify } from "@/lib/slug";
 import { createServiceClient } from "@/lib/supabase/admin";
@@ -30,6 +30,8 @@ export interface DemoResult {
   error?: "invalid" | "forbidden" | "no_event" | "server";
   created?: { users: number; teams: number; fundraisers: number; donations: number };
   purged?: { users: number };
+  /** refreshDemoPhotos: rows given a new avatar. */
+  refreshed?: number;
 }
 
 const generateSchema = z.object({
@@ -83,6 +85,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
       .from("events")
       .select("id, chapter_id, campaign_id")
       .eq("is_published", true)
+      .not("campaign_id", "is", null)
       .gte("starts_at", new Date().toISOString())
       .order("starts_at", { ascending: true })
       .limit(1)
@@ -94,6 +97,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
           .from("events")
           .select("id, chapter_id, campaign_id")
           .eq("is_published", true)
+          .not("campaign_id", "is", null)
           .order("starts_at", { ascending: false })
           .limit(1)
           .maybeSingle()
@@ -103,7 +107,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
     const { data: existingTeams } = await service
       .from("teams")
       .select("name")
-      .eq("event_id", event.id);
+      .eq("campaign_id", event.campaign_id);
     const taken = new Set((existingTeams ?? []).map((row) => row.name));
     const teamNames = TEAM_NAMES.filter((name) => !taken.has(name));
 
@@ -131,7 +135,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
         const photoPath = `${userId}/demo.png`;
         const { error: uploadError } = await service.storage
           .from("fundraiser-photos")
-          .upload(photoPath, gradientPng(320, palette[0], palette[1], palette[2]), {
+          .upload(photoPath, await demoPersonAvatar(userId, palette), {
             contentType: "image/png",
             upsert: true,
           });
@@ -145,6 +149,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
             .from("fundraisers")
             .insert({
               user_id: userId,
+              campaign_id: event.campaign_id,
               event_id: event.id,
               slug: `${slugify(fullName, "trkac")}-${suffix()}`,
               title: fullName,
@@ -198,7 +203,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
       const teamPhotoPath = `${members[0].userId}/team-demo.png`;
       const { error: teamPhotoError } = await service.storage
         .from("fundraiser-photos")
-        .upload(teamPhotoPath, gradientPng(320, teamPalette[1], teamPalette[0], teamPalette[2]), {
+        .upload(teamPhotoPath, await demoTeamAvatar(teamName, teamPalette), {
           contentType: "image/png",
           upsert: true,
         });
@@ -209,6 +214,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
         const { data, error } = await service
           .from("teams")
           .insert({
+            campaign_id: event.campaign_id,
             event_id: event.id,
             name: teamName,
             slug: `${slugify(teamName, "tim")}-${suffix()}`,
@@ -292,4 +298,49 @@ export async function purgeDemoData(): Promise<DemoResult> {
     console.error("[admin] demo purge failed:", error);
     return { ok: false, error: "server" };
   }
+}
+
+/**
+ * Give every demo runner and team an illustrated avatar (older demo runs
+ * had gradient discs). Only rows in the demo registry are touched —
+ * never a real person's page.
+ */
+export async function refreshDemoPhotos(): Promise<DemoResult> {
+  if (!(await requireStaff())) return { ok: false, error: "forbidden" };
+  const service = createServiceClient();
+  const { data: records } = await service.from("demo_records").select("kind, row_id").in("kind", ["fundraiser", "team"]);
+  const fundraiserIds = (records ?? []).filter((r) => r.kind === "fundraiser").map((r) => r.row_id);
+  const teamIds = (records ?? []).filter((r) => r.kind === "team").map((r) => r.row_id);
+  let updated = 0;
+  try {
+    if (fundraiserIds.length) {
+      const { data: pages } = await service.from("fundraisers").select("id, user_id, title").in("id", fundraiserIds);
+      for (const page of pages ?? []) {
+        const path = `${page.user_id}/demo.png`;
+        const { error } = await service.storage
+          .from("fundraiser-photos")
+          .upload(path, await demoPersonAvatar(page.user_id, pick(AVATAR_PALETTES)), { contentType: "image/png", upsert: true });
+        if (error) throw error;
+        await service.from("fundraisers").update({ photo_path: path }).eq("id", page.id);
+        updated += 1;
+      }
+    }
+    if (teamIds.length) {
+      const { data: teams } = await service.from("teams").select("id, name, captain_id").in("id", teamIds);
+      for (const team of teams ?? []) {
+        const path = `${team.captain_id}/team-demo.png`;
+        const { error } = await service.storage
+          .from("fundraiser-photos")
+          .upload(path, await demoTeamAvatar(team.name, pick(AVATAR_PALETTES)), { contentType: "image/png", upsert: true });
+        if (error) throw error;
+        await service.from("teams").update({ photo_path: path }).eq("id", team.id);
+        updated += 1;
+      }
+    }
+  } catch (error) {
+    console.error("[admin] demo photo refresh failed:", error);
+    return { ok: false, error: "server" };
+  }
+  revalidatePath("/[locale]", "layout");
+  return { ok: true, refreshed: updated };
 }

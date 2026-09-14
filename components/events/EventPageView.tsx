@@ -56,6 +56,9 @@ export interface EventView {
   tiers: EventTier[];
   offers_shirts?: boolean;
   going_count?: number;
+  /** Public cause the event raises for; without one there are no fundraising pages. */
+  campaign_slug?: string | null;
+  campaign_title?: string | null;
   /** For challenges: whether the visitor is signed in and has Strava connected. */
   join?: ChallengeJoinState;
 }
@@ -174,8 +177,8 @@ export function EventPageView({
 
       {/* 3 — the two ways in */}
       <div className="mt-6 rounded-lg bg-mist p-5 sm:p-6">
-        <p className="type-eyebrow text-sea/80">{t("waysInHeading")}</p>
-        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+        <p className="type-eyebrow text-sea/80">{event.campaign_slug ? t("waysInHeading") : t("wayInHeading")}</p>
+        <div className={`mt-3 grid gap-4 ${event.campaign_slug ? "sm:grid-cols-2" : ""}`}>
           <div>
             <p className="text-[16px] font-bold">
               {event.kind === "social" ? t("wayGoing") : event.kind === "challenge" ? t("wayJoin") : t("wayRun")}
@@ -191,17 +194,19 @@ export function EventPageView({
               )}
             </div>
           </div>
-          <div>
-            <p className="text-[16px] font-bold">{t("wayRaise")}</p>
-            <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("wayRaiseSub")}</p>
-            <div className="mt-3">
-              {finished ? null : preview ? (
-                <span className={secondary}>{t("fundraiseCta")}</span>
-              ) : (
-                <Link href={`/dashboard/prikupljaj?event=${event.slug}`} className={secondary}>{t("fundraiseCta")}</Link>
-              )}
+          {event.campaign_slug ? (
+            <div>
+              <p className="text-[16px] font-bold">{event.campaign_title ? t("wayRaiseFor", { cause: event.campaign_title }) : t("wayRaise")}</p>
+              <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("wayRaiseSub")}</p>
+              <div className="mt-3">
+                {preview ? (
+                  <span className={secondary}>{t("fundraiseCta")}</span>
+                ) : (
+                  <Link href={`/dashboard/prikupljaj?cause=${event.campaign_slug}`} className={secondary}>{t("fundraiseCta")}</Link>
+                )}
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </div>
 

@@ -27,7 +27,8 @@ export interface DashboardActionResult {
 
 const createPageSchema = z.object({
   title: z.string().trim().min(2).max(80),
-  /** Which event to raise for; null = the next upcoming published one. */
+  /** The cause to raise for; or an event, whose cause is used. Null = the next one. */
+  causeSlug: z.string().trim().min(1).max(100).nullable().optional(),
   eventSlug: z.string().trim().min(1).max(100).nullable().optional(),
 });
 
@@ -54,7 +55,7 @@ const teamFieldsSchema = z.object({
 });
 
 const createTeamSchema = teamFieldsSchema.extend({
-  eventId: z.string().uuid(),
+  causeId: z.string().uuid(),
   /** Join this page (must be the runner's, on the same event) right away. */
   joinFundraiserId: z.string().uuid().nullable().default(null),
 });
@@ -102,46 +103,42 @@ export async function createFundraiserPage(
 
   try {
     const service = createServiceClient();
-    let event: { id: string } | null = null;
-    if (parsed.data.eventSlug) {
-      // A chosen event must be published — the slug is client input.
-      const { data } = await service
-        .from("events")
-        .select("id")
-        .eq("slug", parsed.data.eventSlug)
-        .eq("is_published", true)
-        .maybeSingle();
-      event = data;
+    // A page raises for a cause; an event only points at its cause.
+    let campaignId: string | null = null;
+    let eventId: string | null = null;
+    if (parsed.data.causeSlug) {
+      const { data } = await service.from("campaigns").select("id").eq("slug", parsed.data.causeSlug).eq("is_public", true).maybeSingle();
+      campaignId = data?.id ?? null;
+    } else if (parsed.data.eventSlug) {
+      const { data } = await service.from("events").select("id, campaign_id").eq("slug", parsed.data.eventSlug).eq("is_published", true).maybeSingle();
+      campaignId = data?.campaign_id ?? null;
+      eventId = data?.id ?? null;
     } else {
-      // The next upcoming published event; if none is scheduled yet, the
-      // most recent one (never a long-finished event ahead of a current one).
+      // The next upcoming event with a cause, else the newest public cause.
       const { data: upcoming } = await service
         .from("events")
-        .select("id")
+        .select("id, campaign_id")
         .eq("is_published", true)
+        .not("campaign_id", "is", null)
         .gte("starts_at", new Date().toISOString())
         .order("starts_at", { ascending: true })
         .limit(1)
         .maybeSingle();
-      event = upcoming
-        ? upcoming
-        : (
-            await service
-              .from("events")
-              .select("id")
-              .eq("is_published", true)
-              .order("starts_at", { ascending: false })
-              .limit(1)
-              .maybeSingle()
-          ).data;
+      if (upcoming) {
+        campaignId = upcoming.campaign_id;
+        eventId = upcoming.id;
+      } else {
+        const { data: latest } = await service.from("campaigns").select("id").eq("is_public", true).order("created_at", { ascending: false }).limit(1).maybeSingle();
+        campaignId = latest?.id ?? null;
+      }
     }
-    if (!event) return { ok: false, error: "invalid" };
+    if (!campaignId) return { ok: false, error: "invalid" };
 
     const { data: existing } = await supabase
       .from("fundraisers")
       .select("slug")
       .eq("user_id", user.id)
-      .eq("event_id", event.id)
+      .eq("campaign_id", campaignId)
       .maybeSingle();
     if (existing) return { ok: true, slug: existing.slug };
 
@@ -158,7 +155,8 @@ export async function createFundraiserPage(
       const slug = attempt === 0 ? base : `${base}-${randomSuffix()}`;
       const { error } = await service.from("fundraisers").insert({
         user_id: user.id,
-        event_id: event.id,
+        campaign_id: campaignId,
+        event_id: eventId,
         slug,
         title: parsed.data.title,
         payment_reference: generatePaymentReference(),
@@ -378,13 +376,13 @@ export async function createTeam(
 
   try {
     const service = createServiceClient();
-    const { data: event } = await service
-      .from("events")
+    const { data: cause } = await service
+      .from("campaigns")
       .select("id")
-      .eq("id", parsed.data.eventId)
-      .eq("is_published", true)
+      .eq("id", parsed.data.causeId)
+      .eq("is_public", true)
       .maybeSingle();
-    if (!event) return { ok: false, error: "invalid" };
+    if (!cause) return { ok: false, error: "invalid" };
 
     const base = slugify(parsed.data.name, "tim");
     let teamId: string | null = null;
@@ -393,7 +391,7 @@ export async function createTeam(
       const { data, error } = await service
         .from("teams")
         .insert({
-          event_id: event.id,
+          campaign_id: cause.id,
           name: parsed.data.name,
           slug,
           captain_id: user.id,
@@ -475,8 +473,8 @@ export interface PageEditorData {
     photoPath: string | null;
     status: "draft" | "active" | "hidden";
     teamId: string | null;
-    eventId: string;
-    eventName: string;
+    causeId: string;
+    causeTitle: string;
   };
   teams: { id: string; name: string; description: string | null; photoPath: string | null }[];
   captainOf: string[];
@@ -495,19 +493,23 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
   if (!user) return null;
   const { data: mine } = await supabase
     .from("fundraisers")
-    .select("id, slug, title, story, goal_cents, photo_path, status, team_id, event_id")
+    .select("id, slug, title, story, goal_cents, photo_path, status, team_id, campaign_id")
     .eq("user_id", user.id)
     .eq("slug", parsed.data)
     .maybeSingle();
-  if (!mine) return null;
+  if (!mine || !mine.campaign_id) return null;
 
   const service = createServiceClient();
-  const [{ data: teams }, { data: captained }, { data: totals }, { data: event }, { data: activityRows }, { data: cashRows }] =
+  const { data: cause } = await supabase.from("v_public_campaigns").select("slug, title").eq("id", mine.campaign_id).maybeSingle();
+  const [{ data: teams }, { data: captained }, { data: totals }, { data: challenge }, { data: activityRows }, { data: cashRows }] =
     await Promise.all([
-      supabase.from("v_team_totals").select("id, name, description, photo_path").eq("event_id", mine.event_id).order("name"),
+      supabase.from("v_team_totals").select("id, name, description, photo_path").eq("campaign_id", mine.campaign_id).order("name"),
       supabase.from("teams").select("id").eq("captain_id", user.id),
       supabase.from("v_fundraiser_totals").select("raised_cents, donor_count").eq("slug", mine.slug).maybeSingle(),
-      supabase.from("v_public_events").select("name, kind, challenge_metric").eq("id", mine.event_id).maybeSingle(),
+      // A challenge under this cause makes the activity log relevant.
+      cause
+        ? supabase.from("v_public_events").select("name, kind, challenge_metric").eq("campaign_slug", cause.slug).eq("kind", "challenge").order("starts_at", { ascending: false }).limit(1).maybeSingle()
+        : Promise.resolve({ data: null }),
       supabase
         .from("activities")
         .select("id, started_at, distance_m, moving_time_s, source")
@@ -536,8 +538,8 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
       photoPath: mine.photo_path,
       status: mine.status,
       teamId: mine.team_id,
-      eventId: mine.event_id,
-      eventName: event?.name ?? "Santamore",
+      causeId: mine.campaign_id,
+      causeTitle: cause?.title ?? "Santamore",
     },
     teams: ((teams ?? []) as { id: string; name: string; description: string | null; photo_path: string | null }[]).map((team) => ({
       id: team.id,
@@ -548,7 +550,7 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
     captainOf: (captained ?? []).map((row) => row.id),
     raisedCents: totals?.raised_cents ?? 0,
     donorCount: totals?.donor_count ?? 0,
-    event: event ? { kind: event.kind, challenge_metric: event.challenge_metric } : null,
+    event: challenge ? { kind: challenge.kind, challenge_metric: challenge.challenge_metric } : null,
     activities: (activityRows ?? []) as PageEditorData["activities"],
     cash: (cashRows ?? []) as PageEditorData["cash"],
   };

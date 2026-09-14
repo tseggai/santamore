@@ -11,8 +11,8 @@ import { Link } from "@/i18n/navigation";
 
 export interface MyTeam extends TeamOption {
   slug: string;
-  eventId: string;
-  eventName: string;
+  causeId: string;
+  causeName: string;
   memberCount: number;
   raisedLabel: string;
 }
@@ -20,7 +20,7 @@ export interface MyTeam extends TeamOption {
 export interface TeamEventChoice {
   id: string;
   name: string;
-  /** The runner's own page on this event, if any — joined on creation. */
+  /** The runner's own page on this cause, if any — joined on creation. */
   fundraiserId: string | null;
 }
 
@@ -59,14 +59,14 @@ export function TeamsManager({
                     {team.name}
                   </Link>
                   <span className="block text-[13.5px] text-black/60">
-                    {team.eventName} · {t("memberCountShort", { count: team.memberCount })} ·{" "}
+                    {team.causeName} · {t("memberCountShort", { count: team.memberCount })} ·{" "}
                     <span className="font-mono tabular-nums">{team.raisedLabel}</span>
                   </span>
                 </span>
                 <button
                   type="button"
                   onClick={() => setOpen(open === team.id ? "" : team.id)}
-                  className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea"
+                  className="rounded-lg bg-paper px-2.5 py-1 text-[13px] font-semibold transition-colors hover:bg-mist-2"
                 >
                   {t("teamEdit")}
                 </button>
@@ -88,7 +88,7 @@ export function TeamsManager({
           <>
             <div className="mt-4">
               <label htmlFor="teamEvent" className="text-[13.5px] font-semibold">
-                {t("eventLabel")}
+                {t("causeLabel")}
               </label>
               <select
                 id="teamEvent"
@@ -111,7 +111,7 @@ export function TeamsManager({
             <TeamPanel
               key={eventId}
               mode="create"
-              eventId={eventId}
+              causeId={eventId}
               joinFundraiserId={chosen?.fundraiserId ?? null}
               onDone={done}
               onCancel={() => setOpen("")}

@@ -24,8 +24,10 @@ export interface FundraiserTotalsRow {
   raised_cents: number;
   donor_count: number;
   payment_reference: string;
-  event_slug: string;
-  event_name: string;
+  event_slug: string | null;
+  event_name: string | null;
+  campaign_slug: string | null;
+  campaign_title: string | null;
   team_slug: string | null;
   team_name: string | null;
 }
@@ -117,9 +119,15 @@ export default async function FundraiserPage({
                 {" · "}
               </>
             ) : null}
-            <Link href={`/dogadjaji/${fundraiser.event_slug}`} className={linkClass}>
-              {fundraiser.event_name}
-            </Link>
+            {fundraiser.campaign_slug ? (
+              <Link href={`/kampanje/${fundraiser.campaign_slug}`} className={linkClass}>
+                {fundraiser.campaign_title}
+              </Link>
+            ) : fundraiser.event_slug ? (
+              <Link href={`/dogadjaji/${fundraiser.event_slug}`} className={linkClass}>
+                {fundraiser.event_name}
+              </Link>
+            ) : null}
           </p>
           <div className="mt-4 flex items-center gap-2">
             <DonateButton

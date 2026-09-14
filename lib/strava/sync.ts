@@ -96,17 +96,24 @@ export async function freshAccessToken(connection: Connection): Promise<string> 
  */
 export async function pageForActivities(userId: string, startedAt: string): Promise<string | null> {
   const service = createServiceClient();
-  const { data: pages } = await service
-    .from("fundraisers")
-    .select("id, event:events(kind, starts_at, ends_at)")
-    .eq("user_id", userId);
+  // A page belongs to a cause; the cause's challenge events give the windows.
+  const { data: pages } = await service.from("fundraisers").select("id, campaign_id").eq("user_id", userId);
+  const causeIds = (pages ?? []).map((page) => page.campaign_id).filter((id): id is string => Boolean(id));
+  if (causeIds.length === 0) return null;
+  const { data: challenges } = await service
+    .from("events")
+    .select("campaign_id, starts_at, ends_at")
+    .eq("kind", "challenge")
+    .eq("is_published", true)
+    .in("campaign_id", causeIds);
   const at = new Date(startedAt).getTime();
-  for (const page of pages ?? []) {
-    const event = Array.isArray(page.event) ? page.event[0] : page.event;
-    if (!event || event.kind !== "challenge") continue;
+  for (const event of challenges ?? []) {
     const starts = event.starts_at ? new Date(event.starts_at).getTime() : -Infinity;
     const ends = event.ends_at ? new Date(event.ends_at).getTime() : Infinity;
-    if (at >= starts - 86_400_000 && at <= ends + 86_400_000) return page.id;
+    if (at >= starts - 86_400_000 && at <= ends + 86_400_000) {
+      const page = (pages ?? []).find((row) => row.campaign_id === event.campaign_id);
+      if (page) return page.id;
+    }
   }
   return null;
 }

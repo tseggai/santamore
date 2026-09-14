@@ -59,7 +59,7 @@ export default async function AdminEventsPage({
       supabase.from("chapters").select("id, name").order("name"),
       supabase.from("campaigns").select("id, title").order("title"),
       supabase.from("registrations").select("event_id").limit(10_000),
-      supabase.from("fundraisers").select("event_id").limit(10_000),
+      supabase.from("fundraisers").select("campaign_id").limit(10_000),
       supabase.from("event_rsvps").select("event_id").eq("status", "going").limit(10_000),
       supabase.from("supporters").select("id, name").eq("is_active", true).order("name"),
       supabase.from("perk_challenges").select("*").order("created_at", { ascending: false }),
@@ -93,9 +93,10 @@ export default async function AdminEventsPage({
 
   const regCount = new Map<string, number>();
   for (const row of regs ?? []) regCount.set(row.event_id, (regCount.get(row.event_id) ?? 0) + 1);
-  const pageCount = new Map<string, number>();
+  // Pages belong to causes; an event shows the pages of its cause.
+  const pagesByCause = new Map<string, number>();
   for (const row of pages ?? []) {
-    pageCount.set(row.event_id, (pageCount.get(row.event_id) ?? 0) + 1);
+    if (row.campaign_id) pagesByCause.set(row.campaign_id, (pagesByCause.get(row.campaign_id) ?? 0) + 1);
   }
   const goingCount = new Map<string, number>();
   for (const row of rsvps ?? []) goingCount.set(row.event_id, (goingCount.get(row.event_id) ?? 0) + 1);
@@ -111,7 +112,7 @@ export default async function AdminEventsPage({
     (event): EventListRow => ({
       ...event,
       registrations: regCount.get(event.id) ?? 0,
-      pages: pageCount.get(event.id) ?? 0,
+      pages: event.campaign_id ? (pagesByCause.get(event.campaign_id) ?? 0) : 0,
       going: goingCount.get(event.id) ?? 0,
       offers: offersByEvent.get(event.id) ?? [],
       gallery: ((galleryRows ?? []) as GalleryAdminItem[]).filter((item) => item.event_id === event.id),

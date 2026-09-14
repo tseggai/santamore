@@ -173,6 +173,7 @@ export function EventForm({
     tiers: cleanTiers,
     description: description.trim() || null,
     cover_path: coverPath,
+    campaign_slug: campaignId ? "cause" : null,
   };
 
   const addChapter = async () => {
@@ -384,6 +385,7 @@ export function EventForm({
                   <option key={campaign.id} value={campaign.id}>{campaign.name}</option>
                 ))}
               </select>
+              <p className="mt-1 text-[13px] text-black/55">{t("evCauseHint")}</p>
               <button type="button" onClick={() => setNewCause({ title: name, goal: "" })} className="mt-1.5 text-[13.5px] font-semibold text-sea underline underline-offset-2">
                 {t("evNewCause")}
               </button>

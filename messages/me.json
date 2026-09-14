@@ -330,7 +330,7 @@
     "teamsEmpty": "Još ne vodiš nijedan tim.",
     "registrationsHeading": "Moje prijave",
     "registrationsEmpty": "Nisi prijavljen/a ni na jedan događaj.",
-    "pagesSub": "Jedna stranica za prikupljanje po događaju u kojem učestvuješ — svaka sa svojom pričom, ciljem, timom i linkom za donacije. Otvori red da je urediš.",
+    "pagesSub": "Jedna stranica za prikupljanje po cilju — svaki događaj pod tim ciljem se računa u nju. Otvori red da je urediš.",
     "createNoEvents": "Nema otvorenog događaja za koji već nemaš stranicu.",
     "teamsSub": "Timovi koje vodiš. Svako sa stranicom na istom događaju može se pridružiti iz svog uređivača; stranica svakog člana računa se u ukupan iznos tima.",
     "memberCountShort": "{count, plural, one {# član} few {# člana} other {# članova}}",
@@ -341,7 +341,7 @@
     "menuClose": "Zatvori meni",
     "finishPage": "Dovrši moju stranicu",
     "createAnotherHeading": "Otvori stranicu za drugi događaj",
-    "hubEmptySub": "Tvoja stranica je mjesto gdje stižu donacije i ono što dijeliš. Napravi je za događaj u kojem učestvuješ.",
+    "hubEmptySub": "Tvoja stranica je mjesto gdje stižu donacije i ono što dijeliš. Napravi je za cilj za koji prikupljaš.",
     "shareMessageShort": "Prikupljam sredstva za Santamore — {title}. Svaki euro je javno objavljen u registru. Podrži me ovdje:",
     "cashDonorLabel": "Od (opciono)",
     "cashDonorPlaceholder": "Ime na zidu donatora; prazno = anonimno",
@@ -375,12 +375,12 @@
     "rsvpGoingCount": "{count} dolazi",
     "fundraiseSignIn": "Prijavi se da prikupljaš",
     "fundraiseSignInSub": "Jedan email — isti nalog vodi tvoju stranicu i prijave.",
-    "fundraiseNoEvent": "Prvo izaberi događaj",
-    "fundraiseNoEventSub": "Stranica uvijek prikuplja za jedan događaj. Izaberi ga među svojim stranicama.",
+    "fundraiseNoEvent": "Prvo izaberi cilj",
+    "fundraiseNoEventSub": "Stranica uvijek prikuplja za jedan cilj. Izaberi ga među Ciljevima.",
     "fundraiseHave": "Već prikupljaš za ovaj događaj",
-    "fundraiseHaveSub": "Tvoja stranica „{title}” je {status}. Jedna stranica po događaju čuva poštenu tabelu — uredi je ili podijeli.",
-    "fundraiseFinished": "Ovaj događaj je završen",
-    "fundraiseFinishedSub": "Stranice se otvaraju za predstojeće događaje. Izaberi sljedeći.",
+    "fundraiseHaveSub": "Tvoja stranica „{title}” je {status}. Jedna stranica po cilju drži tvoj iznos na jednom mjestu — uredi je ili podijeli.",
+    "fundraiseFinished": "Ovaj cilj je zatvoren",
+    "fundraiseFinishedSub": "Stranice se otvaraju za ciljeve koji još prikupljaju. Izaberi sljedeći.",
     "fundraiseProgress": "Napredak",
     "fundraiseNext": "Dalje",
     "fundraiseBack": "Nazad",
@@ -405,7 +405,12 @@
     "evFundraisePrompt": "Prikupljaš za ovaj događaj?",
     "evStartFundraising": "Počni prikupljanje",
     "rsvpUndecided": "Još neodlučeno",
-    "evJoin": "Uključi se u izazov"
+    "evJoin": "Uključi se u izazov",
+    "fundraiseNoCause": "Ovaj događaj nema cilj za koji se prikuplja",
+    "fundraiseNoCauseSub": "Stranice prikupljaju za cilj; ovaj događaj (npr. sponzorisani izazov) nema vezan cilj. Izaberi cilj.",
+    "causeLabel": "Cilj",
+    "causeSingle": "Prikupljaš za {name}.",
+    "evFundraiseCausePrompt": "Prikupljaš za ovaj cilj?"
   },
   "email": {
     "instructions": {
@@ -996,7 +1001,13 @@
     "mdQuote": "Citat",
     "mdLinkPrompt": "Adresa linka (prazno uklanja link)",
     "mdUndo": "Vrati",
-    "mdRedo": "Ponovi"
+    "mdRedo": "Ponovi",
+    "demoPhotosHeading": "Demo avatari",
+    "demoPhotosHint": "Svakom generisanom trkaču daje ilustrovani portret, a svakom timu apstraktni znak — nikad fotografiju stvarne osobe. Tvoje stranice se ne diraju.",
+    "demoPhotos": "Osvježi demo avatare",
+    "demoPhotosBusy": "Crtanje…",
+    "demoPhotosDone": "Osvježeno {count} avatara.",
+    "evCauseHint": "Cilj je ono za šta stranice prikupljaju. Sa ciljem članovi mogu otvoriti stranice za ovaj događaj; bez njega — recimo sponzorisani izazov — događaj nema prikupljanja."
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -1123,7 +1134,7 @@
     "wayGoing": "Dođi",
     "wayGoingSub": "Javi da dolaziš da znamo koliko vas očekujemo.",
     "wayRaise": "Prikupljaj",
-    "wayRaiseSub": "Otvori svoju stranicu, podijeli je i svaki euro završi u javnoj knjizi.",
+    "wayRaiseSub": "Otvori svoju stranicu za cilj, podijeli je i svaki euro završi u javnoj knjizi.",
     "free": "Besplatno",
     "shirtsNote": "Majice se dijele na startu — veličinu biraš pri prijavi.",
     "howHeading": "Kako funkcioniše",
@@ -1134,7 +1145,9 @@
     "joinedNote": "Uključen si — Strava je povezana.",
     "joinProgress": "Pogledaj svoj napredak",
     "joinSignInTitle": "Prijavi se da se uključiš",
-    "joinSignInSub": "Jedan email. Zatim jednom poveži Stravu i svaka aktivnost koja ispunjava pravilo se računa."
+    "joinSignInSub": "Jedan email. Zatim jednom poveži Stravu i svaka aktivnost koja ispunjava pravilo se računa.",
+    "wayInHeading": "Kako se uključiti",
+    "wayRaiseFor": "Prikupljaj za {cause}"
   },
   "gallery": {
     "eyebrow": "Galerija",
@@ -1176,7 +1189,7 @@
     "beneficiary": "Kome ide",
     "promise": "100% donacija stiže korisnicima. Naknade se pokrivaju odvojeno i prikazane su u registru.",
     "events": "Događaji koji prikupljaju za ovaj cilj",
-    "fundraisersLink": "Pogledaj prikupljače i timove koji trče za nju →",
+    "fundraisersLink": "Pogledaj prikupljače i timove koji prikupljaju za njega →",
     "galleryHeading": "Fotografije",
     "shareCta": "Podijeli cilj",
     "ledgerTitle": "Priliv",
@@ -1186,7 +1199,8 @@
     "ledgerOutNote": "Odliv se odlučuje po ogranku i objavljuje sa dokumentacijom.",
     "ledgerFull": "Pogledaj cijelu knjigu",
     "viaPage": "preko {title}",
-    "close": "Zatvori"
+    "close": "Zatvori",
+    "raiseCta": "Prikupljaj za ovaj cilj"
   },
   "perks": {
     "title": "Izazovi partnera",

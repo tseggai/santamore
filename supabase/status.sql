@@ -61,5 +61,8 @@ select * from (values
   ,('20260914000023_ledger_cause_slug',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'v_public_ledger_in' and column_name = 'cause_slug'))
+  ,('20260914000024_pages_by_cause',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'fundraisers' and column_name = 'campaign_id'))
 ) as m (migration, applied)
 order by migration;

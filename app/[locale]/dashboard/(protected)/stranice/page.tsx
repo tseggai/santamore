@@ -19,14 +19,14 @@ interface PageRow {
   status: "draft" | "active" | "hidden";
   goal_cents: number | null;
   photo_path: string | null;
-  event_id: string;
+  campaign_id: string | null;
   team_id: string | null;
 }
 
-interface EventRow {
+interface CauseRow {
   id: string;
   slug: string;
-  name: string;
+  title: string;
   starts_at: string | null;
   ends_at: string | null;
 }
@@ -43,8 +43,8 @@ interface TeamRow {
   name: string;
   description: string | null;
   photo_path: string | null;
-  event_id: string;
-  event_name: string;
+  campaign_id: string | null;
+  campaign_title: string | null;
   member_count: number;
   raised_cents: number;
 }
@@ -61,9 +61,9 @@ export default async function PagesHubPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ event?: string; team?: string; stranica?: string }>;
+  searchParams: Promise<{ event?: string; cause?: string; team?: string; stranica?: string }>;
 }) {
-  const [{ locale }, { event: eventParam, team: teamParam, stranica }] = await Promise.all([
+  const [{ locale }, { event: eventParam, cause: causeParam, team: teamParam, stranica }] = await Promise.all([
     params,
     searchParams,
   ]);
@@ -76,37 +76,42 @@ export default async function PagesHubPage({
   } = await supabase.auth.getUser();
   if (!user) notFound();
 
-  const [{ data: pageRows }, { data: eventRows }, { data: profile }, { data: captained }] =
+  const [{ data: pageRows }, { data: causeRows }, { data: profile }, { data: captained }, { data: eventForParam }] =
     await Promise.all([
       supabase
         .from("fundraisers")
-        .select("id, slug, title, status, goal_cents, photo_path, event_id, team_id")
+        .select("id, slug, title, status, goal_cents, photo_path, campaign_id, team_id")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false }),
       supabase
-        .from("v_public_events")
-        .select("id, slug, name, starts_at, ends_at")
-        .order("starts_at", { ascending: true }),
+        .from("v_public_campaigns")
+        .select("id, slug, title, starts_at, ends_at")
+        .order("starts_at", { ascending: false }),
       supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
       supabase.from("teams").select("id").eq("captain_id", user.id),
+      // "?event=" from an event page: raise for that event's cause.
+      eventParam
+        ? supabase.from("v_public_events").select("campaign_slug").eq("slug", eventParam).maybeSingle()
+        : Promise.resolve({ data: null }),
     ]);
   const pages = (pageRows ?? []) as PageRow[];
-  const events = (eventRows ?? []) as EventRow[];
+  const causes = (causeRows ?? []) as CauseRow[];
+  const wantedCause = causeParam ?? eventForParam?.campaign_slug ?? null;
 
-  // "Join this team": resolve the team's event and route to that page.
+  // "Join this team": resolve the team's cause and route to that page.
   let teamEventSlug: string | null = null;
   if (teamParam && UUID.test(teamParam)) {
     const { data: team } = await supabase
       .from("v_team_totals")
-      .select("id, event_id")
+      .select("id, campaign_id")
       .eq("id", teamParam)
       .maybeSingle();
     if (team) {
-      const existing = pages.find((page) => page.event_id === team.event_id);
+      const existing = pages.find((page) => page.campaign_id === team.campaign_id);
       if (existing) {
         redirect(`/${locale}/dashboard/stranice/${existing.slug}?team=${teamParam}`);
       }
-      teamEventSlug = events.find((event) => event.id === team.event_id)?.slug ?? null;
+      teamEventSlug = causes.find((cause) => cause.id === team.campaign_id)?.slug ?? null;
     }
   }
 
@@ -126,7 +131,7 @@ export default async function PagesHubPage({
     teamIds.length
       ? supabase
           .from("v_team_totals")
-          .select("id, slug, name, description, photo_path, event_id, event_name, member_count, raised_cents")
+          .select("id, slug, name, description, photo_path, campaign_id, campaign_title, member_count, raised_cents")
           .in("id", teamIds)
           .order("name")
       : Promise.resolve({ data: [] as TeamRow[] }),
@@ -142,21 +147,18 @@ export default async function PagesHubPage({
     month: "long",
     year: "numeric",
   });
-  const haveEvent = new Set(pages.map((page) => page.event_id));
-  const openEvents = events.filter((event) => {
-    const end = event.ends_at ?? event.starts_at;
-    return !end || new Date(end).getTime() >= now;
-  });
-  const choices = openEvents
-    .filter((event) => !haveEvent.has(event.id))
+  const haveCause = new Set(pages.map((page) => page.campaign_id));
+  const openCauses = causes.filter((cause) => !cause.ends_at || new Date(cause.ends_at).getTime() >= now);
+  const choices = openCauses
+    .filter((cause) => !haveCause.has(cause.id))
     .map(
-      (event): EventChoice => ({
-        slug: event.slug,
-        name: event.name,
-        dateLabel: event.starts_at ? dateFormat.format(new Date(event.starts_at)) : "",
+      (cause): EventChoice => ({
+        slug: cause.slug,
+        name: cause.title,
+        dateLabel: cause.ends_at ? dateFormat.format(new Date(cause.ends_at)) : "",
       }),
     );
-  const eventById = new Map(events.map((event) => [event.id, event]));
+  const causeById = new Map(causes.map((cause) => [cause.id, cause]));
 
   const myTeams: MyTeam[] = ((teamRows ?? []) as TeamRow[])
     .filter((team) => captainIds.has(team.id))
@@ -166,20 +168,20 @@ export default async function PagesHubPage({
       name: team.name,
       description: team.description,
       photoPath: team.photo_path,
-      eventId: team.event_id,
-      eventName: team.event_name,
+      causeId: team.campaign_id ?? "",
+      causeName: team.campaign_title ?? "—",
       memberCount: team.member_count,
       raisedLabel: money(team.raised_cents),
     }));
-  const pageByEvent = new Map(pages.map((page) => [page.event_id, page.id]));
-  const teamEventChoices: TeamEventChoice[] = openEvents.map((event) => ({
-    id: event.id,
-    name: event.name,
-    fundraiserId: pageByEvent.get(event.id) ?? null,
+  const pageByCause = new Map(pages.map((page) => [page.campaign_id, page.id]));
+  const teamEventChoices: TeamEventChoice[] = openCauses.map((cause) => ({
+    id: cause.id,
+    name: cause.title,
+    fundraiserId: pageByCause.get(cause.id) ?? null,
   }));
 
   const hubPages: HubPage[] = pages.map((page) => {
-    const event = eventById.get(page.event_id);
+    const cause = page.campaign_id ? causeById.get(page.campaign_id) : undefined;
     const totals = totalsBySlug.get(page.slug);
     const team = page.team_id ? teamById.get(page.team_id) : null;
     return {
@@ -189,8 +191,8 @@ export default async function PagesHubPage({
       status: page.status,
       goalCents: page.goal_cents,
       photoPath: page.photo_path,
-      eventName: event?.name ?? "—",
-      eventDate: event?.starts_at ? dateFormat.format(new Date(event.starts_at)) : "",
+      causeName: cause?.title ?? "—",
+      causeSlug: cause?.slug ?? null,
       teamName: team?.name ?? null,
       teamSlug: team?.slug ?? null,
       raisedCents: totals?.raised_cents ?? 0,
@@ -209,8 +211,8 @@ export default async function PagesHubPage({
         choices={choices}
         defaultName={profile?.full_name ?? ""}
         initialOpen={stranica}
-        openCreate={choices.some((choice) => choice.slug === (teamEventSlug ?? eventParam))}
-        defaultEventSlug={teamEventSlug ?? eventParam ?? null}
+        openCreate={choices.some((choice) => choice.slug === (teamEventSlug ?? wantedCause))}
+        defaultEventSlug={teamEventSlug ?? wantedCause}
         joinTeamId={teamParam && UUID.test(teamParam) ? teamParam : null}
       />
     </div>

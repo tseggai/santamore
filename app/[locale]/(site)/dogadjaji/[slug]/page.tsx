@@ -88,7 +88,7 @@ export default async function EventPage({
     try {
       const supabase = await createClient();
       const { data } = await supabase
-        .from("v_activity_totals")
+        .from("v_challenge_standings")
         .select("*")
         .eq("event_id", event.id)
         .order(event.challenge_metric, { ascending: false })
@@ -143,6 +143,8 @@ export default async function EventPage({
     offers_shirts: Boolean((event as { offers_shirts?: boolean }).offers_shirts),
     going_count: Number((event as { going_count?: number }).going_count ?? 0),
     join: { signedIn: Boolean(user), stravaConnected: Boolean(stravaRow) },
+    campaign_slug: (event as { campaign_slug?: string | null }).campaign_slug ?? null,
+    campaign_title: (event as { campaign_title?: string | null }).campaign_title ?? null,
     gallery: toGalleryImages((galleryRows ?? []) as PublicGalleryRow[]),
   };
 

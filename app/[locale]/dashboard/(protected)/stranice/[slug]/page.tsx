@@ -71,11 +71,17 @@ export default async function EditPagePage({
 
   const { data: mine } = await supabase
     .from("fundraisers")
-    .select("id, slug, title, story, goal_cents, photo_path, status, team_id, event_id")
+    .select("id, slug, title, story, goal_cents, photo_path, status, team_id, campaign_id")
     .eq("user_id", user.id)
     .eq("slug", slug)
     .maybeSingle();
-  if (!mine) redirect(`/${locale}/dashboard/stranice`);
+  if (!mine || !mine.campaign_id) redirect(`/${locale}/dashboard/stranice`);
+
+  const { data: cause } = await supabase
+    .from("v_public_campaigns")
+    .select("slug, title")
+    .eq("id", mine.campaign_id)
+    .maybeSingle();
 
   const [
     { data: teams },
@@ -88,7 +94,7 @@ export default async function EditPagePage({
     supabase
       .from("v_team_totals")
       .select("id, name, description, photo_path")
-      .eq("event_id", mine.event_id)
+      .eq("campaign_id", mine.campaign_id)
       .order("name"),
     // teams_select_own: the rows this runner captains.
     supabase.from("teams").select("id").eq("captain_id", user.id),
@@ -97,11 +103,17 @@ export default async function EditPagePage({
       .select("raised_cents, donor_count")
       .eq("slug", mine.slug)
       .maybeSingle(),
-    supabase
-      .from("v_public_events")
-      .select("name, kind, challenge_metric")
-      .eq("id", mine.event_id)
-      .maybeSingle(),
+    // A challenge under this cause makes the activity log relevant.
+    cause
+      ? supabase
+          .from("v_public_events")
+          .select("name, kind, challenge_metric")
+          .eq("campaign_slug", cause.slug)
+          .eq("kind", "challenge")
+          .order("starts_at", { ascending: false })
+          .limit(1)
+          .maybeSingle()
+      : Promise.resolve({ data: null as { name: string; kind: string; challenge_metric: string | null } | null }),
     supabase
       .from("activities")
       .select("id, started_at, distance_m, moving_time_s, source")
@@ -152,8 +164,8 @@ export default async function EditPagePage({
             photoPath: mine.photo_path,
             status: mine.status,
             teamId: mine.team_id,
-            eventId: mine.event_id,
-            eventName: event?.name ?? "Santamore",
+            causeId: mine.campaign_id,
+            causeTitle: cause?.title ?? "Santamore",
           }}
           teams={((teams ?? []) as {
             id: string;
