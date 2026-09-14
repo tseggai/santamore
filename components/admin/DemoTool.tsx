@@ -201,6 +201,9 @@ export function DemoTool({
             {result.created && result.created.users > 0
               ? ` ${t("demoPartial", result.created)}`
               : null}
+            {result.message ? (
+              <span className="mt-1 block font-mono text-[13px] font-medium text-black/60">{result.message}</span>
+            ) : null}
           </p>
         )
       ) : null}
