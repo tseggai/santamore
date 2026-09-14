@@ -583,7 +583,7 @@
     "postSlug": "Slug",
     "postTitle": "Naslov",
     "postExcerpt": "Sažetak",
-    "postBody": "Tekst (Markdown)",
+    "postBody": "Tekst",
     "postCover": "Naslovna fotografija",
     "postPublished": "Objavljeno",
     "postSave": "Sačuvaj objavu",
@@ -941,7 +941,13 @@
     "webhookExplain": "Strava šalje svaku novu aktivnost na ovu adresu. Ništa se ovdje ne kuca ručno: adresa prati URL sajta, a pristupni podaci su u serverskom okruženju. Ako se sajt preseli, registruj ponovo.",
     "webhookCallback": "Adresa za prijem",
     "webhookSubscriptions": "Registrovano na Stravi",
-    "webhookReregister": "Registruj ponovo"
+    "webhookReregister": "Registruj ponovo",
+    "moneyTabWall": "Zid donatora",
+    "mdOrderedList": "Numerisana lista",
+    "mdQuote": "Citat",
+    "mdLinkPrompt": "Adresa linka (prazno uklanja link)",
+    "mdUndo": "Vrati",
+    "mdRedo": "Ponovi"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

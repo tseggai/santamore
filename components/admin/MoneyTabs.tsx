@@ -9,6 +9,7 @@ const TABS = [
   { href: "/admin/novac", key: "moneyTabOverview", exact: true },
   { href: "/admin/novac/priliv", key: "moneyTabIn", exact: false },
   { href: "/admin/novac/odliv", key: "moneyTabOut", exact: false },
+  { href: "/admin/novac/zid", key: "moneyTabWall", exact: false },
 ] as const;
 
 export function MoneyTabs() {

@@ -584,7 +584,7 @@
     "postSlug": "Slug",
     "postTitle": "Заголовок",
     "postExcerpt": "Анонс",
-    "postBody": "Текст (Markdown)",
+    "postBody": "Текст",
     "postCover": "Обложка",
     "postPublished": "Опубликовано",
     "postSave": "Сохранить",
@@ -942,7 +942,13 @@
     "webhookExplain": "Strava отправляет каждую новую активность на этот адрес. Здесь ничего не вводится вручную: адрес следует за URL сайта, а учётные данные хранятся в серверном окружении. Если сайт переехал — зарегистрируйте заново.",
     "webhookCallback": "Адрес приёма",
     "webhookSubscriptions": "Зарегистрировано в Strava",
-    "webhookReregister": "Зарегистрировать заново"
+    "webhookReregister": "Зарегистрировать заново",
+    "moneyTabWall": "Стена доноров",
+    "mdOrderedList": "Нумерованный список",
+    "mdQuote": "Цитата",
+    "mdLinkPrompt": "Адрес ссылки (пусто — убрать ссылку)",
+    "mdUndo": "Отменить",
+    "mdRedo": "Повторить"
   },
   "forms": {
     "nameLabel": "Имя и фамилия",
