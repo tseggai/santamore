@@ -1106,10 +1106,14 @@
     "free": "Besplatno",
     "shirtsNote": "Majice se dijele na startu — veličinu biraš pri prijavi.",
     "howHeading": "Kako funkcioniše",
-    "howStep1": "Prijavi se ovdje i poveži Stravu sa svoje stranice.",
+    "howStep1": "Prijavi se i poveži Stravu — stranica za prikupljanje nije potrebna.",
     "howStep2": "Kreći se tokom perioda: svaka aktivnost se provjerava automatski.",
     "howStep3": "Ispuni pravilo i kod za nagradu se pojavi na tvojoj stranici — pokaži ga kod partnera.",
-    "rewardRules": "Pogledaj pravila"
+    "rewardRules": "Pogledaj pravila",
+    "joinedNote": "Uključen si — Strava je povezana.",
+    "joinProgress": "Pogledaj svoj napredak",
+    "joinSignInTitle": "Prijavi se da se uključiš",
+    "joinSignInSub": "Jedan email. Zatim jednom poveži Stravu i svaka aktivnost koja ispunjava pravilo se računa."
   },
   "gallery": {
     "eyebrow": "Galerija",

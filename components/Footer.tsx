@@ -9,7 +9,6 @@ const SITE_LINKS = [
   { href: "/kako-radimo", key: "how" },
   { href: "/dogadjaji", key: "events" },
   { href: "/kampanje", key: "campaigns" },
-  { href: "/izazovi", key: "challenges" },
   { href: "/galerija", key: "gallery" },
   { href: "/transparentnost", key: "ledger" },
   { href: "/podrzi", key: "donate" },

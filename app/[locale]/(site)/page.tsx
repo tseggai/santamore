@@ -90,7 +90,7 @@ export default async function HomePage({
   const eyebrowClass = "font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80";
 
   return (
-    <div className="mx-auto max-w-6xl px-5 pb-20">
+    <div className="mx-auto max-w-3xl px-5 pb-20">
       {/* 1 — hero with the live total */}
       <section className="py-16 sm:py-24">
         <p className={eyebrowClass}>{t("eyebrow")}</p>

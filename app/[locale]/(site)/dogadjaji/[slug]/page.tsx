@@ -72,10 +72,14 @@ export default async function EventPage({
 
   // What hangs off the event: partner rewards on a challenge, sponsors.
   const extras = await createClient();
-  const [{ data: perkRows }, { data: sponsorRows }, { data: galleryRows }] = await Promise.all([
-    extras.from("v_public_perk_challenges").select("slug, partner_name, reward_label, title").eq("event_slug", slug),
+  const {
+    data: { user },
+  } = await extras.auth.getUser();
+  const [{ data: perkRows }, { data: sponsorRows }, { data: galleryRows }, { data: stravaRow }] = await Promise.all([
+    extras.from("v_public_perk_challenges").select("*").eq("event_slug", slug),
     extras.from("v_public_sponsors").select("id, name, website").eq("event_slug", slug),
     extras.from("v_public_gallery").select("id, storage_path, caption, credit, event_slug, event_name, event_starts_at").eq("event_slug", slug).order("sort_order", { ascending: true }).limit(120),
+    user ? extras.from("strava_connections").select("user_id").eq("user_id", user.id).maybeSingle() : Promise.resolve({ data: null }),
   ]);
 
   // Challenge standings, ranked by the event's declared metric.
@@ -138,6 +142,7 @@ export default async function EventPage({
     cover_path: (event as { cover_path?: string | null }).cover_path ?? null,
     offers_shirts: Boolean((event as { offers_shirts?: boolean }).offers_shirts),
     going_count: Number((event as { going_count?: number }).going_count ?? 0),
+    join: { signedIn: Boolean(user), stravaConnected: Boolean(stravaRow) },
     gallery: toGalleryImages((galleryRows ?? []) as PublicGalleryRow[]),
   };
 
