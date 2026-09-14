@@ -19,11 +19,11 @@ async function fetchLanding() {
   try {
     const supabase = await createClient();
     const nowIso = new Date().toISOString();
-    const [summary, events, board, chapters, gallery] = await Promise.all([
-      supabase.from("v_public_ledger_summary").select("received_cents").single(),
+    const [summary, events, board, chapters, gallery, causes] = await Promise.all([
+      supabase.from("v_public_ledger_summary").select("received_cents, disbursed_cents").single(),
       supabase
         .from("v_public_events")
-        .select("slug, name, starts_at")
+        .select("slug, name, starts_at, kind, venue")
         .gte("starts_at", nowIso)
         .order("starts_at", { ascending: true })
         .limit(1),
@@ -38,21 +38,30 @@ async function fetchLanding() {
         .select("id, storage_path, caption")
         .order("sort_order", { ascending: true })
         .limit(8),
+      supabase
+        .from("v_public_campaigns")
+        .select("slug, title, goal_cents, raised_cents, donor_count")
+        .order("starts_at", { ascending: false })
+        .limit(3),
     ]);
     return {
       receivedCents: summary.data?.received_cents ?? 0,
-      nextEvent: events.data?.[0] ?? null,
+      disbursedCents: summary.data?.disbursed_cents ?? 0,
+      nextEvent: (events.data?.[0] ?? null) as { slug: string; name: string; starts_at: string; kind: "race" | "challenge" | "social"; venue: string | null } | null,
       board: board.data ?? [],
       chapters: chapters.data ?? [],
       gallery: gallery.data ?? [],
+      causes: (causes.data ?? []) as { slug: string; title: string; goal_cents: number | null; raised_cents: number; donor_count: number }[],
     };
   } catch {
     return {
       receivedCents: 0,
+      disbursedCents: 0,
       nextEvent: null,
       board: [],
       chapters: [],
       gallery: [],
+      causes: [],
     };
   }
 }
@@ -71,7 +80,7 @@ export default async function HomePage({
     getTranslations("events"),
   ]);
   const content = landingContent[locale as Locale];
-  const { receivedCents, nextEvent, board, chapters, gallery } = await fetchLanding();
+  const { receivedCents, disbursedCents, nextEvent, board, chapters, gallery, causes } = await fetchLanding();
 
   const money = (cents: number) =>
     formatCents(cents, locale as Locale, { trimWholeCents: true });
@@ -112,31 +121,99 @@ export default async function HomePage({
           >
             {t("ctaDonate")}
           </DonateButton>
-          {nextEvent ? (
-            <Link
-              href={`/dogadjaji/${nextEvent.slug}`}
-              className="rounded-lg bg-mist px-6 py-3.5 text-[15.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
-            >
-              {t("ctaRegister")}
-            </Link>
-          ) : null}
+          <Link
+            href="/dashboard/prikupljaj"
+            className="rounded-lg bg-mist px-6 py-3.5 text-[15.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
+          >
+            {t("ctaStartPage")}
+          </Link>
+          <Link
+            href="/dogadjaji"
+            className="rounded-lg px-4 py-3.5 text-[15.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
+          >
+            {t("ctaEvents")} →
+          </Link>
         </div>
         <p className="mt-8 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13px] text-sea">
           {t("heroPhotoNote")}
         </p>
       </section>
 
-      {/* 2 — last year: the only honest track-record claim */}
-      <section className="grid gap-6 border-t-[0.5px] border-line py-12 sm:grid-cols-3">
-        {content.triad.map((item) => (
-          <div key={item.big}>
-            <p className="type-display text-5xl text-red">{item.big}</p>
-            <p className="mt-2 max-w-xs text-[14.5px] leading-relaxed text-black/70">
-              {item.label}
+      {/* 2 — the next thing to do: the next event, with both ways in */}
+      {nextEvent ? (
+        <section className="border-t-[0.5px] border-line py-12">
+          <div className="rounded-brand bg-sea px-6 py-6 text-paper">
+            <p className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-paper/70">
+              {t("nextEvent")} · {nextEvent.kind === "challenge" ? tEvents("kindChallenge") : nextEvent.kind === "social" ? tEvents("kindSocial") : tEvents("kindRace")}
             </p>
+            <p className="type-display mt-1 text-3xl">{nextEvent.name}</p>
+            <p className="mt-1 text-[14.5px] text-paper/75">
+              {dateFormat.format(new Date(nextEvent.starts_at))}
+              {nextEvent.venue && !nextEvent.venue.includes("[[") ? ` · ${nextEvent.venue}` : ""}
+              {daysToEvent !== null ? (
+                <>
+                  {" "}
+                  ·{" "}
+                  <span className="font-mono tabular-nums">
+                    {t("countdown", { count: daysToEvent })}
+                  </span>
+                </>
+              ) : null}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Link
+                href={`/dogadjaji/${nextEvent.slug}`}
+                className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark"
+              >
+                {nextEvent.kind === "challenge" ? tEvents("joinCta") : nextEvent.kind === "social" ? tEvents("goingCta") : tEvents("registerCta")}
+              </Link>
+              <Link
+                href={`/dashboard/prikupljaj?event=${nextEvent.slug}`}
+                className="rounded-lg bg-paper/15 px-6 py-3.5 text-[15.5px] font-semibold text-paper transition-colors hover:bg-paper/25"
+              >
+                {tEvents("wayRaise")}
+              </Link>
+            </div>
           </div>
-        ))}
-      </section>
+        </section>
+      ) : null}
+
+      {/* 3 — what we are raising for right now */}
+      {causes.length > 0 ? (
+        <section className="border-t-[0.5px] border-line py-12">
+          <p className={eyebrowClass}>{t("causesHeading")}</p>
+          <ul className="mt-4 space-y-3">
+            {causes.map((cause) => {
+              const pct = cause.goal_cents && cause.goal_cents > 0 ? Math.min(100, Math.round((cause.raised_cents / cause.goal_cents) * 100)) : null;
+              return (
+                <li key={cause.slug}>
+                  <Link href={`/kampanje/${cause.slug}`} className="block rounded-brand bg-mist px-5 py-4 transition-colors hover:bg-mist-2">
+                    <span className="flex flex-wrap items-baseline justify-between gap-2">
+                      <span className="type-display text-xl">{cause.title}</span>
+                      <span className="font-mono text-[14px] tabular-nums text-black/70">
+                        {money(cause.raised_cents)}
+                        {cause.goal_cents ? <span className="text-black/45"> / {money(cause.goal_cents)}</span> : null}
+                        {pct !== null ? <span className="text-sea"> · {pct}%</span> : null}
+                      </span>
+                    </span>
+                    {pct !== null ? (
+                      <span className="mt-2 block h-[6px] overflow-hidden rounded-[3px] bg-mist-2">
+                        <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
+                      </span>
+                    ) : null}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+          <Link
+            href="/kampanje"
+            className="mt-4 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
+          >
+            {t("causesCta")} →
+          </Link>
+        </section>
+      ) : null}
 
       {/* 3 — how it works */}
       <section className="border-t-[0.5px] border-line py-12">
@@ -152,44 +229,30 @@ export default async function HomePage({
         </div>
       </section>
 
-      {/* 4 — next event with countdown */}
-      {nextEvent ? (
-        <section className="border-t-[0.5px] border-line py-12">
-          <div className="flex flex-wrap items-center justify-between gap-5 rounded-brand bg-sea px-6 py-6 text-paper">
-            <div>
-              <p className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-paper/70">
-                {t("nextEvent")}
-              </p>
-              <p className="type-display mt-1 text-2xl">{nextEvent.name}</p>
-              <p className="mt-1 text-[14px] text-paper/75">
-                {dateFormat.format(new Date(nextEvent.starts_at))}
-                {daysToEvent !== null ? (
-                  <>
-                    {" "}
-                    ·{" "}
-                    <span className="font-mono tabular-nums">
-                      {t("countdown", { count: daysToEvent })}
-                    </span>
-                  </>
-                ) : null}
-              </p>
-            </div>
-            <Link
-              href={`/dogadjaji/${nextEvent.slug}/prijava`}
-              className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark"
-            >
-              {tEvents("registerCta")}
-            </Link>
-          </div>
-        </section>
-      ) : null}
-
-      {/* 5 — the two funds, four lines, → ledger */}
+      {/* 5 — the proof: last year, the two funds, the live ledger */}
       <section className="border-t-[0.5px] border-line py-12">
-        <p className={eyebrowClass}>{t("fundsHeading")}</p>
-        <ul className="mt-4 max-w-2xl space-y-2">
+        <p className={eyebrowClass}>{t("proofHeading")}</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-brand bg-mist px-5 py-4">
+            <p className="font-mono text-3xl font-extrabold tabular-nums">{money(receivedCents)}</p>
+            <p className="mt-1 text-[14px] text-black/65">{t("proofReceived")}</p>
+          </div>
+          <div className="rounded-brand bg-mist px-5 py-4">
+            <p className="font-mono text-3xl font-extrabold tabular-nums">{money(disbursedCents)}</p>
+            <p className="mt-1 text-[14px] text-black/65">{t("proofDisbursed")}</p>
+          </div>
+        </div>
+        <div className="mt-6 grid gap-6 sm:grid-cols-3">
+          {content.triad.map((item) => (
+            <div key={item.big}>
+              <p className="type-display text-4xl text-red">{item.big}</p>
+              <p className="mt-1.5 max-w-xs text-[14px] leading-relaxed text-black/70">{item.label}</p>
+            </div>
+          ))}
+        </div>
+        <ul className="mt-6 max-w-2xl space-y-2">
           {content.funds.map((line) => (
-            <li key={line} className="flex gap-2.5 text-[15.5px] leading-relaxed">
+            <li key={line} className="flex gap-2.5 text-[15px] leading-relaxed">
               <span aria-hidden className="mt-[9px] h-[6px] w-[6px] shrink-0 rounded-full bg-red" />
               {line}
             </li>
@@ -197,12 +260,11 @@ export default async function HomePage({
         </ul>
         <Link
           href="/transparentnost"
-          className="mt-4 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
+          className="mt-5 inline-block rounded-lg bg-mist px-5 py-3 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
         >
           {content.fundsCta}
         </Link>
       </section>
-
       {/* 6 — live leaderboard preview */}
       {board.length > 0 ? (
         <section className="border-t-[0.5px] border-line py-12">
@@ -221,7 +283,7 @@ export default async function HomePage({
             />
           </div>
           <Link
-            href="/dashboard"
+            href="/dashboard/prikupljaj"
             className="mt-4 inline-block rounded-lg bg-mist px-5 py-3 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
           >
             {tLb("cta")}

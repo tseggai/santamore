@@ -1,19 +1,11 @@
 import { notFound, redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { Avatar } from "@/components/Avatar";
-import { CreatePageForm, type EventChoice } from "@/components/dashboard/CreatePageForm";
-import {
-  TeamsManager,
-  type MyTeam,
-  type TeamEventChoice,
-} from "@/components/dashboard/TeamsManager";
-import { ExternalIcon, PencilIcon } from "@/components/Icons";
-import { ShareButton } from "@/components/ShareButton";
+import type { EventChoice } from "@/components/dashboard/CreatePageForm";
+import { PagesHub, type HubPage } from "@/components/dashboard/PagesHub";
+import type { MyTeam, TeamEventChoice } from "@/components/dashboard/TeamsManager";
 import { formatCents } from "@/lib/money";
-import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
-import { Link } from "@/i18n/navigation";
 import { htmlLang, type Locale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
@@ -69,18 +61,14 @@ export default async function PagesHubPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ event?: string; team?: string }>;
+  searchParams: Promise<{ event?: string; team?: string; stranica?: string }>;
 }) {
-  const [{ locale }, { event: eventParam, team: teamParam }] = await Promise.all([
+  const [{ locale }, { event: eventParam, team: teamParam, stranica }] = await Promise.all([
     params,
     searchParams,
   ]);
   setRequestLocale(locale);
-  const [t, tDonate, tRunner] = await Promise.all([
-    getTranslations("dashboard"),
-    getTranslations("donate"),
-    getTranslations("runner"),
-  ]);
+  const t = await getTranslations("dashboard");
 
   const supabase = await createClient();
   const {
@@ -190,143 +178,41 @@ export default async function PagesHubPage({
     fundraiserId: pageByEvent.get(event.id) ?? null,
   }));
 
-  const single = pages.length === 1;
-  const iconBtn =
-    "inline-flex h-10 w-10 items-center justify-center rounded-lg bg-paper text-black transition-colors hover:bg-mist-2 hover:text-sea";
+  const hubPages: HubPage[] = pages.map((page) => {
+    const event = eventById.get(page.event_id);
+    const totals = totalsBySlug.get(page.slug);
+    const team = page.team_id ? teamById.get(page.team_id) : null;
+    return {
+      id: page.id,
+      slug: page.slug,
+      title: page.title,
+      status: page.status,
+      goalCents: page.goal_cents,
+      photoPath: page.photo_path,
+      eventName: event?.name ?? "—",
+      eventDate: event?.starts_at ? dateFormat.format(new Date(event.starts_at)) : "",
+      teamName: team?.name ?? null,
+      teamSlug: team?.slug ?? null,
+      raisedCents: totals?.raised_cents ?? 0,
+      donorCount: totals?.donor_count ?? 0,
+    };
+  });
 
   return (
     <div className="py-8">
-      <h1 className="type-display text-2xl">{single ? t("title") : t("navPages")}</h1>
-      <p className="mt-2 text-[15px] leading-relaxed text-black/65">
-        {pages.length === 0 ? t("hubEmptySub") : t("pagesSub")}
-      </p>
-
-      {pages.length > 0 ? (
-        <ul className="mt-5 space-y-3">
-          {pages.map((page) => {
-            const event = eventById.get(page.event_id);
-            const totals = totalsBySlug.get(page.slug);
-            const team = page.team_id ? teamById.get(page.team_id) : null;
-            const raised = totals?.raised_cents ?? 0;
-            const pct =
-              page.goal_cents && page.goal_cents > 0
-                ? Math.min(100, Math.round((raised / page.goal_cents) * 100))
-                : 0;
-            const live = page.status === "active";
-            return (
-              <li key={page.id} className="rounded-brand bg-mist p-4 sm:p-5">
-                <div className="flex items-start gap-3 sm:gap-4">
-                  <Avatar src={fundraiserPhotoUrl(page.photo_path)} name={page.title} size={single ? 64 : 48} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-                      <span className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-                        <span className={`font-bold ${single ? "text-[20px]" : "text-[16px]"}`}>{page.title}</span>
-                        <span
-                          className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
-                            live ? "bg-sea text-paper" : "bg-paper text-black/60"
-                          }`}
-                        >
-                          {live ? t("statusActiveShort") : t("statusDraftShort")}
-                        </span>
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Link
-                          href={`/dashboard/stranice/${page.slug}`}
-                          aria-label={live ? t("editPage") : t("finishPage")}
-                          title={live ? t("editPage") : t("finishPage")}
-                          className={iconBtn}
-                        >
-                          <PencilIcon />
-                        </Link>
-                        {live ? (
-                          <>
-                            <ShareButton
-                              title={page.title}
-                              path={`/${locale}/f/${page.slug}`}
-                              text={t("shareMessageShort", { title: page.title })}
-                              label={tRunner("share")}
-                              copiedLabel={tDonate("copied")}
-                              variant="icon"
-                              className={iconBtn}
-                            />
-                            <Link
-                              href={`/f/${page.slug}`}
-                              aria-label={t("viewPublic")}
-                              title={t("viewPublic")}
-                              className={iconBtn}
-                            >
-                              <ExternalIcon />
-                            </Link>
-                          </>
-                        ) : null}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-[14px] text-black/60">
-                      {event?.name ?? "—"}
-                      {event?.starts_at ? ` · ${dateFormat.format(new Date(event.starts_at))}` : ""}
-                      {team ? (
-                        <>
-                          {" · "}
-                          <Link href={`/t/${team.slug}`} className="font-semibold text-black/80 hover:text-sea">
-                            {team.name}
-                          </Link>
-                        </>
-                      ) : null}
-                    </p>
-                    <div className="mt-3 flex items-baseline justify-between gap-3">
-                      <span className="font-mono text-[16px] tabular-nums">
-                        {money(raised)}
-                        {page.goal_cents ? (
-                          <span className="text-[13.5px] font-medium text-black/50"> / {money(page.goal_cents)}</span>
-                        ) : null}
-                      </span>
-                      <span className="text-[13.5px] text-black/55">
-                        {totals?.donor_count ?? 0} {tRunner("donors")}
-                        {page.goal_cents ? ` · ${pct}%` : ""}
-                      </span>
-                    </div>
-                    <span className="mt-1.5 block h-[6px] overflow-hidden rounded-[3px] bg-mist-2">
-                      <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
-                    </span>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <Link
-                    href={`/dashboard/stranice/${page.slug}#gotovina`}
-                    className="inline-flex rounded-lg bg-ink px-4 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90"
-                  >
-                    {t("qaCash")}
-                  </Link>
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      ) : null}
-
-      <section id="timovi" className="mt-8 scroll-mt-6 border-t-[0.5px] border-line pt-6">
-        <h2 className="text-[16px] font-bold">{t("navTeams")}</h2>
-        <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("teamsSub")}</p>
-        <TeamsManager teams={myTeams} events={teamEventChoices} />
-      </section>
-
-      <section className="mt-8 border-t-[0.5px] border-line pt-6">
-        <h2 className="text-[16px] font-bold">{pages.length === 0 ? t("createHeading") : t("createAnotherHeading")}</h2>
-        <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">
-          {choices.length === 0 ? t("createNoEvents") : t("createSub")}
-        </p>
-        {choices.length > 0 ? (
-          <div className="mt-4">
-            <CreatePageForm
-              locale={locale}
-              defaultName={profile?.full_name ?? ""}
-              events={choices}
-              defaultEventSlug={teamEventSlug ?? eventParam ?? null}
-              joinTeamId={teamParam && UUID.test(teamParam) ? teamParam : null}
-            />
-          </div>
-        ) : null}
-      </section>
+      <PagesHub
+        title={t("navPages")}
+        lead={pages.length === 0 ? t("hubEmptySub") : t("pagesSub")}
+        pages={hubPages}
+        teams={myTeams}
+        teamEvents={teamEventChoices}
+        choices={choices}
+        defaultName={profile?.full_name ?? ""}
+        initialOpen={stranica}
+        openCreate={choices.some((choice) => choice.slug === (teamEventSlug ?? eventParam))}
+        defaultEventSlug={teamEventSlug ?? eventParam ?? null}
+        joinTeamId={teamParam && UUID.test(teamParam) ? teamParam : null}
+      />
     </div>
   );
 }

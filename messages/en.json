@@ -40,7 +40,14 @@
     "storyHeading": "Who your euro reached",
     "storyNote": "[[PLACEHOLDER: one beneficiary story, told with written consent]]",
     "newsletterHeading": "News and the monthly donor club",
-    "newsletterSub": "A short letter when something real happens — an event opens, a hand-over is published. No noise."
+    "newsletterSub": "A short letter when something real happens — an event opens, a hand-over is published. No noise.",
+    "ctaStartPage": "Start a fundraising page",
+    "ctaEvents": "All events",
+    "causesHeading": "What we are raising for right now",
+    "causesCta": "All causes",
+    "proofHeading": "Every euro, in public",
+    "proofReceived": "received so far",
+    "proofDisbursed": "handed over, with the paperwork"
   },
   "footer": {
     "orgHeading": "Organisation",
@@ -181,7 +188,9 @@
     "joinTeam": "Join this team",
     "teamRaisedBy": "raised by {count, plural, one {# member} other {# members}}",
     "teamAbout": "About the team",
-    "teamMembersHint": "Every member's page counts towards the team total."
+    "teamMembersHint": "Every member's page counts towards the team total.",
+    "startPageCta": "Start a page",
+    "pickEvent": "Event"
   },
   "ledger": {
     "eyebrow": "Public ledger · updates automatically",
@@ -294,7 +303,7 @@
     "consoleBadge": "My Santamore",
     "viewSite": "View public site",
     "navOverview": "Overview",
-    "navPages": "My pages",
+    "navPages": "Fundraising",
     "navTeams": "My teams",
     "navStrava": "Strava & rewards",
     "welcome": "Hi {name}",
@@ -314,7 +323,7 @@
     "teamsEmpty": "You don't captain a team yet.",
     "registrationsHeading": "My registrations",
     "registrationsEmpty": "Not registered for any event yet.",
-    "pagesSub": "One page per event you take part in. Each has its own story, goal, team and donate link.",
+    "pagesSub": "One fundraising page per event you take part in — each with its own story, goal, team and donate link. Open a row to edit it.",
     "createNoEvents": "There is no open event you don't already have a page for.",
     "teamsSub": "Teams you captain. Anyone with a page on the same event can join from their editor; every member's page counts towards the team total.",
     "memberCountShort": "{count, plural, one {# member} other {# members}}",
@@ -339,7 +348,7 @@
     "qaDonate": "Donate",
     "qaInvite": "Invite athletes",
     "inviteMessage": "Come and join me at {name} — we run for Santamore and every euro is published:",
-    "evSub": "Where you're going, what you're raising on and what you've supported. Free RSVP here; registration with the entry fee is on the event page.",
+    "evSub": "Events and causes as they relate to you: going, registered, raising, supported — and everything you have given, at the bottom.",
     "evUpcoming": "Upcoming events",
     "evPast": "Past events ({count})",
     "evCampaigns": "Causes",
@@ -384,7 +393,8 @@
     "fundraiseStep3Body": "A link and a QR code do the work. Send them to the people who would give because it is you asking.",
     "fundraiseStep3Point1": "Share from your page in one tap.",
     "fundraiseStep3Point2": "For challenges, connect Strava and your activity counts automatically.",
-    "fundraiseStep3Point3": "Ask the team for a shirt, a photo, a story — it all goes on the page."
+    "fundraiseStep3Point3": "Ask the team for a shirt, a photo, a story — it all goes on the page.",
+    "newPage": "New page"
   },
   "email": {
     "instructions": {

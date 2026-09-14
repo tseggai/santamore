@@ -24,6 +24,7 @@ export function CreatePageForm({
   events,
   defaultEventSlug,
   joinTeamId = null,
+  onCreated,
 }: {
   locale: string;
   defaultName: string;
@@ -31,6 +32,8 @@ export function CreatePageForm({
   defaultEventSlug: string | null;
   /** Open the new page's editor with this team preselected. */
   joinTeamId?: string | null;
+  /** Hub mode: hand the new slug back instead of navigating. */
+  onCreated?: (slug: string) => void;
 }) {
   const t = useTranslations("dashboard");
   const router = useRouter();
@@ -50,6 +53,10 @@ export function CreatePageForm({
       eventSlug: eventSlug || null,
     }).catch(() => ({ ok: false as const, slug: undefined }));
     if (result.ok && result.slug) {
+      if (onCreated && !joinTeamId) {
+        onCreated(result.slug);
+        return;
+      }
       router.push(
         `/${locale}/dashboard/stranice/${result.slug}${joinTeamId ? `?team=${joinTeamId}` : ""}`,
       );
