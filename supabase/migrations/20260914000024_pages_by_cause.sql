@@ -12,6 +12,26 @@ update public.fundraisers f
  where e.id = f.event_id and f.campaign_id is null;
 alter table public.fundraisers alter column event_id drop not null;
 drop index if exists public.fundraisers_user_event_key;
+
+-- One page per member per cause. A member who already holds pages on
+-- several events of one cause has to be resolved first: approved donations
+-- are immutable, so this migration never moves them between pages. Run
+-- supabase/duplicate_pages.sql to see who is affected; demo rows go away
+-- with Admin › Demo › Purge, after which this migration applies cleanly.
+do $$
+declare
+  n integer;
+begin
+  select count(*) into n
+    from (select 1 from public.fundraisers
+           where campaign_id is not null
+           group by user_id, campaign_id having count(*) > 1) d;
+  if n > 0 then
+    raise exception
+      'fundraisers: % member/cause pairs hold more than one page — see supabase/duplicate_pages.sql', n;
+  end if;
+end $$;
+
 create unique index if not exists fundraisers_user_campaign_key
   on public.fundraisers (user_id, campaign_id);
 create index if not exists fundraisers_campaign_idx on public.fundraisers (campaign_id);
@@ -23,6 +43,19 @@ update public.teams t
   from public.events e
  where e.id = t.event_id and t.campaign_id is null;
 alter table public.teams alter column event_id drop not null;
+
+-- Two teams on different events of one cause may share a slug; the newer
+-- ones get a short suffix so both links keep working under the cause.
+update public.teams t
+   set slug = t.slug || '-' || left(replace(t.id::text, '-', ''), 4)
+  from (
+    select id,
+           row_number() over (partition by campaign_id, slug order by created_at, id) as n
+      from public.teams
+     where campaign_id is not null
+  ) r
+ where r.id = t.id and r.n > 1;
+
 create unique index if not exists teams_campaign_slug_key on public.teams (campaign_id, slug);
 create index if not exists teams_campaign_idx on public.teams (campaign_id);
 
