@@ -16,7 +16,7 @@ export interface Column<T> {
   sort?: (row: T) => string | number | null;
   /** A select in the filter bar, "All" plus these options. */
   filter?: ColumnFilter<T>;
-  align?: "left" | "right";
+  align?: "left" | "right" | "center";
   className?: string;
 }
 
@@ -188,7 +188,7 @@ export function DataTable<T>({
                   <th
                     key={column.key}
                     aria-sort={active ? (sort!.dir === "asc" ? "ascending" : "descending") : undefined}
-                    className={`px-3 py-2.5 ${column.align === "right" ? "text-right" : ""} ${column.className ?? ""}`}
+                    className={`px-3 py-2.5 ${column.align === "right" ? "text-right" : column.align === "center" ? "text-center" : ""} ${column.className ?? ""}`}
                   >
                     {column.sort ? (
                       <button type="button" onClick={() => cycleSort(column.key)} className="inline-flex items-center gap-1 uppercase hover:text-sea">
@@ -232,7 +232,7 @@ export function DataTable<T>({
                     {columns.map((column) => (
                       <td
                         key={column.key}
-                        className={`whitespace-nowrap px-3 py-2 ${column.align === "right" ? "text-right font-mono tabular-nums" : ""} ${column.className ?? ""}`}
+                        className={`whitespace-nowrap px-3 py-2 ${column.align === "right" ? "text-right font-mono tabular-nums" : column.align === "center" ? "text-center font-mono tabular-nums" : ""} ${column.className ?? ""}`}
                       >
                         {column.cell(row)}
                       </td>
@@ -256,6 +256,8 @@ export function DataTable<T>({
 /** Small pieces shared by the console tables. */
 export const rowButton =
   "rounded-lg bg-paper px-2.5 py-1 text-[13px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-40";
+export const iconButton =
+  "inline-flex h-8 w-8 items-center justify-center rounded-lg bg-paper text-black/70 transition-colors hover:bg-mist-2 hover:text-sea disabled:opacity-40";
 export const bulkButton =
   "rounded-lg bg-paper/15 px-3 py-1 text-[13px] font-semibold text-paper transition-colors hover:bg-paper/25 disabled:opacity-40";
 

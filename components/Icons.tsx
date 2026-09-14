@@ -22,3 +22,22 @@ export function ExternalIcon() {
     </svg>
   );
 }
+
+export function EyeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
+      <path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z" {...stroke} />
+      <circle cx="12" cy="12" r="3" {...stroke} />
+    </svg>
+  );
+}
+
+export function ImageIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
+      <rect x="3.5" y="5" width="17" height="14" rx="2" {...stroke} />
+      <path d="M3.5 16l5-5 4 4 3-3 5 5" {...stroke} />
+      <circle cx="15.5" cy="9" r="1.5" {...stroke} />
+    </svg>
+  );
+}

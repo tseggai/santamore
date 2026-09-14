@@ -8,7 +8,9 @@ import { saveCampaign, setCampaignsPublic } from "@/app/[locale]/admin/(protecte
 import { CoverField } from "@/components/admin/CoverField";
 import type { Option } from "@/components/admin/EventForm";
 import { GalleryManager, type GalleryAdminItem } from "@/components/admin/GalleryManager";
-import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
+import { Chip, DataTable, Thumb, bulkButton, iconButton, rowButton, type Column } from "@/components/console/DataTable";
+import { ExternalIcon, EyeIcon } from "@/components/Icons";
+import { formatShortDate } from "@/lib/dates";
 import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
 import { PreviewFrame } from "@/components/admin/PreviewFrame";
@@ -471,17 +473,11 @@ export function CampaignsManager({
     },
     { key: "raised", header: t("table.colRaised"), align: "right", cell: (c) => money(c.raised_cents), sort: (c) => c.raised_cents },
     { key: "goal", header: t("table.colGoal"), align: "right", cell: (c) => (c.goal_cents ? money(c.goal_cents) : "—"), sort: (c) => c.goal_cents },
-    { key: "events", header: t("table.colEvents"), align: "right", cell: (c) => c.events, sort: (c) => c.events },
-    {
-      key: "reference",
-      header: t("table.colReference"),
-      cell: (c) => <span className="font-mono text-[13px] text-black/60">{c.payment_reference}</span>,
-      sort: (c) => c.payment_reference,
-    },
+    { key: "events", header: t("table.colEvents"), align: "center", cell: (c) => c.events, sort: (c) => c.events },
     {
       key: "starts",
       header: t("table.colDate"),
-      cell: (c) => <span className="font-mono tabular-nums text-black/60">{c.starts_at?.slice(0, 10) ?? "—"}</span>,
+      cell: (c) => <span className="font-mono tabular-nums text-black/60">{formatShortDate(c.starts_at, locale)}</span>,
       sort: (c) => c.starts_at,
     },
   ];
@@ -517,9 +513,14 @@ export function CampaignsManager({
         rowActions={(c) => (
           <>
             {c.is_public ? (
-              <Link href={`/kampanje/${c.slug}`} target="_blank" className={rowButton}>{t("table.view")}</Link>
-            ) : null}
-            <button type="button" onClick={() => setOpen(c.id)} className={rowButton}>{t("evEdit")}</button>
+              <Link href={`/kampanje/${c.slug}`} target="_blank" className={iconButton} aria-label={t("table.view")} title={t("table.view")}>
+                <ExternalIcon />
+              </Link>
+            ) : (
+              <button type="button" onClick={() => setOpen(c.id)} className={iconButton} aria-label={t("previewShow")} title={t("previewShow")}>
+                <EyeIcon />
+              </button>
+            )}
             <button type="button" disabled={busy} onClick={() => setPublic([c.id], !c.is_public)} className={rowButton}>
               {c.is_public ? t("galleryUnpublish") : t("galleryPublish")}
             </button>

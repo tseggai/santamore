@@ -67,3 +67,11 @@ Then raise the per-hour email limit under Authentication → Rate Limits.
 2. Is `NEXT_PUBLIC_SITE_URL` set for Production and has the site been redeployed since?
 3. Does the Supabase Redirect URLs list contain `<canonical origin>/**`?
 4. Is the Strava callback domain the same hostname?
+
+## 5. Post translation (optional)
+
+The post editor can draft the other two languages from the one you wrote.
+It calls the Claude API server-side and needs `ANTHROPIC_API_KEY` in the
+Vercel environment (server-only; never `NEXT_PUBLIC_`). Without it the
+Translate button explains that it is not set up. Every translation lands in
+the editor as a draft: a person reads it before it is saved or published.
