@@ -40,7 +40,14 @@
     "storyHeading": "Do koga je stigao tvoj euro",
     "storyNote": "[[PLACEHOLDER: jedna priča korisnika, ispričana uz pisanu saglasnost]]",
     "newsletterHeading": "Novosti i klub mjesečnih donatora",
-    "newsletterSub": "Kratko pismo kad se desi nešto stvarno — otvori se događaj, objavi se primopredaja. Bez buke."
+    "newsletterSub": "Kratko pismo kad se desi nešto stvarno — otvori se događaj, objavi se primopredaja. Bez buke.",
+    "ctaStartPage": "Otvori stranicu za prikupljanje",
+    "ctaEvents": "Svi događaji",
+    "causesHeading": "Za šta trenutno prikupljamo",
+    "causesCta": "Svi ciljevi",
+    "proofHeading": "Svaki euro, javno",
+    "proofReceived": "primljeno do sada",
+    "proofDisbursed": "predato, sa dokumentacijom"
   },
   "footer": {
     "orgHeading": "Organizacija",
@@ -181,7 +188,9 @@
     "joinTeam": "Pridruži se timu",
     "teamRaisedBy": "prikupilo {count, plural, one {# član} few {# člana} other {# članova}}",
     "teamAbout": "O timu",
-    "teamMembersHint": "Stranica svakog člana računa se u ukupan iznos tima."
+    "teamMembersHint": "Stranica svakog člana računa se u ukupan iznos tima.",
+    "startPageCta": "Otvori stranicu",
+    "pickEvent": "Događaj"
   },
   "ledger": {
     "eyebrow": "Javni registar · ažurirano automatski",
@@ -294,7 +303,7 @@
     "consoleBadge": "Moj Santamore",
     "viewSite": "Pogledaj javni sajt",
     "navOverview": "Pregled",
-    "navPages": "Moje stranice",
+    "navPages": "Prikupljanje",
     "navTeams": "Moji timovi",
     "navStrava": "Strava i nagrade",
     "welcome": "Zdravo {name}",
@@ -314,7 +323,7 @@
     "teamsEmpty": "Još ne vodiš nijedan tim.",
     "registrationsHeading": "Moje prijave",
     "registrationsEmpty": "Nisi prijavljen/a ni na jedan događaj.",
-    "pagesSub": "Jedna stranica po događaju u kojem učestvuješ. Svaka ima svoju priču, cilj, tim i link za donacije.",
+    "pagesSub": "Jedna stranica za prikupljanje po događaju u kojem učestvuješ — svaka sa svojom pričom, ciljem, timom i linkom za donacije. Otvori red da je urediš.",
     "createNoEvents": "Nema otvorenog događaja za koji već nemaš stranicu.",
     "teamsSub": "Timovi koje vodiš. Svako sa stranicom na istom događaju može se pridružiti iz svog uređivača; stranica svakog člana računa se u ukupan iznos tima.",
     "memberCountShort": "{count, plural, one {# član} few {# člana} other {# članova}}",
@@ -339,7 +348,7 @@
     "qaDonate": "Doniraj",
     "qaInvite": "Pozovi sportiste",
     "inviteMessage": "Pridruži mi se na {name} — trčimo za Santamore i svaki euro je javno objavljen:",
-    "evSub": "Gdje ideš, za šta prikupljaš i šta si podržao/la. Besplatna prijava dolaska ovdje; registracija sa kotizacijom je na stranici događaja.",
+    "evSub": "Događaji i ciljevi kako se tiču tebe: dolaziš, prijavljen si, prikupljaš, podržao si — i sve što si dao, na dnu.",
     "evUpcoming": "Predstojeći događaji",
     "evPast": "Prošli događaji ({count})",
     "evCampaigns": "Ciljevi",
@@ -384,7 +393,8 @@
     "fundraiseStep3Body": "Link i QR kod rade posao. Pošalji ih ljudima koji bi dali zato što ti pitaš.",
     "fundraiseStep3Point1": "Podijeli sa svoje stranice jednim dodirom.",
     "fundraiseStep3Point2": "Za izazove poveži Stravu i aktivnost se računa automatski.",
-    "fundraiseStep3Point3": "Traži od tima majicu, fotografiju, priču — sve ide na stranicu."
+    "fundraiseStep3Point3": "Traži od tima majicu, fotografiju, priču — sve ide na stranicu.",
+    "newPage": "Nova stranica"
   },
   "email": {
     "instructions": {

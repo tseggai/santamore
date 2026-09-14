@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { GivingSection } from "@/components/dashboard/GivingSection";
 import { RsvpButtons } from "@/components/dashboard/RsvpButtons";
 import { DonateButton } from "@/components/donate/DonateButton";
 import { ExternalIcon } from "@/components/Icons";
@@ -160,11 +161,11 @@ export default async function ConsoleEventsPage({
               </Link>
             ) : null}
             {page ? (
-              <Link href={`/dashboard/stranice/${page.slug}`} className={ghost}>
+              <Link href={`/dashboard/stranice?stranica=${page.slug}`} className={ghost}>
                 {page.status === "active" ? t("editPage") : t("finishPage")}
               </Link>
             ) : (
-              <Link href={`/dashboard/stranice?event=${event.slug}`} className={ghost}>
+              <Link href={`/dashboard/prikupljaj?event=${event.slug}`} className={ghost}>
                 {t("evStartPage")}
               </Link>
             )}
@@ -257,6 +258,7 @@ export default async function ConsoleEventsPage({
           </ul>
         )}
       </section>
+      <GivingSection locale={locale} />
     </div>
   );
 }

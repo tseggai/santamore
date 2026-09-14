@@ -464,3 +464,92 @@ export async function updateTeam(
   revalidatePath("/[locale]/t/[slug]", "page");
   return { ok: true, teamId: parsed.data.teamId };
 }
+
+export interface PageEditorData {
+  fundraiser: {
+    id: string;
+    slug: string;
+    title: string;
+    story: string;
+    goalCents: number | null;
+    photoPath: string | null;
+    status: "draft" | "active" | "hidden";
+    teamId: string | null;
+    eventId: string;
+    eventName: string;
+  };
+  teams: { id: string; name: string; description: string | null; photoPath: string | null }[];
+  captainOf: string[];
+  raisedCents: number;
+  donorCount: number;
+  event: { kind: string; challenge_metric: string | null } | null;
+  activities: { id: string; started_at: string; distance_m: number; moving_time_s: number; source: string }[];
+  cash: { id: string; amount_cents: number; status: string; created_at: string; donor_name: string | null; message: string | null }[];
+}
+
+/** Everything the page editor needs, for the hub's slide-over. Own pages only. */
+export async function fetchPageEditor(slug: string): Promise<PageEditorData | null> {
+  const parsed = z.string().trim().min(1).max(100).safeParse(slug);
+  if (!parsed.success) return null;
+  const { supabase, user } = await currentUser();
+  if (!user) return null;
+  const { data: mine } = await supabase
+    .from("fundraisers")
+    .select("id, slug, title, story, goal_cents, photo_path, status, team_id, event_id")
+    .eq("user_id", user.id)
+    .eq("slug", parsed.data)
+    .maybeSingle();
+  if (!mine) return null;
+
+  const service = createServiceClient();
+  const [{ data: teams }, { data: captained }, { data: totals }, { data: event }, { data: activityRows }, { data: cashRows }] =
+    await Promise.all([
+      supabase.from("v_team_totals").select("id, name, description, photo_path").eq("event_id", mine.event_id).order("name"),
+      supabase.from("teams").select("id").eq("captain_id", user.id),
+      supabase.from("v_fundraiser_totals").select("raised_cents, donor_count").eq("slug", mine.slug).maybeSingle(),
+      supabase.from("v_public_events").select("name, kind, challenge_metric").eq("id", mine.event_id).maybeSingle(),
+      supabase
+        .from("activities")
+        .select("id, started_at, distance_m, moving_time_s, source")
+        .eq("fundraiser_id", mine.id)
+        .order("started_at", { ascending: false })
+        .limit(100),
+      // The runner's own cash log: donor PII stays staff-only under RLS, so
+      // this is read with the service role, restricted to their page and the
+      // fields they typed themselves.
+      service
+        .from("donations")
+        .select("id, amount_cents, status, created_at, donor_name, message")
+        .eq("fundraiser_id", mine.id)
+        .eq("rail", "cash")
+        .order("created_at", { ascending: false })
+        .limit(30),
+    ]);
+
+  return {
+    fundraiser: {
+      id: mine.id,
+      slug: mine.slug,
+      title: mine.title,
+      story: mine.story ?? "",
+      goalCents: mine.goal_cents,
+      photoPath: mine.photo_path,
+      status: mine.status,
+      teamId: mine.team_id,
+      eventId: mine.event_id,
+      eventName: event?.name ?? "Santamore",
+    },
+    teams: ((teams ?? []) as { id: string; name: string; description: string | null; photo_path: string | null }[]).map((team) => ({
+      id: team.id,
+      name: team.name,
+      description: team.description,
+      photoPath: team.photo_path,
+    })),
+    captainOf: (captained ?? []).map((row) => row.id),
+    raisedCents: totals?.raised_cents ?? 0,
+    donorCount: totals?.donor_count ?? 0,
+    event: event ? { kind: event.kind, challenge_metric: event.challenge_metric } : null,
+    activities: (activityRows ?? []) as PageEditorData["activities"],
+    cash: (cashRows ?? []) as PageEditorData["cash"],
+  };
+}

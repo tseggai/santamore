@@ -10,7 +10,6 @@ const ITEMS = [
   { href: "/dashboard/stranice", key: "navPages", exact: false },
   { href: "/dashboard/dogadjaji", key: "navEvents", exact: false },
   { href: "/dashboard/strava", key: "navStrava", exact: false },
-  { href: "/dashboard/donacije", key: "navGiving", exact: false },
 ] as const;
 
 /** Runner console nav: one vertical list, in the desktop rail and the phone drawer alike. */
