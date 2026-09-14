@@ -8,6 +8,7 @@ import { saveSponsorship, saveSupporter } from "@/app/[locale]/admin/(protected)
 import type { Option } from "@/components/admin/EventForm";
 import { downscaleToJpeg } from "@/lib/images";
 import { formatCents, parseEurosToCents } from "@/lib/money";
+import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
 import { supporterLogoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -320,7 +321,11 @@ export function SupportersManager({
   chapters,
   campaigns,
   events,
+  title,
+  lead,
 }: {
+  title: string;
+  lead: string;
   locale: Locale;
   supporters: SupporterRow[];
   sponsorships: SponsorshipRow[];
@@ -336,10 +341,16 @@ export function SupportersManager({
   const eventName = new Map(events.map((e) => [e.id, e.name]));
 
   return (
-    <div className="mt-5 space-y-4">
-      <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
-        + {t("suNew")}
-      </button>
+    <div className="space-y-4">
+      <PageHeader
+        title={title}
+        lead={lead}
+        action={
+          <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
+            + {t("suNew")}
+          </button>
+        }
+      />
       <SidePanel
         open={open !== ""}
         title={open === "new" ? t("suNew") : (supporters.find((s) => s.id === open)?.name ?? "")}

@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { GalleryGrid, type GalleryImage } from "@/components/gallery/GalleryGrid";
-import { galleryImageUrl } from "@/lib/storage";
+import { GalleryGrid } from "@/components/gallery/GalleryGrid";
+import { toGalleryImages, type PublicGalleryRow } from "@/lib/gallery";
 import { createClient } from "@/lib/supabase/server";
 import { routing } from "@/i18n/routing";
 
@@ -19,16 +19,6 @@ export async function generateMetadata({
   return { title: `${t("title")} — Santamore` };
 }
 
-interface GalleryRow {
-  id: string;
-  storage_path: string;
-  caption: string | null;
-  credit: string | null;
-  event_slug: string | null;
-  event_name: string | null;
-  event_starts_at: string | null;
-}
-
 export default async function GalleryPage({
   params,
 }: {
@@ -39,34 +29,20 @@ export default async function GalleryPage({
   setRequestLocale(locale);
   const t = await getTranslations("gallery");
 
-  let rows: GalleryRow[] = [];
+  let rows: PublicGalleryRow[] = [];
   try {
     const supabase = await createClient();
     const { data } = await supabase
       .from("v_public_gallery")
-      .select("id, storage_path, caption, credit, event_slug, event_name, event_starts_at")
+      .select("id, storage_path, caption, credit, event_slug, event_name, event_starts_at, campaign_slug, campaign_title")
       .order("sort_order", { ascending: true })
       .limit(400);
-    rows = (data ?? []) as GalleryRow[];
+    rows = (data ?? []) as PublicGalleryRow[];
   } catch {
     rows = [];
   }
 
-  const images = rows.flatMap((row): GalleryImage[] => {
-    const src = galleryImageUrl(row.storage_path);
-    if (!src) return [];
-    return [
-      {
-        id: row.id,
-        src,
-        caption: row.caption,
-        credit: row.credit,
-        eventSlug: row.event_slug,
-        eventName: row.event_name,
-        year: row.event_starts_at ? new Date(row.event_starts_at).getFullYear() : null,
-      },
-    ];
-  });
+  const images = toGalleryImages(rows);
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-14">

@@ -1,8 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 
 import { LeaderboardList, type LeaderboardEntry } from "@/components/Leaderboard";
+import type { GalleryImage } from "@/components/gallery/GalleryGrid";
+import { PublicGallery } from "@/components/gallery/PublicGallery";
+import { galleryImageUrl } from "@/lib/storage";
 import type { EventTier } from "@/lib/events";
 import { formatCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
@@ -31,6 +35,9 @@ export interface EventView {
   /** Partner rewards attached to this challenge (public view). */
   perks?: EventPerk[];
   sponsors?: EventSponsor[];
+  cover_path?: string | null;
+  /** Published photos of this event. */
+  gallery?: GalleryImage[];
   starts_at: string | null;
   ends_at: string | null;
   venue: string | null;
@@ -71,6 +78,7 @@ export function EventPageView({
   const closesAt = event.registration_closes_at
     ? new Date(event.registration_closes_at).getTime()
     : null;
+  const cover = galleryImageUrl(event.cover_path ?? null);
   const registrationState =
     opensAt && now < opensAt ? "before" : closesAt && now > closesAt ? "after" : "open";
 
@@ -85,6 +93,9 @@ export function EventPageView({
         {event.ends_at ? <> — {fmt(event.ends_at)}</> : null}
         {event.venue ? <> · {event.venue}</> : null}
       </p>
+      {cover ? (
+        <Image src={cover} alt="" width={1200} height={675} priority className="mt-6 aspect-[16/9] w-full rounded-lg bg-mist object-cover" />
+      ) : null}
 
       {event.description ? (
         <div className="mt-6 max-w-2xl">
@@ -207,6 +218,9 @@ export function EventPageView({
           {t("termsLink")}
         </Link>
       </p>
+      {event.gallery && event.gallery.length > 0 ? (
+        <PublicGallery images={event.gallery} heading={t("galleryHeading")} />
+      ) : null}
     </div>
   );
 }

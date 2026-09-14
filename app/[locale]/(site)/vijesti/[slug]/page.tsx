@@ -1,11 +1,8 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import Markdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
-import { galleryImageUrl } from "@/lib/storage";
+import { PostArticle } from "@/components/news/PostArticle";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, routing, type Locale } from "@/i18n/routing";
@@ -68,7 +65,6 @@ export default async function NewsPostPage({
   const post = await fetchPost(slug, locale);
   if (!post) notFound();
 
-  const cover = galleryImageUrl(post.cover_path);
   const dateFormat = new Intl.DateTimeFormat(htmlLang(locale as Locale), {
     day: "numeric",
     month: "long",
@@ -77,24 +73,12 @@ export default async function NewsPostPage({
 
   return (
     <article className="mx-auto max-w-3xl px-5 py-14">
-      <p className="font-mono text-[12.5px] text-black/55">
-        {dateFormat.format(new Date(post.published_at))}
-      </p>
-      <h1 className="type-display mt-2 text-4xl leading-[1.1] sm:text-5xl">{post.title}</h1>
-      {cover ? (
-        <Image
-          src={cover}
-          alt=""
-          width={1200}
-          height={675}
-          priority
-          className="mt-6 w-full rounded-brand bg-mist object-cover"
-        />
-      ) : null}
-
-      <div className="prose-news mt-8">
-        <Markdown remarkPlugins={[remarkGfm]}>{post.body_md}</Markdown>
-      </div>
+      <PostArticle
+        title={post.title}
+        dateLabel={dateFormat.format(new Date(post.published_at))}
+        coverPath={post.cover_path}
+        bodyMd={post.body_md}
+      />
 
       <Link
         href="/vijesti"

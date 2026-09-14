@@ -48,6 +48,7 @@ const eventSchema = z
     isPublished: z.boolean(),
     description: z.string().trim().max(4000).nullable(),
     offersShirts: z.boolean(),
+    coverPath: z.string().trim().max(300).nullable().optional(),
   })
   .refine((data) => data.kind !== "challenge" || data.challengeMetric !== null, {
     message: "a challenge needs a metric",
@@ -83,6 +84,7 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
     is_published: data.isPublished,
     description: data.description,
     offers_shirts: data.kind === "social" ? false : data.offersShirts,
+    ...(data.coverPath !== undefined ? { cover_path: data.coverPath } : {}),
     // Gatherings have no distances, however the form was driven.
     ...(data.kind !== "race" ? { distances: [] } : {}),
   };

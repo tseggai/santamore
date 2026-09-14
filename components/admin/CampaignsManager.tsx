@@ -5,7 +5,10 @@ import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
 import { saveCampaign } from "@/app/[locale]/admin/(protected)/kampanje/actions";
+import { CoverField } from "@/components/admin/CoverField";
 import type { Option } from "@/components/admin/EventForm";
+import { GalleryManager, type GalleryAdminItem } from "@/components/admin/GalleryManager";
+import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
 import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import { CampaignPageView } from "@/components/campaigns/CampaignPageView";
@@ -29,6 +32,8 @@ export interface CampaignRow {
   suggested_amounts: unknown;
   raised_cents: number;
   events: number;
+  cover_path?: string | null;
+  gallery: GalleryAdminItem[];
 }
 
 interface AmountSet {
@@ -100,6 +105,9 @@ function CampaignForm({
   const [endsAt, setEndsAt] = useState(toDateInput(campaign?.ends_at ?? null));
   const [summary, setSummary] = useState(campaign?.beneficiary_summary ?? "");
   const [isPublic, setIsPublic] = useState(campaign?.is_public ?? false);
+  const [coverPath, setCoverPath] = useState<string | null>(campaign?.cover_path ?? null);
+  const [coverFolder] = useState(() => `covers/causes/${campaign?.id ?? `new-${crypto.randomUUID()}`}`);
+  const [formId] = useState(() => `camp-${Math.random().toString(36).slice(2, 8)}`);
   const [oneoff, setOneoff] = useState(oneoffInit.text);
   const [oneoffDefault, setOneoffDefault] = useState(oneoffInit.defaultIndex);
   const [monthly, setMonthly] = useState(monthlyInit.text);
@@ -118,6 +126,7 @@ function CampaignForm({
     ends_at: fromDateInput(endsAt, true),
     chapter_name: chapters.find((chapter) => chapter.id === chapterId)?.name ?? null,
     events: [],
+    cover_path: coverPath,
   };
 
   const submit = async (event: FormEvent) => {
@@ -141,6 +150,7 @@ function CampaignForm({
       endsAt: fromDateInput(endsAt, true),
       beneficiarySummary: summary.trim() || null,
       isPublic,
+      coverPath,
       oneoffCents,
       oneoffDefaultIndex: Math.min(oneoffDefault, oneoffCents.length - 1),
       monthlyCents,
@@ -178,7 +188,8 @@ function CampaignForm({
   };
 
   return (
-    <form onSubmit={submit}>
+    <div>
+    <form id={formId} onSubmit={submit}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label htmlFor="cTitle" className={labelClass}>
@@ -338,6 +349,9 @@ function CampaignForm({
           />
           {t("campPublic")}
         </label>
+        <div className="sm:col-span-2">
+          <CoverField value={coverPath} onChange={setCoverPath} folder={coverFolder} />
+        </div>
       </div>
       <p className="mt-2 text-[13px] text-black/55">{t("campAmountsHint")}</p>
 
@@ -360,24 +374,36 @@ function CampaignForm({
       <PreviewFrame liveHref={campaign?.is_public ? `/kampanje/${campaign.slug}` : null}>
         <CampaignPageView campaign={previewCampaign} preview />
       </PreviewFrame>
-
-      <div className="mt-4 flex gap-2">
-        <button
-          type="submit"
-          disabled={state === "busy"}
-          className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
-        >
-          {campaign ? t("evSave") : t("campCreate")}
-        </button>
-        <button
-          type="button"
-          onClick={onDone}
-          className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2"
-        >
-          {t("cancel")}
-        </button>
-      </div>
     </form>
+
+    {campaign ? (
+      <div className="mt-6 border-t-[0.5px] border-line pt-5">
+        <p className={labelClass}>{t("galleryHeading")}</p>
+        <p className="text-[13px] text-black/55">{t("galleryHint")}</p>
+        <div className="mt-3">
+          <GalleryManager items={campaign.gallery} scope={{ campaignId: campaign.id }} inline />
+        </div>
+      </div>
+    ) : null}
+
+    <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-line bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+      <button
+        type="submit"
+        form={formId}
+        disabled={state === "busy"}
+        className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
+      >
+        {campaign ? t("evSave") : t("campCreate")}
+      </button>
+      <button
+        type="button"
+        onClick={onDone}
+        className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2"
+      >
+        {t("cancel")}
+      </button>
+    </div>
+    </div>
   );
 }
 
@@ -386,7 +412,11 @@ export function CampaignsManager({
   locale,
   campaigns,
   chapters,
+  title,
+  lead,
 }: {
+  title: string;
+  lead: string;
   locale: Locale;
   campaigns: CampaignRow[];
   chapters: Option[];
@@ -397,14 +427,16 @@ export function CampaignsManager({
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
 
   return (
-    <div className="mt-5 space-y-4">
-      <button
-        type="button"
-        onClick={() => setOpen("new")}
-        className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark"
-      >
-        + {t("campNew")}
-      </button>
+    <div className="space-y-4">
+      <PageHeader
+        title={title}
+        lead={lead}
+        action={
+          <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
+            + {t("campNew")}
+          </button>
+        }
+      />
       <SidePanel
         open={open !== ""}
         title={open === "new" ? t("campNew") : (openCampaign?.title ?? "")}

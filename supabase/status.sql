@@ -52,5 +52,8 @@ select * from (values
      to_regclass('public.v_staff_members') is not null),
   ('20260913000020_supporter_logos',
      exists (select 1 from storage.buckets where id = 'supporter-logos'))
+  ,('20260914000021_covers_gallery_scope',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'gallery_items' and column_name = 'campaign_id'))
 ) as m (migration, applied)
 order by migration;

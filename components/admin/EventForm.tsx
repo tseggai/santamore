@@ -6,7 +6,10 @@ import { useState, type FormEvent } from "react";
 
 import { createCauseInline, createChapter, saveEvent } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
 import { DateTimeField } from "@/components/admin/DateTimeField";
-import { OffersPanel, type PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
+import { CoverField } from "@/components/admin/CoverField";
+import { GalleryManager, type GalleryAdminItem } from "@/components/admin/GalleryManager";
+import { OfferForm, OffersPanel, type OfferDraft, type PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
+import { savePerkChallenge } from "@/app/[locale]/admin/(protected)/izazovi/actions";
 import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import { EventPageView } from "@/components/events/EventPageView";
 import { slugify } from "@/lib/slug";
@@ -32,6 +35,7 @@ export interface EventFormValues {
   is_published: boolean;
   description: string | null;
   offers_shirts: boolean;
+  cover_path?: string | null;
 }
 
 export interface Option {
@@ -94,6 +98,7 @@ export function EventForm({
   campaigns: initialCampaigns,
   supporters = [],
   offers = [],
+  gallery = [],
   onDone,
   onCreated,
 }: {
@@ -103,6 +108,8 @@ export function EventForm({
   supporters?: Option[];
   /** Offers already on this challenge (edit mode). */
   offers?: PerkChallengeAdminRow[];
+  /** Photos of this event (edit mode). */
+  gallery?: GalleryAdminItem[];
   onDone?: () => void;
   /** After a create: the manager keeps the new event open for offers. */
   onCreated?: (id: string) => void;
@@ -135,6 +142,12 @@ export function EventForm({
   const [tiers, setTiers] = useState<TierRow[]>(tiersFromValue(event?.price_tiers));
   const [offersShirts, setOffersShirts] = useState(event?.offers_shirts ?? false);
   const [published, setPublished] = useState(event?.is_published ?? false);
+  const [coverPath, setCoverPath] = useState<string | null>(event?.cover_path ?? null);
+  const [coverFolder] = useState(() => `covers/events/${event?.id ?? `new-${crypto.randomUUID()}`}`);
+  // Offers added while the challenge is still being created; saved right after it.
+  const [pendingOffers, setPendingOffers] = useState<OfferDraft[]>([]);
+  const [offerFormOpen, setOfferFormOpen] = useState(false);
+  const [formId] = useState(() => `ev-${Math.random().toString(36).slice(2, 8)}`);
   const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "slug" | "invalid">("idle");
 
   const parsedTiers = tiers
@@ -159,6 +172,7 @@ export function EventForm({
     distances: distanceList,
     tiers: cleanTiers,
     description: description.trim() || null,
+    cover_path: coverPath,
   };
 
   const addChapter = async () => {
@@ -222,9 +236,22 @@ export function EventForm({
       isPublished: published,
       description: description.trim() || null,
       offersShirts: kind === "social" ? false : offersShirts,
+      coverPath,
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
-      setState("saved");
+      let offersFailed = false;
+      if (!event && result.id && kind === "challenge") {
+        const eventId = result.id;
+        const saved = await Promise.all(
+          pendingOffers.map((draft) => {
+            const { supporterName, ...values } = draft;
+            void supporterName;
+            return savePerkChallenge({ ...values, eventId }).then((r) => r.ok).catch(() => false);
+          }),
+        );
+        offersFailed = saved.some((ok) => !ok);
+      }
+      setState(offersFailed ? "error" : "saved");
       router.refresh();
       if (!event && result.id && kind === "challenge" && onCreated) onCreated(result.id);
       else onDone?.();
@@ -236,7 +263,8 @@ export function EventForm({
   const section = "mt-6 border-t-[0.5px] border-line pt-5";
 
   return (
-    <form onSubmit={submit}>
+    <div>
+    <form id={formId} onSubmit={submit}>
       {/* 1 — what kind of event; everything below follows from it */}
       <p className={labelClass}>{t("evKind")}</p>
       <div className="mt-2 grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label={t("evKind")}>
@@ -454,19 +482,9 @@ export function EventForm({
         ) : null}
       </div>
 
-      {kind === "challenge" ? (
-        <div className={section}>
-          <p className={labelClass}>{t("evOffersHeading")}</p>
-          <p className="text-[13px] text-black/55">{t("evOffersHint")}</p>
-          <div className="mt-3">
-            {event?.id ? (
-              <OffersPanel eventId={event.id} eventName={event.name} challenges={offers} supporters={supporters} />
-            ) : (
-              <p className="rounded-lg bg-paper px-4 py-3 text-[14px] text-black/65">{t("evOffersAfterSave")}</p>
-            )}
-          </div>
-        </div>
-      ) : null}
+      <div className={section}>
+        <CoverField value={coverPath} onChange={setCoverPath} folder={coverFolder} />
+      </div>
 
       <label className={`${section} flex items-center gap-2 text-[14.5px]`}>
         <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="h-4 w-4 accent-red" />
@@ -481,17 +499,73 @@ export function EventForm({
       <PreviewFrame liveHref={event?.is_published ? `/dogadjaji/${event.slug}` : null}>
         <EventPageView event={previewEvent} preview />
       </PreviewFrame>
-
-      <div className="mt-4 flex gap-2">
-        <button type="submit" disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
-          {event ? t("evSave") : t("evCreate")}
-        </button>
-        {onDone ? (
-          <button type="button" onClick={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
-            {t("cancel")}
-          </button>
-        ) : null}
-      </div>
     </form>
+
+    {/* Sections with their own forms live beside the main form, never inside it. */}
+    {kind === "challenge" ? (
+      <div className={section}>
+        <p className={labelClass}>{t("evOffersHeading")}</p>
+        <p className="text-[13px] text-black/55">{t("evOffersHint")}</p>
+        <div className="mt-3">
+          {event?.id ? (
+            <OffersPanel eventId={event.id} eventName={event.name} challenges={offers} supporters={supporters} />
+          ) : (
+            <div className="space-y-2">
+              {pendingOffers.length > 0 ? (
+                <ul className="space-y-1.5">
+                  {pendingOffers.map((draft, index) => (
+                    <li key={`${draft.slug}-${index}`} className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-paper px-3.5 py-2.5 text-[14px]">
+                      <span className="font-semibold">{draft.title}</span>
+                      <span className="text-black/60">{draft.supporterName} · {draft.rewardLabel}</span>
+                      <span className="rounded-full bg-mist px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-black/60">{t("evOfferPending")}</span>
+                      <button type="button" onClick={() => setPendingOffers((list) => list.filter((_, i) => i !== index))} className="ml-auto text-[13px] font-semibold text-red-dark underline underline-offset-2">
+                        {t("evTierRemove")}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {offerFormOpen ? (
+                <OfferForm
+                  eventId=""
+                  eventName={name}
+                  challenge={null}
+                  supporters={supporters}
+                  onDone={() => setOfferFormOpen(false)}
+                  onQueue={(draft) => setPendingOffers((list) => [...list, draft])}
+                />
+              ) : (
+                <button type="button" onClick={() => setOfferFormOpen(true)} className="rounded-lg bg-paper px-3.5 py-2 text-[14px] font-semibold hover:bg-mist-2">
+                  + {t("offerNew")}
+                </button>
+              )}
+              <p className="text-[13px] text-black/55">{t("evOffersQueuedHint")}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    ) : null}
+
+    {event?.id ? (
+      <div className={section}>
+        <p className={labelClass}>{t("galleryHeading")}</p>
+        <p className="text-[13px] text-black/55">{t("galleryHint")}</p>
+        <div className="mt-3">
+          <GalleryManager items={gallery} scope={{ eventId: event.id }} inline />
+        </div>
+      </div>
+    ) : null}
+
+    <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-line bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+      <button type="submit" form={formId} disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
+        {event ? t("evSave") : t("evCreate")}
+      </button>
+      {onDone ? (
+        <button type="button" onClick={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
+          {t("cancel")}
+        </button>
+      ) : null}
+    </div>
+    </div>
   );
 }
