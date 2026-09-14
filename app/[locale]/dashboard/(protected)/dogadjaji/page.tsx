@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { GivingSection } from "@/components/dashboard/GivingSection";
-import { RsvpButtons } from "@/components/dashboard/RsvpButtons";
+import { RsvpSelect } from "@/components/dashboard/RsvpSelect";
 import { DonateButton } from "@/components/donate/DonateButton";
 import { ExternalIcon } from "@/components/Icons";
 import { formatCents } from "@/lib/money";
@@ -153,22 +153,27 @@ export default async function ConsoleEventsPage({
           </Link>
         </div>
         {live ? (
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            {!reg ? <RsvpButtons eventId={event.id} status={rsvp} /> : null}
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t-[0.5px] border-line pt-3">
+            {!reg ? <RsvpSelect eventId={event.id} status={rsvp} /> : null}
             {!reg && regOpen ? (
-              <Link href={`/dogadjaji/${event.slug}/prijava`} className={ghost}>
-                {t("evRegister")}
+              <Link href={`/dogadjaji/${event.slug}`} className={ghost}>
+                {event.kind === "challenge" ? t("evJoin") : t("evRegister")}
               </Link>
             ) : null}
-            {page ? (
-              <Link href={`/dashboard/stranice?stranica=${page.slug}`} className={ghost}>
-                {page.status === "active" ? t("editPage") : t("finishPage")}
-              </Link>
-            ) : (
-              <Link href={`/dashboard/prikupljaj?event=${event.slug}`} className={ghost}>
-                {t("evStartPage")}
-              </Link>
-            )}
+            <span className="ml-auto flex flex-wrap items-center gap-2 text-[14px]">
+              {page ? (
+                <Link href={`/dashboard/stranice?stranica=${page.slug}`} className={ghost}>
+                  {page.status === "active" ? t("editPage") : t("finishPage")}
+                </Link>
+              ) : (
+                <>
+                  <span className="text-black/60">{t("evFundraisePrompt")}</span>
+                  <Link href={`/dashboard/prikupljaj?event=${event.slug}`} className="rounded-lg bg-ink px-3.5 py-2 text-[14px] font-bold text-paper transition-opacity hover:opacity-90">
+                    {t("evStartFundraising")}
+                  </Link>
+                </>
+              )}
+            </span>
           </div>
         ) : null}
       </li>

@@ -191,7 +191,14 @@
     "teamAbout": "О команде",
     "teamMembersHint": "Страница каждого участника идёт в общий итог команды.",
     "startPageCta": "Открыть страницу",
-    "pickEvent": "Событие"
+    "pickEvent": "Событие",
+    "fundraisersTitle": "Сборщики",
+    "startFundraisingCta": "Начать сбор",
+    "searchName": "Поиск по имени",
+    "viewLabel": "Вид",
+    "viewGrid": "Сетка",
+    "viewList": "Список",
+    "noMatch": "Никого с таким именем."
   },
   "ledger": {
     "eyebrow": "Публичный реестр · обновляется автоматически",
@@ -395,7 +402,11 @@
     "fundraiseStep3Point1": "Делитесь со своей страницы одним касанием.",
     "fundraiseStep3Point2": "Для челленджей подключите Strava — активность засчитывается автоматически.",
     "fundraiseStep3Point3": "Попросите у команды футболку, фото, историю — всё идёт на страницу.",
-    "newPage": "Новая страница"
+    "newPage": "Новая страница",
+    "evFundraisePrompt": "Собирать на это событие?",
+    "evStartFundraising": "Начать сбор",
+    "rsvpUndecided": "Пока не решено",
+    "evJoin": "Принять вызов"
   },
   "email": {
     "instructions": {
