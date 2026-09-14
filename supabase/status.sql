@@ -64,5 +64,7 @@ select * from (values
   ,('20260914000024_pages_by_cause',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'fundraisers' and column_name = 'campaign_id'))
+  ,('20260914000025_harden_demo_purge',
+     coalesce(obj_description('public.purge_demo_data()'::regprocedure, 'pg_proc'), '') like '0025:%')
 ) as m (migration, applied)
 order by migration;

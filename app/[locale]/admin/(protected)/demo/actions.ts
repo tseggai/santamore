@@ -30,6 +30,8 @@ export interface DemoResult {
   error?: "invalid" | "forbidden" | "no_event" | "server";
   created?: { users: number; teams: number; fundraisers: number; donations: number };
   purged?: { users: number };
+  /** The database's own words when the purge refuses or fails (dev tool; shown as-is). */
+  message?: string;
   /** refreshDemoPhotos: rows given a new avatar. */
   refreshed?: number;
 }
@@ -276,8 +278,8 @@ export async function purgeDemoData(): Promise<DemoResult> {
     const supabase = await createClient();
     const { data: userIds, error } = await supabase.rpc("purge_demo_data");
     if (error) {
-      console.error("[admin] demo purge failed:", error.code);
-      return { ok: false, error: "server" };
+      console.error("[admin] demo purge failed:", error.code, error.message);
+      return { ok: false, error: "server", message: `${error.code}: ${error.message}` };
     }
 
     const service = createServiceClient();
