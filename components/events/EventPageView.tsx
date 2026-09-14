@@ -5,7 +5,9 @@ import { useLocale, useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 import { LeaderboardList, type LeaderboardEntry } from "@/components/Leaderboard";
+import { ChallengeJoin, type ChallengeJoinState } from "@/components/events/ChallengeJoin";
 import { RegisterDialog } from "@/components/events/RegisterDialog";
+import { PerkRule, type PerkChallengeFields } from "@/components/perks/PerkRule";
 import type { GalleryImage } from "@/components/gallery/GalleryGrid";
 import { PublicGallery } from "@/components/gallery/PublicGallery";
 import { galleryImageUrl } from "@/lib/storage";
@@ -16,11 +18,16 @@ import { htmlLang, type Locale } from "@/i18n/routing";
 
 export type { EventTier };
 
-export interface EventPerk {
+export interface EventPerk extends PerkChallengeFields {
   slug: string;
   partner_name: string;
+  partner_url?: string | null;
   reward_label: string;
   title: string;
+  description?: string | null;
+  issued_today?: number;
+  starts_at?: string | null;
+  ends_at?: string | null;
 }
 
 export interface EventSponsor {
@@ -49,6 +56,8 @@ export interface EventView {
   tiers: EventTier[];
   offers_shirts?: boolean;
   going_count?: number;
+  /** For challenges: whether the visitor is signed in and has Strava connected. */
+  join?: ChallengeJoinState;
 }
 
 const primary =
@@ -74,6 +83,7 @@ export function EventPageView({
   now?: number;
 }) {
   const t = useTranslations("events");
+  const tPerks = useTranslations("perks");
   const locale = useLocale() as Locale;
   const lang = htmlLang(locale);
   const dateFormat = new Intl.DateTimeFormat(lang, { day: "numeric", month: "long", year: "numeric" });
@@ -103,6 +113,8 @@ export function EventPageView({
     registrationState === "open" ? (
       preview ? (
         <span className={primary}>{event.kind === "social" ? t("goingCta") : event.kind === "challenge" ? t("joinCta") : t("registerCta")}</span>
+      ) : event.kind === "challenge" ? (
+        <ChallengeJoin eventSlug={event.slug} eventName={event.name} state={event.join ?? { signedIn: false, stravaConnected: false }} className={primary} />
       ) : (
         <RegisterDialog
           event={{
@@ -113,7 +125,7 @@ export function EventPageView({
             tiers: event.tiers.map((tier) => ({ label: tier.label, amountCents: tier.amount_cents })),
             offersShirts: Boolean(event.offers_shirts),
           }}
-          label={event.kind === "social" ? t("goingCta") : event.kind === "challenge" ? t("joinCta") : t("registerCta")}
+          label={event.kind === "social" ? t("goingCta") : t("registerCta")}
           className={primary}
         />
       )
@@ -214,6 +226,7 @@ export function EventPageView({
       {event.kind === "challenge" ? (
         <section className="mt-10">
           <h2 className="type-display text-2xl">{t("howHeading")}</h2>
+          <p className="mt-2 text-[14.5px] text-black/65">{tPerks("noPageNeeded")}</p>
           <ol className="mt-4 grid gap-3 sm:grid-cols-3">
             {(["howStep1", "howStep2", "howStep3"] as const).map((key, index) => (
               <li key={key} className="rounded-lg bg-mist px-4 py-4">
@@ -222,21 +235,38 @@ export function EventPageView({
               </li>
             ))}
           </ol>
+          <p className="mt-3 text-[13px] text-black/50">{tPerks("poweredBy")}</p>
           {event.perks && event.perks.length > 0 ? (
             <>
               <h3 className="mt-8 text-[17px] font-bold">{t("rewardsHeading")}</h3>
-              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-                {event.perks.map((perk) => (
-                  <li key={perk.slug} className="rounded-lg bg-mist px-4 py-4">
-                    <p className="text-[16px] font-bold">{perk.reward_label}</p>
-                    <p className="mt-0.5 text-[14px] text-black/60">{perk.partner_name}</p>
-                    {preview ? null : (
-                      <Link href={`/izazovi/${perk.slug}`} className="mt-2 inline-block text-[14px] font-semibold text-sea underline underline-offset-2 hover:text-sea-2">
-                        {t("rewardRules")} →
-                      </Link>
-                    )}
-                  </li>
-                ))}
+              <ul className="mt-3 space-y-2">
+                {event.perks.map((perk) => {
+                  const left = perk.daily_cap !== null && perk.issued_today !== undefined ? Math.max(0, perk.daily_cap - perk.issued_today) : null;
+                  return (
+                    <li key={perk.slug} className="rounded-lg bg-mist px-5 py-4">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-black/60">
+                        {perk.partner_url && !preview ? (
+                          <a href={perk.partner_url} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-sea">{perk.partner_name} ↗</a>
+                        ) : (
+                          perk.partner_name
+                        )}
+                      </p>
+                      <p className="type-display mt-1 text-2xl">{perk.reward_label}</p>
+                      <p className="mt-2 text-[15px] leading-relaxed text-black/80">
+                        <PerkRule challenge={perk} />
+                      </p>
+                      <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13.5px]">
+                        {left !== null ? <span className="font-mono tabular-nums text-sea">{tPerks("leftToday", { count: left })}</span> : null}
+                        {perk.starts_at || perk.ends_at ? (
+                          <span className="text-black/60">{fmt(perk.starts_at ?? null)} — {fmt(perk.ends_at ?? null)}</span>
+                        ) : null}
+                        {preview ? null : (
+                          <Link href={`/izazovi/${perk.slug}`} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">{tPerks("share")}</Link>
+                        )}
+                      </p>
+                    </li>
+                  );
+                })}
               </ul>
             </>
           ) : null}

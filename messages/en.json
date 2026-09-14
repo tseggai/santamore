@@ -1106,10 +1106,14 @@
     "free": "Free",
     "shirtsNote": "Event shirts are handed out at the start — you pick the size when you register.",
     "howHeading": "How it works",
-    "howStep1": "Register here and connect Strava from your page.",
+    "howStep1": "Sign in and connect Strava — no fundraising page needed.",
     "howStep2": "Move during the period: every qualifying activity is checked automatically.",
     "howStep3": "Hit the rule and a reward code appears on your page — show it at the partner.",
-    "rewardRules": "See the rules"
+    "rewardRules": "See the rules",
+    "joinedNote": "You're in — Strava is connected.",
+    "joinProgress": "See your progress",
+    "joinSignInTitle": "Sign in to join",
+    "joinSignInSub": "One email. Then connect Strava once, and every qualifying activity counts."
   },
   "gallery": {
     "eyebrow": "Gallery",
