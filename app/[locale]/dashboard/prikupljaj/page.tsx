@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
@@ -97,28 +97,10 @@ export default async function FundraiseEntryPage({
     );
   }
 
+  // Already raising for this cause: the console says so, over the list,
+  // and its button opens the page in the slide-over.
   const existing = pages.find((page) => page.campaign_id === cause.id);
-  if (existing) {
-    return shell(
-      <>
-        <p className="type-eyebrow mt-4 text-sea/80">{cause.title}</p>
-        <h1 className="type-display mt-2 text-3xl">{t("fundraiseHave")}</h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-black/65">
-          {t("fundraiseHaveSub", { title: existing.title, status: existing.status === "active" ? t("statusActiveShort") : t("statusDraftShort") })}
-        </p>
-        <div className="mt-6 flex flex-wrap gap-2">
-          <Link href={`/dashboard/stranice/${existing.slug}`} className="inline-flex h-12 items-center rounded-lg bg-red px-7 text-[16px] font-bold text-paper hover:bg-red-dark">
-            {existing.status === "active" ? t("editPage") : t("finishPage")}
-          </Link>
-          {existing.status === "active" ? (
-            <Link href={`/f/${existing.slug}`} className="inline-flex h-12 items-center rounded-lg bg-mist px-6 text-[15.5px] font-semibold hover:bg-mist-2">
-              {t("viewPublic")}
-            </Link>
-          ) : null}
-        </div>
-      </>,
-    );
-  }
+  if (existing) redirect(`/${locale}/dashboard/stranice?have=${encodeURIComponent(existing.slug)}`);
 
   const end = cause.ends_at ? new Date(cause.ends_at).getTime() : 0;
   if (end && end < Date.now()) {

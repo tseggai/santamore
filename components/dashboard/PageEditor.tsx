@@ -98,6 +98,13 @@ export function PageEditor({
   // Non-empty text that doesn't parse must never silently wipe the goal.
   const goalInvalid = goalText.trim() !== "" && goalCents === null;
   const photoUrl = fundraiserPhotoUrl(photoPath);
+  // Mirrors the database gate (photo, goal, story ≥ 80 chars) so the notice
+  // names only what is actually missing.
+  const missing = [
+    ...(photoPath ? [] : [t("needPhoto")]),
+    ...(goalCents && goalCents > 0 ? [] : [t("needGoal")]),
+    ...(story.trim().length >= 80 ? [] : [t("needStory")]),
+  ];
   const selectedTeam = teams.find((team) => team.id === teamId) ?? null;
   const canEditTeam = selectedTeam !== null && captains.includes(selectedTeam.id);
   const money = (cents: Cents) => formatCents(cents, locale, { trimWholeCents: true });
@@ -290,7 +297,7 @@ export function PageEditor({
       ) : null}
       {notice === "incomplete" ? (
         <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">
-          {t("publishBlocked")}
+          {missing.length > 0 ? t("publishNeeds", { items: missing.join(", ") }) : t("publishBlocked")}
         </p>
       ) : null}
       {notice === "goal" ? (
@@ -392,6 +399,9 @@ export function PageEditor({
                 ))}
                 <option value={NEW_TEAM}>{t("newTeamOption")}</option>
               </select>
+              {teams.length === 0 && teamPanel === "" ? (
+                <span className="basis-full text-[13px] text-black/50">{t("noTeamsForCause")}</span>
+              ) : null}
               {canEditTeam && teamPanel === "" ? (
                 <button
                   type="button"
@@ -470,7 +480,7 @@ export function PageEditor({
             locale={locale}
             surface="paper"
           />
-          <div className="absolute right-3 top-3">
+          <div className="absolute right-3 top-3 z-10">
             <Editable
               label={t("goalEdit")}
               editing={editing === "goal"}

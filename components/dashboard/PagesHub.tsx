@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { fetchPageEditor, type PageEditorData } from "@/app/[locale]/dashboard/(protected)/actions";
 import { Avatar } from "@/components/Avatar";
@@ -48,6 +48,7 @@ export function PagesHub({
   choices,
   defaultName,
   initialOpen,
+  havePage = null,
   openCreate,
   defaultEventSlug,
   joinTeamId = null,
@@ -61,6 +62,8 @@ export function PagesHub({
   defaultName: string;
   /** Page slug to open on load (deep link). */
   initialOpen?: string;
+  /** "Raise money for this cause" when a page already exists: say so over the list. */
+  havePage?: HubPage | null;
   openCreate?: boolean;
   defaultEventSlug?: string | null;
   /** "Join this team": the new page opens in the full editor with the team preselected. */
@@ -75,6 +78,14 @@ export function PagesHub({
   const router = useRouter();
   const [open, setOpen] = useState<"" | "new" | string>(openCreate ? "new" : (initialOpen ?? ""));
   const [editor, setEditor] = useState<PageEditorData | null>(null);
+  const [have, setHave] = useState<HubPage | null>(havePage);
+  const haveRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = haveRef.current;
+    if (!dialog) return;
+    if (have && !dialog.open) dialog.showModal();
+    if (!have && dialog.open) dialog.close();
+  }, [have]);
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
 
   const load = useCallback(async (slug: string) => {
@@ -96,13 +107,51 @@ export function PagesHub({
         title={title}
         lead={lead}
         action={
-          choices.length > 0 ? (
-            <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
-              + {t("newPage")}
-            </button>
-          ) : null
+          <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
+            + {t("newPage")}
+          </button>
         }
       />
+
+      <dialog
+        ref={haveRef}
+        aria-labelledby="have-title"
+        onClose={() => setHave(null)}
+        onCancel={(event) => {
+          event.preventDefault();
+          setHave(null);
+        }}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) setHave(null);
+        }}
+        className="m-auto w-[calc(100%-32px)] max-w-md rounded-lg bg-paper p-0 backdrop:bg-ink/55"
+      >
+        {have ? (
+          <div className="p-6">
+            <p className="type-eyebrow text-sea/80">{have.causeName}</p>
+            <h2 id="have-title" className="type-display mt-2 text-2xl">{t("fundraiseHave")}</h2>
+            <p className="mt-3 text-[15px] leading-relaxed text-black/65">
+              {t("fundraiseHaveSub", { title: have.title, status: have.status === "active" ? t("statusActiveShort") : t("statusDraftShort") })}
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const slug = have.slug;
+                  setHave(null);
+                  setOpen(slug);
+                }}
+                className="inline-flex h-11 items-center rounded-lg bg-red px-6 text-[15.5px] font-bold text-paper transition-colors hover:bg-red-dark"
+              >
+                {have.status === "active" ? t("haveEditCta") : t("haveFinishCta")}
+              </button>
+              <button type="button" onClick={() => setHave(null)} className="inline-flex h-11 items-center rounded-lg bg-mist px-5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
+                {t("haveLater")}
+              </button>
+            </div>
+          </div>
+        ) : null}
+      </dialog>
 
       <SidePanel open={open !== ""} title={panelTitle} onClose={() => setOpen("")} wide>
         {open === "new" ? (
@@ -146,7 +195,7 @@ export function PagesHub({
               fundraiser={editor.fundraiser}
               teams={editor.teams}
               captainOf={editor.captainOf}
-              presetTeamId={null}
+              presetTeamId={joinTeamId}
               raisedCents={editor.raisedCents}
               donorCount={editor.donorCount}
             />
@@ -192,13 +241,9 @@ export function PagesHub({
           {pages.length === 0 ? (
             <div className="rounded-lg bg-mist px-5 py-6">
               <p className="text-[15px] leading-relaxed text-black/70">{t("hubEmptySub")}</p>
-              {choices.length > 0 ? (
-                <button type="button" onClick={() => setOpen("new")} className="mt-4 rounded-lg bg-red px-5 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
-                  + {t("newPage")}
-                </button>
-              ) : (
-                <p className="mt-3 text-[14px] text-black/55">{t("createNoEvents")}</p>
-              )}
+              <button type="button" onClick={() => setOpen("new")} className="mt-4 rounded-lg bg-red px-5 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
+                + {t("newPage")}
+              </button>
             </div>
           ) : (
             <ul className="overflow-hidden rounded-lg bg-mist">

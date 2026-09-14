@@ -61,9 +61,9 @@ export default async function PagesHubPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ event?: string; cause?: string; team?: string; stranica?: string }>;
+  searchParams: Promise<{ event?: string; cause?: string; team?: string; stranica?: string; have?: string }>;
 }) {
-  const [{ locale }, { event: eventParam, cause: causeParam, team: teamParam, stranica }] = await Promise.all([
+  const [{ locale }, { event: eventParam, cause: causeParam, team: teamParam, stranica, have }] = await Promise.all([
     params,
     searchParams,
   ]);
@@ -109,7 +109,7 @@ export default async function PagesHubPage({
     if (team) {
       const existing = pages.find((page) => page.campaign_id === team.campaign_id);
       if (existing) {
-        redirect(`/${locale}/dashboard/stranice/${existing.slug}?team=${teamParam}`);
+        redirect(`/${locale}/dashboard/stranice?stranica=${existing.slug}&team=${teamParam}`);
       }
       teamEventSlug = causes.find((cause) => cause.id === team.campaign_id)?.slug ?? null;
     }
@@ -149,15 +149,16 @@ export default async function PagesHubPage({
   });
   const haveCause = new Set(pages.map((page) => page.campaign_id));
   const openCauses = causes.filter((cause) => !cause.ends_at || new Date(cause.ends_at).getTime() >= now);
-  const choices = openCauses
-    .filter((cause) => !haveCause.has(cause.id))
-    .map(
-      (cause): EventChoice => ({
-        slug: cause.slug,
-        name: cause.title,
-        dateLabel: cause.ends_at ? dateFormat.format(new Date(cause.ends_at)) : "",
-      }),
-    );
+  // Every open cause is offered; the ones this runner already raises for
+  // are shown but cannot be picked twice.
+  const choices = openCauses.map(
+    (cause): EventChoice => ({
+      slug: cause.slug,
+      name: cause.title,
+      dateLabel: cause.ends_at ? dateFormat.format(new Date(cause.ends_at)) : "",
+      taken: haveCause.has(cause.id),
+    }),
+  );
   const causeById = new Map(causes.map((cause) => [cause.id, cause]));
 
   const myTeams: MyTeam[] = ((teamRows ?? []) as TeamRow[])
@@ -211,7 +212,8 @@ export default async function PagesHubPage({
         choices={choices}
         defaultName={profile?.full_name ?? ""}
         initialOpen={stranica}
-        openCreate={choices.some((choice) => choice.slug === (teamEventSlug ?? wantedCause))}
+        havePage={have ? (hubPages.find((page) => page.slug === have) ?? null) : null}
+        openCreate={choices.some((choice) => choice.slug === (teamEventSlug ?? wantedCause) && !choice.taken)}
         defaultEventSlug={teamEventSlug ?? wantedCause}
         joinTeamId={teamParam && UUID.test(teamParam) ? teamParam : null}
       />
