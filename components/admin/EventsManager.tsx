@@ -6,7 +6,9 @@ import { useState } from "react";
 
 import { setEventPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
 import { EventForm, type EventFormValues, type Option } from "@/components/admin/EventForm";
+import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
+import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
 import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
 import { StravaWebhookPanel } from "@/components/admin/StravaWebhookPanel";
 import type { WebhookStatus } from "@/app/[locale]/admin/(protected)/izazovi/actions";
@@ -18,6 +20,7 @@ export interface EventListRow extends EventFormValues {
   pages: number;
   going: number;
   offers: PerkChallengeAdminRow[];
+  gallery: GalleryAdminItem[];
 }
 
 /**
@@ -32,7 +35,11 @@ export function EventsManager({
   supporters,
   webhook,
   dateLabels,
+  title,
+  lead,
 }: {
+  title: string;
+  lead: string;
   events: EventListRow[];
   chapters: Option[];
   campaigns: Option[];
@@ -57,15 +64,17 @@ export function EventsManager({
   };
 
   return (
-    <div className="mt-5 space-y-4">
+    <div className="space-y-4">
+      <PageHeader
+        title={title}
+        lead={lead}
+        action={
+          <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
+            + {t("evNew")}
+          </button>
+        }
+      />
       <StravaWebhookPanel webhook={webhook} />
-      <button
-        type="button"
-        onClick={() => setOpen("new")}
-        className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark"
-      >
-        + {t("evNew")}
-      </button>
       <SidePanel
         open={open !== ""}
         title={open === "new" ? t("evNew") : (openEvent?.name ?? "")}
@@ -73,12 +82,13 @@ export function EventsManager({
         wide
       >
         <EventForm
-          key={open}
+          key={openEvent ? `${open}:row` : open}
           event={openEvent}
           chapters={chapters}
           campaigns={campaigns}
           supporters={supporters}
           offers={openEvent?.offers}
+          gallery={openEvent?.gallery}
           onDone={() => setOpen("")}
           onCreated={(id) => setOpen(id)}
         />

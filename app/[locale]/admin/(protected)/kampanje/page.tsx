@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { CampaignsManager, type CampaignRow } from "@/components/admin/CampaignsManager";
+import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
 import { createClient } from "@/lib/supabase/server";
 import type { Locale } from "@/i18n/routing";
 
@@ -20,7 +21,7 @@ export default async function AdminCampaignsPage({
   const t = await getTranslations("admin");
   const supabase = await createClient();
 
-  const [{ data: campaigns }, { data: chapters }, { data: events }, { data: donations }] =
+  const [{ data: campaigns }, { data: chapters }, { data: events }, { data: donations }, { data: galleryRows }] =
     await Promise.all([
       supabase.from("campaigns").select("*").order("starts_at", { ascending: false }).limit(200),
       supabase.from("chapters").select("id, name").order("name"),
@@ -31,6 +32,12 @@ export default async function AdminCampaignsPage({
         .eq("status", "approved")
         .not("campaign_id", "is", null)
         .limit(10_000),
+      supabase
+        .from("gallery_items")
+        .select("id, storage_path, caption, credit, is_published, event_id, campaign_id")
+        .not("campaign_id", "is", null)
+        .order("sort_order", { ascending: false })
+        .limit(2000),
     ]);
 
   const eventCount = new Map<string, number>();
@@ -42,19 +49,20 @@ export default async function AdminCampaignsPage({
     if (row.campaign_id) raised.set(row.campaign_id, (raised.get(row.campaign_id) ?? 0) + row.net_cents);
   }
 
-  const rows = ((campaigns ?? []) as Omit<CampaignRow, "raised_cents" | "events">[]).map(
+  const rows = ((campaigns ?? []) as Omit<CampaignRow, "raised_cents" | "events" | "gallery">[]).map(
     (campaign): CampaignRow => ({
       ...campaign,
       raised_cents: raised.get(campaign.id) ?? 0,
       events: eventCount.get(campaign.id) ?? 0,
+      gallery: ((galleryRows ?? []) as GalleryAdminItem[]).filter((item) => item.campaign_id === campaign.id),
     }),
   );
 
   return (
     <div className="py-8">
-      <h1 className="type-display text-2xl">{t("campaignsTitle")}</h1>
-      <p className="mt-1 text-[14px] text-black/60">{t("campaignsHint")}</p>
       <CampaignsManager
+        title={t("campaignsTitle")}
+        lead={t("campaignsHint")}
         locale={locale as Locale}
         campaigns={rows}
         chapters={(chapters ?? []) as { id: string; name: string }[]}

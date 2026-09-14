@@ -625,9 +625,9 @@
     "evEdit": "Uredi",
     "evCounts": "{registrations, plural, one {# prijava} few {# prijave} other {# prijava}} · {pages, plural, one {# stranica} few {# stranice} other {# stranica}} · {going} dolazi",
     "campaignsTitle": "Ciljevi",
-    "campaignsHint": "Kampanja je novčana strana: poziv na broj na koji donatori uplaćuju, predloženi iznosi na stranici za donacije, cilj i kome ide. Događaji se vežu za kampanju.",
-    "campNew": "Nova kampanja",
-    "campEmpty": "Još nema kampanja.",
+    "campaignsHint": "Cilj je novčana strana: poziv na broj na koji donatori uplaćuju, predloženi iznosi na stranici za donacije, iznos i kome ide. Događaji se vežu za cilj.",
+    "campNew": "Novi cilj",
+    "campEmpty": "Još nema ciljeva.",
     "campDescription": "Opis",
     "campBeneficiary": "Kome ide (javna rečenica)",
     "campGoal": "Cilj (€)",
@@ -639,7 +639,7 @@
     "campPublic": "Javna — prima donacije",
     "campPublicBadge": "javna",
     "campAmountsHint": "Opisi uticaja postoje za 10 €, 25 € i 50 € (messages/*.json); ostali iznosi se prikazuju bez opisa.",
-    "campCreate": "Napravi kampanju",
+    "campCreate": "Napravi cilj",
     "campRaised": "prikupljeno {amount}",
     "campEvents": "{count, plural, one {# događaj} few {# događaja} other {# događaja}}",
     "demoTitle": "Demo podaci",
@@ -861,7 +861,19 @@
     "spEditTitle": "Uredi sponzorstvo",
     "postNew": "Nova objava",
     "galleryAdd": "Dodaj fotografije",
-    "disbNew": "Nova isplata"
+    "disbNew": "Nova isplata",
+    "coverLabel": "Naslovna slika",
+    "coverNone": "Nema slike",
+    "coverChoose": "Izaberi sliku",
+    "coverReplace": "Zamijeni sliku",
+    "coverHint": "Najbolje horizontalna; smanjuje se na 2000px pri otpremanju.",
+    "galleryEmptyScoped": "Još nema fotografija.",
+    "evOfferPending": "Čuva se uz događaj",
+    "evOffersQueuedHint": "Ponude koje ovdje dodaš čuvaju se čim se događaj napravi.",
+    "galleryLooseHeading": "Fotografije bez događaja ili cilja",
+    "galleryLooseHint": "Sve ostalo stoji uz svoj događaj ili cilj. Otvori ga da urediš fotografije.",
+    "postViewLive": "Pogledaj",
+    "postSlugTaken": "Objava sa ovim slugom već postoji na ovom jeziku."
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -954,7 +966,8 @@
     "participantPhone": "Telefon (opciono)",
     "registerAnother": "Registruj još jednu osobu",
     "yourRegistrations": "Tvoje registracije",
-    "termsAccept": "Prihvatam uslove događaja"
+    "termsAccept": "Prihvatam uslove događaja",
+    "galleryHeading": "Fotografije"
   },
   "gallery": {
     "eyebrow": "Galerija",
@@ -996,7 +1009,8 @@
     "beneficiary": "Kome ide",
     "promise": "100% donacija stiže korisnicima. Naknade se pokrivaju odvojeno i prikazane su u registru.",
     "events": "Događaji koji prikupljaju za ovu kampanju",
-    "fundraisersLink": "Pogledaj prikupljače i timove koji trče za nju →"
+    "fundraisersLink": "Pogledaj prikupljače i timove koji trče za nju →",
+    "galleryHeading": "Fotografije"
   },
   "perks": {
     "title": "Izazovi partnera",

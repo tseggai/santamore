@@ -31,6 +31,7 @@ const campaignSchema = z.object({
   endsAt: isoDate.nullable(),
   beneficiarySummary: z.string().trim().max(1000).nullable(),
   isPublic: z.boolean(),
+  coverPath: z.string().trim().max(300).nullable().optional(),
   oneoffCents: amounts,
   oneoffDefaultIndex: z.number().int().min(0),
   monthlyCents: amounts,
@@ -72,6 +73,7 @@ export async function saveCampaign(input: unknown): Promise<CampaignActionResult
     ends_at: data.endsAt,
     beneficiary_summary: data.beneficiarySummary,
     is_public: data.isPublic,
+    ...(data.coverPath !== undefined ? { cover_path: data.coverPath } : {}),
     suggested_amounts: {
       oneoff: buildSet(data.oneoffCents, data.oneoffDefaultIndex, true),
       monthly: buildSet(data.monthlyCents, data.monthlyDefaultIndex, false),

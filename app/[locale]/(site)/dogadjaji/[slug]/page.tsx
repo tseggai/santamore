@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { LeaderboardEntry } from "@/components/Leaderboard";
 import { EventPageView, type EventView } from "@/components/events/EventPageView";
 import { parseDistances, parseTiers } from "@/lib/events";
+import { toGalleryImages, type PublicGalleryRow } from "@/lib/gallery";
 import {
   formatMetricValue,
   metricValue,
@@ -71,9 +72,10 @@ export default async function EventPage({
 
   // What hangs off the event: partner rewards on a challenge, sponsors.
   const extras = await createClient();
-  const [{ data: perkRows }, { data: sponsorRows }] = await Promise.all([
+  const [{ data: perkRows }, { data: sponsorRows }, { data: galleryRows }] = await Promise.all([
     extras.from("v_public_perk_challenges").select("slug, partner_name, reward_label, title").eq("event_slug", slug),
     extras.from("v_public_sponsors").select("id, name, website").eq("event_slug", slug),
+    extras.from("v_public_gallery").select("id, storage_path, caption, credit, event_slug, event_name, event_starts_at").eq("event_slug", slug).order("sort_order", { ascending: true }).limit(120),
   ]);
 
   // Challenge standings, ranked by the event's declared metric.
@@ -133,6 +135,8 @@ export default async function EventPage({
     description: event.description,
     perks: (perkRows ?? []) as EventView["perks"],
     sponsors: (sponsorRows ?? []) as EventView["sponsors"],
+    cover_path: (event as { cover_path?: string | null }).cover_path ?? null,
+    gallery: toGalleryImages((galleryRows ?? []) as PublicGalleryRow[]),
   };
 
   return (

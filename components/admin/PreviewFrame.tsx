@@ -29,12 +29,12 @@ export function PreviewFrame({
           type="button"
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
-          className="rounded-lg border-[1.5px] border-line bg-paper px-3 py-1.5 text-[13.5px] font-semibold hover:border-sea hover:text-sea"
+          className="rounded-lg bg-paper px-3 py-1.5 text-[13.5px] font-semibold transition-colors hover:bg-mist-2"
         >
           {open ? t("previewHide") : t("previewShow")}
         </button>
         {open ? (
-          <div role="group" aria-label={t("previewWidth")} className="flex overflow-hidden rounded-lg border-[1.5px] border-line">
+          <div role="group" aria-label={t("previewWidth")} className="flex overflow-hidden rounded-lg bg-paper">
             {(["phone", "desktop"] as const).map((option) => (
               <button
                 key={option}
@@ -64,7 +64,7 @@ export function PreviewFrame({
             {t("previewNote")}
           </p>
           <div
-            className="mx-auto max-h-[720px] overflow-y-auto rounded-lg border-[1.5px] border-ink bg-paper shadow-[0_12px_32px_rgba(54,67,75,0.16)]"
+            className="mx-auto max-h-[720px] overflow-y-auto rounded-lg bg-paper"
             style={{ width: width === "phone" ? "min(100%, 400px)" : "100%" }}
           >
             {children}

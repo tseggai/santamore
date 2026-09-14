@@ -3,6 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
+import { SidePanel } from "@/components/console/SidePanel";
+
 import { FundraiserStatusButtons } from "@/components/admin/FundraiserModeration";
 import { RegistrationRowActions } from "@/components/admin/RegistrationRowActions";
 import { formatCents } from "@/lib/money";
@@ -180,16 +182,15 @@ export function MembersManager({
                   </div>
                   <button
                     type="button"
-                    aria-expanded={isOpen}
-                    onClick={() => setOpen(isOpen ? null : member.id)}
+                    onClick={() => setOpen(member.id)}
                     className="rounded-lg bg-paper px-3 py-1.5 text-[13.5px] font-semibold transition-colors hover:bg-mist-2"
                   >
-                    {isOpen ? t("memberClose") : t("memberOpen")}
+                    {t("memberOpen")}
                   </button>
                 </div>
 
-                {isOpen ? (
-                  <div className="mt-3 space-y-4 border-t-[0.5px] border-line pt-3">
+                <SidePanel open={isOpen} title={member.full_name?.trim() || member.email || member.id.slice(0, 8)} onClose={() => setOpen(null)}>
+                  <div className="space-y-5">
                     <section>
                       <p className="type-eyebrow text-black/60">{t("memberPagesHeading")}</p>
                       {myPages.length === 0 ? (
@@ -265,7 +266,7 @@ export function MembersManager({
                       </section>
                     ) : null}
                   </div>
-                ) : null}
+                </SidePanel>
               </li>
             );
           })}

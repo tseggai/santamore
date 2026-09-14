@@ -42,6 +42,32 @@ export interface PerkChallengeAdminRow {
 
 const SPORTS = ["Run", "TrailRun", "VirtualRun", "Walk", "Hike", "Ride", "Swim"] as const;
 
+/** An offer captured before its challenge event exists; saved once the event has an id. */
+export interface OfferDraft {
+  slug: string;
+  supporterId: string;
+  supporterName: string;
+  title: string;
+  description: string | null;
+  rewardLabel: string;
+  sportTypes: string[];
+  minDistanceM: number;
+  maxMovingTimeS: number | null;
+  minElevationM: number;
+  maxPaceSPerKm: number | null;
+  requiredDays: number;
+  windowDays: number | null;
+  partnerUrl: string | null;
+  allowManual: boolean;
+  perUserDailyCap: number;
+  dailyCap: number | null;
+  validDays: number;
+  startsAt: string | null;
+  endsAt: string | null;
+  isActive: boolean;
+  pin: string;
+}
+
 const inputClass =
   "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 const labelClass = "text-[13.5px] font-semibold";
@@ -66,12 +92,15 @@ export function OfferForm({
   challenge,
   supporters: initialSupporters,
   onDone,
+  onQueue,
 }: {
   eventId: string;
   eventName: string;
   challenge: PerkChallengeAdminRow | null;
   supporters: { id: string; name: string }[];
   onDone: () => void;
+  /** Create mode of the event form: hand the values back instead of saving. */
+  onQueue?: (draft: OfferDraft) => void;
 }) {
   const t = useTranslations("admin");
   const tPerks = useTranslations("perks");
@@ -131,12 +160,9 @@ export function OfferForm({
       setState("invalid");
       return;
     }
-    setState("busy");
-    const result = await savePerkChallenge({
-      id: challenge?.id,
+    const values = {
       slug: slug || slugify(title),
       supporterId,
-      eventId,
       title,
       description: description.trim() || null,
       rewardLabel: reward,
@@ -156,7 +182,14 @@ export function OfferForm({
       endsAt: fromDateInput(endsAt, true),
       isActive: active,
       pin,
-    }).catch(() => ({ ok: false as const, error: "server" as const }));
+    };
+    if (onQueue) {
+      onQueue({ ...values, supporterName: supporters.find((s) => s.id === supporterId)?.name ?? "" });
+      onDone();
+      return;
+    }
+    setState("busy");
+    const result = await savePerkChallenge({ id: challenge?.id, eventId, ...values }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       router.refresh();
       onDone();
@@ -171,7 +204,7 @@ export function OfferForm({
     );
 
   return (
-    <form onSubmit={submit} className="rounded-lg bg-mist p-4 sm:p-5">
+    <form onSubmit={submit} className="rounded-lg bg-paper p-4 sm:p-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="pkSupporter" className={labelClass}>{t("perkSupporter")}</label>

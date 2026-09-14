@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { EventsManager, type EventListRow } from "@/components/admin/EventsManager";
+import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
 import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
 import { localToday } from "@/lib/strava/sync";
 import { createClient } from "@/lib/supabase/server";
@@ -51,6 +52,7 @@ export default async function AdminEventsPage({
     { data: perks },
     { data: awards },
     webhook,
+    { data: galleryRows },
   ] =
     await Promise.all([
       supabase.from("events").select("*").order("starts_at", { ascending: false }).limit(200),
@@ -63,6 +65,7 @@ export default async function AdminEventsPage({
       supabase.from("perk_challenges").select("*").order("created_at", { ascending: false }),
       supabase.from("perk_awards").select("challenge_id, status, awarded_on").limit(20_000),
       stravaWebhookStatus(),
+      supabase.from("gallery_items").select("id, storage_path, caption, credit, is_published, event_id").not("event_id", "is", null).order("sort_order", { ascending: false }).limit(2000),
     ]);
 
   // Offers, with their award counts, grouped by event.
@@ -111,6 +114,7 @@ export default async function AdminEventsPage({
       pages: pageCount.get(event.id) ?? 0,
       going: goingCount.get(event.id) ?? 0,
       offers: offersByEvent.get(event.id) ?? [],
+      gallery: ((galleryRows ?? []) as GalleryAdminItem[]).filter((item) => item.event_id === event.id),
     }),
   );
   const dateLabels = Object.fromEntries(
@@ -119,9 +123,9 @@ export default async function AdminEventsPage({
 
   return (
     <div className="py-8">
-      <h1 className="type-display text-2xl">{t("eventsTitle")}</h1>
-      <p className="mt-1 text-[14px] text-black/60">{t("eventsHint")}</p>
       <EventsManager
+        title={t("eventsTitle")}
+        lead={t("eventsHint")}
         events={rows}
         chapters={(chapters ?? []) as { id: string; name: string }[]}
         campaigns={((campaigns ?? []) as { id: string; title: string }[]).map((campaign) => ({

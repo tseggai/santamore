@@ -1,13 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useState, type FormEvent } from "react";
 
 import { savePost } from "@/app/[locale]/admin/(protected)/sadrzaj/actions";
-import { downscaleToJpeg } from "@/lib/images";
-import { createClient } from "@/lib/supabase/client";
-import { routing } from "@/i18n/routing";
+import { CoverField } from "@/components/admin/CoverField";
+import { PreviewFrame } from "@/components/admin/PreviewFrame";
+import { PostArticle } from "@/components/news/PostArticle";
+import { slugify } from "@/lib/slug";
+import { htmlLang, routing, type Locale } from "@/i18n/routing";
 
 export interface EditablePost {
   id: string;
@@ -20,68 +22,64 @@ export interface EditablePost {
   published_at: string | null;
 }
 
-type State = "idle" | "busy" | "done" | "error";
+type State = "idle" | "busy" | "done" | "error" | "slug";
 
 const inputClass =
   "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
+const labelClass = "text-[13.5px] font-semibold";
 
 /** Markdown post editor — one row per locale, same slug links translations. */
 export function PostEditor({ post, onSaved }: { post: EditablePost | null; onSaved?: () => void }) {
   const t = useTranslations("admin");
+  const uiLocale = useLocale() as Locale;
   const router = useRouter();
+  const [locale, setLocale] = useState<string>(post?.locale ?? routing.defaultLocale);
+  const [title, setTitle] = useState(post?.title ?? "");
+  const [slug, setSlug] = useState(post?.slug ?? "");
+  const [slugTouched, setSlugTouched] = useState(Boolean(post));
+  const [excerpt, setExcerpt] = useState(post?.excerpt ?? "");
+  const [body, setBody] = useState(post?.body_md ?? "");
+  const [coverPath, setCoverPath] = useState<string | null>(post?.cover_path ?? null);
+  const [coverFolder] = useState(() => `covers/posts/${post?.id ?? `new-${crypto.randomUUID()}`}`);
+  const [published, setPublished] = useState(Boolean(post?.published_at));
   const [state, setState] = useState<State>("idle");
-  const [coverPath, setCoverPath] = useState(post?.cover_path ?? "");
-  const [uploading, setUploading] = useState(false);
+  const [detail, setDetail] = useState<string | null>(null);
 
-  const onCover = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
-    setUploading(true);
-    try {
-      const blob = await downscaleToJpeg(file, 2000);
-      const path = `covers/${crypto.randomUUID()}.jpg`;
-      const supabase = createClient();
-      const { error } = await supabase.storage
-        .from("gallery")
-        .upload(path, blob, { contentType: "image/jpeg" });
-      if (!error) setCoverPath(path);
-    } finally {
-      setUploading(false);
-    }
-  };
+  const effectiveSlug = slug || slugify(title);
+  const dateLabel = new Intl.DateTimeFormat(htmlLang(uiLocale), { day: "numeric", month: "long", year: "numeric" }).format(
+    post?.published_at ? new Date(post.published_at) : new Date(),
+  );
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const form = new FormData(event.currentTarget);
     setState("busy");
+    setDetail(null);
     const result = await savePost({
       ...(post ? { id: post.id } : {}),
-      locale: String(form.get("locale") ?? routing.defaultLocale),
-      slug: String(form.get("slug") ?? ""),
-      title: String(form.get("title") ?? ""),
-      excerpt: String(form.get("excerpt") ?? ""),
-      bodyMd: String(form.get("body") ?? ""),
-      coverPath,
-      published: form.get("published") === "on",
-    }).catch(() => ({ ok: false }));
-    setState(result.ok ? "done" : "error");
+      locale,
+      slug: effectiveSlug,
+      title,
+      excerpt,
+      bodyMd: body,
+      coverPath: coverPath ?? "",
+      published,
+    }).catch(() => ({ ok: false, detail: "network" }));
     if (result.ok) {
+      setState("done");
       router.refresh();
       onSaved?.();
+    } else {
+      setState(result.detail === "slug" ? "slug" : "error");
+      setDetail(result.detail ?? null);
     }
   };
 
   return (
-    <form onSubmit={submit} className="grid gap-3">
-      <div className="grid gap-3 sm:grid-cols-3">
-        <label className="text-[14px] font-semibold">
+    <form onSubmit={submit} className="grid gap-4">
+      <div className="grid gap-4 sm:grid-cols-3">
+        <label className={labelClass}>
           {t("postLocale")}
-          <select
-            name="locale"
-            defaultValue={post?.locale ?? routing.defaultLocale}
-            className={inputClass}
-          >
+          <select value={locale} onChange={(e) => setLocale(e.target.value)} className={inputClass}>
             {routing.locales.map((code) => (
               <option key={code} value={code}>
                 {code}
@@ -89,92 +87,73 @@ export function PostEditor({ post, onSaved }: { post: EditablePost | null; onSav
             ))}
           </select>
         </label>
-        <label className="text-[14px] font-semibold sm:col-span-2">
+        <label className={`${labelClass} sm:col-span-2`}>
           {t("postSlug")}
           <input
-            name="slug"
+            value={slugTouched ? slug : effectiveSlug}
+            onChange={(e) => {
+              setSlugTouched(true);
+              setSlug(e.target.value);
+            }}
             required
-            defaultValue={post?.slug ?? ""}
             maxLength={120}
             className={`${inputClass} font-mono`}
           />
         </label>
       </div>
-      <label className="text-[14px] font-semibold">
+      <label className={labelClass}>
         {t("postTitle")}
-        <input
-          name="title"
-          required
-          minLength={3}
-          maxLength={200}
-          defaultValue={post?.title ?? ""}
-          className={inputClass}
-        />
+        <input value={title} onChange={(e) => setTitle(e.target.value)} required minLength={3} maxLength={200} className={inputClass} />
       </label>
-      <label className="text-[14px] font-semibold">
+      <label className={labelClass}>
         {t("postExcerpt")}
-        <textarea
-          name="excerpt"
-          rows={2}
-          maxLength={500}
-          defaultValue={post?.excerpt ?? ""}
-          className={inputClass}
-        />
+        <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} maxLength={500} className={inputClass} />
       </label>
-      <label className="text-[14px] font-semibold">
+      <label className={labelClass}>
         {t("postBody")}
         <textarea
-          name="body"
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
           required
           rows={14}
           maxLength={50000}
-          defaultValue={post?.body_md ?? ""}
           className={`${inputClass} font-mono text-[14px]`}
         />
       </label>
 
-      <div>
-        <span className="text-[14px] font-semibold">{t("postCover")}</span>
-        <label className="mt-1 block">
-          <span className="sr-only">{t("postCover")}</span>
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={onCover}
-            disabled={uploading}
-            className="text-[14.5px] file:mr-3 file:rounded-lg file:border-0 file:bg-sea file:px-4 file:py-2 file:font-semibold file:text-paper"
-          />
-        </label>
-        {coverPath ? (
-          <p className="mt-1 font-mono text-[13px] text-sea">{coverPath}</p>
-        ) : null}
-      </div>
+      <CoverField value={coverPath} onChange={setCoverPath} folder={coverFolder} />
 
       <label className="flex items-center gap-2 text-[14.5px] font-semibold">
-        <input
-          type="checkbox"
-          name="published"
-          defaultChecked={post?.published_at !== null && post !== null}
-          className="h-4 w-4 accent-sea"
-        />
+        <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="h-4 w-4 accent-red" />
         {t("postPublished")}
       </label>
 
-      <button
-        type="submit"
-        disabled={state === "busy" || uploading}
-        className="rounded-lg bg-sea px-5 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-50"
-      >
-        {t("postSave")}
-      </button>
-      {state === "done" ? (
-        <p className="text-[14px] font-semibold text-sea">{t("postSaved")}</p>
-      ) : null}
       {state === "error" ? (
         <p role="alert" className="text-[14px] font-semibold text-red-dark">
           {t("actionError")}
+          {detail ? <span className="block font-mono text-[12.5px] font-normal text-black/60">{detail}</span> : null}
         </p>
       ) : null}
+      {state === "slug" ? (
+        <p role="alert" className="text-[14px] font-semibold text-red-dark">{t("postSlugTaken")}</p>
+      ) : null}
+      {state === "done" ? <p className="text-[14px] font-semibold text-sea">{t("postSaved")}</p> : null}
+
+      <PreviewFrame liveHref={post?.published_at ? `/vijesti/${post.slug}` : null}>
+        <article className="mx-auto max-w-3xl px-5 py-10">
+          <PostArticle title={title} dateLabel={dateLabel} coverPath={coverPath} bodyMd={body} preview />
+        </article>
+      </PreviewFrame>
+
+      <div className="sticky bottom-0 -mx-5 flex gap-2 border-t-[0.5px] border-line bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+        <button
+          type="submit"
+          disabled={state === "busy"}
+          className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
+        >
+          {t("postSave")}
+        </button>
+      </div>
     </form>
   );
 }

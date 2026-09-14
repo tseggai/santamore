@@ -1,8 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 
 import { DonateButton } from "@/components/donate/DonateButton";
+import type { GalleryImage } from "@/components/gallery/GalleryGrid";
+import { PublicGallery } from "@/components/gallery/PublicGallery";
+import { galleryImageUrl } from "@/lib/storage";
 import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
 import { formatCents } from "@/lib/money";
@@ -28,6 +32,8 @@ export interface CampaignView {
   ends_at: string | null;
   chapter_name: string | null;
   events: CampaignEventItem[];
+  cover_path?: string | null;
+  gallery?: GalleryImage[];
 }
 
 /**
@@ -50,6 +56,7 @@ export function CampaignPageView({
     year: "numeric",
   });
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
+  const cover = galleryImageUrl(campaign.cover_path ?? null);
   const linkClass =
     "font-semibold text-black underline decoration-black/30 underline-offset-[3px] transition-colors hover:text-sea";
 
@@ -71,6 +78,9 @@ export function CampaignPageView({
           />
         ) : null}
       </div>
+      {cover ? (
+        <Image src={cover} alt="" width={1200} height={675} priority className="mt-5 aspect-[16/9] w-full rounded-lg bg-mist object-cover" />
+      ) : null}
       {campaign.starts_at || campaign.ends_at ? (
         <p className="mt-2 text-[14.5px] text-black/60">
           {campaign.starts_at ? dateFormat.format(new Date(campaign.starts_at)) : "…"}
@@ -167,6 +177,10 @@ export function CampaignPageView({
           {t("fundraisersLink")}
         </Link>
       </p>
+
+      {campaign.gallery && campaign.gallery.length > 0 ? (
+        <PublicGallery images={campaign.gallery} heading={t("galleryHeading")} />
+      ) : null}
     </div>
   );
 }

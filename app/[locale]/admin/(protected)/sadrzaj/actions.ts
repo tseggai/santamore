@@ -12,6 +12,8 @@ import { routing } from "@/i18n/routing";
 
 export interface ActionResult {
   ok: boolean;
+  /** Staff-facing detail when the write is refused (RLS, constraint). */
+  detail?: string;
 }
 
 const postSchema = z.object({
@@ -28,7 +30,7 @@ const postSchema = z.object({
 /** Create or update one post (per-locale row; same slug links translations). */
 export async function savePost(input: unknown): Promise<ActionResult> {
   const parsed = postSchema.safeParse(input);
-  if (!parsed.success) return { ok: false };
+  if (!parsed.success) return { ok: false, detail: "invalid" };
   const data = parsed.data;
   const slug = slugify(data.slug);
   if (!slug) return { ok: false };
@@ -41,7 +43,7 @@ export async function savePost(input: unknown): Promise<ActionResult> {
       .select("published_at")
       .eq("id", data.id)
       .maybeSingle();
-    if (!existing) return { ok: false };
+    if (!existing) return { ok: false, detail: "post not found" };
     const { error } = await supabase
       .from("posts")
       .update({
@@ -58,7 +60,7 @@ export async function savePost(input: unknown): Promise<ActionResult> {
       .eq("id", data.id)
       .select("id")
       .single();
-    if (error) return { ok: false };
+    if (error) return { ok: false, detail: error.code === "23505" ? "slug" : error.message };
   } else {
     const { error } = await supabase.from("posts").insert({
       locale: data.locale,
@@ -69,16 +71,17 @@ export async function savePost(input: unknown): Promise<ActionResult> {
       cover_path: data.coverPath || null,
       published_at: data.published ? new Date().toISOString() : null,
     });
-    if (error) return { ok: false };
+    if (error) return { ok: false, detail: error.code === "23505" ? "slug" : error.message };
   }
 
   revalidatePath("/[locale]/admin/sadrzaj", "page");
-  revalidatePath("/[locale]/vijesti", "page");
+  revalidatePath("/[locale]/vijesti", "layout");
   return { ok: true };
 }
 
 const galleryBatchSchema = z.object({
   eventId: z.string().uuid().nullable(),
+  campaignId: z.string().uuid().nullable().optional(),
   caption: z.string().trim().max(300).optional(),
   credit: z.string().trim().max(120).optional(),
   publish: z.boolean(),
@@ -103,6 +106,7 @@ export async function addGalleryItems(input: unknown): Promise<ActionResult> {
   const { error } = await supabase.from("gallery_items").insert(
     data.paths.map((path, index) => ({
       event_id: data.eventId,
+      campaign_id: data.campaignId ?? null,
       storage_path: path,
       caption: data.caption || null,
       credit: data.credit || null,
@@ -112,9 +116,17 @@ export async function addGalleryItems(input: unknown): Promise<ActionResult> {
   );
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/sadrzaj", "page");
-  revalidatePath("/[locale]/galerija", "page");
+  revalidateGallery();
   return { ok: true };
+}
+
+function revalidateGallery() {
+  revalidatePath("/[locale]/admin/sadrzaj", "page");
+  revalidatePath("/[locale]/admin/dogadjaji", "page");
+  revalidatePath("/[locale]/admin/kampanje", "page");
+  revalidatePath("/[locale]/galerija", "page");
+  revalidatePath("/[locale]/dogadjaji", "layout");
+  revalidatePath("/[locale]/kampanje", "layout");
 }
 
 const galleryToggleSchema = z.object({
@@ -135,8 +147,7 @@ export async function setGalleryPublished(input: unknown): Promise<ActionResult>
     .single();
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/sadrzaj", "page");
-  revalidatePath("/[locale]/galerija", "page");
+  revalidateGallery();
   return { ok: true };
 }
 
@@ -164,7 +175,6 @@ export async function deleteGalleryItem(input: unknown): Promise<ActionResult> {
   // Best-effort: consent withdrawal means the file itself must go too.
   await supabase.storage.from("gallery").remove([item.storage_path]);
 
-  revalidatePath("/[locale]/admin/sadrzaj", "page");
-  revalidatePath("/[locale]/galerija", "page");
+  revalidateGallery();
   return { ok: true };
 }
