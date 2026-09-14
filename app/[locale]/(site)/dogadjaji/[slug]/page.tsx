@@ -136,6 +136,8 @@ export default async function EventPage({
     perks: (perkRows ?? []) as EventView["perks"],
     sponsors: (sponsorRows ?? []) as EventView["sponsors"],
     cover_path: (event as { cover_path?: string | null }).cover_path ?? null,
+    offers_shirts: Boolean((event as { offers_shirts?: boolean }).offers_shirts),
+    going_count: Number((event as { going_count?: number }).going_count ?? 0),
     gallery: toGalleryImages((galleryRows ?? []) as PublicGalleryRow[]),
   };
 

@@ -29,6 +29,7 @@ export function RegistrationForm({
   offersShirts,
   defaultName,
   defaultEmail,
+  onDone,
 }: {
   eventSlug: string;
   kind: "race" | "challenge" | "social";
@@ -37,6 +38,8 @@ export function RegistrationForm({
   offersShirts: boolean;
   defaultName: string;
   defaultEmail: string;
+  /** Overlay mode: called after a successful registration instead of navigating. */
+  onDone?: () => void;
 }) {
   const t = useTranslations("events");
   const locale = useLocale() as Locale;
@@ -68,6 +71,10 @@ export function RegistrationForm({
       locale,
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
+      if (onDone) {
+        onDone();
+        return;
+      }
       // Back to the list of registrations, which now includes this one.
       router.push(`/${locale}/dogadjaji/${eventSlug}/prijava`);
       router.refresh();

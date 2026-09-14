@@ -58,5 +58,8 @@ select * from (values
   ,('20260914000022_staff_members_avatar',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'v_staff_members' and column_name = 'avatar_url'))
+  ,('20260914000023_ledger_cause_slug',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'v_public_ledger_in' and column_name = 'cause_slug'))
 ) as m (migration, applied)
 order by migration;

@@ -8,6 +8,19 @@ import { useState } from "react";
  * square button for header action rows; the label becomes its
  * accessible name and a short-lived badge after copying.
  */
+const shareIcon = (
+  <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
+              <path
+                d="M12 3v12m0-12L8 7m4-4 4 4M5 13v6h14v-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+);
+
 export function ShareButton({
   title,
   path,
@@ -55,16 +68,7 @@ export function ShareButton({
           title={label}
           className={className ?? "inline-flex h-11 w-11 items-center justify-center rounded-lg bg-mist text-black transition-colors hover:bg-mist-2 hover:text-sea"}
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-            <path
-              d="M12 3v12m0-12L8 7m4-4 4 4M5 13v6h14v-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          {shareIcon}
         </button>
         <span aria-live="polite" className="sr-only">
           {copied ? copiedLabel : ""}
@@ -88,6 +92,7 @@ export function ShareButton({
 
   return (
     <button type="button" onClick={share} aria-live="polite" className={className ?? buttonClass}>
+      {className ? shareIcon : null}
       {copied ? copiedLabel : label}
     </button>
   );
