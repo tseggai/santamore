@@ -4,14 +4,16 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { setEventPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
+import { setEventPublished, setEventsPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
 import { EventForm, type EventFormValues, type Option } from "@/components/admin/EventForm";
-import { PageHeader } from "@/components/console/PageHeader";
-import { SidePanel } from "@/components/console/SidePanel";
 import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
 import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
 import { StravaWebhookPanel } from "@/components/admin/StravaWebhookPanel";
+import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
+import { PageHeader } from "@/components/console/PageHeader";
+import { SidePanel } from "@/components/console/SidePanel";
 import type { WebhookStatus } from "@/app/[locale]/admin/(protected)/izazovi/actions";
+import { galleryImageUrl } from "@/lib/storage";
 import { Link } from "@/i18n/navigation";
 
 export interface EventListRow extends EventFormValues {
@@ -23,10 +25,12 @@ export interface EventListRow extends EventFormValues {
   gallery: GalleryAdminItem[];
 }
 
+const KINDS = ["race", "challenge", "social"] as const;
+
 /**
- * Event list with inline edit: one form open at a time, either "new" at
- * the top or the row being edited. Publish is a one-click toggle because
- * it is the thing staff reach for on event day.
+ * Event list: one row per event, filter by kind and status, the row opens
+ * the editor in the panel. Publish is a one-click toggle because it is
+ * the thing staff reach for on event day; bulk for the season.
  */
 export function EventsManager({
   events,
@@ -56,12 +60,77 @@ export function EventsManager({
 
   const togglePublished = async (event: EventListRow) => {
     setBusy(event.id);
-    await setEventPublished({ id: event.id, published: !event.is_published }).catch(
-      () => null,
-    );
+    await setEventPublished({ id: event.id, published: !event.is_published }).catch(() => null);
     setBusy(null);
     router.refresh();
   };
+  const bulkPublish = async (ids: string[], published: boolean, clear: () => void) => {
+    setBusy("bulk");
+    await setEventsPublished({ ids, published }).catch(() => null);
+    setBusy(null);
+    clear();
+    router.refresh();
+  };
+
+  const columns: Column<EventListRow>[] = [
+    {
+      key: "name",
+      header: t("table.colName"),
+      cell: (e) => (
+        <span className="block max-w-[260px] truncate">
+          <span className="font-semibold">{e.name}</span>
+          <span className="ml-2 font-mono text-[12.5px] text-black/45">/{e.slug}</span>
+        </span>
+      ),
+      sort: (e) => e.name,
+    },
+    {
+      key: "kind",
+      header: t("table.colKind"),
+      cell: (e) => <Chip>{t(`evKind_${e.kind}`)}</Chip>,
+      sort: (e) => e.kind,
+      filter: {
+        options: KINDS.map((kind) => ({ value: kind, label: t(`evKind_${kind}`) })),
+        match: (e, value) => e.kind === value,
+      },
+    },
+    {
+      key: "status",
+      header: t("table.colStatus"),
+      cell: (e) => (e.is_published ? <Chip tone="sea">{t("postLive")}</Chip> : <Chip>{t("postDraft")}</Chip>),
+      sort: (e) => (e.is_published ? 1 : 0),
+      filter: {
+        options: [
+          { value: "live", label: t("postLive") },
+          { value: "draft", label: t("postDraft") },
+        ],
+        match: (e, value) => (value === "live" ? e.is_published : !e.is_published),
+      },
+    },
+    {
+      key: "date",
+      header: t("table.colDate"),
+      cell: (e) => <span className="font-mono tabular-nums text-black/70">{dateLabels[e.id]}</span>,
+      sort: (e) => e.starts_at,
+    },
+    {
+      key: "venue",
+      header: t("table.colVenue"),
+      cell: (e) => <span className="block max-w-[180px] truncate text-black/60">{e.venue ?? "—"}</span>,
+      sort: (e) => e.venue,
+    },
+    {
+      key: "registrations",
+      header: t("table.colRegistrations"),
+      align: "right",
+      cell: (e) => (
+        <Link href={`/admin/prijave?event=${e.id}`} className="underline underline-offset-2 hover:text-sea">{e.registrations}</Link>
+      ),
+      sort: (e) => e.registrations,
+    },
+    { key: "pages", header: t("table.colPages"), align: "right", cell: (e) => e.pages, sort: (e) => e.pages },
+    { key: "going", header: t("table.colGoing"), align: "right", cell: (e) => e.going, sort: (e) => e.going },
+  ];
 
   return (
     <div className="space-y-4">
@@ -94,72 +163,32 @@ export function EventsManager({
         />
       </SidePanel>
 
-      {events.length === 0 ? (
-        <p className="text-[14.5px] text-black/60">{t("regNoEvents")}</p>
-      ) : (
-        <ul className="space-y-2">
-          {events.map((event) => (
-            <li
-              key={event.id}
-              className="rounded-brand border-[1.5px] border-line px-4 py-3.5"
-            >
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <div className="min-w-0 flex-1">
-                  <p className="flex flex-wrap items-center gap-2 text-[15.5px] font-bold">
-                    {event.is_published ? (
-                      <Link href={`/dogadjaji/${event.slug}`} className="hover:underline">
-                        {event.name}
-                      </Link>
-                    ) : (
-                      event.name
-                    )}
-                    <span
-                      className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
-                        event.is_published
-                          ? "bg-sea text-paper"
-                          : "border border-line text-black/60"
-                      }`}
-                    >
-                      {event.is_published ? t("postLive") : t("postDraft")}
-                    </span>
-                    <span className="rounded-full border border-line px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-black/60">
-                      {t(`evKind_${event.kind}`)}
-                    </span>
-                  </p>
-                  <p className="mt-0.5 text-[13.5px] text-black/60">
-                    <span className="font-mono tabular-nums">{dateLabels[event.id]}</span>
-                    {event.venue ? <> · {event.venue}</> : null}
-                    {" · "}
-                    <span className="font-mono">/dogadjaji/{event.slug}</span>
-                  </p>
-                  <p className="mt-0.5 text-[13.5px] text-black/60">
-                    <Link href={`/admin/prijave?event=${event.id}`} className="font-semibold text-sea underline underline-offset-2">
-                      {t("evCounts", { registrations: event.registrations, pages: event.pages, going: event.going })}
-                    </Link>
-                  </p>
-                </div>
-                <div className="flex shrink-0 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setOpen(event.id)}
-                    className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea"
-                  >
-                    {t("evEdit")}
-                  </button>
-                  <button
-                    type="button"
-                    disabled={busy === event.id}
-                    onClick={() => togglePublished(event)}
-                    className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea disabled:opacity-40"
-                  >
-                    {event.is_published ? t("galleryUnpublish") : t("galleryPublish")}
-                  </button>
-                </div>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      <DataTable
+        rows={events}
+        getId={(e) => e.id}
+        columns={columns}
+        leading={(e) => <Thumb src={galleryImageUrl(e.cover_path ?? null)} initial={e.name.charAt(0).toUpperCase()} />}
+        onOpen={(e) => setOpen(e.id)}
+        searchText={(e) => `${e.name} ${e.slug} ${e.venue ?? ""}`}
+        emptyLabel={t("regNoEvents")}
+        rowActions={(e) => (
+          <>
+            {e.is_published ? (
+              <Link href={`/dogadjaji/${e.slug}`} target="_blank" className={rowButton}>{t("table.view")}</Link>
+            ) : null}
+            <button type="button" onClick={() => setOpen(e.id)} className={rowButton}>{t("evEdit")}</button>
+            <button type="button" disabled={busy === e.id} onClick={() => togglePublished(e)} className={rowButton}>
+              {e.is_published ? t("galleryUnpublish") : t("galleryPublish")}
+            </button>
+          </>
+        )}
+        bulkActions={(ids, clear) => (
+          <>
+            <button type="button" disabled={busy === "bulk"} onClick={() => bulkPublish(ids, true, clear)} className={bulkButton}>{t("galleryPublish")}</button>
+            <button type="button" disabled={busy === "bulk"} onClick={() => bulkPublish(ids, false, clear)} className={bulkButton}>{t("galleryUnpublish")}</button>
+          </>
+        )}
+      />
     </div>
   );
 }

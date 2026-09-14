@@ -4,14 +4,16 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { saveCampaign } from "@/app/[locale]/admin/(protected)/kampanje/actions";
+import { saveCampaign, setCampaignsPublic } from "@/app/[locale]/admin/(protected)/kampanje/actions";
 import { CoverField } from "@/components/admin/CoverField";
 import type { Option } from "@/components/admin/EventForm";
 import { GalleryManager, type GalleryAdminItem } from "@/components/admin/GalleryManager";
+import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
 import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
 import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import { CampaignPageView } from "@/components/campaigns/CampaignPageView";
+import { galleryImageUrl } from "@/lib/storage";
 import { formatCents, parseEurosToCents } from "@/lib/money";
 import { slugify } from "@/lib/slug";
 import { Link } from "@/i18n/navigation";
@@ -407,7 +409,7 @@ function CampaignForm({
   );
 }
 
-/** Campaign list with inline create/edit (one form open at a time). */
+/** Cause list: one row each, filter by status and chapter, the row opens the editor. */
 export function CampaignsManager({
   locale,
   campaigns,
@@ -422,9 +424,67 @@ export function CampaignsManager({
   chapters: Option[];
 }) {
   const t = useTranslations("admin");
+  const router = useRouter();
   const [open, setOpen] = useState<"" | "new" | string>("");
+  const [busy, setBusy] = useState(false);
   const openCampaign = campaigns.find((candidate) => candidate.id === open) ?? null;
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
+  const chapterName = new Map(chapters.map((c) => [c.id, c.name]));
+
+  const setPublic = async (ids: string[], isPublic: boolean, clear?: () => void) => {
+    setBusy(true);
+    await setCampaignsPublic({ ids, isPublic }).catch(() => null);
+    setBusy(false);
+    clear?.();
+    router.refresh();
+  };
+
+  const columns: Column<CampaignRow>[] = [
+    {
+      key: "title",
+      header: t("table.colTitle"),
+      cell: (c) => <span className="block max-w-[260px] truncate font-semibold">{c.title}</span>,
+      sort: (c) => c.title,
+    },
+    {
+      key: "status",
+      header: t("table.colStatus"),
+      cell: (c) => (c.is_public ? <Chip tone="sea">{t("campPublicBadge")}</Chip> : <Chip>{t("postDraft")}</Chip>),
+      sort: (c) => (c.is_public ? 1 : 0),
+      filter: {
+        options: [
+          { value: "public", label: t("campPublicBadge") },
+          { value: "draft", label: t("postDraft") },
+        ],
+        match: (c, value) => (value === "public" ? c.is_public : !c.is_public),
+      },
+    },
+    {
+      key: "chapter",
+      header: t("table.colChapter"),
+      cell: (c) => <span className="text-black/60">{chapterName.get(c.chapter_id) ?? "—"}</span>,
+      sort: (c) => chapterName.get(c.chapter_id) ?? null,
+      filter: {
+        options: chapters.map((ch) => ({ value: ch.id, label: ch.name })),
+        match: (c, value) => c.chapter_id === value,
+      },
+    },
+    { key: "raised", header: t("table.colRaised"), align: "right", cell: (c) => money(c.raised_cents), sort: (c) => c.raised_cents },
+    { key: "goal", header: t("table.colGoal"), align: "right", cell: (c) => (c.goal_cents ? money(c.goal_cents) : "—"), sort: (c) => c.goal_cents },
+    { key: "events", header: t("table.colEvents"), align: "right", cell: (c) => c.events, sort: (c) => c.events },
+    {
+      key: "reference",
+      header: t("table.colReference"),
+      cell: (c) => <span className="font-mono text-[13px] text-black/60">{c.payment_reference}</span>,
+      sort: (c) => c.payment_reference,
+    },
+    {
+      key: "starts",
+      header: t("table.colDate"),
+      cell: (c) => <span className="font-mono tabular-nums text-black/60">{c.starts_at?.slice(0, 10) ?? "—"}</span>,
+      sort: (c) => c.starts_at,
+    },
+  ];
 
   return (
     <div className="space-y-4">
@@ -446,53 +506,32 @@ export function CampaignsManager({
         <CampaignForm key={open} campaign={openCampaign} chapters={chapters} onDone={() => setOpen("")} />
       </SidePanel>
 
-      {campaigns.length === 0 ? (
-        <p className="text-[14.5px] text-black/60">{t("campEmpty")}</p>
-      ) : (
-        <ul className="space-y-2">
-          {campaigns.map((campaign) => (
-            <li key={campaign.id} className="rounded-brand border-[1.5px] border-line px-4 py-3.5">
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                <div className="min-w-0 flex-1">
-                  <p className="flex flex-wrap items-center gap-2 text-[15.5px] font-bold">
-                    {campaign.is_public ? (
-                      <Link href={`/kampanje/${campaign.slug}`} className="hover:underline">
-                        {campaign.title}
-                      </Link>
-                    ) : (
-                      campaign.title
-                    )}
-                    <span
-                      className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
-                        campaign.is_public
-                          ? "bg-sea text-paper"
-                          : "border border-line text-black/60"
-                      }`}
-                    >
-                      {campaign.is_public ? t("campPublicBadge") : t("postDraft")}
-                    </span>
-                  </p>
-                  <p className="mt-0.5 text-[13.5px] text-black/60">
-                    <span className="font-mono">{campaign.payment_reference}</span>
-                    {" · "}
-                    {t("campRaised", { amount: money(campaign.raised_cents) })}
-                    {campaign.goal_cents ? <> / {money(campaign.goal_cents)}</> : null}
-                    {" · "}
-                    {t("campEvents", { count: campaign.events })}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setOpen(campaign.id)}
-                  className="rounded-lg border-[1.5px] border-line px-2.5 py-1 text-[13px] font-semibold hover:border-sea hover:text-sea"
-                >
-                  {t("evEdit")}
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
+      <DataTable
+        rows={campaigns}
+        getId={(c) => c.id}
+        columns={columns}
+        leading={(c) => <Thumb src={galleryImageUrl(c.cover_path ?? null)} initial={c.title.charAt(0).toUpperCase()} />}
+        onOpen={(c) => setOpen(c.id)}
+        searchText={(c) => `${c.title} ${c.slug} ${c.payment_reference}`}
+        emptyLabel={t("campEmpty")}
+        rowActions={(c) => (
+          <>
+            {c.is_public ? (
+              <Link href={`/kampanje/${c.slug}`} target="_blank" className={rowButton}>{t("table.view")}</Link>
+            ) : null}
+            <button type="button" onClick={() => setOpen(c.id)} className={rowButton}>{t("evEdit")}</button>
+            <button type="button" disabled={busy} onClick={() => setPublic([c.id], !c.is_public)} className={rowButton}>
+              {c.is_public ? t("galleryUnpublish") : t("galleryPublish")}
+            </button>
+          </>
+        )}
+        bulkActions={(ids, clear) => (
+          <>
+            <button type="button" disabled={busy} onClick={() => setPublic(ids, true, clear)} className={bulkButton}>{t("galleryPublish")}</button>
+            <button type="button" disabled={busy} onClick={() => setPublic(ids, false, clear)} className={bulkButton}>{t("galleryUnpublish")}</button>
+          </>
+        )}
+      />
     </div>
   );
 }

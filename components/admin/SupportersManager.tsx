@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState, type FormEvent } from "react";
 
-import { saveSponsorship, saveSupporter } from "@/app/[locale]/admin/(protected)/podrska/actions";
+import { saveSponsorship, saveSupporter, setSupportersActive } from "@/app/[locale]/admin/(protected)/podrska/actions";
 import type { Option } from "@/components/admin/EventForm";
 import { downscaleToJpeg } from "@/lib/images";
 import { formatCents, parseEurosToCents } from "@/lib/money";
+import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
 import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
 import { supporterLogoUrl } from "@/lib/storage";
@@ -60,10 +61,13 @@ export function SupporterForm({
   supporter,
   onDone,
   onCreated,
+  formId,
 }: {
   supporter: SupporterRow | null;
   onDone: () => void;
   onCreated?: (created: { id: string; name: string }) => void;
+  /** When set, the panel renders the Save/Cancel footer for this form id. */
+  formId?: string;
 }) {
   const t = useTranslations("admin");
   const router = useRouter();
@@ -100,6 +104,7 @@ export function SupporterForm({
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
+    if (state === "busy" || logoBusy) return;
     setState("busy");
     const result = await saveSupporter({
       id: supporter?.id,
@@ -122,7 +127,7 @@ export function SupporterForm({
   };
 
   return (
-    <form onSubmit={submit}>
+    <form id={formId} onSubmit={submit}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="suName" className={labelClass}>{t("suName")}</label>
@@ -189,14 +194,16 @@ export function SupporterForm({
       </div>
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
-      <div className="mt-4 flex gap-2">
-        <button type="submit" disabled={state === "busy" || logoBusy} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
-          {supporter ? t("evSave") : t("suCreate")}
-        </button>
-        <button type="button" onClick={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
-          {t("cancel")}
-        </button>
-      </div>
+      {formId ? null : (
+        <div className="mt-4 flex gap-2">
+          <button type="submit" disabled={state === "busy" || logoBusy} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
+            {supporter ? t("evSave") : t("suCreate")}
+          </button>
+          <button type="button" onClick={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
+            {t("cancel")}
+          </button>
+        </div>
+      )}
     </form>
   );
 }
@@ -313,6 +320,7 @@ function SponsorshipForm({
   );
 }
 
+/** Supporter list: one row each; the row opens details, deals and offers in the panel. */
 export function SupportersManager({
   locale,
   supporters,
@@ -335,10 +343,105 @@ export function SupportersManager({
   events: Option[];
 }) {
   const t = useTranslations("admin");
+  const router = useRouter();
   const [open, setOpen] = useState<"" | "new" | string>("");
-  const [dealOpen, setDealOpen] = useState<"" | `new:${string}` | string>("");
+  const [dealOpen, setDealOpen] = useState<"" | "new" | string>("");
+  const [busy, setBusy] = useState(false);
+  const supporter = supporters.find((s) => s.id === open) ?? null;
   const campaignName = new Map(campaigns.map((c) => [c.id, c.name]));
   const eventName = new Map(events.map((e) => [e.id, e.name]));
+  const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
+  const dealsOf = (id: string) => sponsorships.filter((d) => d.supporter_id === id);
+  const offersOf = (id: string) => offers.filter((o) => o.supporter_id === id);
+  const signedCents = (id: string) =>
+    dealsOf(id)
+      .filter((d) => (d.status === "signed" || d.status === "active") && !d.is_in_kind)
+      .reduce((sum, d) => sum + (d.amount_cents ?? 0), 0);
+
+  const openSupporter = (id: string, deal: "" | "new" = "") => {
+    setOpen(id);
+    setDealOpen(deal);
+  };
+  const close = () => {
+    setOpen("");
+    setDealOpen("");
+  };
+  const setActive = async (ids: string[], active: boolean, clear?: () => void) => {
+    setBusy(true);
+    await setSupportersActive({ ids, active }).catch(() => null);
+    setBusy(false);
+    clear?.();
+    router.refresh();
+  };
+
+  const columns: Column<SupporterRow>[] = [
+    {
+      key: "name",
+      header: t("table.colName"),
+      cell: (s) => <span className="block max-w-[220px] truncate font-semibold">{s.name}</span>,
+      sort: (s) => s.name,
+    },
+    {
+      key: "status",
+      header: t("table.colStatus"),
+      cell: (s) => (s.is_active ? <Chip tone="sea">{t("table.statusActive")}</Chip> : <Chip>{t("suInactive")}</Chip>),
+      sort: (s) => (s.is_active ? 1 : 0),
+      filter: {
+        options: [
+          { value: "active", label: t("table.statusActive") },
+          { value: "inactive", label: t("suInactive") },
+        ],
+        match: (s, value) => (value === "active" ? s.is_active : !s.is_active),
+      },
+    },
+    {
+      key: "deals",
+      header: t("table.colSponsorships"),
+      align: "right",
+      cell: (s) => {
+        const count = dealsOf(s.id).length;
+        const signed = signedCents(s.id);
+        return count === 0 ? "—" : `${count}${signed > 0 ? ` · ${money(signed)}` : ""}`;
+      },
+      sort: (s) => signedCents(s.id),
+      filter: {
+        options: [
+          { value: "deals", label: t("table.hasSponsorship") },
+          { value: "offers", label: t("table.hasOffer") },
+          { value: "none", label: t("table.hasNeither") },
+        ],
+        match: (s, value) =>
+          value === "deals" ? dealsOf(s.id).length > 0 : value === "offers" ? offersOf(s.id).length > 0 : dealsOf(s.id).length === 0 && offersOf(s.id).length === 0,
+      },
+    },
+    { key: "offers", header: t("table.colOffers"), align: "right", cell: (s) => offersOf(s.id).length || "—", sort: (s) => offersOf(s.id).length },
+    {
+      key: "website",
+      header: t("table.colWebsite"),
+      cell: (s) =>
+        s.website ? (
+          <a href={s.website} target="_blank" rel="noopener" className="block max-w-[180px] truncate text-black/60 underline underline-offset-2 hover:text-sea">
+            {s.website.replace(/^https?:\/\//, "")}
+          </a>
+        ) : (
+          <span className="text-black/40">—</span>
+        ),
+      sort: (s) => s.website,
+    },
+    {
+      key: "contact",
+      header: t("table.colContact"),
+      cell: (s) => (
+        <span className="block max-w-[240px] truncate text-black/60">
+          {[s.contact_name, s.contact_email, s.contact_phone].filter(Boolean).join(" · ") || "—"}
+        </span>
+      ),
+      sort: (s) => s.contact_name,
+    },
+  ];
+
+  const deals = supporter ? dealsOf(supporter.id) : [];
+  const theirOffers = supporter ? offersOf(supporter.id) : [];
 
   return (
     <div className="space-y-4">
@@ -346,85 +449,43 @@ export function SupportersManager({
         title={title}
         lead={lead}
         action={
-          <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
+          <button type="button" onClick={() => openSupporter("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
             + {t("suNew")}
           </button>
         }
       />
-      <SidePanel
-        open={open !== ""}
-        title={open === "new" ? t("suNew") : (supporters.find((s) => s.id === open)?.name ?? "")}
-        onClose={() => setOpen("")}
-      >
-        <SupporterForm key={open} supporter={supporters.find((s) => s.id === open) ?? null} onDone={() => setOpen("")} />
-      </SidePanel>
-      <SidePanel
-        open={dealOpen !== ""}
-        title={dealOpen.startsWith("new:") ? t("spNew") : t("spEditTitle")}
-        onClose={() => setDealOpen("")}
-      >
-        {dealOpen.startsWith("new:") ? (
-          <SponsorshipForm key={dealOpen} supporterId={dealOpen.slice(4)} sponsorship={null} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setDealOpen("")} />
-        ) : (
-          (() => {
-            const deal = sponsorships.find((d) => d.id === dealOpen);
-            return deal?.supporter_id ? (
-              <SponsorshipForm key={dealOpen} supporterId={deal.supporter_id} sponsorship={deal} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setDealOpen("")} />
-            ) : null;
-          })()
-        )}
-      </SidePanel>
-      {supporters.length === 0 ? (
-        <p className="text-[14.5px] text-black/60">{t("suEmpty")}</p>
-      ) : (
-        <ul className="space-y-3">
-          {supporters.map((supporter) => {
-            const deals = sponsorships.filter((d) => d.supporter_id === supporter.id);
-            const theirOffers = offers.filter((o) => o.supporter_id === supporter.id);
-            return (
-              <li key={supporter.id} className="rounded-lg bg-mist px-4 py-4">
-                <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
-                  <div className="min-w-0 flex-1">
-                    <p className="flex flex-wrap items-center gap-2 text-[16px] font-bold">
-                      {supporter.name}
-                      {!supporter.is_active ? (
-                        <span className="rounded-full bg-paper px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-black/60">{t("suInactive")}</span>
-                      ) : null}
-                      {deals.length > 0 ? (
-                        <span className="rounded-full bg-sea px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("suSponsorChip", { count: deals.length })}</span>
-                      ) : null}
-                      {theirOffers.length > 0 ? (
-                        <span className="rounded-full bg-red px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("suOfferChip", { count: theirOffers.length })}</span>
-                      ) : null}
-                    </p>
-                    <p className="mt-0.5 text-[13.5px] text-black/60">
-                      {supporter.website ? <a href={supporter.website} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-sea">{supporter.website.replace(/^https?:\/\//, "")}</a> : null}
-                      {supporter.contact_name ? <> · {supporter.contact_name}</> : null}
-                      {supporter.contact_email ? <> · {supporter.contact_email}</> : null}
-                      {supporter.contact_phone ? <> · {supporter.contact_phone}</> : null}
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 gap-1.5">
-                    <button type="button" onClick={() => setOpen(supporter.id)} className={ghost}>{t("evEdit")}</button>
-                    <button type="button" onClick={() => setDealOpen(`new:${supporter.id}`)} className={ghost}>+ {t("spNew")}</button>
-                  </div>
+
+      <SidePanel open={open !== ""} title={open === "new" ? t("suNew") : (supporter?.name ?? "")} onClose={close} wide>
+        <div>
+          <SupporterForm key={open} supporter={supporter} onDone={close} formId="supporter-form" />
+
+          {supporter ? (
+            <>
+              <div className="mt-6 border-t-[0.5px] border-line pt-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className={labelClass}>{t("suDealsHeading")}</p>
+                  {dealOpen === "" ? (
+                    <button type="button" onClick={() => setDealOpen("new")} className={ghost}>+ {t("spNew")}</button>
+                  ) : null}
                 </div>
-
-
+                {dealOpen === "new" ? (
+                  <div className="mt-3 rounded-lg bg-paper p-4">
+                    <SponsorshipForm supporterId={supporter.id} sponsorship={null} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setDealOpen("")} />
+                  </div>
+                ) : null}
+                {deals.length === 0 && dealOpen !== "new" ? (
+                  <p className="mt-2 text-[14px] text-black/60">{t("suDealsEmpty")}</p>
+                ) : null}
                 {deals.length > 0 ? (
                   <ul className="mt-3 space-y-1.5">
                     {deals.map((deal) => (
                       <li key={deal.id} className="rounded-lg bg-paper px-3.5 py-2.5 text-[14px]">
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                          <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
-                            deal.status === "active" || deal.status === "signed" ? "bg-sea text-paper" : "bg-mist text-black/60"
-                          }`}>
-                            {t(`spStatusValue.${deal.status}`)}
-                          </span>
+                          <Chip tone={deal.status === "active" || deal.status === "signed" ? "sea" : "paper"}>{t(`spStatusValue.${deal.status}`)}</Chip>
                           {deal.tier ? <span className="font-semibold">{deal.tier}</span> : null}
                           {deal.amount_cents ? (
                             <span className="font-mono tabular-nums">
-                              {formatCents(deal.amount_cents, locale, { trimWholeCents: true })}
+                              {money(deal.amount_cents)}
                               {deal.is_in_kind ? ` · ${t("spInKindShort")}` : ""}
                             </span>
                           ) : deal.is_in_kind ? <span>{t("spInKindShort")}</span> : null}
@@ -433,36 +494,78 @@ export function SupportersManager({
                             {deal.campaign_id && deal.event_id ? " · " : ""}
                             {deal.event_id ? eventName.get(deal.event_id) : null}
                           </span>
-                          <button type="button" onClick={() => setDealOpen(deal.id)} className="ml-auto text-[13px] font-semibold text-sea underline underline-offset-2">
+                          <button type="button" onClick={() => setDealOpen(dealOpen === deal.id ? "" : deal.id)} className={`ml-auto ${rowButton} bg-mist`}>
                             {t("evEdit")}
                           </button>
                         </div>
+                        {dealOpen === deal.id ? (
+                          <div className="mt-3">
+                            <SponsorshipForm supporterId={supporter.id} sponsorship={deal} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setDealOpen("")} />
+                          </div>
+                        ) : null}
                       </li>
                     ))}
                   </ul>
                 ) : null}
+              </div>
 
-                {theirOffers.length > 0 ? (
-                  <ul className="mt-2 space-y-1.5">
+              <div className="mt-6 border-t-[0.5px] border-line pt-5">
+                <p className={labelClass}>{t("suOffersHeading")}</p>
+                {theirOffers.length === 0 ? (
+                  <p className="mt-2 text-[14px] text-black/60">{t("suOffersEmpty")}</p>
+                ) : (
+                  <ul className="mt-3 space-y-1.5">
                     {theirOffers.map((offer) => (
                       <li key={offer.id} className="flex flex-wrap items-center gap-x-3 rounded-lg bg-paper px-3.5 py-2.5 text-[14px]">
                         <span className="font-semibold">{offer.reward_label}</span>
                         <span className="text-black/60">{offer.title}</span>
-                        <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${offer.is_active ? "bg-sea text-paper" : "bg-mist text-black/60"}`}>
-                          {offer.is_active ? t("perkActiveBadge") : t("postDraft")}
-                        </span>
+                        <Chip tone={offer.is_active ? "sea" : "paper"}>{offer.is_active ? t("perkActiveBadge") : t("postDraft")}</Chip>
                         <Link href="/admin/dogadjaji" className="ml-auto text-[13px] font-semibold text-sea underline underline-offset-2">
                           {t("suOfferOnEvent")}
                         </Link>
                       </li>
                     ))}
                   </ul>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
-      )}
+                )}
+              </div>
+            </>
+          ) : null}
+
+          <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-line bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+            <button type="submit" form="supporter-form" className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90">
+              {supporter ? t("evSave") : t("suCreate")}
+            </button>
+            <button type="button" onClick={close} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
+              {t("cancel")}
+            </button>
+          </div>
+        </div>
+      </SidePanel>
+
+      <DataTable
+        rows={supporters}
+        getId={(s) => s.id}
+        columns={columns}
+        leading={(s) => <Thumb src={supporterLogoUrl(s.logo_path)} initial={s.name.charAt(0).toUpperCase()} />}
+        onOpen={(s) => openSupporter(s.id)}
+        searchText={(s) => `${s.name} ${s.website ?? ""} ${s.contact_name ?? ""} ${s.contact_email ?? ""}`}
+        emptyLabel={t("suEmpty")}
+        rowActions={(s) => (
+          <>
+            <button type="button" onClick={() => openSupporter(s.id)} className={rowButton}>{t("evEdit")}</button>
+            <button type="button" onClick={() => openSupporter(s.id, "new")} className={rowButton}>+ {t("spNew")}</button>
+            <button type="button" disabled={busy} onClick={() => setActive([s.id], !s.is_active)} className={rowButton}>
+              {s.is_active ? t("table.deactivate") : t("table.activate")}
+            </button>
+          </>
+        )}
+        bulkActions={(ids, clear) => (
+          <>
+            <button type="button" disabled={busy} onClick={() => setActive(ids, true, clear)} className={bulkButton}>{t("table.activate")}</button>
+            <button type="button" disabled={busy} onClick={() => setActive(ids, false, clear)} className={bulkButton}>{t("table.deactivate")}</button>
+          </>
+        )}
+      />
     </div>
   );
 }

@@ -1,8 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
+import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
 import { SidePanel } from "@/components/console/SidePanel";
 
 import { FundraiserStatusButtons } from "@/components/admin/FundraiserModeration";
@@ -29,6 +30,7 @@ export interface MemberRow {
   awards: number;
   donations: number;
   given_cents: number;
+  avatar_url?: string | null;
 }
 
 export interface MemberPage {
@@ -65,22 +67,30 @@ export interface MemberTeam {
   event_name: string;
 }
 
-type Filter = "all" | "athletes" | "fundraisers" | "participants" | "captains" | "donors" | "staff";
-const FILTERS: Filter[] = ["all", "athletes", "fundraisers", "participants", "captains", "donors", "staff"];
+type Kind = "athletes" | "fundraisers" | "participants" | "captains" | "donors" | "staff";
+const KINDS: Kind[] = ["athletes", "fundraisers", "participants", "captains", "donors", "staff"];
 
-function matches(member: MemberRow, filter: Filter): boolean {
-  switch (filter) {
+function isKind(member: MemberRow, kind: Kind): boolean {
+  switch (kind) {
     case "athletes": return member.strava;
     case "fundraisers": return member.pages > 0;
     case "participants": return member.registrations > 0 || member.rsvps > 0;
     case "captains": return member.teams > 0;
     case "donors": return member.donations > 0;
     case "staff": return member.role !== "member";
-    default: return true;
   }
 }
 
-/** Everyone, filtered by what they do; a row opens into their pages, registrations and teams. */
+function displayName(member: MemberRow): string {
+  return member.full_name?.trim() || member.email || member.id.slice(0, 8);
+}
+
+function csvCell(value: string | number | null): string {
+  const text = value === null ? "" : String(value);
+  return /[",\n;]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+/** Everyone, one row each; the row opens their pages, registrations and teams. */
 export function MembersManager({
   locale,
   members,
@@ -95,183 +105,220 @@ export function MembersManager({
   teams: MemberTeam[];
 }) {
   const t = useTranslations("admin");
-  const [filter, setFilter] = useState<Filter>("all");
-  const [query, setQuery] = useState("");
   const [open, setOpen] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
+  const member = members.find((m) => m.id === open) ?? null;
+  const myPages = member ? pages.filter((p) => p.user_id === member.id) : [];
+  const myRegs = member ? registrations.filter((r) => r.user_id === member.id) : [];
+  const myTeams = member ? teams.filter((tm) => tm.captain_id === member.id) : [];
 
-  const counts = useMemo(
-    () => Object.fromEntries(FILTERS.map((f) => [f, members.filter((m) => matches(m, f)).length])) as Record<Filter, number>,
-    [members],
-  );
-  const visible = useMemo(() => {
-    const needle = query.trim().toLowerCase();
-    return members.filter(
-      (m) => matches(m, filter) && (!needle || `${m.full_name ?? ""} ${m.email ?? ""}`.toLowerCase().includes(needle)),
-    );
-  }, [members, filter, query]);
+  const copyEmails = async (ids: string[]) => {
+    const emails = members.filter((m) => ids.includes(m.id) && m.email).map((m) => m.email as string);
+    try {
+      await navigator.clipboard.writeText(emails.join(", "));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard blocked — nothing to do
+    }
+  };
+  const exportCsv = (ids: string[]) => {
+    const rows = members.filter((m) => ids.includes(m.id));
+    const lines = [
+      ["name", "email", "role", "joined", "pages", "raised_eur", "registrations", "teams", "strava", "donations"].join(","),
+      ...rows.map((m) =>
+        [
+          csvCell(m.full_name), csvCell(m.email), m.role, csvCell(m.joined_at?.slice(0, 10) ?? null), m.pages,
+          (m.raised_cents / 100).toFixed(2), m.registrations, m.teams, m.strava ? "yes" : "no", m.donations,
+        ].join(","),
+      ),
+    ];
+    const url = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `members-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
-  const chip = (text: string, tone: "sea" | "red" | "paper" | "ink" = "paper") => (
-    <span
-      key={text}
-      className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${
-        tone === "sea" ? "bg-sea text-paper" : tone === "red" ? "bg-red text-paper" : tone === "ink" ? "bg-ink text-paper" : "bg-paper text-black/60"
-      }`}
-    >
-      {text}
-    </span>
-  );
+  const columns: Column<MemberRow>[] = [
+    {
+      key: "name",
+      header: t("table.colName"),
+      cell: (m) => <span className="block max-w-[220px] truncate font-semibold">{displayName(m)}</span>,
+      sort: (m) => displayName(m),
+    },
+    {
+      key: "email",
+      header: t("table.colEmail"),
+      cell: (m) => <span className="block max-w-[240px] truncate text-black/60">{m.email ?? "—"}</span>,
+      sort: (m) => m.email,
+    },
+    {
+      key: "kind",
+      header: t("table.colRoles"),
+      cell: (m) => (
+        <span className="flex flex-wrap gap-1">
+          {m.role !== "member" ? <Chip tone="ink">{t(`memberRole.${m.role}`)}</Chip> : null}
+          {m.strava ? <Chip tone="sea">{t("memberFilter.athletes")}</Chip> : null}
+          {m.pages > 0 ? <Chip tone="sea">{t("memberFilter.fundraisers")}</Chip> : null}
+          {m.registrations > 0 || m.rsvps > 0 ? <Chip>{t("memberFilter.participants")}</Chip> : null}
+          {m.teams > 0 ? <Chip>{t("memberChipCaptain")}</Chip> : null}
+          {m.donations > 0 ? <Chip>{t("memberChipDonor")}</Chip> : null}
+        </span>
+      ),
+      filter: {
+        options: KINDS.map((kind) => ({ value: kind, label: t(`memberFilter.${kind}`) })),
+        match: (m, value) => isKind(m, value as Kind),
+      },
+    },
+    {
+      key: "raised",
+      header: t("table.colRaised"),
+      align: "right",
+      cell: (m) => (m.pages > 0 ? money(m.raised_cents) : "—"),
+      sort: (m) => m.raised_cents,
+    },
+    {
+      key: "given",
+      header: t("table.colGiven"),
+      align: "right",
+      cell: (m) => (m.donations > 0 ? money(m.given_cents) : "—"),
+      sort: (m) => m.given_cents,
+    },
+    {
+      key: "joined",
+      header: t("table.colJoined"),
+      cell: (m) => <span className="font-mono tabular-nums text-black/60">{m.joined_at?.slice(0, 10) ?? "—"}</span>,
+      sort: (m) => m.joined_at,
+    },
+    {
+      key: "strava",
+      header: "Strava",
+      cell: (m) =>
+        m.strava ? (
+          <span className="font-mono tabular-nums text-black/60">
+            {m.strava_last_sync ? m.strava_last_sync.slice(0, 10) : "—"} · {t("memberRuns", { count: m.activities_30d })}
+          </span>
+        ) : (
+          <span className="text-black/40">—</span>
+        ),
+      sort: (m) => m.strava_last_sync,
+      filter: {
+        options: [
+          { value: "on", label: t("table.stravaOn") },
+          { value: "off", label: t("table.stravaOff") },
+        ],
+        match: (m, value) => (value === "on" ? m.strava : !m.strava),
+      },
+    },
+  ];
 
   return (
     <div className="mt-5">
-      <div className="flex flex-wrap items-center gap-2">
-        {FILTERS.map((f) => (
-          <button
-            key={f}
-            type="button"
-            aria-pressed={filter === f}
-            onClick={() => setFilter(f)}
-            className={`rounded-lg px-3 py-1.5 text-[14px] font-semibold transition-colors ${
-              filter === f ? "bg-ink text-paper" : "bg-mist hover:bg-mist-2"
-            }`}
-          >
-            {t(`memberFilter.${f}`)} <span className="font-mono tabular-nums opacity-70">{counts[f]}</span>
-          </button>
-        ))}
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("memberSearch")}
-          aria-label={t("memberSearch")}
-          className="ml-auto w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2 text-[14.5px] outline-none focus:border-sea sm:w-64"
-        />
+      <DataTable
+        rows={members}
+        getId={(m) => m.id}
+        columns={columns}
+        leading={(m) => <Thumb src={m.avatar_url ?? null} initial={displayName(m).charAt(0).toUpperCase()} rounded />}
+        onOpen={(m) => setOpen(m.id)}
+        searchText={(m) => `${m.full_name ?? ""} ${m.email ?? ""}`}
+        searchPlaceholder={t("memberSearch")}
+        emptyLabel={t("membersEmpty")}
+        rowActions={(m) => (
+          <button type="button" onClick={() => setOpen(m.id)} className={rowButton}>{t("memberOpen")}</button>
+        )}
+        bulkActions={(ids) => (
+          <>
+            <button type="button" onClick={() => copyEmails(ids)} className={bulkButton}>
+              {copied ? t("table.emailsCopied") : t("table.copyEmails")}
+            </button>
+            <button type="button" onClick={() => exportCsv(ids)} className={bulkButton}>{t("table.exportCsv")}</button>
+          </>
+        )}
+      />
+
+      <SidePanel open={member !== null} title={member ? displayName(member) : ""} onClose={() => setOpen(null)}>
+        {member ? (
+      <div className="space-y-5">
+        <section>
+          <p className="type-eyebrow text-black/60">{t("memberPagesHeading")}</p>
+          {myPages.length === 0 ? (
+            <p className="mt-1 text-[14px] text-black/60">{t("pagesEmpty")}</p>
+          ) : (
+            <ul className="mt-2 space-y-1.5">
+              {myPages.map((page) => (
+                <li key={page.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-paper px-3.5 py-2.5 text-[14px]">
+                  {page.status === "active" ? (
+                    <Link href={`/f/${page.slug}`} className="font-semibold text-sea hover:underline">{page.title}</Link>
+                  ) : (
+                    <span className="font-semibold">{page.title}</span>
+                  )}
+                  <span className="text-black/60">{page.event_name}{page.goal_cents ? ` · ${money(page.goal_cents)}` : ""}</span>
+                  <span className={page.status === "active" ? "font-semibold text-sea" : page.status === "hidden" ? "font-semibold text-red-dark" : "text-black/60"}>
+                    {t(`pageStatusValue.${page.status}`)}
+                  </span>
+                  <span className="ml-auto"><FundraiserStatusButtons fundraiserId={page.id} status={page.status} /></span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section>
+          <p className="type-eyebrow text-black/60">{t("memberRegsHeading")}</p>
+          {myRegs.length === 0 ? (
+            <p className="mt-1 text-[14px] text-black/60">{t("regEmpty")}</p>
+          ) : (
+            <ul className="mt-2 space-y-1.5">
+              {myRegs.map((row) => (
+                <li key={row.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-paper px-3.5 py-2.5 text-[14px]">
+                  <span className="font-semibold">{row.event_name}</span>
+                  {row.participant_name ? <span className="text-black/70">{row.participant_name}</span> : null}
+                  <span className="text-black/60">{[row.distance, row.tier_label, row.shirt_size].filter(Boolean).join(" · ")}</span>
+                  <span className="font-mono tabular-nums text-black/60">
+                    {row.status === "confirmed" ? money(row.amount_paid_cents) : row.amount_due_cents > 0 ? money(row.amount_due_cents) : ""}
+                    {row.payment_reference ? ` · ${row.payment_reference}` : ""}
+                  </span>
+                  <span className={row.status === "confirmed" ? "font-semibold text-sea" : row.status === "cancelled" ? "text-black/40 line-through" : "text-black/60"}>
+                    {t(`regStatusValue.${row.status}`)}
+                  </span>
+                  <span className="ml-auto"><RegistrationRowActions registrationId={row.id} bib={row.bib_number} status={row.status} /></span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {myTeams.length > 0 ? (
+          <section>
+            <p className="type-eyebrow text-black/60">{t("memberTeamsHeading")}</p>
+            <ul className="mt-2 flex flex-wrap gap-2 text-[14px]">
+              {myTeams.map((team) => (
+                <li key={team.id} className="rounded-lg bg-paper px-3 py-1.5">
+                  <Link href={`/t/${team.slug}`} className="font-semibold hover:text-sea">{team.name}</Link>
+                  <span className="text-black/55"> · {team.event_name}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {member.strava ? (
+          <section>
+            <p className="type-eyebrow text-black/60">Strava</p>
+            <p className="mt-1 text-[14px] text-black/70">
+              {member.strava_last_sync ? t("athLastSync") + ": " + member.strava_last_sync.slice(0, 16).replace("T", " ") : "—"}
+              {" · "}
+              {t("memberRuns", { count: member.activities_30d })}
+              {member.awards > 0 ? ` · ${t("memberAwards", { count: member.awards })}` : ""}
+            </p>
+          </section>
+        ) : null}
       </div>
-
-      {visible.length === 0 ? (
-        <p className="mt-6 text-[14.5px] text-black/60">{t("membersEmpty")}</p>
-      ) : (
-        <ul className="mt-4 space-y-2">
-          {visible.map((member) => {
-            const myPages = pages.filter((p) => p.user_id === member.id);
-            const myRegs = registrations.filter((r) => r.user_id === member.id);
-            const myTeams = teams.filter((tm) => tm.captain_id === member.id);
-            const isOpen = open === member.id;
-            return (
-              <li key={member.id} className="rounded-lg bg-mist px-4 py-3.5">
-                <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
-                  <div className="min-w-0 flex-1">
-                    <p className="flex flex-wrap items-center gap-2 text-[15.5px] font-bold">
-                      {member.full_name?.trim() || member.email || member.id.slice(0, 8)}
-                      {member.role !== "member" ? chip(t(`memberRole.${member.role}`), "ink") : null}
-                      {member.strava ? chip(t("memberFilter.athletes"), "sea") : null}
-                      {member.pages > 0 ? chip(t("memberFilter.fundraisers"), "sea") : null}
-                      {member.registrations > 0 ? chip(t("memberFilter.participants")) : null}
-                      {member.teams > 0 ? chip(t("memberChipCaptain")) : null}
-                      {member.donations > 0 ? chip(t("memberChipDonor")) : null}
-                    </p>
-                    <p className="mt-0.5 text-[13.5px] text-black/60">
-                      {member.full_name?.trim() && member.email ? <>{member.email} · </> : null}
-                      {member.joined_at ? t("memberJoined", { date: member.joined_at.slice(0, 10) }) : null}
-                    </p>
-                    <p className="mt-1 flex flex-wrap gap-x-4 gap-y-0.5 font-mono text-[13px] tabular-nums text-black/70">
-                      {member.pages > 0 ? <span>{t("memberRaised", { amount: money(member.raised_cents), pages: member.pages })}</span> : null}
-                      {member.strava ? <span>{t("memberRuns", { count: member.activities_30d })}{member.awards > 0 ? ` · ${t("memberAwards", { count: member.awards })}` : ""}</span> : null}
-                      {member.donations > 0 ? <span>{t("memberGiven", { amount: money(member.given_cents), count: member.donations })}</span> : null}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setOpen(member.id)}
-                    className="rounded-lg bg-paper px-3 py-1.5 text-[13.5px] font-semibold transition-colors hover:bg-mist-2"
-                  >
-                    {t("memberOpen")}
-                  </button>
-                </div>
-
-                <SidePanel open={isOpen} title={member.full_name?.trim() || member.email || member.id.slice(0, 8)} onClose={() => setOpen(null)}>
-                  <div className="space-y-5">
-                    <section>
-                      <p className="type-eyebrow text-black/60">{t("memberPagesHeading")}</p>
-                      {myPages.length === 0 ? (
-                        <p className="mt-1 text-[14px] text-black/60">{t("pagesEmpty")}</p>
-                      ) : (
-                        <ul className="mt-2 space-y-1.5">
-                          {myPages.map((page) => (
-                            <li key={page.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-paper px-3.5 py-2.5 text-[14px]">
-                              {page.status === "active" ? (
-                                <Link href={`/f/${page.slug}`} className="font-semibold text-sea hover:underline">{page.title}</Link>
-                              ) : (
-                                <span className="font-semibold">{page.title}</span>
-                              )}
-                              <span className="text-black/60">{page.event_name}{page.goal_cents ? ` · ${money(page.goal_cents)}` : ""}</span>
-                              <span className={page.status === "active" ? "font-semibold text-sea" : page.status === "hidden" ? "font-semibold text-red-dark" : "text-black/60"}>
-                                {t(`pageStatusValue.${page.status}`)}
-                              </span>
-                              <span className="ml-auto"><FundraiserStatusButtons fundraiserId={page.id} status={page.status} /></span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </section>
-
-                    <section>
-                      <p className="type-eyebrow text-black/60">{t("memberRegsHeading")}</p>
-                      {myRegs.length === 0 ? (
-                        <p className="mt-1 text-[14px] text-black/60">{t("regEmpty")}</p>
-                      ) : (
-                        <ul className="mt-2 space-y-1.5">
-                          {myRegs.map((row) => (
-                            <li key={row.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg bg-paper px-3.5 py-2.5 text-[14px]">
-                              <span className="font-semibold">{row.event_name}</span>
-                              {row.participant_name ? <span className="text-black/70">{row.participant_name}</span> : null}
-                              <span className="text-black/60">{[row.distance, row.tier_label, row.shirt_size].filter(Boolean).join(" · ")}</span>
-                              <span className="font-mono tabular-nums text-black/60">
-                                {row.status === "confirmed" ? money(row.amount_paid_cents) : row.amount_due_cents > 0 ? money(row.amount_due_cents) : ""}
-                                {row.payment_reference ? ` · ${row.payment_reference}` : ""}
-                              </span>
-                              <span className={row.status === "confirmed" ? "font-semibold text-sea" : row.status === "cancelled" ? "text-black/40 line-through" : "text-black/60"}>
-                                {t(`regStatusValue.${row.status}`)}
-                              </span>
-                              <span className="ml-auto"><RegistrationRowActions registrationId={row.id} bib={row.bib_number} status={row.status} /></span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </section>
-
-                    {myTeams.length > 0 ? (
-                      <section>
-                        <p className="type-eyebrow text-black/60">{t("memberTeamsHeading")}</p>
-                        <ul className="mt-2 flex flex-wrap gap-2 text-[14px]">
-                          {myTeams.map((team) => (
-                            <li key={team.id} className="rounded-lg bg-paper px-3 py-1.5">
-                              <Link href={`/t/${team.slug}`} className="font-semibold hover:text-sea">{team.name}</Link>
-                              <span className="text-black/55"> · {team.event_name}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </section>
-                    ) : null}
-
-                    {member.strava ? (
-                      <section>
-                        <p className="type-eyebrow text-black/60">Strava</p>
-                        <p className="mt-1 text-[14px] text-black/70">
-                          {member.strava_last_sync ? t("athLastSync") + ": " + member.strava_last_sync.slice(0, 16).replace("T", " ") : "—"}
-                          {" · "}
-                          {t("memberRuns", { count: member.activities_30d })}
-                          {member.awards > 0 ? ` · ${t("memberAwards", { count: member.awards })}` : ""}
-                        </p>
-                      </section>
-                    ) : null}
-                  </div>
-                </SidePanel>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+        ) : null}
+      </SidePanel>
     </div>
   );
 }
