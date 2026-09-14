@@ -10,6 +10,8 @@ export interface EventChoice {
   slug: string;
   name: string;
   dateLabel: string;
+  /** The runner already has a page for this cause: shown, not selectable. */
+  taken?: boolean;
 }
 
 /**
@@ -38,12 +40,13 @@ export function CreatePageForm({
   const t = useTranslations("dashboard");
   const router = useRouter();
   const [title, setTitle] = useState(defaultName);
+  const open = events.filter((event) => !event.taken);
+  // Preselect only what the runner arrived with; otherwise they choose.
   const [eventSlug, setEventSlug] = useState(
-    defaultEventSlug && events.some((event) => event.slug === defaultEventSlug)
-      ? defaultEventSlug
-      : (events[0]?.slug ?? ""),
+    defaultEventSlug && open.some((event) => event.slug === defaultEventSlug) ? defaultEventSlug : "",
   );
   const [state, setState] = useState<"idle" | "busy" | "error">("idle");
+  const blocked = events.length === 0 ? "none" : open.length === 0 ? "taken" : "";
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -87,29 +90,33 @@ export function CreatePageForm({
         />
         <p className="mt-1 text-[13.5px] text-black/55">{t("nameHint")}</p>
       </div>
-      {events.length > 1 ? (
-        <div>
-          <label htmlFor="pageEvent" className="text-[14px] font-semibold">
-            {t("causeLabel")}
-          </label>
-          <select
-            id="pageEvent"
-            value={eventSlug}
-            onChange={(event) => setEventSlug(event.target.value)}
-            className={inputClass}
-          >
-            {events.map((event) => (
-              <option key={event.slug} value={event.slug}>
-                {event.name} · {event.dateLabel}
-              </option>
-            ))}
-          </select>
-        </div>
-      ) : events.length === 1 ? (
-        <p className="text-[14px] text-black/65">
-          {t("causeSingle", { name: events[0].name, date: events[0].dateLabel })}
-        </p>
-      ) : null}
+      <div>
+        <label htmlFor="pageEvent" className="text-[14px] font-semibold">
+          {t("causeLabel")}
+        </label>
+        <select
+          id="pageEvent"
+          required
+          value={eventSlug}
+          disabled={blocked !== ""}
+          onChange={(event) => setEventSlug(event.target.value)}
+          className={`${inputClass} disabled:opacity-60`}
+        >
+          <option value="">{t("causeChoose")}</option>
+          {events.map((event) => (
+            <option key={event.slug} value={event.slug} disabled={event.taken}>
+              {event.name}
+              {event.dateLabel ? ` · ${event.dateLabel}` : ""}
+              {event.taken ? ` — ${t("causeTaken")}` : ""}
+            </option>
+          ))}
+        </select>
+        {blocked ? (
+          <p className="mt-2 text-[14px] font-semibold text-black/65">
+            {blocked === "none" ? t("createNoEvents") : t("createAllTaken")}
+          </p>
+        ) : null}
+      </div>
       {state === "error" ? (
         <p role="alert" className="text-[14px] font-semibold text-red-dark">
           {t("actionError")}
@@ -117,7 +124,7 @@ export function CreatePageForm({
       ) : null}
       <button
         type="submit"
-        disabled={state === "busy"}
+        disabled={state === "busy" || blocked !== "" || eventSlug === ""}
         className="w-full rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
       >
         {t("createSubmit")}

@@ -39,57 +39,47 @@ interface CauseOption extends EventRow {
 }
 
 /**
- * The board is per cause. Default: the cause people are actually raising
- * for (most published pages, open causes first).
+ * One board across every cause by default, ranked by what each page raised;
+ * `?cilj=` narrows it to one cause. Rows carry their cause so the browser
+ * can label them.
  */
 async function fetchBoard(causeSlug: string | undefined) {
   try {
     const supabase = await createClient();
-    const [{ data: causeRows }, { data: pageRows }] = await Promise.all([
-      supabase.from("v_public_campaigns").select("id, slug, title, ends_at").order("starts_at", { ascending: false }),
-      supabase.from("v_fundraiser_totals").select("campaign_id, raised_cents"),
-    ]);
-    const counts = new Map<string, number>();
-    for (const row of (pageRows ?? []) as { campaign_id: string | null }[]) if (row.campaign_id) counts.set(row.campaign_id, (counts.get(row.campaign_id) ?? 0) + 1);
-    const now = Date.now();
+    const { data: causeRows } = await supabase
+      .from("v_public_campaigns")
+      .select("id, slug, title, ends_at")
+      .order("starts_at", { ascending: false });
     const options: CauseOption[] = ((causeRows ?? []) as { id: string; slug: string; title: string; ends_at: string | null }[]).map((c) => ({
       id: c.id,
       name: c.title,
       slug: c.slug,
       ends_at: c.ends_at,
-      pages: counts.get(c.id) ?? 0,
+      pages: 0,
     }));
-    const open = options.filter((c) => !c.ends_at || new Date(c.ends_at).getTime() >= now);
-    const chosen =
-      options.find((c) => c.slug === causeSlug) ??
-      [...open].sort((a, b) => b.pages - a.pages)[0] ??
-      [...options].sort((a, b) => b.pages - a.pages)[0] ??
-      null;
-    if (!chosen) return null;
-    const event: EventRow = { id: chosen.id, name: chosen.name };
+    const chosen = causeSlug ? (options.find((c) => c.slug === causeSlug) ?? null) : null;
+    let individualsQuery = supabase.from("v_leaderboard").select("slug, title, photo_path, raised_cents, campaign_id");
+    let teamsQuery = supabase.from("v_leaderboard_teams").select("slug, name, photo_path, raised_cents, member_count, campaign_id");
+    let totalsQuery = supabase.from("v_fundraiser_totals").select("raised_cents, campaign_id");
+    if (chosen) {
+      individualsQuery = individualsQuery.eq("campaign_id", chosen.id);
+      teamsQuery = teamsQuery.eq("campaign_id", chosen.id);
+      totalsQuery = totalsQuery.eq("campaign_id", chosen.id);
+    }
     const [{ data: individuals }, { data: teams }, { data: allTotals }] = await Promise.all([
-      supabase
-        .from("v_leaderboard")
-        .select("slug, title, photo_path, raised_cents, campaign_id")
-        .eq("campaign_id", event.id)
-        .order("rank", { ascending: true })
-        .limit(50),
-      supabase
-        .from("v_leaderboard_teams")
-        .select("slug, name, photo_path, raised_cents, member_count, campaign_id")
-        .eq("campaign_id", event.id)
-        .order("rank", { ascending: true })
-        .limit(50),
-      // Header aggregates over EVERY active page, not just the displayed 50.
-      supabase
-        .from("v_fundraiser_totals")
-        .select("raised_cents")
-        .eq("campaign_id", event.id),
+      individualsQuery.order("raised_cents", { ascending: false }).limit(100),
+      teamsQuery.order("raised_cents", { ascending: false }).limit(100),
+      // Header aggregates over EVERY active page, not just the displayed 100.
+      totalsQuery,
     ]);
-    const totalsRows = (allTotals ?? []) as { raised_cents: number }[];
+    const totalsRows = (allTotals ?? []) as { raised_cents: number; campaign_id: string | null }[];
+    for (const row of totalsRows) {
+      const option = options.find((c) => c.id === row.campaign_id);
+      if (option) option.pages += 1;
+    }
     return {
-      event,
-      causeSlug: chosen.slug,
+      event: chosen ? { id: chosen.id, name: chosen.name } : null,
+      causeSlug: chosen?.slug ?? null,
       options,
       individuals: (individuals ?? []) as IndividualRow[],
       teams: (teams ?? []) as TeamRow[],
@@ -129,35 +119,18 @@ export default async function FundraisersDirectoryPage({
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
       <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
-        {board?.event.name ?? "Santamore"}
+        {board?.event?.name ?? t("allCauses")}
       </p>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
         <h1 className="type-display text-4xl">{t("fundraisersTitle")}</h1>
         <Link
-          href={board ? `/dashboard/prikupljaj?cause=${board.causeSlug}` : "/dashboard/prikupljaj"}
+          href={board?.causeSlug ? `/dashboard/prikupljaj?cause=${board.causeSlug}` : "/dashboard/prikupljaj"}
           className="inline-flex items-center gap-1.5 rounded-lg bg-red px-4 py-2.5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark"
         >
           <span aria-hidden className="text-[18px] leading-none">+</span>
           {t("startFundraisingCta")}
         </Link>
       </div>
-      {board && board.options.length > 1 ? (
-        <div className="mt-4 flex flex-wrap gap-1.5" role="group" aria-label={t("pickEvent")}>
-          {board.options.map((option) => (
-            <Link
-              key={option.slug}
-              href={`/prikupljaci?cilj=${option.slug}`}
-              aria-current={option.slug === board.causeSlug ? "page" : undefined}
-              className={`rounded-lg px-3 py-1.5 text-[13.5px] font-semibold transition-colors ${
-                option.slug === board.causeSlug ? "bg-ink text-paper" : "bg-mist hover:bg-mist-2"
-              }`}
-            >
-              {option.name}
-              {option.pages > 0 ? <span className="ml-1.5 font-mono text-[12px] tabular-nums opacity-70">{option.pages}</span> : null}
-            </Link>
-          ))}
-        </div>
-      ) : null}
       <p className="mt-2 text-[14.5px] text-black/65">
         <span className="font-mono tabular-nums">{board?.activeCount ?? 0}</span>{" "}
         {t("activeFundraisers")} ·{" "}
@@ -167,6 +140,8 @@ export default async function FundraisersDirectoryPage({
       </p>
 
       <FundraisersBrowser
+        causes={(board?.options ?? []).map((option) => ({ slug: option.slug, name: option.name, pages: option.pages }))}
+        selectedCause={board?.causeSlug ?? null}
         individuals={
           board?.individuals.map(
             (row): LeaderboardEntry => ({
@@ -174,6 +149,7 @@ export default async function FundraisersDirectoryPage({
               title: row.title,
               photoUrl: fundraiserPhotoUrl(row.photo_path),
               raisedCents: row.raised_cents,
+              meta: board.event ? undefined : (board.options.find((option) => option.id === row.campaign_id)?.name ?? undefined),
               href: `/f/${row.slug}`,
             }),
           ) ?? []

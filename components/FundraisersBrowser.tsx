@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Avatar } from "@/components/Avatar";
@@ -13,9 +14,21 @@ import type { Locale } from "@/i18n/routing";
  * Everyone raising on one event: individuals or teams, as a grid of faces
  * or the ranked list, with a name search. Rank is by what the page raised.
  */
-export function FundraisersBrowser({ individuals, teams }: { individuals: LeaderboardEntry[]; teams: LeaderboardEntry[] }) {
+export function FundraisersBrowser({
+  causes,
+  selectedCause,
+  individuals,
+  teams,
+}: {
+  causes: { slug: string; name: string; pages: number }[];
+  /** null = every cause, ranked together. */
+  selectedCause: string | null;
+  individuals: LeaderboardEntry[];
+  teams: LeaderboardEntry[];
+}) {
   const t = useTranslations("leaderboard");
   const locale = useLocale() as Locale;
+  const router = useRouter();
   const [tab, setTab] = useState<"individuals" | "teams">("individuals");
   const [view, setView] = useState<"grid" | "list">("grid");
   const [query, setQuery] = useState("");
@@ -31,6 +44,20 @@ export function FundraisersBrowser({ individuals, teams }: { individuals: Leader
   return (
     <div className="mt-6">
       <div className="flex flex-wrap items-center gap-2">
+        <label className="sr-only" htmlFor="causePick">{t("pickCause")}</label>
+        <select
+          id="causePick"
+          value={selectedCause ?? ""}
+          onChange={(e) => router.push(`/${locale}/prikupljaci${e.target.value ? `?cilj=${encodeURIComponent(e.target.value)}` : ""}`)}
+          className="rounded-lg bg-mist px-3.5 py-2 text-[14px] font-semibold outline-none focus:bg-mist-2"
+        >
+          <option value="">{t("allCauses")}</option>
+          {causes.map((cause) => (
+            <option key={cause.slug} value={cause.slug}>
+              {cause.name}{cause.pages > 0 ? ` (${cause.pages})` : ""}
+            </option>
+          ))}
+        </select>
         <div role="group" aria-label={t("fundraisersTitle")} className="flex gap-1.5">
           <button type="button" aria-pressed={tab === "individuals"} onClick={() => setTab("individuals")} className={chip(tab === "individuals")}>{t("individuals")}</button>
           <button type="button" aria-pressed={tab === "teams"} onClick={() => setTab("teams")} className={chip(tab === "teams")}>{t("teams")}</button>

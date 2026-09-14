@@ -177,10 +177,10 @@ export function EventPageView({
 
       {/* 3 — the two ways in */}
       <div className="mt-6 rounded-lg bg-mist p-5 sm:p-6">
-        <p className="type-eyebrow text-sea/80">{event.campaign_slug ? t("waysInHeading") : t("wayInHeading")}</p>
-        <div className={`mt-3 grid gap-4 ${event.campaign_slug ? "sm:grid-cols-2" : ""}`}>
+        <div className={`grid gap-4 ${event.campaign_slug ? "sm:grid-cols-2" : ""}`}>
           <div>
-            <p className="text-[16px] font-bold">
+            <p className="type-eyebrow text-sea/80">{event.campaign_slug ? t("waysInHeading") : t("wayInHeading")}</p>
+            <p className="mt-3 text-[16px] font-bold">
               {event.kind === "social" ? t("wayGoing") : event.kind === "challenge" ? t("wayJoin") : t("wayRun")}
             </p>
             <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">
@@ -196,7 +196,8 @@ export function EventPageView({
           </div>
           {event.campaign_slug ? (
             <div>
-              <p className="text-[16px] font-bold">{event.campaign_title ? t("wayRaiseFor", { cause: event.campaign_title }) : t("wayRaise")}</p>
+              <p className="type-eyebrow text-sea/80">{t("causeEyebrow")}</p>
+              <p className="mt-3 text-[16px] font-bold">{event.campaign_title ? t("wayRaiseFor", { cause: event.campaign_title }) : t("wayRaise")}</p>
               <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("wayRaiseSub")}</p>
               <div className="mt-3">
                 {preview ? (
