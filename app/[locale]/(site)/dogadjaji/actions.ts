@@ -7,6 +7,7 @@ import { buildRegistrationEmail } from "@/lib/email/registration";
 import { sendEmail } from "@/lib/email/send";
 import { generatePaymentReference } from "@/lib/references";
 import { createServiceClient } from "@/lib/supabase/admin";
+import { getOrgBankDetails } from "@/lib/org";
 import { createClient } from "@/lib/supabase/server";
 import { WAIVER_VERSION } from "@/lib/waiver";
 
@@ -176,4 +177,54 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     console.error("[events] registration failed:", error);
     return { ok: false, error: "server" };
   }
+}
+
+export interface MyRegistration {
+  id: string;
+  status: "pending" | "confirmed" | "cancelled";
+  distance: string | null;
+  shirt_size: string | null;
+  tier_label: string | null;
+  amount_due_cents: number;
+  payment_reference: string | null;
+  participant_name: string | null;
+}
+
+export interface RegistrationState {
+  signedIn: boolean;
+  fullName: string;
+  email: string;
+  registrations: MyRegistration[];
+  bank: { name: string; iban: string; bic: string };
+}
+
+/** What the register overlay needs: who is signed in and what they already hold on this event. */
+export async function fetchRegistrationState(eventSlug: string): Promise<RegistrationState> {
+  const empty: RegistrationState = { signedIn: false, fullName: "", email: "", registrations: [], bank: getOrgBankDetails() };
+  const slug = z.string().trim().min(1).max(100).safeParse(eventSlug);
+  if (!slug.success) return empty;
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return empty;
+  const { data: event } = await supabase.from("v_public_events").select("id").eq("slug", slug.data).maybeSingle();
+  if (!event) return empty;
+  const [{ data: rows }, { data: profile }] = await Promise.all([
+    supabase
+      .from("registrations")
+      .select("id, status, distance, shirt_size, tier_label, amount_due_cents, payment_reference, participant_name")
+      .eq("event_id", event.id)
+      .eq("user_id", user.id)
+      .neq("status", "cancelled")
+      .order("created_at", { ascending: true }),
+    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+  ]);
+  return {
+    signedIn: true,
+    fullName: profile?.full_name ?? "",
+    email: user.email ?? "",
+    registrations: (rows ?? []) as MyRegistration[],
+    bank: getOrgBankDetails(),
+  };
 }

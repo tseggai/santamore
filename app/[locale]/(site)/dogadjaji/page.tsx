@@ -2,20 +2,14 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { EventsBrowser, type PublicEventCard } from "@/components/events/EventsBrowser";
 import { calendarContent } from "@/content/site/calendar";
 import { createClient } from "@/lib/supabase/server";
-import { Link } from "@/i18n/navigation";
-import { htmlLang, routing, type Locale } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
-interface EventRow {
-  slug: string;
-  name: string;
-  starts_at: string;
-  venue: string | null;
-  kind: "race" | "challenge";
-}
+
 
 export async function generateMetadata({
   params,
@@ -37,23 +31,17 @@ export default async function EventsIndexPage({
   setRequestLocale(locale);
   const t = await getTranslations("events");
 
-  let events: EventRow[] = [];
+  let events: PublicEventCard[] = [];
   try {
     const supabase = await createClient();
     const { data } = await supabase
       .from("v_public_events")
-      .select("slug, name, starts_at, venue, kind")
+      .select("slug, name, starts_at, ends_at, venue, kind, cover_path, description")
       .order("starts_at", { ascending: true });
-    events = (data ?? []) as EventRow[];
+    events = (data ?? []) as PublicEventCard[];
   } catch {
     events = [];
   }
-
-  const dateFormat = new Intl.DateTimeFormat(htmlLang(locale as Locale), {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
   const calendar = calendarContent[locale as Locale];
 
   return (
@@ -61,27 +49,7 @@ export default async function EventsIndexPage({
       <h1 className="type-display text-4xl">{t("title")}</h1>
       <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-black/70">{t("sub")}</p>
 
-      <ul className="mt-7 space-y-3">
-        {events.map((event) => (
-          <li key={event.slug}>
-            <Link
-              href={`/dogadjaji/${event.slug}`}
-              className="block rounded-brand bg-mist px-5 py-4 transition-colors hover:bg-mist-2"
-            >
-              <span className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="type-display text-xl">{event.name}</span>
-                <span className="font-mono text-[13px] tabular-nums text-black/60">
-                  {dateFormat.format(new Date(event.starts_at))}
-                </span>
-              </span>
-              <span className="mt-1 block text-[14px] text-black/60">
-                {event.kind === "challenge" ? t("kindChallenge") : t("kindRace")}
-                {event.venue ? <> · {event.venue}</> : null}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <EventsBrowser events={events} />
 
       {/* the full-size calendar, from the team guide */}
       <h2 className="type-display mt-12 text-2xl">{calendar.heading}</h2>

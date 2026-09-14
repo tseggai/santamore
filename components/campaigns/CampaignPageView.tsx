@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 
+import { CauseLedgerDialog } from "@/components/campaigns/CauseLedgerDialog";
 import { DonateButton } from "@/components/donate/DonateButton";
 import type { GalleryImage } from "@/components/gallery/GalleryGrid";
 import { PublicGallery } from "@/components/gallery/PublicGallery";
@@ -57,6 +58,8 @@ export function CampaignPageView({
   });
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
   const cover = galleryImageUrl(campaign.cover_path ?? null);
+  const secondaryButton =
+    "inline-flex h-12 items-center rounded-lg bg-mist px-5 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea";
   const linkClass =
     "font-semibold text-black underline decoration-black/30 underline-offset-[3px] transition-colors hover:text-sea";
 
@@ -66,18 +69,7 @@ export function CampaignPageView({
         {t("eyebrow")}
         {campaign.chapter_name ? <> · {campaign.chapter_name}</> : null}
       </p>
-      <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
-        <h1 className="type-display text-3xl sm:text-4xl">{campaign.title || t("untitled")}</h1>
-        {!preview ? (
-          <ShareButton
-            title={campaign.title}
-            path={`/${locale}/kampanje/${campaign.slug}`}
-            label={t("share")}
-            copiedLabel={tDonate("copied")}
-            variant="icon"
-          />
-        ) : null}
-      </div>
+      <h1 className="type-display mt-2 text-3xl sm:text-4xl">{campaign.title || t("untitled")}</h1>
       {cover ? (
         <Image src={cover} alt="" width={1200} height={675} priority className="mt-5 aspect-[16/9] w-full rounded-lg bg-mist object-cover" />
       ) : null}
@@ -110,7 +102,7 @@ export function CampaignPageView({
         )}
       </div>
 
-      <div className="mt-5 flex items-center gap-2">
+      <div className="mt-5 flex flex-wrap items-center gap-2">
         <DonateButton
           request={{ kind: "campaign", slug: campaign.slug }}
           href={`/podrzi?kampanja=${campaign.slug}`}
@@ -118,12 +110,23 @@ export function CampaignPageView({
         >
           {tDonate("payVerb")}
         </DonateButton>
-        <Link
-          href="/transparentnost"
-          className="inline-flex h-12 items-center rounded-lg bg-mist px-5 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
-        >
-          {t("ledgerLink")}
-        </Link>
+        {preview ? (
+          <span className={secondaryButton}>{t("shareCta")}</span>
+        ) : (
+          <ShareButton
+            title={campaign.title}
+            path={`/${locale}/kampanje/${campaign.slug}`}
+            label={t("shareCta")}
+            copiedLabel={tDonate("copied")}
+            variant="ghost"
+            className={`${secondaryButton} gap-2`}
+          />
+        )}
+        {preview ? (
+          <span className={secondaryButton}>{t("ledgerLink")}</span>
+        ) : (
+          <CauseLedgerDialog slug={campaign.slug} className={secondaryButton} />
+        )}
       </div>
 
       {campaign.description ? (

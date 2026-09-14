@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
+import type { ReactNode } from "react";
 
 import { LeaderboardList, type LeaderboardEntry } from "@/components/Leaderboard";
+import { RegisterDialog } from "@/components/events/RegisterDialog";
 import type { GalleryImage } from "@/components/gallery/GalleryGrid";
 import { PublicGallery } from "@/components/gallery/PublicGallery";
 import { galleryImageUrl } from "@/lib/storage";
@@ -45,12 +47,20 @@ export interface EventView {
   registration_closes_at: string | null;
   distances: string[];
   tiers: EventTier[];
+  offers_shirts?: boolean;
+  going_count?: number;
 }
 
+const primary =
+  "inline-flex h-12 items-center justify-center rounded-lg bg-red px-7 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark";
+const secondary =
+  "inline-flex h-12 items-center justify-center rounded-lg bg-paper px-6 text-[15.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea";
+
 /**
- * The public event page body — shared with the admin preview so what
- * staff see while editing is exactly what visitors get. `preview`
- * renders links inert.
+ * The public event page — shared with the admin preview so what staff see
+ * while editing is exactly what visitors get. The page walks a visitor
+ * from what the event is, to the facts, to the two ways in (take part,
+ * raise money), then the details. `preview` renders links inert.
  */
 export function EventPageView({
   event,
@@ -65,126 +75,187 @@ export function EventPageView({
 }) {
   const t = useTranslations("events");
   const locale = useLocale() as Locale;
-  const dateFormat = new Intl.DateTimeFormat(htmlLang(locale), {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const lang = htmlLang(locale);
+  const dateFormat = new Intl.DateTimeFormat(lang, { day: "numeric", month: "long", year: "numeric" });
+  const timeFormat = new Intl.DateTimeFormat(lang, { hour: "2-digit", minute: "2-digit" });
+  const weekdayFormat = new Intl.DateTimeFormat(lang, { weekday: "long" });
   const fmt = (iso: string | null) => (iso ? dateFormat.format(new Date(iso)) : "—");
 
-  const opensAt = event.registration_opens_at
-    ? new Date(event.registration_opens_at).getTime()
-    : null;
-  const closesAt = event.registration_closes_at
-    ? new Date(event.registration_closes_at).getTime()
-    : null;
+  const opensAt = event.registration_opens_at ? new Date(event.registration_opens_at).getTime() : null;
+  const closesAt = event.registration_closes_at ? new Date(event.registration_closes_at).getTime() : null;
+  const endsAt = new Date(event.ends_at ?? event.starts_at ?? now).getTime();
+  const finished = endsAt < now;
+  const registrationState = finished ? "after" : opensAt && now < opensAt ? "before" : closesAt && now > closesAt ? "after" : "open";
   const cover = galleryImageUrl(event.cover_path ?? null);
-  const registrationState =
-    opensAt && now < opensAt ? "before" : closesAt && now > closesAt ? "after" : "open";
+  const kindLabel = event.kind === "challenge" ? t("kindChallenge") : event.kind === "social" ? t("kindSocial") : t("kindRace");
+  const starts = event.starts_at ? new Date(event.starts_at) : null;
+  const sameDay = starts && event.ends_at ? fmt(event.starts_at) === fmt(event.ends_at) : true;
+  const daysLeft = starts ? Math.ceil((starts.getTime() - now) / 86_400_000) : null;
+
+  const fact = (label: string, value: ReactNode) => (
+    <div className="rounded-lg bg-mist px-4 py-3">
+      <p className="type-eyebrow text-black/55">{label}</p>
+      <p className="mt-1 text-[15.5px] font-semibold leading-snug">{value}</p>
+    </div>
+  );
+
+  const registerButton =
+    registrationState === "open" ? (
+      preview ? (
+        <span className={primary}>{event.kind === "social" ? t("goingCta") : event.kind === "challenge" ? t("joinCta") : t("registerCta")}</span>
+      ) : (
+        <RegisterDialog
+          event={{
+            slug: event.slug,
+            name: event.name,
+            kind: event.kind,
+            distances: event.distances,
+            tiers: event.tiers.map((tier) => ({ label: tier.label, amountCents: tier.amount_cents })),
+            offersShirts: Boolean(event.offers_shirts),
+          }}
+          label={event.kind === "social" ? t("goingCta") : event.kind === "challenge" ? t("joinCta") : t("registerCta")}
+          className={primary}
+        />
+      )
+    ) : null;
 
   return (
-    <div className={`mx-auto max-w-3xl px-5 py-14 ${preview ? "pointer-events-none select-none" : ""}`}>
+    <div className={`mx-auto max-w-3xl px-5 py-12 sm:py-14 ${preview ? "pointer-events-none select-none" : ""}`}>
+      {/* 1 — what it is */}
       <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
-        {event.kind === "challenge" ? t("kindChallenge") : event.kind === "social" ? t("kindSocial") : t("kindRace")}
+        {kindLabel}
+        {daysLeft !== null && daysLeft > 0 && daysLeft <= 60 ? <> · {t("daysLeft", { count: daysLeft })}</> : null}
+        {finished ? <> · {t("finished")}</> : null}
       </p>
-      <h1 className="type-display mt-2 text-4xl">{event.name || "…"}</h1>
-      <p className="mt-3 text-[15.5px] text-black/70">
-        {fmt(event.starts_at)}
-        {event.ends_at ? <> — {fmt(event.ends_at)}</> : null}
-        {event.venue ? <> · {event.venue}</> : null}
-      </p>
+      <h1 className="type-display mt-2 text-4xl leading-[1.05] sm:text-5xl">{event.name || "…"}</h1>
+      {event.description ? (
+        <p className="mt-4 max-w-2xl whitespace-pre-line text-[17px] leading-relaxed text-black/80">{event.description}</p>
+      ) : null}
       {cover ? (
         <Image src={cover} alt="" width={1200} height={675} priority className="mt-6 aspect-[16/9] w-full rounded-lg bg-mist object-cover" />
       ) : null}
 
-      {event.description ? (
-        <div className="mt-6 max-w-2xl">
-          <p className="type-eyebrow text-sea/80">{t("aboutHeading")}</p>
-          <p className="mt-2 whitespace-pre-line text-[16px] leading-relaxed text-black/80">{event.description}</p>
-        </div>
-      ) : null}
+      {/* 2 — the facts */}
+      <div className="mt-6 grid gap-2 sm:grid-cols-3">
+        {event.kind === "challenge" && event.ends_at && !sameDay
+          ? fact(t("factPeriod"), <>{fmt(event.starts_at)} — {fmt(event.ends_at)}</>)
+          : fact(
+              t("factWhen"),
+              starts ? (
+                <>
+                  <span className="capitalize">{weekdayFormat.format(starts)}</span>, {fmt(event.starts_at)}
+                  {event.kind !== "challenge" ? <span className="block font-mono text-[14px] tabular-nums text-black/60">{timeFormat.format(starts)}</span> : null}
+                </>
+              ) : (
+                "—"
+              ),
+            )}
+        {event.venue ? fact(t("factWhere"), event.venue) : null}
+        {event.kind === "race" && event.distances.length > 0
+          ? fact(t("factDistances"), <span className="font-mono tabular-nums">{event.distances.join(" · ")}</span>)
+          : null}
+        {event.kind === "social" && (event.going_count ?? 0) > 0 ? fact(t("factGoing"), t("goingCount", { count: event.going_count ?? 0 })) : null}
+        {event.kind === "challenge" && event.perks && event.perks.length > 0
+          ? fact(t("factRewards"), t("rewardsCount", { count: event.perks.length }))
+          : null}
+      </div>
 
-      {event.distances.length > 0 ? (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {event.distances.map((distance) => (
-            <span
-              key={distance}
-              className="rounded-full bg-mist px-3 py-1 font-mono text-[13px] tabular-nums"
-            >
-              {distance}
-            </span>
-          ))}
+      {/* 3 — the two ways in */}
+      <div className="mt-6 rounded-lg bg-mist p-5 sm:p-6">
+        <p className="type-eyebrow text-sea/80">{t("waysInHeading")}</p>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <div>
+            <p className="text-[16px] font-bold">
+              {event.kind === "social" ? t("wayGoing") : event.kind === "challenge" ? t("wayJoin") : t("wayRun")}
+            </p>
+            <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">
+              {event.kind === "social" ? t("wayGoingSub") : event.kind === "challenge" ? t("wayJoinSub") : t("wayRunSub")}
+            </p>
+            <div className="mt-3">
+              {registerButton ?? (
+                <p className="rounded-lg bg-paper px-4 py-3 text-[14.5px] text-sea">
+                  {registrationState === "before" ? t("registrationOpens", { date: fmt(event.registration_opens_at) }) : finished ? t("finishedNote") : t("registrationClosed")}
+                </p>
+              )}
+            </div>
+          </div>
+          <div>
+            <p className="text-[16px] font-bold">{t("wayRaise")}</p>
+            <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("wayRaiseSub")}</p>
+            <div className="mt-3">
+              {finished ? null : preview ? (
+                <span className={secondary}>{t("fundraiseCta")}</span>
+              ) : (
+                <Link href={`/dashboard/prikupljaj?event=${event.slug}`} className={secondary}>{t("fundraiseCta")}</Link>
+              )}
+            </div>
+          </div>
         </div>
-      ) : null}
+      </div>
 
-      {event.tiers.length > 0 ? (
-        <div className="mt-6 max-w-md">
-          <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-sea/80">
-            {t("tiersHeading")}
-          </p>
-          <ul className="mt-2">
+      {/* 4 — the details, by kind */}
+      {event.kind === "race" && event.tiers.length > 0 ? (
+        <section className="mt-10">
+          <h2 className="type-display text-2xl">{t("tiersHeading")}</h2>
+          <ul className="mt-3 max-w-md">
             {event.tiers.map((tier) => (
-              <li
-                key={tier.label}
-                className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-2 text-[14.5px] last:border-b-0"
-              >
+              <li key={tier.label} className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-2.5 text-[15px] last:border-b-0">
                 <span>{tier.label}</span>
-                <span className="font-mono font-medium tabular-nums">
-                  {formatCents(tier.amount_cents, locale, { trimWholeCents: true })}
+                <span className="font-mono font-semibold tabular-nums">
+                  {tier.amount_cents === 0 ? t("free") : formatCents(tier.amount_cents, locale, { trimWholeCents: true })}
                 </span>
               </li>
             ))}
           </ul>
-        </div>
+          {event.offers_shirts ? <p className="mt-3 text-[14px] text-black/60">{t("shirtsNote")}</p> : null}
+        </section>
       ) : null}
 
-      {/* two ways in: take part, or raise money for it (your own page or a team) */}
-      <div className="mt-7 flex flex-wrap items-center gap-2">
-        {registrationState === "open" ? (
-          <Link
-            href={`/dogadjaji/${event.slug}/prijava`}
-            className="inline-flex h-12 items-center rounded-lg bg-red px-8 text-[16.5px] font-bold text-paper transition-colors hover:bg-red-dark"
-          >
-            {t("registerCta")}
-          </Link>
-        ) : null}
-        <Link
-          href={`/dashboard?event=${event.slug}`}
-          className="inline-flex h-12 items-center rounded-lg bg-mist px-6 text-[15.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
-        >
-          {t("fundraiseCta")}
-        </Link>
-      </div>
-      {registrationState !== "open" ? (
-        <p className="mt-4 rounded-brand bg-mist px-4 py-3 text-[14.5px] text-sea">
-          {registrationState === "before"
-            ? t("registrationOpens", { date: fmt(event.registration_opens_at) })
-            : t("registrationClosed")}
-        </p>
-      ) : null}
-
-      {event.perks && event.perks.length > 0 ? (
-        <div className="mt-10">
-          <h2 className="type-display text-2xl">{t("rewardsHeading")}</h2>
-          <ul className="mt-3 space-y-2">
-            {event.perks.map((perk) => (
-              <li key={perk.slug} className="rounded-lg bg-mist px-4 py-3">
-                <Link href={`/izazovi/${perk.slug}`} className="block text-[15px] font-bold hover:text-sea">
-                  {perk.reward_label} · {perk.partner_name}
-                </Link>
-                <span className="block text-[13.5px] text-black/60">{perk.title}</span>
+      {event.kind === "challenge" ? (
+        <section className="mt-10">
+          <h2 className="type-display text-2xl">{t("howHeading")}</h2>
+          <ol className="mt-4 grid gap-3 sm:grid-cols-3">
+            {(["howStep1", "howStep2", "howStep3"] as const).map((key, index) => (
+              <li key={key} className="rounded-lg bg-mist px-4 py-4">
+                <span className="font-mono text-[12px] text-red">{String(index + 1).padStart(2, "0")}</span>
+                <p className="mt-1.5 text-[15px] leading-relaxed">{t(key)}</p>
               </li>
             ))}
-          </ul>
-        </div>
+          </ol>
+          {event.perks && event.perks.length > 0 ? (
+            <>
+              <h3 className="mt-8 text-[17px] font-bold">{t("rewardsHeading")}</h3>
+              <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+                {event.perks.map((perk) => (
+                  <li key={perk.slug} className="rounded-lg bg-mist px-4 py-4">
+                    <p className="text-[16px] font-bold">{perk.reward_label}</p>
+                    <p className="mt-0.5 text-[14px] text-black/60">{perk.partner_name}</p>
+                    {preview ? null : (
+                      <Link href={`/izazovi/${perk.slug}`} className="mt-2 inline-block text-[14px] font-semibold text-sea underline underline-offset-2 hover:text-sea-2">
+                        {t("rewardRules")} →
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : null}
+        </section>
+      ) : null}
+
+      {event.kind === "challenge" && challengeEntries.length > 0 ? (
+        <section className="mt-10">
+          <h2 className="type-display text-2xl">{t("challengeBoard")}</h2>
+          <LeaderboardList locale={locale} entries={challengeEntries} />
+        </section>
       ) : null}
 
       {event.sponsors && event.sponsors.length > 0 ? (
-        <div className="mt-10">
+        <section className="mt-10">
           <p className="type-eyebrow text-sea/80">{t("sponsorsHeading")}</p>
-          <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[15px] font-semibold">
+          <ul className="mt-2 flex flex-wrap gap-2">
             {event.sponsors.map((sponsor) => (
-              <li key={sponsor.id}>
+              <li key={sponsor.id} className="rounded-lg bg-mist px-4 py-2 text-[15px] font-semibold">
                 {sponsor.website ? (
                   <a href={sponsor.website} target="_blank" rel="noopener" className="hover:text-sea">{sponsor.name}</a>
                 ) : (
@@ -193,34 +264,20 @@ export function EventPageView({
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       ) : null}
 
-      {event.kind === "challenge" && challengeEntries.length > 0 ? (
-        <div className="mt-10">
-          <h2 className="type-display text-2xl">{t("challengeBoard")}</h2>
-          <LeaderboardList locale={locale} entries={challengeEntries} />
-        </div>
-      ) : null}
+      {event.gallery && event.gallery.length > 0 ? <PublicGallery images={event.gallery} heading={t("galleryHeading")} /> : null}
 
-      <p className="mt-10 text-[14.5px]">
-        <Link
-          href="/prikupljaci"
-          className="font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
-        >
+      <p className="mt-10 border-t-[0.5px] border-line pt-5 text-[14.5px]">
+        <Link href="/prikupljaci" className="font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2">
           {t("moneyBoardLink")}
         </Link>
         {" · "}
-        <Link
-          href="/uslovi-ucesca"
-          className="font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
-        >
+        <Link href="/uslovi-ucesca" className="font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2">
           {t("termsLink")}
         </Link>
       </p>
-      {event.gallery && event.gallery.length > 0 ? (
-        <PublicGallery images={event.gallery} heading={t("galleryHeading")} />
-      ) : null}
     </div>
   );
 }
