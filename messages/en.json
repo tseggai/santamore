@@ -583,7 +583,7 @@
     "postSlug": "Slug",
     "postTitle": "Title",
     "postExcerpt": "Excerpt",
-    "postBody": "Body (Markdown)",
+    "postBody": "Body",
     "postCover": "Cover photo",
     "postPublished": "Published",
     "postSave": "Save post",
@@ -941,7 +941,13 @@
     "webhookExplain": "Strava pushes every new activity to this address. Nothing here is typed by hand: the address follows the site URL and the credentials live in the server environment. If the site moves, re-register.",
     "webhookCallback": "Callback address",
     "webhookSubscriptions": "Registered on Strava",
-    "webhookReregister": "Re-register"
+    "webhookReregister": "Re-register",
+    "moneyTabWall": "Donor wall",
+    "mdOrderedList": "Numbered list",
+    "mdQuote": "Quote",
+    "mdLinkPrompt": "Link address (empty removes the link)",
+    "mdUndo": "Undo",
+    "mdRedo": "Redo"
   },
   "forms": {
     "nameLabel": "Full name",

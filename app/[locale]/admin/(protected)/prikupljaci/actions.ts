@@ -35,6 +35,7 @@ export async function setFundraiserModeration(input: unknown): Promise<ActionRes
   if (error) return { ok: false };
 
   revalidatePath("/[locale]/admin/prikupljaci", "page");
+  revalidatePath("/[locale]/admin/novac", "layout");
   return { ok: true };
 }
 
@@ -58,5 +59,6 @@ export async function setMessageHidden(input: unknown): Promise<ActionResult> {
   if (error) return { ok: false };
 
   revalidatePath("/[locale]/admin/prikupljaci", "page");
+  revalidatePath("/[locale]/admin/novac", "layout");
   return { ok: true };
 }

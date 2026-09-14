@@ -2,12 +2,12 @@
 
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useRef, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
 import { savePostGroup } from "@/app/[locale]/admin/(protected)/sadrzaj/actions";
 import { translatePost } from "@/app/[locale]/admin/(protected)/sadrzaj/translate";
 import { CoverField } from "@/components/admin/CoverField";
-import { MarkdownToolbar } from "@/components/admin/MarkdownToolbar";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import { EyeIcon } from "@/components/Icons";
 import { PostArticle } from "@/components/news/PostArticle";
@@ -75,7 +75,6 @@ export function PostEditor({ group, onSaved }: { group: PostGroup | null; onSave
   const [detail, setDetail] = useState<string | null>(null);
   const [translating, setTranslating] = useState(false);
   const [translateNote, setTranslateNote] = useState<string | null>(null);
-  const bodyRef = useRef<HTMLTextAreaElement>(null);
 
   const draft = drafts[tab];
   const setDraft = (patch: Partial<Draft>) => setDrafts((all) => ({ ...all, [tab]: { ...all[tab], ...patch } }));
@@ -194,16 +193,7 @@ export function PostEditor({ group, onSaved }: { group: PostGroup | null; onSave
       </label>
       <div>
         <label htmlFor={`postBody-${tab}`} className={labelClass}>{t("postBody")}</label>
-        <MarkdownToolbar textarea={bodyRef} value={draft.body} onChange={(body) => setDraft({ body })} folder={`posts/${first?.id ?? "new"}`} />
-        <textarea
-          id={`postBody-${tab}`}
-          ref={bodyRef}
-          value={draft.body}
-          onChange={(e) => setDraft({ body: e.target.value })}
-          rows={16}
-          maxLength={50000}
-          className={`${inputClass} font-mono text-[14px]`}
-        />
+        <RichTextEditor key={tab} id={`postBody-${tab}`} value={draft.body} onChange={(body) => setDraft({ body })} folder={`posts/${first?.id ?? "new"}`} />
       </div>
 
       {state === "error" ? (
