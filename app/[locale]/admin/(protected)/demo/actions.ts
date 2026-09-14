@@ -107,7 +107,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
     const { data: existingTeams } = await service
       .from("teams")
       .select("name")
-      .eq("event_id", event.id);
+      .eq("campaign_id", event.campaign_id);
     const taken = new Set((existingTeams ?? []).map((row) => row.name));
     const teamNames = TEAM_NAMES.filter((name) => !taken.has(name));
 
@@ -149,6 +149,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
             .from("fundraisers")
             .insert({
               user_id: userId,
+              campaign_id: event.campaign_id,
               event_id: event.id,
               slug: `${slugify(fullName, "trkac")}-${suffix()}`,
               title: fullName,
@@ -213,6 +214,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
         const { data, error } = await service
           .from("teams")
           .insert({
+            campaign_id: event.campaign_id,
             event_id: event.id,
             name: teamName,
             slug: `${slugify(teamName, "tim")}-${suffix()}`,

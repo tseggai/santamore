@@ -27,6 +27,7 @@ interface EventRow {
 }
 
 interface CampaignRow {
+  id: string;
   slug: string;
   title: string;
   goal_cents: number | null;
@@ -72,12 +73,12 @@ export default async function ConsoleEventsPage({
       .order("starts_at", { ascending: true }),
     supabase
       .from("v_public_campaigns")
-      .select("slug, title, goal_cents, raised_cents, donor_count, starts_at, ends_at")
+      .select("id, slug, title, goal_cents, raised_cents, donor_count, starts_at, ends_at")
       .order("starts_at", { ascending: false }),
     supabase.from("registrations").select("event_id, status").eq("user_id", user.id),
     supabase.from("event_rsvps").select("event_id, status").eq("user_id", user.id),
-    supabase.from("fundraisers").select("slug, event_id, status").eq("user_id", user.id),
-    supabase.from("teams").select("name, slug, event_id").eq("captain_id", user.id),
+    supabase.from("fundraisers").select("slug, campaign_id, status").eq("user_id", user.id),
+    supabase.from("teams").select("name, slug, campaign_id").eq("captain_id", user.id),
     supabase.from("v_my_donations").select("event_id, campaign_id, campaign_slug, status").eq("status", "approved"),
   ]);
 
@@ -85,14 +86,14 @@ export default async function ConsoleEventsPage({
   const campaigns = (campaignRows ?? []) as CampaignRow[];
   const regByEvent = new Map((regRows ?? []).map((r) => [r.event_id, r.status as string]));
   const rsvpByEvent = new Map((rsvpRows ?? []).map((r) => [r.event_id, r.status as "going" | "interested"]));
-  const pageByEvent = new Map((pageRows ?? []).map((p) => [p.event_id, p]));
-  const teamByEvent = new Map((teamRows ?? []).map((tm) => [tm.event_id, tm]));
+  const causeIdBySlug = new Map(campaigns.map((c) => [c.slug, c.id]));
+  const pageByCause = new Map((pageRows ?? []).map((p) => [p.campaign_id, p]));
+  const teamByCause = new Map((teamRows ?? []).map((tm) => [tm.campaign_id, tm]));
+  const pageForEvent = (e: EventRow) => (e.campaign_slug ? pageByCause.get(causeIdBySlug.get(e.campaign_slug) ?? "") : undefined);
+  const teamForEvent = (e: EventRow) => (e.campaign_slug ? teamByCause.get(causeIdBySlug.get(e.campaign_slug) ?? "") : undefined);
   const supportedEvents = new Set((donationRows ?? []).flatMap((d) => (d.event_id ? [d.event_id] : [])));
   const supportedCampaigns = new Set((donationRows ?? []).flatMap((d) => (d.campaign_slug ? [d.campaign_slug] : [])));
-  // Raising on an event of the campaign counts as supporting the campaign.
-  const campaignsRaising = new Set(
-    events.filter((e) => pageByEvent.has(e.id) && e.campaign_slug).map((e) => e.campaign_slug as string),
-  );
+  const campaignsRaising = new Set(campaigns.filter((c) => pageByCause.has(c.id)).map((c) => c.slug));
   for (const e of events) if (supportedEvents.has(e.id) && e.campaign_slug) supportedCampaigns.add(e.campaign_slug);
 
   const now = Date.now();
@@ -123,8 +124,8 @@ export default async function ConsoleEventsPage({
   const eventCard = (event: EventRow, live: boolean) => {
     const reg = regByEvent.get(event.id);
     const rsvp = rsvpByEvent.get(event.id) ?? null;
-    const page = pageByEvent.get(event.id);
-    const team = teamByEvent.get(event.id);
+    const page = pageForEvent(event);
+    const team = teamForEvent(event);
     const regOpen =
       live &&
       (!event.registration_opens_at || new Date(event.registration_opens_at).getTime() <= now) &&
@@ -168,7 +169,7 @@ export default async function ConsoleEventsPage({
               ) : event.campaign_slug ? (
                 <>
                   <span className="text-black/60">{t("evFundraisePrompt")}</span>
-                  <Link href={`/dashboard/prikupljaj?event=${event.slug}`} className="rounded-lg bg-ink px-3.5 py-2 text-[14px] font-bold text-paper transition-opacity hover:opacity-90">
+                  <Link href={`/dashboard/prikupljaj?cause=${event.campaign_slug}`} className="rounded-lg bg-ink px-3.5 py-2 text-[14px] font-bold text-paper transition-opacity hover:opacity-90">
                     {t("evStartFundraising")}
                   </Link>
                 </>
@@ -247,6 +248,22 @@ export default async function ConsoleEventsPage({
                     <Link href={`/kampanje/${campaign.slug}`} aria-label={t("evView")} title={t("evView")} className={iconBtn}>
                       <ExternalIcon />
                     </Link>
+                  </div>
+                  <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t-[0.5px] border-line pt-3">
+                    <span className="ml-auto flex flex-wrap items-center gap-2 text-[14px]">
+                      {pageByCause.get(campaign.id) ? (
+                        <Link href={`/dashboard/stranice?stranica=${pageByCause.get(campaign.id)!.slug}`} className={ghost}>
+                          {pageByCause.get(campaign.id)!.status === "active" ? t("editPage") : t("finishPage")}
+                        </Link>
+                      ) : (
+                        <>
+                          <span className="text-black/60">{t("evFundraiseCausePrompt")}</span>
+                          <Link href={`/dashboard/prikupljaj?cause=${campaign.slug}`} className="rounded-lg bg-ink px-3.5 py-2 text-[14px] font-bold text-paper transition-opacity hover:opacity-90">
+                            {t("evStartFundraising")}
+                          </Link>
+                        </>
+                      )}
+                    </span>
                   </div>
                   <div className="mt-4">
                     <DonateButton

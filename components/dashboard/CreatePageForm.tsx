@@ -50,7 +50,7 @@ export function CreatePageForm({
     setState("busy");
     const result = await createFundraiserPage({
       title,
-      eventSlug: eventSlug || null,
+      causeSlug: eventSlug || null,
     }).catch(() => ({ ok: false as const, slug: undefined }));
     if (result.ok && result.slug) {
       if (onCreated && !joinTeamId) {
@@ -90,7 +90,7 @@ export function CreatePageForm({
       {events.length > 1 ? (
         <div>
           <label htmlFor="pageEvent" className="text-[14px] font-semibold">
-            {t("eventLabel")}
+            {t("causeLabel")}
           </label>
           <select
             id="pageEvent"
@@ -107,7 +107,7 @@ export function CreatePageForm({
         </div>
       ) : events.length === 1 ? (
         <p className="text-[14px] text-black/65">
-          {t("eventSingle", { name: events[0].name, date: events[0].dateLabel })}
+          {t("causeSingle", { name: events[0].name, date: events[0].dateLabel })}
         </p>
       ) : null}
       {state === "error" ? (

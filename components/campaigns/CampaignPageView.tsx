@@ -111,6 +111,11 @@ export function CampaignPageView({
           {tDonate("payVerb")}
         </DonateButton>
         {preview ? (
+          <span className={secondaryButton}>{t("raiseCta")}</span>
+        ) : (
+          <Link href={`/dashboard/prikupljaj?cause=${campaign.slug}`} className={secondaryButton}>{t("raiseCta")}</Link>
+        )}
+        {preview ? (
           <span className={secondaryButton}>{t("shareCta")}</span>
         ) : (
           <ShareButton
@@ -176,7 +181,7 @@ export function CampaignPageView({
       ) : null}
 
       <p className="mt-7 text-[14.5px]">
-        <Link href="/prikupljaci" className={linkClass}>
+        <Link href={`/prikupljaci?cilj=${campaign.slug}`} className={linkClass}>
           {t("fundraisersLink")}
         </Link>
       </p>

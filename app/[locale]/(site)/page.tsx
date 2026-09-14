@@ -169,7 +169,7 @@ export default async function HomePage({
               </Link>
               {nextEvent.campaign_slug ? (
                 <Link
-                  href={`/dashboard/prikupljaj?event=${nextEvent.slug}`}
+                  href={`/dashboard/prikupljaj?cause=${nextEvent.campaign_slug}`}
                   className="rounded-lg bg-paper/15 px-6 py-3.5 text-[15.5px] font-semibold text-paper transition-colors hover:bg-paper/25"
                 >
                   {tEvents("wayRaise")}

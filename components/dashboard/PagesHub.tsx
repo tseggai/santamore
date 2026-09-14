@@ -28,8 +28,8 @@ export interface HubPage {
   status: "draft" | "active" | "hidden";
   goalCents: number | null;
   photoPath: string | null;
-  eventName: string;
-  eventDate: string;
+  causeName: string;
+  causeSlug: string | null;
   teamName: string | null;
   teamSlug: string | null;
   raisedCents: number;
@@ -228,8 +228,7 @@ export function PagesHub({
                           </span>
                         </p>
                         <p className="mt-0.5 truncate text-[13.5px] text-black/60">
-                          {page.eventName}
-                          {page.eventDate ? ` · ${page.eventDate}` : ""}
+                          {page.causeName}
                           {page.teamName ? ` · ${page.teamName}` : ""}
                         </p>
                         <span className="mt-2 block h-[5px] max-w-[280px] overflow-hidden rounded-[3px] bg-mist-2">

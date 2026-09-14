@@ -21,8 +21,10 @@ interface TeamTotalsRow {
   description: string | null;
   photo_path: string | null;
   goal_cents: number | null;
-  event_slug: string;
-  event_name: string;
+  event_slug: string | null;
+  event_name: string | null;
+  campaign_slug: string | null;
+  campaign_title: string | null;
   member_count: number;
   raised_cents: number;
   donor_count: number;
@@ -107,10 +109,10 @@ export default async function TeamPage({
             {t("memberCount", { count: team.member_count })}
             {" · "}
             <Link
-              href={`/dogadjaji/${team.event_slug}`}
+              href={team.campaign_slug ? `/kampanje/${team.campaign_slug}` : `/dogadjaji/${team.event_slug ?? ""}`}
               className="font-semibold text-black underline decoration-black/30 underline-offset-[3px] transition-colors hover:text-sea"
             >
-              {team.event_name}
+              {team.campaign_title ?? team.event_name}
             </Link>
           </p>
           <div className="mt-4 flex items-center gap-2">

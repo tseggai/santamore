@@ -58,6 +58,7 @@ export interface EventView {
   going_count?: number;
   /** Public cause the event raises for; without one there are no fundraising pages. */
   campaign_slug?: string | null;
+  campaign_title?: string | null;
   /** For challenges: whether the visitor is signed in and has Strava connected. */
   join?: ChallengeJoinState;
 }
@@ -195,13 +196,13 @@ export function EventPageView({
           </div>
           {event.campaign_slug ? (
             <div>
-              <p className="text-[16px] font-bold">{t("wayRaise")}</p>
+              <p className="text-[16px] font-bold">{event.campaign_title ? t("wayRaiseFor", { cause: event.campaign_title }) : t("wayRaise")}</p>
               <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("wayRaiseSub")}</p>
               <div className="mt-3">
-                {finished ? null : preview ? (
+                {preview ? (
                   <span className={secondary}>{t("fundraiseCta")}</span>
                 ) : (
-                  <Link href={`/dashboard/prikupljaj?event=${event.slug}`} className={secondary}>{t("fundraiseCta")}</Link>
+                  <Link href={`/dashboard/prikupljaj?cause=${event.campaign_slug}`} className={secondary}>{t("fundraiseCta")}</Link>
                 )}
               </div>
             </div>

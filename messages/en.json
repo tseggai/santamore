@@ -330,7 +330,7 @@
     "teamsEmpty": "You don't captain a team yet.",
     "registrationsHeading": "My registrations",
     "registrationsEmpty": "Not registered for any event yet.",
-    "pagesSub": "One fundraising page per event you take part in — each with its own story, goal, team and donate link. Open a row to edit it.",
+    "pagesSub": "One fundraising page per cause you raise for — every event under that cause counts towards it. Open a row to edit it.",
     "createNoEvents": "There is no open event you don't already have a page for.",
     "teamsSub": "Teams you captain. Anyone with a page on the same event can join from their editor; every member's page counts towards the team total.",
     "memberCountShort": "{count, plural, one {# member} other {# members}}",
@@ -341,7 +341,7 @@
     "menuClose": "Close menu",
     "finishPage": "Finish my page",
     "createAnotherHeading": "Start a page for another event",
-    "hubEmptySub": "Your page is where donations land and what you share. Create one for the event you are joining.",
+    "hubEmptySub": "Your page is where donations land and what you share. Create one for the cause you are raising for.",
     "shareMessageShort": "I'm fundraising for Santamore — {title}. Every euro is published in a public ledger. Support me here:",
     "cashDonorLabel": "From (optional)",
     "cashDonorPlaceholder": "Name shown on the donor wall; empty = anonymous",
@@ -375,12 +375,12 @@
     "rsvpGoingCount": "{count} going",
     "fundraiseSignIn": "Sign in to raise money",
     "fundraiseSignInSub": "One email — the same account runs your page and your registrations.",
-    "fundraiseNoEvent": "Pick an event first",
-    "fundraiseNoEventSub": "A page always raises for one event. Choose it from your pages.",
+    "fundraiseNoEvent": "Pick a cause first",
+    "fundraiseNoEventSub": "A page always raises for one cause. Choose it from Causes.",
     "fundraiseHave": "You're already raising for this event",
-    "fundraiseHaveSub": "Your page “{title}” is {status}. One page per event keeps the leaderboard fair — edit it or share it.",
-    "fundraiseFinished": "This event has finished",
-    "fundraiseFinishedSub": "Pages open for upcoming events. Pick the next one.",
+    "fundraiseHaveSub": "Your page “{title}” is {status}. One page per cause keeps your total in one place — edit it or share it.",
+    "fundraiseFinished": "This cause has closed",
+    "fundraiseFinishedSub": "Pages open for causes that are still raising. Pick the next one.",
     "fundraiseProgress": "Progress",
     "fundraiseNext": "Next",
     "fundraiseBack": "Back",
@@ -407,7 +407,10 @@
     "rsvpUndecided": "Not decided yet",
     "evJoin": "Join the challenge",
     "fundraiseNoCause": "This event has no cause to raise for",
-    "fundraiseNoCauseSub": "Pages raise money for a cause; this event (a sponsored challenge, for instance) has none attached. Pick an event that does."
+    "fundraiseNoCauseSub": "Pages raise money for a cause; this event (a sponsored challenge, for instance) has none attached. Pick a cause instead.",
+    "causeLabel": "Cause",
+    "causeSingle": "You're raising for {name}.",
+    "evFundraiseCausePrompt": "Fundraise for this cause?"
   },
   "email": {
     "instructions": {
@@ -1131,7 +1134,7 @@
     "wayGoing": "Come along",
     "wayGoingSub": "Tell us you're coming so we know how many to expect.",
     "wayRaise": "Raise money",
-    "wayRaiseSub": "Open your own page, share it, and every euro lands in the public ledger.",
+    "wayRaiseSub": "Open your own page for the cause, share it, and every euro lands in the public ledger.",
     "free": "Free",
     "shirtsNote": "Event shirts are handed out at the start — you pick the size when you register.",
     "howHeading": "How it works",
@@ -1143,7 +1146,8 @@
     "joinProgress": "See your progress",
     "joinSignInTitle": "Sign in to join",
     "joinSignInSub": "One email. Then connect Strava once, and every qualifying activity counts.",
-    "wayInHeading": "The way in"
+    "wayInHeading": "The way in",
+    "wayRaiseFor": "Raise money for {cause}"
   },
   "gallery": {
     "eyebrow": "Gallery",
@@ -1185,7 +1189,7 @@
     "beneficiary": "Who benefits",
     "promise": "100% of donations reach beneficiaries. Fees are covered separately and shown in the ledger.",
     "events": "Events raising for this cause",
-    "fundraisersLink": "See the fundraisers and teams running for it →",
+    "fundraisersLink": "See the fundraisers and teams raising for it →",
     "galleryHeading": "Photos",
     "shareCta": "Share cause",
     "ledgerTitle": "Money in",
@@ -1195,7 +1199,8 @@
     "ledgerOutNote": "Money out is decided per chapter and published with its paperwork.",
     "ledgerFull": "See the full ledger",
     "viaPage": "via {title}",
-    "close": "Close"
+    "close": "Close",
+    "raiseCta": "Raise money for this cause"
   },
   "perks": {
     "title": "Partner challenges",

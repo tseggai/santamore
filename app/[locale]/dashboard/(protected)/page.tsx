@@ -8,7 +8,7 @@ import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
-import { htmlLang, type Locale } from "@/i18n/routing";
+import type { Locale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +19,7 @@ interface PageRow {
   status: "draft" | "active" | "hidden";
   goal_cents: number | null;
   photo_path: string | null;
-  event_id: string;
+  campaign_id: string | null;
   team_id: string | null;
 }
 
@@ -60,10 +60,10 @@ export default async function DashboardOverviewPage({
   ] = await Promise.all([
     supabase
       .from("fundraisers")
-      .select("id, slug, title, status, goal_cents, photo_path, event_id, team_id")
+      .select("id, slug, title, status, goal_cents, photo_path, campaign_id, team_id")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false }),
-    supabase.from("teams").select("id, name, slug, event_id").eq("captain_id", user.id),
+    supabase.from("teams").select("id, name, slug, campaign_id").eq("captain_id", user.id),
     supabase.from("registrations").select("id, event_id, status").eq("user_id", user.id),
     supabase.from("perk_awards").select("code, status").eq("user_id", user.id),
     supabase.from("strava_connections").select("user_id").eq("user_id", user.id).maybeSingle(),
@@ -71,13 +71,12 @@ export default async function DashboardOverviewPage({
   ]);
   const pages = (pageRows ?? []) as PageRow[];
 
-  const eventIds = [
-    ...new Set([
-      ...pages.map((page) => page.event_id),
-      ...(teamRows ?? []).map((team) => team.event_id),
-      ...(regRows ?? []).map((registration) => registration.event_id),
-    ]),
-  ];
+  const eventIds = [...new Set((regRows ?? []).map((registration) => registration.event_id))];
+  const causeIds = [...new Set([...pages.map((page) => page.campaign_id), ...(teamRows ?? []).map((team) => team.campaign_id)].filter((id): id is string => Boolean(id)))];
+  const { data: causeRows } = causeIds.length
+    ? await supabase.from("v_public_campaigns").select("id, slug, title").in("id", causeIds)
+    : { data: [] as { id: string; slug: string; title: string }[] };
+  const causeById = new Map((causeRows ?? []).map((cause) => [cause.id, cause]));
   const [{ data: events }, { data: totalsRows }] = await Promise.all([
     eventIds.length
       ? supabase.from("v_public_events").select("id, slug, name, starts_at, kind").in("id", eventIds)
@@ -110,10 +109,6 @@ export default async function DashboardOverviewPage({
     : null;
 
   const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
-  const dateFormat = new Intl.DateTimeFormat(htmlLang(locale as Locale), {
-    day: "numeric",
-    month: "short",
-  });
 
   // The one next move (brief §10 nudge treatment).
   const nextAction =
@@ -142,13 +137,15 @@ export default async function DashboardOverviewPage({
   // Quick actions are verbs: things a runner does, not places they go.
   const livePage = pages.find((page) => page.status === "active") ?? null;
   const captainedTeam = (teamRows ?? [])[0] ?? null;
-  const inviteEvent = nextEvent ?? (livePage ? eventById.get(livePage.event_id) : undefined);
+  const inviteCause = livePage?.campaign_id ? causeById.get(livePage.campaign_id) : undefined;
   const invitePath = captainedTeam
     ? `/${locale}/t/${captainedTeam.slug}`
-    : inviteEvent
-      ? `/${locale}/dogadjaji/${inviteEvent.slug}`
-      : `/${locale}/prikupljaci`;
-  const inviteTitle = captainedTeam?.name ?? inviteEvent?.name ?? "Santamore";
+    : nextEvent
+      ? `/${locale}/dogadjaji/${nextEvent.slug}`
+      : inviteCause
+        ? `/${locale}/kampanje/${inviteCause.slug}`
+        : `/${locale}/prikupljaci`;
+  const inviteTitle = captainedTeam?.name ?? nextEvent?.name ?? inviteCause?.title ?? "Santamore";
   const actionClass =
     "rounded-lg bg-mist px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea";
 
@@ -254,7 +251,7 @@ export default async function DashboardOverviewPage({
           <ul className="mt-3 space-y-2">
             {pages.map((page) => {
               const totals = totalsBySlug.get(page.slug);
-              const event = eventById.get(page.event_id);
+              const cause = page.campaign_id ? causeById.get(page.campaign_id) : undefined;
               const pct =
                 page.goal_cents && page.goal_cents > 0 && totals
                   ? Math.min(100, Math.round((totals.raised_cents / page.goal_cents) * 100))
@@ -278,8 +275,7 @@ export default async function DashboardOverviewPage({
                         </span>
                       </span>
                       <span className="block text-[13.5px] text-black/60">
-                        {event?.name ?? "—"}
-                        {event?.starts_at ? ` · ${dateFormat.format(new Date(event.starts_at))}` : ""}
+                        {cause?.title ?? "—"}
                       </span>
                       <span className="mt-1.5 block h-[5px] overflow-hidden rounded-[3px] bg-line-soft">
                         <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
@@ -316,7 +312,7 @@ export default async function DashboardOverviewPage({
                   <Link href={`/t/${team.slug}`} className="font-semibold hover:text-sea">
                     {team.name}
                   </Link>
-                  <span className="text-black/50"> · {eventById.get(team.event_id)?.name ?? "—"}</span>
+                  <span className="text-black/50"> · {(team.campaign_id && causeById.get(team.campaign_id)?.title) || "—"}</span>
                 </li>
               ))}
             </ul>
