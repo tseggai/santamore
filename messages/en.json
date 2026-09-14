@@ -190,7 +190,14 @@
     "teamAbout": "About the team",
     "teamMembersHint": "Every member's page counts towards the team total.",
     "startPageCta": "Start a page",
-    "pickEvent": "Event"
+    "pickEvent": "Event",
+    "fundraisersTitle": "Fundraisers",
+    "startFundraisingCta": "Start fundraising",
+    "searchName": "Search by name",
+    "viewLabel": "View",
+    "viewGrid": "Grid",
+    "viewList": "List",
+    "noMatch": "Nobody by that name."
   },
   "ledger": {
     "eyebrow": "Public ledger · updates automatically",
@@ -394,7 +401,11 @@
     "fundraiseStep3Point1": "Share from your page in one tap.",
     "fundraiseStep3Point2": "For challenges, connect Strava and your activity counts automatically.",
     "fundraiseStep3Point3": "Ask the team for a shirt, a photo, a story — it all goes on the page.",
-    "newPage": "New page"
+    "newPage": "New page",
+    "evFundraisePrompt": "Fundraise for this event?",
+    "evStartFundraising": "Start fundraising",
+    "rsvpUndecided": "Not decided yet",
+    "evJoin": "Join the challenge"
   },
   "email": {
     "instructions": {

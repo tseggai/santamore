@@ -190,7 +190,14 @@
     "teamAbout": "O timu",
     "teamMembersHint": "Stranica svakog člana računa se u ukupan iznos tima.",
     "startPageCta": "Otvori stranicu",
-    "pickEvent": "Događaj"
+    "pickEvent": "Događaj",
+    "fundraisersTitle": "Prikupljači",
+    "startFundraisingCta": "Počni prikupljanje",
+    "searchName": "Pretraži po imenu",
+    "viewLabel": "Prikaz",
+    "viewGrid": "Mreža",
+    "viewList": "Lista",
+    "noMatch": "Nema nikoga sa tim imenom."
   },
   "ledger": {
     "eyebrow": "Javni registar · ažurirano automatski",
@@ -394,7 +401,11 @@
     "fundraiseStep3Point1": "Podijeli sa svoje stranice jednim dodirom.",
     "fundraiseStep3Point2": "Za izazove poveži Stravu i aktivnost se računa automatski.",
     "fundraiseStep3Point3": "Traži od tima majicu, fotografiju, priču — sve ide na stranicu.",
-    "newPage": "Nova stranica"
+    "newPage": "Nova stranica",
+    "evFundraisePrompt": "Prikupljaš za ovaj događaj?",
+    "evStartFundraising": "Počni prikupljanje",
+    "rsvpUndecided": "Još neodlučeno",
+    "evJoin": "Uključi se u izazov"
   },
   "email": {
     "instructions": {

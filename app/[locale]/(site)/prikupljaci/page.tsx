@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { Leaderboard, type LeaderboardEntry } from "@/components/Leaderboard";
+import { FundraisersBrowser } from "@/components/FundraisersBrowser";
+import type { LeaderboardEntry } from "@/components/Leaderboard";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
@@ -120,18 +121,18 @@ export default async function FundraisersDirectoryPage({
   const totalRaised = board?.totalRaised ?? 0;
 
   return (
-    <div className="mx-auto max-w-xl px-5 py-12">
+    <div className="mx-auto max-w-3xl px-5 py-14">
       <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
         {board?.event.name ?? "Santamore"}
       </p>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-        <h1 className="type-display text-3xl">{t("title")}</h1>
+        <h1 className="type-display text-4xl">{t("fundraisersTitle")}</h1>
         <Link
           href={board ? `/dashboard/prikupljaj?event=${board.eventSlug}` : "/dashboard/prikupljaj"}
           className="inline-flex items-center gap-1.5 rounded-lg bg-red px-4 py-2.5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark"
         >
           <span aria-hidden className="text-[18px] leading-none">+</span>
-          {t("startPageCta")}
+          {t("startFundraisingCta")}
         </Link>
       </div>
       {board && board.options.length > 1 ? (
@@ -159,8 +160,7 @@ export default async function FundraisersDirectoryPage({
         </span>
       </p>
 
-      <Leaderboard
-        locale={locale as Locale}
+      <FundraisersBrowser
         individuals={
           board?.individuals.map(
             (row): LeaderboardEntry => ({
