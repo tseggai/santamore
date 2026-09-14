@@ -405,7 +405,9 @@
     "evFundraisePrompt": "Prikupljaš za ovaj događaj?",
     "evStartFundraising": "Počni prikupljanje",
     "rsvpUndecided": "Još neodlučeno",
-    "evJoin": "Uključi se u izazov"
+    "evJoin": "Uključi se u izazov",
+    "fundraiseNoCause": "Ovaj događaj nema cilj za koji se prikuplja",
+    "fundraiseNoCauseSub": "Stranice prikupljaju za cilj; ovaj događaj (npr. sponzorisani izazov) nema vezan cilj. Izaberi događaj koji ima."
   },
   "email": {
     "instructions": {
@@ -996,7 +998,13 @@
     "mdQuote": "Citat",
     "mdLinkPrompt": "Adresa linka (prazno uklanja link)",
     "mdUndo": "Vrati",
-    "mdRedo": "Ponovi"
+    "mdRedo": "Ponovi",
+    "demoPhotosHeading": "Demo avatari",
+    "demoPhotosHint": "Svakom generisanom trkaču daje ilustrovani portret, a svakom timu apstraktni znak — nikad fotografiju stvarne osobe. Tvoje stranice se ne diraju.",
+    "demoPhotos": "Osvježi demo avatare",
+    "demoPhotosBusy": "Crtanje…",
+    "demoPhotosDone": "Osvježeno {count} avatara.",
+    "evCauseHint": "Cilj je ono za šta stranice prikupljaju. Sa ciljem članovi mogu otvoriti stranice za ovaj događaj; bez njega — recimo sponzorisani izazov — događaj nema prikupljanja."
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -1134,7 +1142,8 @@
     "joinedNote": "Uključen si — Strava je povezana.",
     "joinProgress": "Pogledaj svoj napredak",
     "joinSignInTitle": "Prijavi se da se uključiš",
-    "joinSignInSub": "Jedan email. Zatim jednom poveži Stravu i svaka aktivnost koja ispunjava pravilo se računa."
+    "joinSignInSub": "Jedan email. Zatim jednom poveži Stravu i svaka aktivnost koja ispunjava pravilo se računa.",
+    "wayInHeading": "Kako se uključiti"
   },
   "gallery": {
     "eyebrow": "Galerija",

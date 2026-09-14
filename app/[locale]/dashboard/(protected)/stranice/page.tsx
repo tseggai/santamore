@@ -29,6 +29,7 @@ interface EventRow {
   name: string;
   starts_at: string | null;
   ends_at: string | null;
+  campaign_slug: string | null;
 }
 
 interface TotalsRow {
@@ -85,7 +86,7 @@ export default async function PagesHubPage({
         .order("created_at", { ascending: false }),
       supabase
         .from("v_public_events")
-        .select("id, slug, name, starts_at, ends_at")
+        .select("id, slug, name, starts_at, ends_at, campaign_slug")
         .order("starts_at", { ascending: true }),
       supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
       supabase.from("teams").select("id").eq("captain_id", user.id),
@@ -148,7 +149,7 @@ export default async function PagesHubPage({
     return !end || new Date(end).getTime() >= now;
   });
   const choices = openEvents
-    .filter((event) => !haveEvent.has(event.id))
+    .filter((event) => event.campaign_slug && !haveEvent.has(event.id))
     .map(
       (event): EventChoice => ({
         slug: event.slug,

@@ -165,14 +165,14 @@ export default async function ConsoleEventsPage({
                 <Link href={`/dashboard/stranice?stranica=${page.slug}`} className={ghost}>
                   {page.status === "active" ? t("editPage") : t("finishPage")}
                 </Link>
-              ) : (
+              ) : event.campaign_slug ? (
                 <>
                   <span className="text-black/60">{t("evFundraisePrompt")}</span>
                   <Link href={`/dashboard/prikupljaj?event=${event.slug}`} className="rounded-lg bg-ink px-3.5 py-2 text-[14px] font-bold text-paper transition-opacity hover:opacity-90">
                     {t("evStartFundraising")}
                   </Link>
                 </>
-              )}
+              ) : null}
             </span>
           </div>
         ) : null}

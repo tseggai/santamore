@@ -51,7 +51,7 @@ export default async function FundraiseEntryPage({
 
   const [{ data: event }, { data: pageRows }, { data: profile }] = await Promise.all([
     eventSlug
-      ? supabase.from("v_public_events").select("id, slug, name, starts_at, ends_at").eq("slug", eventSlug).maybeSingle()
+      ? supabase.from("v_public_events").select("id, slug, name, starts_at, ends_at, campaign_slug").eq("slug", eventSlug).maybeSingle()
       : Promise.resolve({ data: null }),
     supabase.from("fundraisers").select("id, slug, title, status, event_id").eq("user_id", user.id),
     supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
@@ -75,6 +75,19 @@ export default async function FundraiseEntryPage({
         <p className="mt-3 text-[15px] leading-relaxed text-black/65">{t("fundraiseNoEventSub")}</p>
         <Link href="/dashboard/stranice" className="mt-6 inline-flex h-12 items-center rounded-lg bg-ink px-6 text-[15.5px] font-bold text-paper hover:opacity-90">
           {t("navPages")}
+        </Link>
+      </>,
+    );
+  }
+
+  if (!event.campaign_slug) {
+    return shell(
+      <>
+        <p className="type-eyebrow mt-4 text-sea/80">{event.name}</p>
+        <h1 className="type-display mt-2 text-3xl">{t("fundraiseNoCause")}</h1>
+        <p className="mt-3 text-[15px] leading-relaxed text-black/65">{t("fundraiseNoCauseSub")}</p>
+        <Link href="/dogadjaji" className="mt-6 inline-flex h-12 items-center rounded-lg bg-ink px-6 text-[15.5px] font-bold text-paper hover:opacity-90">
+          {t("navEvents")}
         </Link>
       </>,
     );

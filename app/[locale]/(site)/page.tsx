@@ -23,7 +23,7 @@ async function fetchLanding() {
       supabase.from("v_public_ledger_summary").select("received_cents, disbursed_cents").single(),
       supabase
         .from("v_public_events")
-        .select("slug, name, starts_at, kind, venue")
+        .select("slug, name, starts_at, kind, venue, campaign_slug")
         .gte("starts_at", nowIso)
         .order("starts_at", { ascending: true })
         .limit(1),
@@ -47,7 +47,7 @@ async function fetchLanding() {
     return {
       receivedCents: summary.data?.received_cents ?? 0,
       disbursedCents: summary.data?.disbursed_cents ?? 0,
-      nextEvent: (events.data?.[0] ?? null) as { slug: string; name: string; starts_at: string; kind: "race" | "challenge" | "social"; venue: string | null } | null,
+      nextEvent: (events.data?.[0] ?? null) as { slug: string; name: string; starts_at: string; kind: "race" | "challenge" | "social"; venue: string | null; campaign_slug: string | null } | null,
       board: board.data ?? [],
       chapters: chapters.data ?? [],
       gallery: gallery.data ?? [],
@@ -167,12 +167,14 @@ export default async function HomePage({
               >
                 {nextEvent.kind === "challenge" ? tEvents("joinCta") : nextEvent.kind === "social" ? tEvents("goingCta") : tEvents("registerCta")}
               </Link>
-              <Link
-                href={`/dashboard/prikupljaj?event=${nextEvent.slug}`}
-                className="rounded-lg bg-paper/15 px-6 py-3.5 text-[15.5px] font-semibold text-paper transition-colors hover:bg-paper/25"
-              >
-                {tEvents("wayRaise")}
-              </Link>
+              {nextEvent.campaign_slug ? (
+                <Link
+                  href={`/dashboard/prikupljaj?event=${nextEvent.slug}`}
+                  className="rounded-lg bg-paper/15 px-6 py-3.5 text-[15.5px] font-semibold text-paper transition-colors hover:bg-paper/25"
+                >
+                  {tEvents("wayRaise")}
+                </Link>
+              ) : null}
             </div>
           </div>
         </section>

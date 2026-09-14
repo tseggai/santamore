@@ -7,6 +7,7 @@ import { useState, type FormEvent } from "react";
 import {
   generateDemoData,
   purgeDemoData,
+  refreshDemoPhotos,
   type DemoResult,
 } from "@/app/[locale]/admin/(protected)/demo/actions";
 
@@ -23,7 +24,7 @@ export function DemoTool({
   const [teams, setTeams] = useState("5");
   const [perTeam, setPerTeam] = useState("4");
   const [maxDonations, setMaxDonations] = useState("6");
-  const [busy, setBusy] = useState<"" | "generate" | "purge">("");
+  const [busy, setBusy] = useState<"" | "generate" | "purge" | "photos">("");
   const [result, setResult] = useState<DemoResult | null>(null);
   const [confirmPurge, setConfirmPurge] = useState(false);
 
@@ -54,6 +55,15 @@ export function DemoTool({
     router.refresh();
   };
 
+  const refreshPhotos = async () => {
+    setBusy("photos");
+    setResult(null);
+    const outcome = await refreshDemoPhotos().catch(() => ({ ok: false as const, error: "server" as const }));
+    setBusy("");
+    setResult(outcome);
+    router.refresh();
+  };
+
   const hasDemo = counts.users + counts.teams + counts.fundraisers + counts.donations > 0;
 
   return (
@@ -67,14 +77,14 @@ export function DemoTool({
             ["demoDonations", counts.donations],
           ] as const
         ).map(([key, value]) => (
-          <div key={key} className="rounded-brand border-[1.5px] border-line-soft bg-mist/50 px-4 py-3">
+          <div key={key} className="rounded-lg bg-mist px-4 py-3">
             <p className="font-mono text-2xl tabular-nums">{value}</p>
             <p className="mt-0.5 text-[13px] font-semibold text-black/60">{t(key)}</p>
           </div>
         ))}
       </div>
 
-      <form onSubmit={generate} className="rounded-brand border-[1.5px] border-line p-4 sm:p-5">
+      <form onSubmit={generate} className="rounded-lg bg-mist p-4 sm:p-5">
         <h2 className="text-[16px] font-bold">{t("demoGenerateHeading")}</h2>
         <p className="mt-1 text-[14px] text-black/60">{t("demoGenerateHint")}</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
@@ -130,7 +140,20 @@ export function DemoTool({
         </button>
       </form>
 
-      <div className="rounded-brand border-[1.5px] border-dashed border-red bg-red/5 p-4 sm:p-5">
+      <div className="rounded-lg bg-mist p-4 sm:p-5">
+        <h2 className="text-[16px] font-bold">{t("demoPhotosHeading")}</h2>
+        <p className="mt-1 text-[14px] text-black/70">{t("demoPhotosHint")}</p>
+        <button
+          type="button"
+          disabled={busy !== "" || !hasDemo}
+          onClick={refreshPhotos}
+          className="mt-3 rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-40"
+        >
+          {busy === "photos" ? t("demoPhotosBusy") : t("demoPhotos")}
+        </button>
+      </div>
+
+      <div className="rounded-lg bg-red/8 p-4 sm:p-5">
         <h2 className="text-[16px] font-bold text-red-dark">{t("demoPurgeHeading")}</h2>
         <p className="mt-1 text-[14px] text-black/70">{t("demoPurgeHint")}</p>
         {confirmPurge ? (
@@ -146,7 +169,7 @@ export function DemoTool({
             <button
               type="button"
               onClick={() => setConfirmPurge(false)}
-              className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold"
+              className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold"
             >
               {t("cancel")}
             </button>
@@ -156,7 +179,7 @@ export function DemoTool({
             type="button"
             disabled={busy !== "" || !hasDemo}
             onClick={() => setConfirmPurge(true)}
-            className="mt-3 rounded-lg border-[1.5px] border-red px-5 py-2.5 text-[14.5px] font-bold text-red-dark transition-colors hover:bg-red hover:text-paper disabled:opacity-40"
+            className="mt-3 rounded-lg bg-paper px-5 py-2.5 text-[14.5px] font-bold text-red-dark transition-colors hover:bg-red hover:text-paper disabled:opacity-40"
           >
             {t("demoPurge")}
           </button>
@@ -168,7 +191,9 @@ export function DemoTool({
           <p className="text-[14.5px] font-semibold text-sea" role="status">
             {result.created
               ? t("demoCreated", result.created)
-              : t("demoPurged", { count: result.purged?.users ?? 0 })}
+              : result.refreshed !== undefined
+                ? t("demoPhotosDone", { count: result.refreshed })
+                : t("demoPurged", { count: result.purged?.users ?? 0 })}
           </p>
         ) : (
           <p role="alert" className="text-[14.5px] font-semibold text-red-dark">

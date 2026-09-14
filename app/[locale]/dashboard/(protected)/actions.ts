@@ -105,11 +105,13 @@ export async function createFundraiserPage(
     let event: { id: string } | null = null;
     if (parsed.data.eventSlug) {
       // A chosen event must be published — the slug is client input.
+      // A page raises for a cause; the event is the occasion. No cause, no page.
       const { data } = await service
         .from("events")
         .select("id")
         .eq("slug", parsed.data.eventSlug)
         .eq("is_published", true)
+        .not("campaign_id", "is", null)
         .maybeSingle();
       event = data;
     } else {
@@ -119,6 +121,7 @@ export async function createFundraiserPage(
         .from("events")
         .select("id")
         .eq("is_published", true)
+        .not("campaign_id", "is", null)
         .gte("starts_at", new Date().toISOString())
         .order("starts_at", { ascending: true })
         .limit(1)
@@ -130,6 +133,7 @@ export async function createFundraiserPage(
               .from("events")
               .select("id")
               .eq("is_published", true)
+              .not("campaign_id", "is", null)
               .order("starts_at", { ascending: false })
               .limit(1)
               .maybeSingle()

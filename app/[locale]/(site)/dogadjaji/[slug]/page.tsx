@@ -143,6 +143,7 @@ export default async function EventPage({
     offers_shirts: Boolean((event as { offers_shirts?: boolean }).offers_shirts),
     going_count: Number((event as { going_count?: number }).going_count ?? 0),
     join: { signedIn: Boolean(user), stravaConnected: Boolean(stravaRow) },
+    campaign_slug: (event as { campaign_slug?: string | null }).campaign_slug ?? null,
     gallery: toGalleryImages((galleryRows ?? []) as PublicGalleryRow[]),
   };
 

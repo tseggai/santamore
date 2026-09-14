@@ -405,7 +405,9 @@
     "evFundraisePrompt": "Fundraise for this event?",
     "evStartFundraising": "Start fundraising",
     "rsvpUndecided": "Not decided yet",
-    "evJoin": "Join the challenge"
+    "evJoin": "Join the challenge",
+    "fundraiseNoCause": "This event has no cause to raise for",
+    "fundraiseNoCauseSub": "Pages raise money for a cause; this event (a sponsored challenge, for instance) has none attached. Pick an event that does."
   },
   "email": {
     "instructions": {
@@ -996,7 +998,13 @@
     "mdQuote": "Quote",
     "mdLinkPrompt": "Link address (empty removes the link)",
     "mdUndo": "Undo",
-    "mdRedo": "Redo"
+    "mdRedo": "Redo",
+    "demoPhotosHeading": "Demo avatars",
+    "demoPhotosHint": "Gives every generated runner an illustrated portrait and every generated team an abstract mark — never a photograph of a real person. Your own pages are untouched.",
+    "demoPhotos": "Refresh demo avatars",
+    "demoPhotosBusy": "Drawing…",
+    "demoPhotosDone": "Refreshed {count} avatars.",
+    "evCauseHint": "A cause is what pages raise for. With a cause, members can open fundraising pages for this event; without one — a sponsored challenge, say — the event has no fundraising."
   },
   "forms": {
     "nameLabel": "Full name",
@@ -1134,7 +1142,8 @@
     "joinedNote": "You're in — Strava is connected.",
     "joinProgress": "See your progress",
     "joinSignInTitle": "Sign in to join",
-    "joinSignInSub": "One email. Then connect Strava once, and every qualifying activity counts."
+    "joinSignInSub": "One email. Then connect Strava once, and every qualifying activity counts.",
+    "wayInHeading": "The way in"
   },
   "gallery": {
     "eyebrow": "Gallery",

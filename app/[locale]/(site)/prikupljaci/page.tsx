@@ -46,7 +46,7 @@ async function fetchBoard(eventSlug: string | undefined) {
   try {
     const supabase = await createClient();
     const [{ data: eventRows }, { data: pageRows }] = await Promise.all([
-      supabase.from("v_public_events").select("id, slug, name, starts_at").order("starts_at", { ascending: true }),
+      supabase.from("v_public_events").select("id, slug, name, starts_at").not("campaign_slug", "is", null).order("starts_at", { ascending: true }),
       supabase.from("v_fundraiser_totals").select("event_id, raised_cents"),
     ]);
     const counts = new Map<string, number>();
