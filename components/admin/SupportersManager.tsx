@@ -345,7 +345,8 @@ export function SupportersManager({
   const t = useTranslations("admin");
   const router = useRouter();
   const [open, setOpen] = useState<"" | "new" | string>("");
-  const [dealOpen, setDealOpen] = useState<"" | "new" | string>("");
+  // The sponsorship form is its own overlay: for a row's "+ Sponsorship" and for edits inside the supporter panel.
+  const [dealPanel, setDealPanel] = useState<{ supporterId: string; deal: SponsorshipRow | null } | null>(null);
   const [busy, setBusy] = useState(false);
   const supporter = supporters.find((s) => s.id === open) ?? null;
   const campaignName = new Map(campaigns.map((c) => [c.id, c.name]));
@@ -358,14 +359,9 @@ export function SupportersManager({
       .filter((d) => (d.status === "signed" || d.status === "active") && !d.is_in_kind)
       .reduce((sum, d) => sum + (d.amount_cents ?? 0), 0);
 
-  const openSupporter = (id: string, deal: "" | "new" = "") => {
-    setOpen(id);
-    setDealOpen(deal);
-  };
-  const close = () => {
-    setOpen("");
-    setDealOpen("");
-  };
+  const openSupporter = (id: string) => setOpen(id);
+  const close = () => setOpen("");
+  const dealSupporter = dealPanel ? supporters.find((s) => s.id === dealPanel.supporterId) : null;
   const setActive = async (ids: string[], active: boolean, clear?: () => void) => {
     setBusy(true);
     await setSupportersActive({ ids, active }).catch(() => null);
@@ -397,13 +393,9 @@ export function SupportersManager({
     {
       key: "deals",
       header: t("table.colSponsorships"),
-      align: "right",
-      cell: (s) => {
-        const count = dealsOf(s.id).length;
-        const signed = signedCents(s.id);
-        return count === 0 ? "—" : `${count}${signed > 0 ? ` · ${money(signed)}` : ""}`;
-      },
-      sort: (s) => signedCents(s.id),
+      align: "center",
+      cell: (s) => dealsOf(s.id).length || "—",
+      sort: (s) => dealsOf(s.id).length,
       filter: {
         options: [
           { value: "deals", label: t("table.hasSponsorship") },
@@ -414,7 +406,14 @@ export function SupportersManager({
           value === "deals" ? dealsOf(s.id).length > 0 : value === "offers" ? offersOf(s.id).length > 0 : dealsOf(s.id).length === 0 && offersOf(s.id).length === 0,
       },
     },
-    { key: "offers", header: t("table.colOffers"), align: "right", cell: (s) => offersOf(s.id).length || "—", sort: (s) => offersOf(s.id).length },
+    {
+      key: "signed",
+      header: t("table.colSigned"),
+      align: "right",
+      cell: (s) => (signedCents(s.id) > 0 ? money(signedCents(s.id)) : "—"),
+      sort: (s) => signedCents(s.id),
+    },
+    { key: "offers", header: t("table.colOffers"), align: "center", cell: (s) => offersOf(s.id).length || "—", sort: (s) => offersOf(s.id).length },
     {
       key: "website",
       header: t("table.colWebsite"),
@@ -464,16 +463,9 @@ export function SupportersManager({
               <div className="mt-6 border-t-[0.5px] border-line pt-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className={labelClass}>{t("suDealsHeading")}</p>
-                  {dealOpen === "" ? (
-                    <button type="button" onClick={() => setDealOpen("new")} className={ghost}>+ {t("spNew")}</button>
-                  ) : null}
+                  <button type="button" onClick={() => setDealPanel({ supporterId: supporter.id, deal: null })} className={ghost}>+ {t("spNew")}</button>
                 </div>
-                {dealOpen === "new" ? (
-                  <div className="mt-3 rounded-lg bg-paper p-4">
-                    <SponsorshipForm supporterId={supporter.id} sponsorship={null} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setDealOpen("")} />
-                  </div>
-                ) : null}
-                {deals.length === 0 && dealOpen !== "new" ? (
+                {deals.length === 0 ? (
                   <p className="mt-2 text-[14px] text-black/60">{t("suDealsEmpty")}</p>
                 ) : null}
                 {deals.length > 0 ? (
@@ -494,15 +486,10 @@ export function SupportersManager({
                             {deal.campaign_id && deal.event_id ? " · " : ""}
                             {deal.event_id ? eventName.get(deal.event_id) : null}
                           </span>
-                          <button type="button" onClick={() => setDealOpen(dealOpen === deal.id ? "" : deal.id)} className={`ml-auto ${rowButton} bg-mist`}>
+                          <button type="button" onClick={() => setDealPanel({ supporterId: supporter.id, deal })} className={`ml-auto ${rowButton} bg-mist`}>
                             {t("evEdit")}
                           </button>
                         </div>
-                        {dealOpen === deal.id ? (
-                          <div className="mt-3">
-                            <SponsorshipForm supporterId={supporter.id} sponsorship={deal} chapters={chapters} campaigns={campaigns} events={events} onDone={() => setDealOpen("")} />
-                          </div>
-                        ) : null}
                       </li>
                     ))}
                   </ul>
@@ -542,6 +529,24 @@ export function SupportersManager({
         </div>
       </SidePanel>
 
+      <SidePanel
+        open={dealPanel !== null}
+        title={dealPanel?.deal ? t("spEditTitle") : `${t("spNew")}${dealSupporter ? ` · ${dealSupporter.name}` : ""}`}
+        onClose={() => setDealPanel(null)}
+      >
+        {dealPanel ? (
+          <SponsorshipForm
+            key={dealPanel.deal?.id ?? `new:${dealPanel.supporterId}`}
+            supporterId={dealPanel.supporterId}
+            sponsorship={dealPanel.deal}
+            chapters={chapters}
+            campaigns={campaigns}
+            events={events}
+            onDone={() => setDealPanel(null)}
+          />
+        ) : null}
+      </SidePanel>
+
       <DataTable
         rows={supporters}
         getId={(s) => s.id}
@@ -552,8 +557,7 @@ export function SupportersManager({
         emptyLabel={t("suEmpty")}
         rowActions={(s) => (
           <>
-            <button type="button" onClick={() => openSupporter(s.id)} className={rowButton}>{t("evEdit")}</button>
-            <button type="button" onClick={() => openSupporter(s.id, "new")} className={rowButton}>+ {t("spNew")}</button>
+            <button type="button" onClick={() => setDealPanel({ supporterId: s.id, deal: null })} className={rowButton}>+ {t("spNew")}</button>
             <button type="button" disabled={busy} onClick={() => setActive([s.id], !s.is_active)} className={rowButton}>
               {s.is_active ? t("table.deactivate") : t("table.activate")}
             </button>

@@ -13,26 +13,40 @@ import { Link } from "@/i18n/navigation";
 export function PreviewFrame({
   children,
   liveHref,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   children: ReactNode;
   /** The published page, when there is one to open in a new tab. */
   liveHref?: string | null;
+  /** Controlled mode: the host owns the toggle (an icon in its footer). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
   const t = useTranslations("admin");
-  const [open, setOpen] = useState(false);
+  const [ownOpen, setOwnOpen] = useState(false);
+  const controlled = controlledOpen !== undefined;
+  const open = controlled ? controlledOpen : ownOpen;
+  const setOpen = (next: boolean | ((current: boolean) => boolean)) => {
+    const value = typeof next === "function" ? next(open) : next;
+    if (controlled) onOpenChange?.(value);
+    else setOwnOpen(value);
+  };
   const [width, setWidth] = useState<"phone" | "desktop">("phone");
 
   return (
     <div className="mt-4">
       <div className="flex flex-wrap items-center gap-2">
-        <button
-          type="button"
-          aria-expanded={open}
-          onClick={() => setOpen((value) => !value)}
-          className="rounded-lg bg-paper px-3 py-1.5 text-[13.5px] font-semibold transition-colors hover:bg-mist-2"
-        >
-          {open ? t("previewHide") : t("previewShow")}
-        </button>
+        {controlled ? null : (
+          <button
+            type="button"
+            aria-expanded={open}
+            onClick={() => setOpen((value) => !value)}
+            className="rounded-lg bg-paper px-3 py-1.5 text-[13.5px] font-semibold transition-colors hover:bg-mist-2"
+          >
+            {open ? t("previewHide") : t("previewShow")}
+          </button>
+        )}
         {open ? (
           <div role="group" aria-label={t("previewWidth")} className="flex overflow-hidden rounded-lg bg-paper">
             {(["phone", "desktop"] as const).map((option) => (

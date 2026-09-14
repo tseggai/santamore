@@ -178,3 +178,75 @@ export async function deleteGalleryItem(input: unknown): Promise<ActionResult> {
   revalidateGallery();
   return { ok: true };
 }
+
+const localeDraft = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().trim().max(200),
+  excerpt: z.string().trim().max(500),
+  bodyMd: z.string().trim().max(50_000),
+});
+
+const postGroupSchema = z.object({
+  slug: z.string().trim().min(1).max(120),
+  coverPath: z.string().trim().max(300).nullable(),
+  published: z.boolean(),
+  locales: z.record(z.enum(routing.locales), localeDraft),
+});
+
+export interface PostGroupResult extends ActionResult {
+  /** Row id per locale after the save, so the editor can keep editing. */
+  ids?: Partial<Record<string, string>>;
+}
+
+/**
+ * One post in up to three languages, saved together: same slug and cover,
+ * one publish state. A language with no title and body is skipped (and an
+ * existing row for it is deleted); the rest are upserted.
+ */
+export async function savePostGroup(input: unknown): Promise<PostGroupResult> {
+  const parsed = postGroupSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, detail: "invalid" };
+  const data = parsed.data;
+  const slug = slugify(data.slug);
+  if (!slug) return { ok: false, detail: "invalid" };
+
+  const supabase = await createClient();
+  const ids: Partial<Record<string, string>> = {};
+  for (const locale of routing.locales) {
+    const draft = data.locales[locale];
+    if (!draft) continue;
+    const empty = draft.title.length === 0 && draft.bodyMd.length === 0;
+    if (empty) {
+      if (draft.id) {
+        const { error } = await supabase.from("posts").delete().eq("id", draft.id);
+        if (error) return { ok: false, detail: error.message };
+      }
+      continue;
+    }
+    if (draft.title.length < 3 || draft.bodyMd.length === 0) return { ok: false, detail: `incomplete:${locale}` };
+
+    let publishedAt: string | null = data.published ? new Date().toISOString() : null;
+    if (draft.id && data.published) {
+      const { data: existing } = await supabase.from("posts").select("published_at").eq("id", draft.id).maybeSingle();
+      publishedAt = existing?.published_at ?? publishedAt;
+    }
+    const row = {
+      locale,
+      slug,
+      title: draft.title,
+      excerpt: draft.excerpt || null,
+      body_md: draft.bodyMd,
+      cover_path: data.coverPath,
+      published_at: publishedAt,
+    };
+    const { data: saved, error } = draft.id
+      ? await supabase.from("posts").update(row).eq("id", draft.id).select("id").single()
+      : await supabase.from("posts").insert(row).select("id").single();
+    if (error || !saved) return { ok: false, detail: error?.code === "23505" ? "slug" : (error?.message ?? "save failed") };
+    ids[locale] = saved.id;
+  }
+
+  revalidatePath("/[locale]/admin/sadrzaj", "page");
+  revalidatePath("/[locale]/vijesti", "layout");
+  return { ok: true, ids };
+}

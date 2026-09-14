@@ -194,3 +194,23 @@ export async function registerStravaWebhook(): Promise<PerkActionResult> {
     return { ok: false, error: "server", message: error instanceof Error ? error.message : "" };
   }
 }
+
+/**
+ * Drop every subscription on the Strava app and create a fresh one for
+ * this site. The only thing that can change is the callback host, which
+ * comes from NEXT_PUBLIC_SITE_URL; credentials live in the environment.
+ */
+export async function reregisterStravaWebhook(): Promise<PerkActionResult> {
+  if (!(await requireStaff())) return { ok: false, error: "forbidden" };
+  const config = stravaConfig();
+  if (!config.configured || !config.verifyToken) return { ok: false, error: "unconfigured" };
+  const callback = `${siteOrigin()}/api/webhooks/strava`;
+  try {
+    for (const subscription of await viewSubscriptions()) await deleteSubscription(subscription.id);
+    await createSubscription(callback);
+    revalidatePath("/[locale]/admin/dogadjaji", "page");
+    return { ok: true };
+  } catch (error) {
+    return { ok: false, error: "server", message: error instanceof Error ? error.message : "" };
+  }
+}

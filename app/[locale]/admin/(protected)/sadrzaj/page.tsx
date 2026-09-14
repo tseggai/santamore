@@ -38,10 +38,7 @@ export default async function AdminContentPage({
 
   return (
     <div className="py-8">
-      <h1 className="type-display text-2xl">{t("contentTitle")}</h1>
-
-      <h2 className="mt-6 text-[16px] font-bold">{t("postListHeading")}</h2>
-      <PostsManager posts={posts} initialPostId={postId} />
+      <PostsManager posts={posts} initialPostId={postId} title={t("contentTitle")} lead={t("contentLead")} />
 
       <h2 className="mt-12 text-[16px] font-bold">{t("galleryLooseHeading")}</h2>
       <p className="mt-1 text-[14px] text-black/60">{t("galleryLooseHint")}</p>

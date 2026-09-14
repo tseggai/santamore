@@ -8,8 +8,9 @@ import { setEventPublished, setEventsPublished } from "@/app/[locale]/admin/(pro
 import { EventForm, type EventFormValues, type Option } from "@/components/admin/EventForm";
 import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
 import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
-import { StravaWebhookPanel } from "@/components/admin/StravaWebhookPanel";
-import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
+import { Chip, DataTable, Thumb, bulkButton, iconButton, rowButton, type Column } from "@/components/console/DataTable";
+import { ExternalIcon, EyeIcon } from "@/components/Icons";
+import { StravaWebhookButton } from "@/components/admin/StravaWebhookPanel";
 import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
 import type { WebhookStatus } from "@/app/[locale]/admin/(protected)/izazovi/actions";
@@ -76,12 +77,7 @@ export function EventsManager({
     {
       key: "name",
       header: t("table.colName"),
-      cell: (e) => (
-        <span className="block max-w-[260px] truncate">
-          <span className="font-semibold">{e.name}</span>
-          <span className="ml-2 font-mono text-[12.5px] text-black/45">/{e.slug}</span>
-        </span>
-      ),
+      cell: (e) => <span className="block max-w-[260px] truncate font-semibold">{e.name}</span>,
       sort: (e) => e.name,
     },
     {
@@ -122,14 +118,14 @@ export function EventsManager({
     {
       key: "registrations",
       header: t("table.colRegistrations"),
-      align: "right",
+      align: "center",
       cell: (e) => (
         <Link href={`/admin/prijave?event=${e.id}`} className="underline underline-offset-2 hover:text-sea">{e.registrations}</Link>
       ),
       sort: (e) => e.registrations,
     },
-    { key: "pages", header: t("table.colPages"), align: "right", cell: (e) => e.pages, sort: (e) => e.pages },
-    { key: "going", header: t("table.colGoing"), align: "right", cell: (e) => e.going, sort: (e) => e.going },
+    { key: "pages", header: t("table.colPages"), align: "center", cell: (e) => e.pages, sort: (e) => e.pages },
+    { key: "going", header: t("table.colGoing"), align: "center", cell: (e) => e.going, sort: (e) => e.going },
   ];
 
   return (
@@ -138,12 +134,14 @@ export function EventsManager({
         title={title}
         lead={lead}
         action={
-          <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
-            + {t("evNew")}
-          </button>
+          <span className="flex flex-wrap items-center gap-2">
+            <StravaWebhookButton webhook={webhook} />
+            <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
+              + {t("evNew")}
+            </button>
+          </span>
         }
       />
-      <StravaWebhookPanel webhook={webhook} />
       <SidePanel
         open={open !== ""}
         title={open === "new" ? t("evNew") : (openEvent?.name ?? "")}
@@ -174,9 +172,14 @@ export function EventsManager({
         rowActions={(e) => (
           <>
             {e.is_published ? (
-              <Link href={`/dogadjaji/${e.slug}`} target="_blank" className={rowButton}>{t("table.view")}</Link>
-            ) : null}
-            <button type="button" onClick={() => setOpen(e.id)} className={rowButton}>{t("evEdit")}</button>
+              <Link href={`/dogadjaji/${e.slug}`} target="_blank" className={iconButton} aria-label={t("table.view")} title={t("table.view")}>
+                <ExternalIcon />
+              </Link>
+            ) : (
+              <button type="button" onClick={() => setOpen(e.id)} className={iconButton} aria-label={t("previewShow")} title={t("previewShow")}>
+                <EyeIcon />
+              </button>
+            )}
             <button type="button" disabled={busy === e.id} onClick={() => togglePublished(e)} className={rowButton}>
               {e.is_published ? t("galleryUnpublish") : t("galleryPublish")}
             </button>

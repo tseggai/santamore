@@ -3,7 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
+import { DataTable, Thumb, bulkButton, type Column } from "@/components/console/DataTable";
+import { formatShortDate } from "@/lib/dates";
 import { SidePanel } from "@/components/console/SidePanel";
 
 import { FundraiserStatusButtons } from "@/components/admin/FundraiserModeration";
@@ -68,7 +69,16 @@ export interface MemberTeam {
 }
 
 type Kind = "athletes" | "fundraisers" | "participants" | "captains" | "donors" | "staff";
-const KINDS: Kind[] = ["athletes", "fundraisers", "participants", "captains", "donors", "staff"];
+const KINDS: Kind[] = ["staff", "athletes", "fundraisers", "participants", "captains", "donors"];
+/** One fixed dot per role, brand tones; a tooltip names it. */
+const KIND_DOT: Record<Kind, string> = {
+  staff: "bg-ink",
+  athletes: "bg-sea",
+  fundraisers: "bg-red",
+  participants: "bg-sea/45",
+  captains: "bg-red-dark/70",
+  donors: "bg-ink/40",
+};
 
 function isKind(member: MemberRow, kind: Kind): boolean {
   switch (kind) {
@@ -159,13 +169,20 @@ export function MembersManager({
       key: "kind",
       header: t("table.colRoles"),
       cell: (m) => (
-        <span className="flex flex-wrap gap-1">
-          {m.role !== "member" ? <Chip tone="ink">{t(`memberRole.${m.role}`)}</Chip> : null}
-          {m.strava ? <Chip tone="sea">{t("memberFilter.athletes")}</Chip> : null}
-          {m.pages > 0 ? <Chip tone="sea">{t("memberFilter.fundraisers")}</Chip> : null}
-          {m.registrations > 0 || m.rsvps > 0 ? <Chip>{t("memberFilter.participants")}</Chip> : null}
-          {m.teams > 0 ? <Chip>{t("memberChipCaptain")}</Chip> : null}
-          {m.donations > 0 ? <Chip>{t("memberChipDonor")}</Chip> : null}
+        <span className="flex items-center gap-1.5">
+          {KINDS.map((kind) => {
+            const on = isKind(m, kind);
+            const label = kind === "staff" && m.role !== "member" ? t(`memberRole.${m.role}`) : t(`memberFilter.${kind}`);
+            return (
+              <span
+                key={kind}
+                role="img"
+                aria-label={on ? label : `${label}: —`}
+                title={on ? label : `${label}: —`}
+                className={`inline-block h-3 w-3 rounded-full ${on ? KIND_DOT[kind] : "bg-mist-2"}`}
+              />
+            );
+          })}
         </span>
       ),
       filter: {
@@ -190,7 +207,7 @@ export function MembersManager({
     {
       key: "joined",
       header: t("table.colJoined"),
-      cell: (m) => <span className="font-mono tabular-nums text-black/60">{m.joined_at?.slice(0, 10) ?? "—"}</span>,
+      cell: (m) => <span className="font-mono tabular-nums text-black/60">{formatShortDate(m.joined_at, locale)}</span>,
       sort: (m) => m.joined_at,
     },
     {
@@ -199,7 +216,7 @@ export function MembersManager({
       cell: (m) =>
         m.strava ? (
           <span className="font-mono tabular-nums text-black/60">
-            {m.strava_last_sync ? m.strava_last_sync.slice(0, 10) : "—"} · {t("memberRuns", { count: m.activities_30d })}
+            {formatShortDate(m.strava_last_sync, locale)} · {t("memberRuns", { count: m.activities_30d })}
           </span>
         ) : (
           <span className="text-black/40">—</span>
@@ -226,9 +243,6 @@ export function MembersManager({
         searchText={(m) => `${m.full_name ?? ""} ${m.email ?? ""}`}
         searchPlaceholder={t("memberSearch")}
         emptyLabel={t("membersEmpty")}
-        rowActions={(m) => (
-          <button type="button" onClick={() => setOpen(m.id)} className={rowButton}>{t("memberOpen")}</button>
-        )}
         bulkActions={(ids) => (
           <>
             <button type="button" onClick={() => copyEmails(ids)} className={bulkButton}>

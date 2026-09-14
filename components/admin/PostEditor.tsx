@@ -2,14 +2,18 @@
 
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
-import { savePost } from "@/app/[locale]/admin/(protected)/sadrzaj/actions";
+import { savePostGroup } from "@/app/[locale]/admin/(protected)/sadrzaj/actions";
+import { translatePost } from "@/app/[locale]/admin/(protected)/sadrzaj/translate";
 import { CoverField } from "@/components/admin/CoverField";
+import { MarkdownToolbar } from "@/components/admin/MarkdownToolbar";
 import { PreviewFrame } from "@/components/admin/PreviewFrame";
+import { EyeIcon } from "@/components/Icons";
 import { PostArticle } from "@/components/news/PostArticle";
+import { formatShortDate } from "@/lib/dates";
 import { slugify } from "@/lib/slug";
-import { htmlLang, routing, type Locale } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
 
 export interface EditablePost {
   id: string;
@@ -22,47 +26,75 @@ export interface EditablePost {
   published_at: string | null;
 }
 
+/** One post = the same slug in up to three languages. */
+export interface PostGroup {
+  slug: string;
+  rows: EditablePost[];
+}
+
+interface Draft {
+  id?: string;
+  title: string;
+  excerpt: string;
+  body: string;
+}
+
 type State = "idle" | "busy" | "done" | "error" | "slug";
 
 const inputClass =
   "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 const labelClass = "text-[13.5px] font-semibold";
 
-/** Markdown post editor — one row per locale, same slug links translations. */
-export function PostEditor({ post, onSaved }: { post: EditablePost | null; onSaved?: () => void }) {
+function draftFrom(row: EditablePost | undefined): Draft {
+  return { id: row?.id, title: row?.title ?? "", excerpt: row?.excerpt ?? "", body: row?.body_md ?? "" };
+}
+
+/**
+ * Markdown post editor with one tab per site language. Slug, cover and
+ * publish state are shared; each language has its own title, excerpt and
+ * body, and can be drafted from another language with one click.
+ */
+export function PostEditor({ group, onSaved }: { group: PostGroup | null; onSaved?: () => void }) {
   const t = useTranslations("admin");
   const uiLocale = useLocale() as Locale;
   const router = useRouter();
-  const [locale, setLocale] = useState<string>(post?.locale ?? routing.defaultLocale);
-  const [title, setTitle] = useState(post?.title ?? "");
-  const [slug, setSlug] = useState(post?.slug ?? "");
-  const [slugTouched, setSlugTouched] = useState(Boolean(post));
-  const [excerpt, setExcerpt] = useState(post?.excerpt ?? "");
-  const [body, setBody] = useState(post?.body_md ?? "");
-  const [coverPath, setCoverPath] = useState<string | null>(post?.cover_path ?? null);
-  const [coverFolder] = useState(() => `covers/posts/${post?.id ?? `new-${crypto.randomUUID()}`}`);
-  const [published, setPublished] = useState(Boolean(post?.published_at));
+  const first = group?.rows[0];
+  const [slug, setSlug] = useState(group?.slug ?? "");
+  const [slugTouched, setSlugTouched] = useState(Boolean(group));
+  const [drafts, setDrafts] = useState<Record<Locale, Draft>>(
+    () => Object.fromEntries(routing.locales.map((l) => [l, draftFrom(group?.rows.find((r) => r.locale === l))])) as Record<Locale, Draft>,
+  );
+  const [tab, setTab] = useState<Locale>(
+    (group?.rows.find((r) => r.locale === routing.defaultLocale)?.locale ?? group?.rows[0]?.locale ?? routing.defaultLocale) as Locale,
+  );
+  const [coverPath, setCoverPath] = useState<string | null>(first?.cover_path ?? null);
+  const [coverFolder] = useState(() => `covers/posts/${first?.id ?? `new-${crypto.randomUUID()}`}`);
+  const [published] = useState(Boolean(first?.published_at));
+  const [preview, setPreview] = useState(false);
   const [state, setState] = useState<State>("idle");
   const [detail, setDetail] = useState<string | null>(null);
+  const [translating, setTranslating] = useState(false);
+  const [translateNote, setTranslateNote] = useState<string | null>(null);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
 
-  const effectiveSlug = slug || slugify(title);
-  const dateLabel = new Intl.DateTimeFormat(htmlLang(uiLocale), { day: "numeric", month: "long", year: "numeric" }).format(
-    post?.published_at ? new Date(post.published_at) : new Date(),
-  );
+  const draft = drafts[tab];
+  const setDraft = (patch: Partial<Draft>) => setDrafts((all) => ({ ...all, [tab]: { ...all[tab], ...patch } }));
+  const filled = (l: Locale) => drafts[l].title.trim().length > 0 || drafts[l].body.trim().length > 0;
+  const effectiveSlug = slug || slugify(drafts[routing.defaultLocale as Locale].title || draft.title);
+  const dateLabel = formatShortDate(first?.published_at ?? new Date().toISOString(), uiLocale);
+  const sources = routing.locales.filter((l) => l !== tab && filled(l as Locale)) as Locale[];
 
-  const submit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const save = async (publish: boolean) => {
+    if (state === "busy") return;
     setState("busy");
     setDetail(null);
-    const result = await savePost({
-      ...(post ? { id: post.id } : {}),
-      locale,
+    const result = await savePostGroup({
       slug: effectiveSlug,
-      title,
-      excerpt,
-      bodyMd: body,
-      coverPath: coverPath ?? "",
-      published,
+      coverPath,
+      published: publish,
+      locales: Object.fromEntries(
+        routing.locales.map((l) => [l, { id: drafts[l as Locale].id, title: drafts[l as Locale].title, excerpt: drafts[l as Locale].excerpt, bodyMd: drafts[l as Locale].body }]),
+      ),
     }).catch(() => ({ ok: false, detail: "network" }));
     if (result.ok) {
       setState("done");
@@ -74,19 +106,28 @@ export function PostEditor({ post, onSaved }: { post: EditablePost | null; onSav
     }
   };
 
+  const translate = async (from: Locale) => {
+    setTranslating(true);
+    setTranslateNote(null);
+    const source = drafts[from];
+    const result = await translatePost({ from, to: tab, title: source.title, excerpt: source.excerpt, body: source.body }).catch(() => ({ ok: false as const, error: "server" as const }));
+    setTranslating(false);
+    if (result.ok) {
+      setDraft({ title: result.title, excerpt: result.excerpt, body: result.body });
+      setTranslateNote(t("postTranslated"));
+    } else {
+      setTranslateNote(result.error === "unconfigured" ? t("postTranslateUnconfigured") : `${t("actionError")} ${"detail" in result && result.detail ? result.detail : ""}`.trim());
+    }
+  };
+
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    void save(published);
+  };
+
   return (
     <form onSubmit={submit} className="grid gap-4">
       <div className="grid gap-4 sm:grid-cols-3">
-        <label className={labelClass}>
-          {t("postLocale")}
-          <select value={locale} onChange={(e) => setLocale(e.target.value)} className={inputClass}>
-            {routing.locales.map((code) => (
-              <option key={code} value={code}>
-                {code}
-              </option>
-            ))}
-          </select>
-        </label>
         <label className={`${labelClass} sm:col-span-2`}>
           {t("postSlug")}
           <input
@@ -100,33 +141,70 @@ export function PostEditor({ post, onSaved }: { post: EditablePost | null; onSav
             className={`${inputClass} font-mono`}
           />
         </label>
+        <div className="sm:col-span-3">
+          <CoverField value={coverPath} onChange={setCoverPath} folder={coverFolder} />
+        </div>
       </div>
+
+      {/* Language tabs: filled ones carry a dot. */}
+      <div role="tablist" aria-label={t("postLocale")} className="flex flex-wrap gap-1.5 border-b-[0.5px] border-line pb-2">
+        {routing.locales.map((l) => (
+          <button
+            key={l}
+            type="button"
+            role="tab"
+            aria-selected={tab === l}
+            onClick={() => {
+              setTab(l as Locale);
+              setTranslateNote(null);
+            }}
+            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-[13px] uppercase tracking-[0.08em] transition-colors ${
+              tab === l ? "bg-ink text-paper" : "bg-paper hover:bg-mist-2"
+            }`}
+          >
+            {l}
+            <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${filled(l as Locale) ? (tab === l ? "bg-red" : "bg-sea") : "bg-black/20"}`} />
+          </button>
+        ))}
+        {sources.length > 0 ? (
+          <span className="ml-auto flex flex-wrap items-center gap-1.5">
+            {sources.map((from) => (
+              <button
+                key={from}
+                type="button"
+                disabled={translating}
+                onClick={() => translate(from)}
+                className="rounded-lg bg-paper px-3 py-1.5 text-[13px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-50"
+              >
+                {translating ? "…" : t("postTranslateFrom", { locale: from.toUpperCase() })}
+              </button>
+            ))}
+          </span>
+        ) : null}
+      </div>
+      {translateNote ? <p className="text-[13.5px] font-semibold text-sea">{translateNote}</p> : null}
+
       <label className={labelClass}>
         {t("postTitle")}
-        <input value={title} onChange={(e) => setTitle(e.target.value)} required minLength={3} maxLength={200} className={inputClass} />
+        <input value={draft.title} onChange={(e) => setDraft({ title: e.target.value })} maxLength={200} className={inputClass} />
       </label>
       <label className={labelClass}>
         {t("postExcerpt")}
-        <textarea value={excerpt} onChange={(e) => setExcerpt(e.target.value)} rows={2} maxLength={500} className={inputClass} />
+        <textarea value={draft.excerpt} onChange={(e) => setDraft({ excerpt: e.target.value })} rows={2} maxLength={500} className={inputClass} />
       </label>
-      <label className={labelClass}>
-        {t("postBody")}
+      <div>
+        <label htmlFor={`postBody-${tab}`} className={labelClass}>{t("postBody")}</label>
+        <MarkdownToolbar textarea={bodyRef} value={draft.body} onChange={(body) => setDraft({ body })} folder={`posts/${first?.id ?? "new"}`} />
         <textarea
-          value={body}
-          onChange={(e) => setBody(e.target.value)}
-          required
-          rows={14}
+          id={`postBody-${tab}`}
+          ref={bodyRef}
+          value={draft.body}
+          onChange={(e) => setDraft({ body: e.target.value })}
+          rows={16}
           maxLength={50000}
           className={`${inputClass} font-mono text-[14px]`}
         />
-      </label>
-
-      <CoverField value={coverPath} onChange={setCoverPath} folder={coverFolder} />
-
-      <label className="flex items-center gap-2 text-[14.5px] font-semibold">
-        <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="h-4 w-4 accent-red" />
-        {t("postPublished")}
-      </label>
+      </div>
 
       {state === "error" ? (
         <p role="alert" className="text-[14px] font-semibold text-red-dark">
@@ -134,24 +212,40 @@ export function PostEditor({ post, onSaved }: { post: EditablePost | null; onSav
           {detail ? <span className="block font-mono text-[12.5px] font-normal text-black/60">{detail}</span> : null}
         </p>
       ) : null}
-      {state === "slug" ? (
-        <p role="alert" className="text-[14px] font-semibold text-red-dark">{t("postSlugTaken")}</p>
-      ) : null}
+      {state === "slug" ? <p role="alert" className="text-[14px] font-semibold text-red-dark">{t("postSlugTaken")}</p> : null}
       {state === "done" ? <p className="text-[14px] font-semibold text-sea">{t("postSaved")}</p> : null}
 
-      <PreviewFrame liveHref={post?.published_at ? `/vijesti/${post.slug}` : null}>
+      <PreviewFrame open={preview} onOpenChange={setPreview} liveHref={first?.published_at ? `/vijesti/${group?.slug}` : null}>
         <article className="mx-auto max-w-3xl px-5 py-10">
-          <PostArticle title={title} dateLabel={dateLabel} coverPath={coverPath} bodyMd={body} preview />
+          <PostArticle title={draft.title} dateLabel={dateLabel} coverPath={coverPath} bodyMd={draft.body} preview />
         </article>
       </PreviewFrame>
 
-      <div className="sticky bottom-0 -mx-5 flex gap-2 border-t-[0.5px] border-line bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+      <div className="sticky bottom-0 -mx-5 flex items-center gap-2 border-t-[0.5px] border-line bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+        <button
+          type="button"
+          aria-pressed={preview}
+          aria-label={preview ? t("previewHide") : t("previewShow")}
+          title={preview ? t("previewHide") : t("previewShow")}
+          onClick={() => setPreview((v) => !v)}
+          className={`inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${preview ? "bg-ink text-paper" : "bg-paper text-black/70 hover:bg-mist-2 hover:text-sea"}`}
+        >
+          <EyeIcon />
+        </button>
         <button
           type="submit"
           disabled={state === "busy"}
+          className="rounded-lg bg-paper px-5 py-2.5 text-[14.5px] font-bold transition-colors hover:bg-mist-2 disabled:opacity-60"
+        >
+          {published ? t("evSave") : t("postSaveDraft")}
+        </button>
+        <button
+          type="button"
+          disabled={state === "busy"}
+          onClick={() => save(!published)}
           className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
         >
-          {t("postSave")}
+          {published ? t("galleryUnpublish") : t("galleryPublish")}
         </button>
       </div>
     </form>
