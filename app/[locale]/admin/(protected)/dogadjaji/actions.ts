@@ -204,3 +204,23 @@ export async function createChapter(
   revalidatePath("/[locale]/admin", "layout");
   return { ok: true, chapter: data };
 }
+
+/** Publish / unpublish several events at once. */
+export async function setEventsPublished(input: unknown): Promise<EventActionResult> {
+  const parsed = z
+    .object({ ids: z.array(z.string().uuid()).min(1).max(200), published: z.boolean() })
+    .safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("events")
+    .update({ is_published: parsed.data.published })
+    .in("id", parsed.data.ids);
+  if (error) return { ok: false, error: "server" };
+
+  revalidatePath("/[locale]/admin/dogadjaji", "page");
+  revalidatePath("/[locale]/dogadjaji", "layout");
+  revalidatePath("/[locale]", "page");
+  return { ok: true };
+}

@@ -519,7 +519,7 @@ export function EventForm({
                       <span className="text-black/60">{draft.supporterName} · {draft.rewardLabel}</span>
                       <span className="rounded-full bg-mist px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-black/60">{t("evOfferPending")}</span>
                       <button type="button" onClick={() => setPendingOffers((list) => list.filter((_, i) => i !== index))} className="ml-auto text-[13px] font-semibold text-red-dark underline underline-offset-2">
-                        {t("evTierRemove")}
+                        {t("evRemoveTier")}
                       </button>
                     </li>
                   ))}

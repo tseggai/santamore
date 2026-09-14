@@ -119,3 +119,23 @@ export async function saveCampaign(input: unknown): Promise<CampaignActionResult
   revalidatePath("/[locale]", "page");
   return { ok: true };
 }
+
+/** Make causes public or draft without touching anything else. */
+export async function setCampaignsPublic(input: unknown): Promise<CampaignActionResult> {
+  const parsed = z
+    .object({ ids: z.array(z.string().uuid()).min(1).max(200), isPublic: z.boolean() })
+    .safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("campaigns")
+    .update({ is_public: parsed.data.isPublic })
+    .in("id", parsed.data.ids);
+  if (error) return { ok: false, error: "server" };
+
+  revalidatePath("/[locale]/admin/kampanje", "page");
+  revalidatePath("/[locale]/kampanje", "layout");
+  revalidatePath("/[locale]", "page");
+  return { ok: true };
+}

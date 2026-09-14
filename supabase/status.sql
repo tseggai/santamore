@@ -55,5 +55,8 @@ select * from (values
   ,('20260914000021_covers_gallery_scope',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'gallery_items' and column_name = 'campaign_id'))
+  ,('20260914000022_staff_members_avatar',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'v_staff_members' and column_name = 'avatar_url'))
 ) as m (migration, applied)
 order by migration;
