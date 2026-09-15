@@ -278,18 +278,16 @@ export function DonateFlow({
         {/* Never a dead-end thank-you (brief §9.8). */}
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <button type="button" onClick={share} className={primaryBtn}>
-            {t("confShare")}
+            {campaign.kind === "fundraiser" ? t("confShareFundraiser") : t("confShareCause")}
           </button>
-          {inDialog ? (
-            <button type="button" onClick={onClose} className={secondaryBtn}>
-              {t("close")}
-            </button>
-          ) : backPath ? (
+          {!inDialog && backPath ? (
             <Link href={backPath} className={secondaryBtn}>
               {t("backToPage")}
             </Link>
           ) : null}
-          <Link href="/prikupljaci" className={secondaryBtn}>
+          {/* The overlay lives in the layout, so it must close before the
+              page underneath changes — otherwise the thank-you just stays. */}
+          <Link href="/dashboard/prikupljaj" onClick={onClose} className={secondaryBtn}>
             {t("confStartOwn")}
           </Link>
         </div>

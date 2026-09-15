@@ -139,7 +139,6 @@
     "confTitle": "Hvala, {name}!",
     "confEmailNote": "Poslali smo ti ove podatke i na e-mail.",
     "confLedgerNote": "Kad uparimo uplatu, tvoja donacija se pojavljuje u javnom registru.",
-    "confShare": "Podijeli kampanju",
     "confStartOwn": "Ili napravi svoju stranicu za prikupljanje",
     "backToPage": "Nazad na stranicu",
     "stepAmount": "Iznos",
@@ -152,7 +151,9 @@
     "summaryGift": "Tvoja donacija",
     "summaryFrom": "Od",
     "summaryAnonymous": "{name} (javno anonimno)",
-    "emailHint": "Samo za podatke o uplati i potvrdu. Nikad se ne prikazuje javno."
+    "emailHint": "Samo za podatke o uplati i potvrdu. Nikad se ne prikazuje javno.",
+    "confShareFundraiser": "Podijeli ovog prikupljača",
+    "confShareCause": "Podijeli ovaj cilj"
   },
   "runner": {
     "team": "Tim",

@@ -112,6 +112,44 @@ export function EventPageView({
     </div>
   );
 
+  const rewards =
+    event.kind === "challenge" && event.perks && event.perks.length > 0 ? (
+      <section className="mt-8">
+        <h2 className="text-[17px] font-bold">{t("rewardsHeading")}</h2>
+        <ul className="mt-3 space-y-2">
+          {event.perks.map((perk) => {
+            const left = perk.daily_cap !== null && perk.issued_today !== undefined ? Math.max(0, perk.daily_cap - perk.issued_today) : null;
+            return (
+              <li key={perk.slug} className="rounded-lg bg-mist px-5 py-4">
+                <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-black/60">
+                  {perk.partner_url && !preview ? (
+                    <a href={perk.partner_url} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-sea">{perk.partner_name} ↗</a>
+                  ) : (
+                    perk.partner_name
+                  )}
+                </p>
+                <p className="type-display mt-1 text-2xl">{perk.reward_label}</p>
+                <p className="mt-2 text-[15px] leading-relaxed text-black/80">
+                  <PerkRule challenge={perk} />
+                </p>
+                <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13.5px]">
+                  {left !== null ? <span className="font-mono tabular-nums text-sea">{tPerks("leftToday", { count: left })}</span> : null}
+                  {perk.starts_at || perk.ends_at ? (
+                    <span className="text-black/60">{fmt(perk.starts_at ?? null)} — {fmt(perk.ends_at ?? null)}</span>
+                  ) : null}
+                  {preview ? null : (
+                    <Link href={`/izazovi/${perk.slug}`} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">{tPerks("share")}</Link>
+                  )}
+                </p>
+              </li>
+            );
+          })}
+        </ul>
+</section>
+    ) : null;
+
+  const dark = event.kind === "challenge";
+
   const registerButton =
     registrationState === "open" ? (
       preview ? (
@@ -175,15 +213,18 @@ export function EventPageView({
           : null}
       </div>
 
-      {/* 3 — the two ways in */}
-      <div className="mt-6 rounded-lg bg-mist p-5 sm:p-6">
+      {rewards}
+
+      {/* 3 — the two ways in. A challenge's way in is an action (sign in,
+          connect Strava), so it sits on a dark surface, apart from the facts. */}
+      <div className={`mt-6 rounded-lg p-5 sm:p-6 ${dark ? "bg-sea text-paper" : "bg-mist"}`}>
         <div className={`grid gap-4 ${event.campaign_slug ? "sm:grid-cols-2" : ""}`}>
           <div>
-            <p className="type-eyebrow text-sea/80">{event.campaign_slug ? t("waysInHeading") : t("wayInHeading")}</p>
+            <p className={`type-eyebrow ${dark ? "text-paper/70" : "text-sea/80"}`}>{event.campaign_slug ? t("waysInHeading") : t("wayInHeading")}</p>
             <p className="mt-3 text-[16px] font-bold">
               {event.kind === "social" ? t("wayGoing") : event.kind === "challenge" ? t("wayJoin") : t("wayRun")}
             </p>
-            <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">
+            <p className={`mt-1 text-[14.5px] leading-relaxed ${dark ? "text-paper/75" : "text-black/65"}`}>
               {event.kind === "social" ? t("wayGoingSub") : event.kind === "challenge" ? t("wayJoinSub") : t("wayRunSub")}
             </p>
             <div className="mt-3">
@@ -196,9 +237,9 @@ export function EventPageView({
           </div>
           {event.campaign_slug ? (
             <div>
-              <p className="type-eyebrow text-sea/80">{t("causeEyebrow")}</p>
+              <p className={`type-eyebrow ${dark ? "text-paper/70" : "text-sea/80"}`}>{t("causeEyebrow")}</p>
               <p className="mt-3 text-[16px] font-bold">{event.campaign_title ? t("wayRaiseFor", { cause: event.campaign_title }) : t("wayRaise")}</p>
-              <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("wayRaiseSub")}</p>
+              <p className={`mt-1 text-[14.5px] leading-relaxed ${dark ? "text-paper/75" : "text-black/65"}`}>{t("wayRaiseSub")}</p>
               <div className="mt-3">
                 {preview ? (
                   <span className={secondary}>{t("fundraiseCta")}</span>
@@ -242,40 +283,6 @@ export function EventPageView({
             ))}
           </ol>
           <p className="mt-3 text-[13px] text-black/50">{tPerks("poweredBy")}</p>
-          {event.perks && event.perks.length > 0 ? (
-            <>
-              <h3 className="mt-8 text-[17px] font-bold">{t("rewardsHeading")}</h3>
-              <ul className="mt-3 space-y-2">
-                {event.perks.map((perk) => {
-                  const left = perk.daily_cap !== null && perk.issued_today !== undefined ? Math.max(0, perk.daily_cap - perk.issued_today) : null;
-                  return (
-                    <li key={perk.slug} className="rounded-lg bg-mist px-5 py-4">
-                      <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-black/60">
-                        {perk.partner_url && !preview ? (
-                          <a href={perk.partner_url} target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-sea">{perk.partner_name} ↗</a>
-                        ) : (
-                          perk.partner_name
-                        )}
-                      </p>
-                      <p className="type-display mt-1 text-2xl">{perk.reward_label}</p>
-                      <p className="mt-2 text-[15px] leading-relaxed text-black/80">
-                        <PerkRule challenge={perk} />
-                      </p>
-                      <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[13.5px]">
-                        {left !== null ? <span className="font-mono tabular-nums text-sea">{tPerks("leftToday", { count: left })}</span> : null}
-                        {perk.starts_at || perk.ends_at ? (
-                          <span className="text-black/60">{fmt(perk.starts_at ?? null)} — {fmt(perk.ends_at ?? null)}</span>
-                        ) : null}
-                        {preview ? null : (
-                          <Link href={`/izazovi/${perk.slug}`} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">{tPerks("share")}</Link>
-                        )}
-                      </p>
-                    </li>
-                  );
-                })}
-              </ul>
-            </>
-          ) : null}
         </section>
       ) : null}
 
