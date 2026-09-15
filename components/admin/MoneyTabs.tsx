@@ -10,6 +10,7 @@ const TABS = [
   { href: "/admin/novac/priliv", key: "moneyTabIn", exact: false },
   { href: "/admin/novac/odliv", key: "moneyTabOut", exact: false },
   { href: "/admin/novac/zid", key: "moneyTabWall", exact: false },
+  { href: "/admin/novac/godine", key: "moneyTabYears", exact: false },
 ] as const;
 
 export function MoneyTabs() {

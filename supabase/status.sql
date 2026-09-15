@@ -66,5 +66,7 @@ select * from (values
              where table_schema = 'public' and table_name = 'fundraisers' and column_name = 'campaign_id'))
   ,('20260914000025_harden_demo_purge',
      coalesce(obj_description('public.purge_demo_data()'::regprocedure, 'pg_proc'), '') like '0025:%')
+  ,('20260915000026_years',
+     to_regclass('public.v_public_year_stats') is not null)
 ) as m (migration, applied)
 order by migration;
