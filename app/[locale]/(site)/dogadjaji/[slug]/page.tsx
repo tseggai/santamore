@@ -145,6 +145,12 @@ export default async function EventPage({
     join: { signedIn: Boolean(user), stravaConnected: Boolean(stravaRow) },
     campaign_slug: (event as { campaign_slug?: string | null }).campaign_slug ?? null,
     campaign_title: (event as { campaign_title?: string | null }).campaign_title ?? null,
+    hosting: ((event as { hosting?: "own" | "external" }).hosting ?? "own"),
+    external_url: (event as { external_url?: string | null }).external_url ?? null,
+    bib_policy: ((event as { bib_policy?: "none" | "we_buy" }).bib_policy ?? "none"),
+    bib_capacity: (event as { bib_capacity?: number | null }).bib_capacity ?? null,
+    bibs_claimed: Number((event as { bibs_claimed?: number }).bibs_claimed ?? 0),
+    max_guests: Number((event as { max_guests?: number }).max_guests ?? 0),
     gallery: toGalleryImages((galleryRows ?? []) as PublicGalleryRow[]),
   };
 

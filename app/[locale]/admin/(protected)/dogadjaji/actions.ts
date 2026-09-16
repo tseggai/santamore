@@ -24,6 +24,7 @@ const isoDate = z.string().datetime({ offset: true });
 const tierSchema = z.object({
   label: z.string().trim().min(1).max(100),
   amount_cents: z.number().int().min(0).max(MAX_CENTS),
+  until: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
 });
 
 const eventSchema = z
@@ -49,6 +50,11 @@ const eventSchema = z
     description: z.string().trim().max(4000).nullable(),
     offersShirts: z.boolean(),
     coverPath: z.string().trim().max(300).nullable().optional(),
+    hosting: z.enum(["own", "external"]).default("own"),
+    externalUrl: z.string().trim().url().max(300).nullable().default(null),
+    bibPolicy: z.enum(["none", "we_buy"]).default("none"),
+    bibCapacity: z.number().int().min(0).max(100_000).nullable().default(null),
+    maxGuests: z.number().int().min(0).max(20).default(0),
   })
   .refine((data) => data.kind !== "challenge" || data.challengeMetric !== null, {
     message: "a challenge needs a metric",
@@ -80,8 +86,14 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
     registration_opens_at: data.registrationOpensAt,
     registration_closes_at: data.registrationClosesAt,
     distances: data.distances,
-    price_tiers: data.priceTiers,
+    price_tiers: data.priceTiers.map((tier) => ({ label: tier.label, amount_cents: tier.amount_cents, ...(tier.until ? { until: tier.until } : {}) })),
     is_published: data.isPublished,
+    // Only a race can be someone else's; only a gathering brings guests.
+    hosting: data.kind === "race" ? data.hosting : "own",
+    external_url: data.kind === "race" && data.hosting === "external" ? data.externalUrl : null,
+    bib_policy: data.kind === "race" && data.hosting === "external" ? data.bibPolicy : "none",
+    bib_capacity: data.kind === "race" && data.hosting === "external" && data.bibPolicy === "we_buy" ? data.bibCapacity : null,
+    max_guests: data.kind === "social" ? data.maxGuests : 0,
     description: data.description,
     offers_shirts: data.kind === "social" ? false : data.offersShirts,
     ...(data.coverPath !== undefined ? { cover_path: data.coverPath } : {}),

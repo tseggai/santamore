@@ -11,7 +11,7 @@ import { PerkRule, type PerkChallengeFields } from "@/components/perks/PerkRule"
 import type { GalleryImage } from "@/components/gallery/GalleryGrid";
 import { PublicGallery } from "@/components/gallery/PublicGallery";
 import { galleryImageUrl } from "@/lib/storage";
-import type { EventTier } from "@/lib/events";
+import { activeTiers, type EventTier } from "@/lib/events";
 import { formatCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, type Locale } from "@/i18n/routing";
@@ -61,6 +61,14 @@ export interface EventView {
   campaign_title?: string | null;
   /** For challenges: whether the visitor is signed in and has Strava connected. */
   join?: ChallengeJoinState;
+  /** A race someone else organises ("Run for Santamore"). */
+  hosting?: "own" | "external";
+  external_url?: string | null;
+  bib_policy?: "none" | "we_buy";
+  bib_capacity?: number | null;
+  bibs_claimed?: number;
+  /** A gathering: guests a member may bring. */
+  max_guests?: number;
 }
 
 const primary =
@@ -149,11 +157,15 @@ export function EventPageView({
     ) : null;
 
   const dark = event.kind === "challenge";
+  const external = event.kind === "race" && event.hosting === "external";
+  const bibsLeft = external && event.bib_policy === "we_buy" ? Math.max(0, (event.bib_capacity ?? 0) - (event.bibs_claimed ?? 0)) : null;
+  // Only tiers still on offer today; early-bird deadlines shown beside the price.
+  const tiersToday = activeTiers(event.tiers);
 
   const registerButton =
     registrationState === "open" ? (
       preview ? (
-        <span className={primary}>{event.kind === "social" ? t("goingCta") : event.kind === "challenge" ? t("joinCta") : t("registerCta")}</span>
+        <span className={primary}>{event.kind === "social" ? t("goingCta") : event.kind === "challenge" ? t("joinCta") : external ? t("joinTeamCta") : t("registerCta")}</span>
       ) : event.kind === "challenge" ? (
         <ChallengeJoin eventSlug={event.slug} eventName={event.name} state={event.join ?? { signedIn: false, stravaConnected: false }} className={primary} />
       ) : (
@@ -163,10 +175,14 @@ export function EventPageView({
             name: event.name,
             kind: event.kind,
             distances: event.distances,
-            tiers: event.tiers.map((tier) => ({ label: tier.label, amountCents: tier.amount_cents })),
+            tiers: tiersToday.map((tier) => ({ label: tier.label, amountCents: tier.amount_cents, until: tier.until ?? null })),
             offersShirts: Boolean(event.offers_shirts),
+            hosting: external ? "external" : "own",
+            externalUrl: event.external_url ?? null,
+            bibsLeft,
+            maxGuests: event.max_guests ?? 0,
           }}
-          label={event.kind === "social" ? t("goingCta") : t("registerCta")}
+          label={event.kind === "social" ? t("goingCta") : external ? t("joinTeamCta") : t("registerCta")}
           className={primary}
         />
       )
@@ -222,11 +238,19 @@ export function EventPageView({
           <div>
             <p className={`type-eyebrow ${dark ? "text-paper/70" : "text-sea/80"}`}>{event.campaign_slug ? t("waysInHeading") : t("wayInHeading")}</p>
             <p className="mt-3 text-[16px] font-bold">
-              {event.kind === "social" ? t("wayGoing") : event.kind === "challenge" ? t("wayJoin") : t("wayRun")}
+              {event.kind === "social" ? t("wayGoing") : event.kind === "challenge" ? t("wayJoin") : external ? t("wayRunExternal") : t("wayRun")}
             </p>
             <p className={`mt-1 text-[14.5px] leading-relaxed ${dark ? "text-paper/75" : "text-black/65"}`}>
-              {event.kind === "social" ? t("wayGoingSub") : event.kind === "challenge" ? t("wayJoinSub") : t("wayRunSub")}
+              {event.kind === "social" ? t("wayGoingSub") : event.kind === "challenge" ? t("wayJoinSub") : external ? t("wayRunExternalSub") : t("wayRunSub")}
             </p>
+            {external && event.external_url && !preview ? (
+              <a href={event.external_url} target="_blank" rel="noopener" className="mt-2 inline-block text-[14px] font-semibold text-sea underline underline-offset-2 hover:text-sea-2">
+                {t("organizerLink")} ↗
+              </a>
+            ) : null}
+            {bibsLeft !== null ? (
+              <p className="mt-2 text-[13.5px] text-black/60">{bibsLeft > 0 ? t("bibsLeft", { count: bibsLeft }) : t("bibsGone")}</p>
+            ) : null}
             <div className="mt-3">
               {registerButton ?? (
                 <p className="rounded-lg bg-paper px-4 py-3 text-[14.5px] text-sea">
@@ -253,13 +277,16 @@ export function EventPageView({
       </div>
 
       {/* 4 — the details, by kind */}
-      {event.kind === "race" && event.tiers.length > 0 ? (
+      {event.kind !== "challenge" && tiersToday.length > 0 ? (
         <section className="mt-10">
-          <h2 className="type-display text-2xl">{t("tiersHeading")}</h2>
+          <h2 className="type-display text-2xl">{event.kind === "social" ? t("ticketsHeading") : t("tiersHeading")}</h2>
           <ul className="mt-3 max-w-md">
-            {event.tiers.map((tier) => (
+            {tiersToday.map((tier) => (
               <li key={tier.label} className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-2.5 text-[15px] last:border-b-0">
-                <span>{tier.label}</span>
+                <span>
+                  {tier.label}
+                  {tier.until ? <span className="ml-2 text-[13px] text-black/55">{t("tierUntil", { date: fmt(tier.until) })}</span> : null}
+                </span>
                 <span className="font-mono font-semibold tabular-nums">
                   {tier.amount_cents === 0 ? t("free") : formatCents(tier.amount_cents, locale, { trimWholeCents: true })}
                 </span>
