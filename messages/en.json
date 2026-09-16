@@ -871,7 +871,7 @@
     "evCampaignHint": "Every euro raised on this event's pages counts towards the cause and lands under its reference.",
     "evEndsChallenge": "Ends (last day that counts)",
     "evTiersTickets": "Tickets",
-    "evTierLabel": "Label (e.g. Adults)",
+    "evTierLabel": "Name (e.g. Adults, Child, Front row)",
     "evTierPrice": "Price (€)",
     "evAddTier": "+ Add tier",
     "evRemoveTier": "Remove tier",
@@ -1065,7 +1065,7 @@
     "evBibCapacity": "Bibs we buy",
     "evMaxGuests": "Guests per member",
     "evMaxGuestsHint": "0 means everyone registers themselves.",
-    "evTierUntil": "Offered until (early bird)",
+    "evTierUntil": "Offered until",
     "causesTabCauses": "Causes",
     "causesTabProposals": "Proposals",
     "proposalsHint": "What members proposed, screened by the questions below. Shortlist the strong ones, choose one to turn into a cause, decline the rest with a note.",
@@ -1098,7 +1098,8 @@
     "yes": "Yes",
     "no": "No",
     "cpLocation": "Where",
-    "evChapter": "Chapter"
+    "evChapter": "Chapter",
+    "dtPickDate": "Pick a date"
   },
   "forms": {
     "nameLabel": "Full name",

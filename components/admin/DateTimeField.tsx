@@ -11,9 +11,9 @@ export type LocalDateTime = string;
 const pad = (n: number) => String(n).padStart(2, "0");
 
 function parse(value: LocalDateTime): { y: number; m: number; d: number; hh: number; mm: number } | null {
-  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value);
+  const match = /^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}):(\d{2}))?$/.exec(value);
   if (!match) return null;
-  return { y: +match[1], m: +match[2] - 1, d: +match[3], hh: +match[4], mm: +match[5] };
+  return { y: +match[1], m: +match[2] - 1, d: +match[3], hh: +(match[4] ?? 0), mm: +(match[5] ?? 0) };
 }
 
 function build(y: number, m: number, d: number, hh: number, mm: number): LocalDateTime {
@@ -33,13 +33,20 @@ export function DateTimeField({
   value,
   onChange,
   required = false,
+  mode = "datetime",
+  hideLabel = false,
 }: {
   id: string;
   label: string;
   value: LocalDateTime;
   onChange: (next: LocalDateTime) => void;
   required?: boolean;
+  /** "date" yields plain "YYYY-MM-DD" and hides the time. */
+  mode?: "datetime" | "date";
+  /** The label stays for screen readers only (a row with a header above). */
+  hideLabel?: boolean;
 }) {
+  const dateOnly = mode === "date";
   const t = useTranslations("admin");
   const locale = useLocale() as Locale;
   const lang = htmlLang(locale);
@@ -81,8 +88,7 @@ export function DateTimeField({
         day: "numeric",
         month: "long",
         year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
+        ...(dateOnly ? {} : { hour: "2-digit", minute: "2-digit" }),
       }).format(new Date(parsed.y, parsed.m, parsed.d, parsed.hh, parsed.mm))
     : "";
   const weekdays = Array.from({ length: 7 }, (_, i) =>
@@ -99,7 +105,15 @@ export function DateTimeField({
   const mm = parsed?.mm ?? 0;
   const minutes = Array.from(new Set([...Array.from({ length: 12 }, (_, i) => i * 5), mm])).sort((a, b) => a - b);
 
-  const pickDay = (d: number) => onChange(build(viewY, viewM, d, hh, mm));
+  const pickDay = (d: number) => {
+    if (dateOnly) {
+      onChange(`${viewY}-${pad(viewM + 1)}-${pad(d)}`);
+      setOpen(false);
+      buttonRef.current?.focus();
+      return;
+    }
+    onChange(build(viewY, viewM, d, hh, mm));
+  };
   const setTime = (nextH: number, nextM: number) => {
     const base = parsed ?? { y: viewY, m: viewM, d: today.getDate() };
     onChange(build(base.y, base.m, base.d, nextH, nextM));
@@ -120,7 +134,7 @@ export function DateTimeField({
 
   return (
     <div ref={rootRef} className="relative">
-      <label htmlFor={id} className="text-[14.5px] font-semibold">
+      <label htmlFor={id} className={hideLabel ? "sr-only" : "text-[14.5px] font-semibold"}>
         {label}
       </label>
       <button
@@ -131,11 +145,11 @@ export function DateTimeField({
         aria-expanded={open}
         aria-controls={popId}
         onClick={() => setOpen((v) => !v)}
-        className={`mt-1 flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] px-3 py-2.5 text-left text-[15px] outline-none focus:border-sea ${
+        className={`${hideLabel ? "" : "mt-1 "}flex w-full items-center justify-between gap-3 rounded-lg border-[1.5px] px-3 py-2.5 text-left text-[15px] outline-none focus:border-sea ${
           open ? "border-sea" : "border-line"
         } ${parsed ? "bg-paper" : "bg-paper text-black/45"}`}
       >
-        <span>{valueLabel || t("dtPick")}</span>
+        <span className="truncate">{valueLabel || (dateOnly ? t("dtPickDate") : t("dtPick"))}</span>
         <svg aria-hidden viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-black/50" fill="none" stroke="currentColor" strokeWidth="1.6">
           <rect x="3" y="4.5" width="14" height="12" rx="2" />
           <path d="M3 8.5h14M7 3v3M13 3v3" />
@@ -175,6 +189,7 @@ export function DateTimeField({
               ),
             )}
           </div>
+          {dateOnly ? null : (
           <div className="mt-4 flex items-end gap-2 border-t-[0.5px] border-line pt-3">
             <label className="flex-1 text-[13px] font-semibold">
               {t("dtHour")}
@@ -205,6 +220,7 @@ export function DateTimeField({
               </select>
             </label>
           </div>
+          )}
           <div className="mt-3 flex items-center justify-between">
             <button type="button" onClick={() => onChange("")} className="text-[13.5px] font-semibold text-black/60 hover:text-red-dark">
               {t("dtClear")}

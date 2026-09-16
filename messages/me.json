@@ -871,7 +871,7 @@
     "evCampaignHint": "Svaki euro prikupljen na stranicama ovog događaja računa se u cilj i stiže pod njegovom referencom.",
     "evEndsChallenge": "Kraj (zadnji dan koji se računa)",
     "evTiersTickets": "Karte",
-    "evTierLabel": "Naziv (npr. Odrasli)",
+    "evTierLabel": "Naziv (npr. Odrasli, Dijete, Prvi red)",
     "evTierPrice": "Cijena (€)",
     "evAddTier": "+ Dodaj kategoriju",
     "evRemoveTier": "Ukloni kategoriju",
@@ -1065,7 +1065,7 @@
     "evBibCapacity": "Broj startnih brojeva",
     "evMaxGuests": "Gostiju po članu",
     "evMaxGuestsHint": "0 znači da se svako prijavljuje sam.",
-    "evTierUntil": "Važi do (early bird)",
+    "evTierUntil": "Važi do",
     "causesTabCauses": "Ciljevi",
     "causesTabProposals": "Prijedlozi",
     "proposalsHint": "Šta su članovi predložili, provjereno pitanjima ispod. Jake stavi u uži izbor, jedan izaberi i pretvori u cilj, ostale odbij uz bilješku.",
@@ -1098,7 +1098,8 @@
     "yes": "Da",
     "no": "Ne",
     "cpLocation": "Gdje",
-    "evChapter": "Ogranak"
+    "evChapter": "Ogranak",
+    "dtPickDate": "Izaberi datum"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

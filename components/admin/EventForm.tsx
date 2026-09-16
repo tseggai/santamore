@@ -493,16 +493,33 @@ export function EventForm({
           <p className={labelClass}>{kind === "social" ? t("evTiersTickets") : t("evTiers")}</p>
           <p className="text-[13px] text-black/55">{t("evTiersHint")}</p>
           <div className="mt-2 space-y-2">
+            {tiers.length > 0 ? (
+              <div className="hidden gap-2 text-[13px] font-semibold text-black/60 sm:grid sm:grid-cols-[minmax(0,1fr)_7rem_13rem_2.5rem]">
+                <span>{t("evTierLabel")}</span>
+                <span>{t("evTierPrice")}</span>
+                <span>{t("evTierUntil")}</span>
+                <span />
+              </div>
+            ) : null}
             {tiers.map((tier, index) => (
-              <div key={index} className="flex items-center gap-2">
+              <div key={index} className="grid grid-cols-[minmax(0,1fr)_2.5rem] items-center gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_13rem_2.5rem]">
                 <input
                   type="text"
                   value={tier.label}
                   onChange={(e) => setTiers((rows) => rows.map((r, i) => (i === index ? { ...r, label: e.target.value } : r)))}
                   placeholder={t("evTierLabel")}
                   aria-label={t("evTierLabel")}
-                  className={`${inputClass} mt-0 flex-1`}
+                  className={`${inputClass} mt-0 min-w-0`}
                 />
+                <button
+                  type="button"
+                  onClick={() => setTiers((rows) => rows.filter((_, i) => i !== index))}
+                  aria-label={t("evRemoveTier")}
+                  title={t("evRemoveTier")}
+                  className="h-10 w-10 shrink-0 rounded-lg bg-paper text-[18px] leading-none hover:bg-mist-2 hover:text-red-dark sm:order-last"
+                >
+                  ×
+                </button>
                 <span className="flex items-center gap-1">
                   <span aria-hidden className="text-black/50">€</span>
                   <input
@@ -512,26 +529,17 @@ export function EventForm({
                     onChange={(e) => setTiers((rows) => rows.map((r, i) => (i === index ? { ...r, euros: e.target.value } : r)))}
                     placeholder="0"
                     aria-label={t("evTierPrice")}
-                    className={`${inputClass} mt-0 w-24 font-mono`}
+                    className={`${inputClass} mt-0 min-w-0 font-mono`}
                   />
                 </span>
-                <input
-                  type="date"
+                <DateTimeField
+                  id={`${formId}-tier-${index}`}
+                  mode="date"
+                  hideLabel
+                  label={t("evTierUntil")}
                   value={tier.until}
-                  onChange={(e) => setTiers((rows) => rows.map((r, i) => (i === index ? { ...r, until: e.target.value } : r)))}
-                  aria-label={t("evTierUntil")}
-                  title={t("evTierUntil")}
-                  className={`${inputClass} mt-0 w-40 font-mono`}
+                  onChange={(next) => setTiers((rows) => rows.map((r, i) => (i === index ? { ...r, until: next } : r)))}
                 />
-                <button
-                  type="button"
-                  onClick={() => setTiers((rows) => rows.filter((_, i) => i !== index))}
-                  aria-label={t("evRemoveTier")}
-                  title={t("evRemoveTier")}
-                  className="h-10 w-10 shrink-0 rounded-lg bg-paper text-[18px] leading-none hover:bg-mist-2 hover:text-red-dark"
-                >
-                  ×
-                </button>
               </div>
             ))}
           </div>
