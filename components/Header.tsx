@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { DonateButton } from "@/components/donate/DonateButton";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
+import { MobileMenu } from "@/components/MobileMenu";
 import icon from "@/public/brand/SantamoreIcon-Color.png";
 
 const NAV_ITEMS = [
@@ -24,34 +25,27 @@ export default function Header() {
       >
         {t("common.skipToContent")}
       </a>
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-5 py-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3 sm:py-4">
         <Link href="/" className="shrink-0">
-          <Image src={icon} alt={t("common.siteName")} className="h-11 w-auto" priority />
+          <Image src={icon} alt={t("common.siteName")} className="h-10 w-auto sm:h-11" priority />
         </Link>
 
-        <nav
-          aria-label={t("nav.menu")}
-          className="order-last flex w-full flex-wrap items-center gap-x-5 gap-y-2 sm:order-none sm:w-auto"
-        >
+        {/* desktop: the links in the middle */}
+        <nav aria-label={t("nav.menu")} className="hidden items-center gap-x-6 md:flex">
           {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-sm font-semibold text-black/80 hover:text-sea"
-            >
+            <Link key={item.href} href={item.href} className="text-[15px] font-semibold text-black/80 hover:text-sea">
               {t(`nav.${item.key}`)}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/dashboard"
-            className="hidden text-sm font-semibold text-black/80 hover:text-sea sm:inline"
-          >
+        <div className="flex items-center gap-2 sm:gap-3">
+          <Link href="/dashboard" className="hidden text-[15px] font-semibold text-black/80 hover:text-sea md:inline">
             {t("nav.myPage")}
           </Link>
-          <LocaleSwitcher />
+          <div className="hidden md:block">
+            <LocaleSwitcher />
+          </div>
           <DonateButton
             request={{ kind: "campaign" }}
             href="/podrzi"
@@ -59,6 +53,13 @@ export default function Header() {
           >
             {t("nav.donate")}
           </DonateButton>
+          {/* phone: everything else behind one button */}
+          <MobileMenu
+            items={NAV_ITEMS.map((item) => ({ href: item.href, label: t(`nav.${item.key}`) }))}
+            consoleItem={{ href: "/dashboard", label: t("nav.myPage") }}
+            openLabel={t("nav.menu")}
+            closeLabel={t("nav.menuClose")}
+          />
         </div>
       </div>
     </header>

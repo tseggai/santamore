@@ -14,7 +14,8 @@
     "menu": "Meni",
     "campaigns": "Ciljevi",
     "challenges": "Izazovi",
-    "myPage": "Moja stranica za prikupljanje"
+    "myPage": "Moja stranica za prikupljanje",
+    "menuClose": "Zatvori meni"
   },
   "home": {
     "eyebrow": "Crnogorska neprofitna organizacija · Tivat",
@@ -47,7 +48,13 @@
     "causesCta": "Svi ciljevi",
     "proofHeading": "Svaki euro, javno",
     "proofReceived": "primljeno do sada",
-    "proofDisbursed": "predato, sa dokumentacijom"
+    "proofDisbursed": "predato, sa dokumentacijom",
+    "proposalsEyebrow": "Tvoja riječ",
+    "proposalsHeading": "Koji cilj da preuzmemo sljedeći?",
+    "proposalsSub": "Svako može predložiti potrebu u Crnoj Gori. Članovi glasaju za prijedloge, prvih pet ulazi u uži izbor, a mi biramo jedan i objavljujemo svaki euro koji do njega stigne.",
+    "proposalsShortlist": "Uži izbor",
+    "proposalsCta": "Predloži cilj",
+    "proposalsVoteCta": "Pogledaj i glasaj"
   },
   "footer": {
     "orgHeading": "Organizacija",
