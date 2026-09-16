@@ -73,5 +73,7 @@ select * from (values
   ,('20260916000028_events_hosting_guests',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'events' and column_name = 'hosting'))
+  ,('20260916000029_cause_proposals',
+     to_regclass('public.cause_proposals') is not null)
 ) as m (migration, applied)
 order by migration;
