@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { buildRegistrationEmail } from "@/lib/email/registration";
+import { activeTiers, parseTiers } from "@/lib/events";
 import { sendEmail } from "@/lib/email/send";
 import { generatePaymentReference } from "@/lib/references";
 import { createServiceClient } from "@/lib/supabase/admin";
@@ -23,28 +24,15 @@ const registerSchema = z.object({
   participantEmail: z.string().trim().email().max(120),
   participantPhone: z.string().trim().max(40).default(""),
   locale: z.enum(["me", "en", "ru"]),
+  /** External race we buy bibs for: this runner wants one of ours. */
+  needsBib: z.boolean().default(false),
+  /** A gathering: the people this member brings, by name. */
+  guests: z.array(z.object({ name: z.string().trim().min(2).max(120), tierLabel: z.string().trim().max(100) })).max(20).default([]),
 });
-
-interface Tier {
-  label: string;
-  amount_cents: number;
-}
-
-function parseTiers(value: unknown): Tier[] {
-  if (!Array.isArray(value)) return [];
-  return value.flatMap((entry) =>
-    typeof entry?.label === "string" &&
-    typeof entry?.amount_cents === "number" &&
-    Number.isInteger(entry.amount_cents) &&
-    entry.amount_cents >= 0
-      ? [{ label: entry.label, amount_cents: entry.amount_cents }]
-      : [],
-  );
-}
 
 export interface RegisterResult {
   ok: boolean;
-  error?: "invalid" | "closed" | "full" | "server";
+  error?: "invalid" | "closed" | "full" | "bibsGone" | "server";
 }
 
 /**
@@ -70,12 +58,18 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     const { data: event } = await service
       .from("events")
       .select(
-        "id, name, kind, is_published, distances, price_tiers, capacity, registration_opens_at, registration_closes_at, offers_shirts",
+        "id, name, kind, is_published, distances, price_tiers, capacity, registration_opens_at, registration_closes_at, offers_shirts, hosting, bib_policy, bib_capacity, max_guests",
       )
       .eq("slug", data.eventSlug)
       .maybeSingle();
     if (!event?.is_published) return { ok: false, error: "server" };
-    if (event.kind !== "social" && !data.waiverAccepted) return { ok: false, error: "invalid" };
+    // Our own races and challenges carry the waiver; a race someone else
+    // organises is theirs to waive, and a gathering has none.
+    const needsWaiver = event.kind !== "social" && event.hosting !== "external";
+    if (needsWaiver && !data.waiverAccepted) return { ok: false, error: "invalid" };
+    const guests = event.kind === "social" ? data.guests.slice(0, event.max_guests ?? 0) : [];
+    if (event.kind === "social" && data.guests.length > (event.max_guests ?? 0)) return { ok: false, error: "invalid" };
+    const wantsBib = data.needsBib && event.hosting === "external" && event.bib_policy === "we_buy";
     const shirtSize = event.offers_shirts ? data.shirtSize : null;
 
     const now = Date.now();
@@ -94,13 +88,17 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     if (data.distance !== null && !distances.includes(data.distance)) {
       return { ok: false, error: "invalid" };
     }
-    // Free events (no tiers) register at zero; priced events need a valid tier.
-    const tiers = parseTiers(event.price_tiers);
+    // Free events (no tiers) register at zero; priced events need a tier
+    // that is still on offer today (early-bird dates are enforced here).
+    const tiers = activeTiers(parseTiers(event.price_tiers));
     const tier =
       tiers.length === 0
         ? null
         : tiers.find((candidate) => candidate.label === data.tierLabel);
     if (tiers.length > 0 && !tier) return { ok: false, error: "invalid" };
+    const guestTiers = guests.map((guest) => (tiers.length === 0 ? null : tiers.find((candidate) => candidate.label === guest.tierLabel)));
+    if (tiers.length > 0 && guestTiers.some((candidate) => !candidate)) return { ok: false, error: "invalid" };
+    const dueCents = (tier?.amount_cents ?? 0) + guestTiers.reduce((sum, candidate) => sum + (candidate?.amount_cents ?? 0), 0);
 
     const { data: existing } = await service
       .from("registrations")
@@ -108,9 +106,21 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
       .eq("event_id", event.id)
       .eq("user_id", user.id)
       .eq("participant_email", data.participantEmail.toLowerCase())
+      .is("party_of", null)
       .neq("status", "cancelled")
       .maybeSingle();
     if (existing) return { ok: true };
+
+    // Bibs we buy for the team are few; the count is the truth.
+    if (wantsBib) {
+      const { count } = await service
+        .from("registrations")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", event.id)
+        .eq("needs_bib", true)
+        .neq("status", "cancelled");
+      if ((count ?? 0) >= (event.bib_capacity ?? 0)) return { ok: false, error: "bibsGone" };
+    }
 
     // Capacity gate (best effort — the tiny race window can only ever
     // oversell by concurrent submissions, not without bound).
@@ -120,36 +130,67 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
         .select("id", { count: "exact", head: true })
         .eq("event_id", event.id)
         .neq("status", "cancelled");
-      if ((count ?? 0) >= event.capacity) return { ok: false, error: "full" };
+      if ((count ?? 0) + guests.length >= event.capacity) return { ok: false, error: "full" };
     }
 
-    let inserted = false;
+    // Nothing to pay → the place is confirmed right away.
+    const status = dueCents === 0 ? "confirmed" : "pending";
+    let primaryId: string | null = null;
     let reference = "";
-    for (let attempt = 0; attempt < 5 && !inserted; attempt += 1) {
+    for (let attempt = 0; attempt < 5 && !primaryId; attempt += 1) {
       reference = generatePaymentReference();
-      const { error } = await service.from("registrations").insert({
-        event_id: event.id,
-        user_id: user.id,
-        distance: data.distance,
-        shirt_size: shirtSize,
-        tier_label: tier?.label ?? null,
-        amount_due_cents: tier?.amount_cents ?? 0,
-        payment_reference: reference,
-        waiver_signed_at: event.kind === "social" ? null : new Date().toISOString(),
-        waiver_version: event.kind === "social" ? null : WAIVER_VERSION,
-        participant_name: data.participantName,
-        participant_email: data.participantEmail.toLowerCase(),
-        participant_phone: data.participantPhone || null,
-        // Nothing to pay → the place is confirmed right away.
-        status: (tier?.amount_cents ?? 0) === 0 ? "confirmed" : "pending",
-      });
-      if (!error) inserted = true;
-      else if (error.code !== "23505" && error.code !== "P0001") {
+      const { data: row, error } = await service
+        .from("registrations")
+        .insert({
+          event_id: event.id,
+          user_id: user.id,
+          distance: data.distance,
+          shirt_size: shirtSize,
+          tier_label: tier?.label ?? null,
+          // The whole party is owed on the one reference the payer quotes.
+          amount_due_cents: dueCents,
+          payment_reference: reference,
+          waiver_signed_at: needsWaiver ? new Date().toISOString() : null,
+          waiver_version: needsWaiver ? WAIVER_VERSION : null,
+          participant_name: data.participantName,
+          participant_email: data.participantEmail.toLowerCase(),
+          participant_phone: data.participantPhone || null,
+          needs_bib: wantsBib,
+          status,
+        })
+        .select("id")
+        .single();
+      if (!error && row) primaryId = row.id;
+      else if (error && error.code !== "23505" && error.code !== "P0001") {
         console.error("[events] registration failed:", error.code);
         return { ok: false, error: "server" };
       }
     }
-    if (!inserted) return { ok: false, error: "server" };
+    if (!primaryId) return { ok: false, error: "server" };
+
+    if (guests.length > 0) {
+      const { error: guestError } = await service.from("registrations").insert(
+        guests.map((guest, index) => ({
+          event_id: event.id,
+          user_id: user.id,
+          party_of: primaryId,
+          tier_label: guestTiers[index]?.label ?? null,
+          amount_due_cents: 0,
+          payment_reference: generatePaymentReference(),
+          participant_name: guest.name,
+          participant_email: data.participantEmail.toLowerCase(),
+          status,
+        })),
+      );
+      if (guestError) console.error("[events] guest rows failed:", guestError.code);
+    }
+
+    // A gathering registration is also the loudest "I'm coming".
+    if (event.kind === "social") {
+      await service
+        .from("event_rsvps")
+        .upsert({ event_id: event.id, user_id: user.id, status: "going", updated_at: new Date().toISOString() }, { onConflict: "event_id,user_id" });
+    }
 
     // Best effort — a failed email must never lose the registration.
     {
@@ -163,7 +204,7 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
             distance: data.distance,
             tierLabel: tier?.label ?? null,
             reference,
-            amountDueCents: tier?.amount_cents ?? 0,
+            amountDueCents: dueCents,
           }),
         );
       } catch (emailError) {
@@ -188,6 +229,9 @@ export interface MyRegistration {
   amount_due_cents: number;
   payment_reference: string | null;
   participant_name: string | null;
+  /** Set on a guest row: the registration that pays for it. */
+  party_of: string | null;
+  needs_bib: boolean;
 }
 
 export interface RegistrationState {
@@ -213,7 +257,7 @@ export async function fetchRegistrationState(eventSlug: string): Promise<Registr
   const [{ data: rows }, { data: profile }] = await Promise.all([
     supabase
       .from("registrations")
-      .select("id, status, distance, shirt_size, tier_label, amount_due_cents, payment_reference, participant_name")
+      .select("id, status, distance, shirt_size, tier_label, amount_due_cents, payment_reference, participant_name, party_of, needs_bib")
       .eq("event_id", event.id)
       .eq("user_id", user.id)
       .neq("status", "cancelled")

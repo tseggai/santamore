@@ -66,5 +66,14 @@ select * from (values
              where table_schema = 'public' and table_name = 'fundraisers' and column_name = 'campaign_id'))
   ,('20260914000025_harden_demo_purge',
      coalesce(obj_description('public.purge_demo_data()'::regprocedure, 'pg_proc'), '') like '0025:%')
+  ,('20260915000026_years',
+     to_regclass('public.v_public_year_stats') is not null)
+  ,('20260916000027_my_giving_confirmed_email',
+     to_regproc('public.my_confirmed_email') is not null)
+  ,('20260916000028_events_hosting_guests',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'events' and column_name = 'hosting'))
+  ,('20260916000029_cause_proposals',
+     to_regclass('public.cause_proposals') is not null)
 ) as m (migration, applied)
 order by migration;

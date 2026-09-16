@@ -18,6 +18,10 @@ export interface RegisterEvent {
   distances: string[];
   tiers: TierOption[];
   offersShirts: boolean;
+  hosting?: "own" | "external";
+  externalUrl?: string | null;
+  bibsLeft?: number | null;
+  maxGuests?: number;
 }
 
 type Phase = "closed" | "loading" | "signin" | "form" | "list";
@@ -72,7 +76,9 @@ export function RegisterDialog({ event, label, className }: { event: RegisterEve
   }, [phase]);
 
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
-  const registrations = state?.registrations ?? [];
+  // Guests hang under the registration that pays for them.
+  const registrations = (state?.registrations ?? []).filter((r) => !r.party_of);
+  const guestsOf = (id: string) => (state?.registrations ?? []).filter((r) => r.party_of === id);
 
   return (
     <>
@@ -132,6 +138,9 @@ export function RegisterDialog({ event, label, className }: { event: RegisterEve
                     distances={event.distances}
                     tiers={event.tiers}
                     offersShirts={event.offersShirts}
+                    hosting={event.hosting ?? "own"}
+                    bibsLeft={event.bibsLeft ?? null}
+                    maxGuests={event.maxGuests ?? 0}
                     defaultName={another ? "" : state.fullName}
                     defaultEmail={another ? "" : state.email}
                     onDone={() => {
@@ -156,9 +165,19 @@ export function RegisterDialog({ event, label, className }: { event: RegisterEve
                       <li key={registration.id} className="rounded-lg bg-mist p-4">
                         <p className="text-[16px] font-bold">{registration.participant_name ?? state.fullName ?? state.email}</p>
                         <p className="mt-0.5 text-[14.5px] text-black/65">
-                          {[registration.distance, registration.tier_label, registration.shirt_size].filter(Boolean).join(" · ")}
+                          {[registration.distance, registration.tier_label, registration.shirt_size, registration.needs_bib ? t("needBib") : null].filter(Boolean).join(" · ")}
                           {due > 0 ? ` · ${money(due)}` : ""}
                         </p>
+                        {guestsOf(registration.id).length > 0 ? (
+                          <ul className="mt-1.5 space-y-0.5 text-[14px] text-black/70">
+                            {guestsOf(registration.id).map((guest) => (
+                              <li key={guest.id}>
+                                + {guest.participant_name}
+                                {guest.tier_label ? <span className="text-black/50"> · {guest.tier_label}</span> : null}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
                         {pendingPayment ? (
                           <>
                             <p className="mt-3 text-[14.5px] leading-relaxed text-black/70">{t("payInstructions")}</p>
@@ -175,7 +194,15 @@ export function RegisterDialog({ event, label, className }: { event: RegisterEve
                     );
                   })}
                 </ul>
-                <p className="mt-4 text-[13.5px] leading-relaxed text-black/60">{t("opsNote")}</p>
+                {event.hosting === "external" ? (
+                  event.externalUrl ? (
+                    <a href={event.externalUrl} target="_blank" rel="noopener" className="mt-4 inline-block text-[14.5px] font-semibold text-sea underline underline-offset-2 hover:text-sea-2">
+                      {t("organizerLink")} ↗
+                    </a>
+                  ) : null
+                ) : (
+                  <p className="mt-4 text-[13.5px] leading-relaxed text-black/60">{t("opsNote")}</p>
+                )}
                 <div className="mt-5 flex flex-wrap gap-2">
                   <button
                     type="button"

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { ProposalsList, type PublicProposal } from "@/components/proposals/ProposalsList";
 import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
@@ -41,11 +42,22 @@ export default async function CampaignsIndexPage({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const t = await getTranslations("campaigns");
+  const [t, tProposals] = await Promise.all([getTranslations("campaigns"), getTranslations("proposals")]);
 
   let campaigns: CampaignRow[] = [];
+  let proposals: PublicProposal[] = [];
+  let myVotes: string[] = [];
+  let signedIn = false;
   try {
     const supabase = await createClient();
+    const [{ data: proposalRows }, { data: voteRows }, { data: auth }] = await Promise.all([
+      supabase.from("v_public_cause_proposals").select("*").order("vote_rank").order("created_at").limit(100),
+      supabase.from("v_my_cause_votes").select("proposal_id"),
+      supabase.auth.getUser(),
+    ]);
+    proposals = ((proposalRows ?? []) as PublicProposal[]).sort((a, b) => (a.status === "chosen" ? 1 : 0) - (b.status === "chosen" ? 1 : 0) || a.vote_rank - b.vote_rank);
+    myVotes = (voteRows ?? []).map((row) => row.proposal_id as string);
+    signedIn = Boolean(auth.user);
     const { data } = await supabase
       .from("v_public_campaigns")
       .select(
@@ -123,6 +135,22 @@ export default async function CampaignsIndexPage({
           })}
         </ul>
       )}
+
+      {/* what the community proposes, ranked by votes */}
+      <section id="prijedlozi" className="mt-14 scroll-mt-6 border-t-[0.5px] border-line pt-10">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="type-eyebrow text-sea/80">{tProposals("eyebrow")}</p>
+            <h2 className="type-display mt-2 text-3xl">{tProposals("listHeading")}</h2>
+            <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-black/65">{tProposals("listSub")}</p>
+          </div>
+          <Link href="/kampanje/predlozi" className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-red px-5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark">
+            <span aria-hidden className="text-[18px] leading-none">+</span>
+            {tProposals("proposeCta")}
+          </Link>
+        </div>
+        <ProposalsList proposals={proposals} myVotes={myVotes} signedIn={signedIn} />
+      </section>
     </div>
   );
 }

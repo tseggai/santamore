@@ -6,18 +6,16 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 
 const TABS = [
-  { href: "/admin/novac", key: "moneyTabOverview", exact: true },
-  { href: "/admin/novac/priliv", key: "moneyTabIn", exact: false },
-  { href: "/admin/novac/odliv", key: "moneyTabOut", exact: false },
-  { href: "/admin/novac/zid", key: "moneyTabWall", exact: false },
-  { href: "/admin/novac/godine", key: "moneyTabYears", exact: false },
+  { href: "/admin/kampanje", key: "causesTabCauses", exact: true },
+  { href: "/admin/kampanje/prijedlozi", key: "causesTabProposals", exact: false },
 ] as const;
 
-export function MoneyTabs() {
+/** Causes we run, and causes the community proposes. */
+export function CausesTabs() {
   const t = useTranslations("admin");
   const pathname = usePathname().replace(/^\/(me|en|ru)(?=\/|$)/, "");
   return (
-    <nav aria-label={t("moneyTitle")} className="mt-5 flex gap-1 border-b-[0.5px] border-line">
+    <nav aria-label={t("campaignsTitle")} className="flex gap-1 border-b-[0.5px] border-line">
       {TABS.map((tab) => {
         const active = tab.exact ? pathname === tab.href : pathname.startsWith(tab.href);
         return (

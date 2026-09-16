@@ -36,6 +36,11 @@ export interface EventFormValues {
   description: string | null;
   offers_shirts: boolean;
   cover_path?: string | null;
+  hosting?: "own" | "external";
+  external_url?: string | null;
+  bib_policy?: "none" | "we_buy";
+  bib_capacity?: number | null;
+  max_guests?: number;
 }
 
 export interface Option {
@@ -46,6 +51,8 @@ export interface Option {
 interface TierRow {
   label: string;
   euros: string;
+  /** YYYY-MM-DD or empty: the last day this price is offered. */
+  until: string;
 }
 
 const KINDS: EventKind[] = ["race", "challenge", "social"];
@@ -77,7 +84,7 @@ function tiersFromValue(value: unknown): TierRow[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((tier) =>
     typeof tier?.label === "string" && typeof tier?.amount_cents === "number"
-      ? [{ label: tier.label, euros: (tier.amount_cents / 100).toFixed(2).replace(/\.00$/, "") }]
+      ? [{ label: tier.label, euros: (tier.amount_cents / 100).toFixed(2).replace(/\.00$/, ""), until: typeof tier.until === "string" ? tier.until : "" }]
       : [],
   );
 }
@@ -141,6 +148,11 @@ export function EventForm({
   );
   const [tiers, setTiers] = useState<TierRow[]>(tiersFromValue(event?.price_tiers));
   const [offersShirts, setOffersShirts] = useState(event?.offers_shirts ?? false);
+  const [hosting, setHosting] = useState<"own" | "external">(event?.hosting ?? "own");
+  const [externalUrl, setExternalUrl] = useState(event?.external_url ?? "");
+  const [weBuyBibs, setWeBuyBibs] = useState((event?.bib_policy ?? "none") === "we_buy");
+  const [bibCapacity, setBibCapacity] = useState(event?.bib_capacity != null ? String(event.bib_capacity) : "");
+  const [maxGuests, setMaxGuests] = useState(String(event?.max_guests ?? 0));
   const [published, setPublished] = useState(event?.is_published ?? false);
   const [coverPath, setCoverPath] = useState<string | null>(event?.cover_path ?? null);
   const [coverFolder] = useState(() => `covers/events/${event?.id ?? `new-${crypto.randomUUID()}`}`);
@@ -154,10 +166,12 @@ export function EventForm({
     .filter((tier) => tier.label.trim() !== "" || tier.euros.trim() !== "")
     .map((tier) => {
       const cents = eurosToCents(tier.euros);
-      return tier.label.trim() && cents !== null ? { label: tier.label.trim(), amount_cents: cents } : null;
+      return tier.label.trim() && cents !== null
+        ? { label: tier.label.trim(), amount_cents: cents, ...(tier.until ? { until: tier.until } : {}) }
+        : null;
     });
   const tiersValid = parsedTiers.every((tier) => tier !== null);
-  const cleanTiers = parsedTiers.filter((tier): tier is { label: string; amount_cents: number } => tier !== null);
+  const cleanTiers = parsedTiers.filter((tier): tier is { label: string; amount_cents: number; until?: string } => tier !== null);
   const distanceList = kind === "race" ? distances.split(",").map((part) => part.trim()).filter(Boolean) : [];
 
   const previewEvent = {
@@ -238,6 +252,11 @@ export function EventForm({
       description: description.trim() || null,
       offersShirts: kind === "social" ? false : offersShirts,
       coverPath,
+      hosting,
+      externalUrl: externalUrl.trim() || null,
+      bibPolicy: weBuyBibs ? "we_buy" : "none",
+      bibCapacity: bibCapacity.trim() === "" ? null : Number(bibCapacity),
+      maxGuests: maxGuests.trim() === "" ? 0 : Number(maxGuests),
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       let offersFailed = false;
@@ -426,6 +445,45 @@ export function EventForm({
         <DateTimeField id="evRegOpens" label={t("evRegOpens")} value={regOpens} onChange={setRegOpens} />
         <DateTimeField id="evRegCloses" label={t("evRegCloses")} value={regCloses} onChange={setRegCloses} />
         {kind === "race" ? (
+          <>
+            <div>
+              <label htmlFor="evHosting" className={labelClass}>{t("evHosting")}</label>
+              <select id="evHosting" value={hosting} onChange={(e) => setHosting(e.target.value as "own" | "external")} className={inputClass}>
+                <option value="own">{t("evHostingOwn")}</option>
+                <option value="external">{t("evHostingExternal")}</option>
+              </select>
+            </div>
+            {hosting === "external" ? (
+              <>
+                <div>
+                  <label htmlFor="evExternalUrl" className={labelClass}>{t("evExternalUrl")}</label>
+                  <input id="evExternalUrl" type="url" value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)} placeholder="https://" className={inputClass} />
+                </div>
+                <label className="flex items-start gap-2.5 text-[14.5px]">
+                  <input type="checkbox" checked={weBuyBibs} onChange={(e) => setWeBuyBibs(e.target.checked)} className="mt-0.5 h-4 w-4 accent-red" />
+                  <span>
+                    <span className="font-semibold">{t("evBibs")}</span>
+                    <span className="block text-[13px] text-black/55">{t("evBibsHint")}</span>
+                  </span>
+                </label>
+                {weBuyBibs ? (
+                  <div>
+                    <label htmlFor="evBibCapacity" className={labelClass}>{t("evBibCapacity")}</label>
+                    <input id="evBibCapacity" type="number" min={0} value={bibCapacity} onChange={(e) => setBibCapacity(e.target.value)} className={`${inputClass} font-mono`} />
+                  </div>
+                ) : null}
+              </>
+            ) : null}
+          </>
+        ) : null}
+        {kind === "social" ? (
+          <div>
+            <label htmlFor="evMaxGuests" className={labelClass}>{t("evMaxGuests")}</label>
+            <input id="evMaxGuests" type="number" min={0} max={20} value={maxGuests} onChange={(e) => setMaxGuests(e.target.value)} className={`${inputClass} font-mono`} />
+            <p className="mt-1 text-[13px] text-black/55">{t("evMaxGuestsHint")}</p>
+          </div>
+        ) : null}
+        {kind === "race" ? (
           <div className="sm:col-span-2">
             <label htmlFor="evDistances" className={labelClass}>{t("evDistances")}</label>
             <input id="evDistances" type="text" value={distances} onChange={(e) => setDistances(e.target.value)} placeholder="5 km, 10 km" className={inputClass} />
@@ -457,6 +515,14 @@ export function EventForm({
                     className={`${inputClass} mt-0 w-24 font-mono`}
                   />
                 </span>
+                <input
+                  type="date"
+                  value={tier.until}
+                  onChange={(e) => setTiers((rows) => rows.map((r, i) => (i === index ? { ...r, until: e.target.value } : r)))}
+                  aria-label={t("evTierUntil")}
+                  title={t("evTierUntil")}
+                  className={`${inputClass} mt-0 w-40 font-mono`}
+                />
                 <button
                   type="button"
                   onClick={() => setTiers((rows) => rows.filter((_, i) => i !== index))}
@@ -469,7 +535,7 @@ export function EventForm({
               </div>
             ))}
           </div>
-          <button type="button" onClick={() => setTiers((rows) => [...rows, { label: "", euros: "" }])} className="mt-2 rounded-lg bg-paper px-3.5 py-2 text-[14px] font-semibold hover:bg-mist-2">
+          <button type="button" onClick={() => setTiers((rows) => [...rows, { label: "", euros: "", until: "" }])} className="mt-2 rounded-lg bg-paper px-3.5 py-2 text-[14px] font-semibold hover:bg-mist-2">
             {t("evAddTier")}
           </button>
         </div>

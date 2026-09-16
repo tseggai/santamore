@@ -54,6 +54,13 @@ Settings** tab (older dashboards: Project Settings → Authentication):
 
 Then raise the per-hour email limit under Authentication → Rate Limits.
 
+Until SMTP is in place, "Error sending confirmation email" on the sign-in
+form is this mailer refusing — not the app. The form also offers a password
+path (Authentication → Providers → Email: keep **Confirm email** on; "My
+giving" only trusts confirmed addresses, migration 0027), which spares
+returning members an email per sign-in but still needs one delivery to
+confirm a new account.
+
 ## 4. Strava → My API Application
 
 | Field | Value |
