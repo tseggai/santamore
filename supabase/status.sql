@@ -68,5 +68,7 @@ select * from (values
      coalesce(obj_description('public.purge_demo_data()'::regprocedure, 'pg_proc'), '') like '0025:%')
   ,('20260915000026_years',
      to_regclass('public.v_public_year_stats') is not null)
+  ,('20260916000027_my_giving_confirmed_email',
+     to_regproc('public.my_confirmed_email') is not null)
 ) as m (migration, applied)
 order by migration;

@@ -233,7 +233,7 @@
   "dashboard": {
     "title": "My fundraising page",
     "signInTitle": "Sign in",
-    "signInSub": "One email, no password: run partner challenges, earn rewards, and create a fundraising page if you like.",
+    "signInSub": "One email — a sign-in link or a password, your choice: run partner challenges, earn rewards, and create a fundraising page if you like.",
     "createHeading": "Start your fundraising page",
     "createSub": "Give your fundraising page a name and choose the cause it raises for — you'll add the photo, story and goal next. It stays a draft until you publish it.",
     "pageTitleLabel": "Page title",
@@ -1044,7 +1044,18 @@
     "yearBeneficiariesHint": "Overrides the count of published hand-overs when set.",
     "yearVenues": "Extra venues",
     "yearVenuesHint": "Comma-separated. Event venues are added automatically.",
-    "yearPublic": "Show this year on the Transparency page"
+    "yearPublic": "Show this year on the Transparency page",
+    "usePassword": "Sign in with a password instead",
+    "useLink": "Send me a sign-in link instead",
+    "passwordLabel": "Password",
+    "passwordHint": "At least 8 characters.",
+    "signInPassword": "Sign in",
+    "createAccount": "Create account",
+    "passwordWrong": "Wrong email or password.",
+    "passwordNoAccount": "No account with this email and password yet. Create one below — or use the sign-in link.",
+    "signupSent": "Account created. Check your inbox for the confirmation link, then sign in.",
+    "signupFailed": "Could not create the account.",
+    "linkErrorHint": "If the link keeps failing, sign in with a password instead."
   },
   "forms": {
     "nameLabel": "Full name",

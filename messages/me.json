@@ -233,7 +233,7 @@
   "dashboard": {
     "title": "Moja stranica za prikupljanje",
     "signInTitle": "Prijavi se",
-    "signInSub": "Jedan e-mail, bez lozinke: učestvuj u izazovima partnera, osvajaj nagrade i, ako želiš, napravi stranicu za prikupljanje.",
+    "signInSub": "Jedan email — link za prijavu ili lozinka, kako ti odgovara: trči partnerske izazove, osvajaj nagrade i otvori stranicu za prikupljanje ako želiš.",
     "createHeading": "Otvori svoju stranicu za prikupljanje",
     "createSub": "Daj stranici za prikupljanje ime i izaberi cilj za koji prikuplja — fotografiju, priču i cilj dodaješ odmah zatim. Ostaje nacrt dok je ne objaviš.",
     "pageTitleLabel": "Naziv stranice",
@@ -1044,7 +1044,18 @@
     "yearBeneficiariesHint": "Kad je upisano, zamjenjuje broj objavljenih predaja.",
     "yearVenues": "Dodatne lokacije",
     "yearVenuesHint": "Odvojene zarezom. Lokacije događaja se dodaju same.",
-    "yearPublic": "Prikaži ovu godinu na stranici Transparentnost"
+    "yearPublic": "Prikaži ovu godinu na stranici Transparentnost",
+    "usePassword": "Prijavi se lozinkom",
+    "useLink": "Pošalji mi link za prijavu",
+    "passwordLabel": "Lozinka",
+    "passwordHint": "Najmanje 8 znakova.",
+    "signInPassword": "Prijavi se",
+    "createAccount": "Napravi nalog",
+    "passwordWrong": "Pogrešan email ili lozinka.",
+    "passwordNoAccount": "Još nema naloga sa ovim emailom i lozinkom. Napravi ga ispod — ili koristi link za prijavu.",
+    "signupSent": "Nalog je napravljen. Provjeri inbox za link za potvrdu, pa se prijavi.",
+    "signupFailed": "Nalog nije mogao biti napravljen.",
+    "linkErrorHint": "Ako link stalno ne prolazi, prijavi se lozinkom."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

@@ -30,6 +30,12 @@ export function SignInForm({
   const [state, setState] = useState<
     "idle" | "sending" | "sent" | "error" | "verifying" | "codeError"
   >("idle");
+  // The password path: for people whose inbox never gets the link, and
+  // for returning members who would rather not wait for an email.
+  const [mode, setMode] = useState<"link" | "password">("link");
+  const [password, setPassword] = useState("");
+  const [pwState, setPwState] = useState<"idle" | "busy" | "wrong" | "noAccount" | "signupSent" | "signupFailed">("idle");
+  const [pwDetail, setPwDetail] = useState("");
   /** What Supabase actually said — the owner needs it to fix the project. */
   const [detail, setDetail] = useState<{ rateLimited: boolean; message: string } | null>(null);
 
@@ -83,6 +89,127 @@ export function SignInForm({
       setState("codeError");
     }
   };
+
+  const signInWithPassword = async (event: FormEvent) => {
+    event.preventDefault();
+    setPwState("busy");
+    setPwDetail("");
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setPwDetail(error.message);
+        // Supabase does not say which; offer the account when sign-up is open.
+        setPwState(allowSignup ? "noAccount" : "wrong");
+        return;
+      }
+      window.location.href = nextPath ?? `/${locale}/admin`;
+    } catch (caught) {
+      setPwDetail(caught instanceof Error ? caught.message : "");
+      setPwState("wrong");
+    }
+  };
+
+  const createAccount = async () => {
+    setPwState("busy");
+    setPwDetail("");
+    try {
+      const supabase = createClient();
+      const target = nextPath ?? `/${locale}/dashboard`;
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(target)}` },
+      });
+      if (error) {
+        setPwDetail(error.message);
+        setPwState("signupFailed");
+        return;
+      }
+      // With email confirmation on (the default, and what "My giving"
+      // relies on) there is no session yet: the link in the inbox finishes it.
+      if (data.session) {
+        window.location.href = target;
+        return;
+      }
+      setPwState("signupSent");
+    } catch (caught) {
+      setPwDetail(caught instanceof Error ? caught.message : "");
+      setPwState("signupFailed");
+    }
+  };
+
+  const modeSwitch = (
+    <button
+      type="button"
+      onClick={() => {
+        setMode(mode === "link" ? "password" : "link");
+        setPwState("idle");
+        setState("idle");
+      }}
+      className="text-[14px] font-semibold text-sea underline underline-offset-2 hover:text-sea-2"
+    >
+      {mode === "link" ? t("usePassword") : t("useLink")}
+    </button>
+  );
+
+  if (mode === "password") {
+    return (
+      <form onSubmit={signInWithPassword} className="space-y-3">
+        <div>
+          <label htmlFor="pwEmail" className="text-[14px] font-semibold">
+            {t("emailLabel")}
+          </label>
+          <input id="pwEmail" type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="pwPassword" className="text-[14px] font-semibold">
+            {t("passwordLabel")}
+          </label>
+          <input
+            id="pwPassword"
+            type="password"
+            required
+            minLength={8}
+            autoComplete={allowSignup ? "new-password" : "current-password"}
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            className={inputClass}
+          />
+          {allowSignup ? <p className="mt-1 text-[13px] text-black/55">{t("passwordHint")}</p> : null}
+        </div>
+        {pwState === "wrong" || pwState === "noAccount" || pwState === "signupFailed" ? (
+          <div role="alert" className="text-[14px] text-red-dark">
+            <p className="font-semibold">
+              {pwState === "wrong" ? t("passwordWrong") : pwState === "noAccount" ? t("passwordNoAccount") : t("signupFailed")}
+            </p>
+            {pwDetail ? <p className="mt-0.5 font-mono text-[12.5px] text-black/55">{pwDetail}</p> : null}
+          </div>
+        ) : null}
+        {pwState === "signupSent" ? (
+          <p className="rounded-brand border-[1.5px] border-dashed border-sea bg-mist px-5 py-4 text-[15px] text-sea">{t("signupSent")}</p>
+        ) : null}
+        <button
+          type="submit"
+          disabled={pwState === "busy"}
+          className="w-full rounded-lg bg-sea px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
+        >
+          {t("signInPassword")}
+        </button>
+        {allowSignup && pwState === "noAccount" ? (
+          <button
+            type="button"
+            disabled={pwState !== "noAccount" || password.length < 8}
+            onClick={createAccount}
+            className="w-full rounded-lg bg-mist px-6 py-3.5 text-[16px] font-bold transition-colors hover:bg-mist-2 disabled:opacity-60"
+          >
+            {t("createAccount")}
+          </button>
+        ) : null}
+        <div className="pt-1">{modeSwitch}</div>
+      </form>
+    );
+  }
 
   if (state === "sent" || state === "verifying" || state === "codeError") {
     return (
@@ -148,6 +275,7 @@ export function SignInForm({
           {detail?.message ? (
             <p className="mt-0.5 font-mono text-[12.5px] text-black/55">{detail.message}</p>
           ) : null}
+          <p className="mt-1 text-[13.5px] text-black/65">{t("linkErrorHint")}</p>
         </div>
       ) : null}
       <button
@@ -157,6 +285,7 @@ export function SignInForm({
       >
         {t("sendLink")}
       </button>
+      <div className="pt-1">{modeSwitch}</div>
     </form>
   );
 }
