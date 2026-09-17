@@ -3,8 +3,9 @@ import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
 import { InboundForm } from "@/components/forms/InboundForm";
+import { SponsorGrid, type PublicSponsor } from "@/components/partners/SponsorGrid";
 import { partnersContent } from "@/content/site/partners";
-import { supporterLogoUrl } from "@/lib/storage";
+import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
@@ -24,6 +25,7 @@ interface SponsorshipRow {
   supporter_slug: string | null;
   tier: string | null;
   is_in_kind: boolean;
+  amount_cents: number | null;
 }
 
 interface OfferRow {
@@ -38,7 +40,7 @@ async function loadSupporters() {
     const supabase = await createClient();
     const [{ data: supporters }, { data: sponsorships }, { data: offers }] = await Promise.all([
       supabase.from("v_public_supporters").select("id, name, slug, logo_path, website").order("name"),
-      supabase.from("v_public_sponsors").select("supporter_slug, tier, is_in_kind"),
+      supabase.from("v_public_sponsors").select("supporter_slug, tier, is_in_kind, amount_cents"),
       supabase.from("v_public_perk_challenges").select("slug, supporter_slug, reward_label, title"),
     ]);
     return {
@@ -75,9 +77,20 @@ export default async function PartnersPage({
   const content = partnersContent[locale as Locale];
   const { supporters, sponsorships, offers } = await loadSupporters();
   // Only supporters with something public to show: a signed deal or a live offer.
-  const shown = supporters.filter(
-    (su) => sponsorships.some((d) => d.supporter_slug === su.slug) || offers.some((o) => o.supporter_slug === su.slug),
-  );
+  const shown: PublicSponsor[] = supporters
+    .filter((su) => sponsorships.some((d) => d.supporter_slug === su.slug) || offers.some((o) => o.supporter_slug === su.slug))
+    .map((su) => {
+      const deals = sponsorships.filter((d) => d.supporter_slug === su.slug);
+      return {
+        ...su,
+        cash_cents: deals.reduce((sum, d) => sum + (d.is_in_kind ? 0 : (d.amount_cents ?? 0)), 0),
+        in_kind: deals.some((d) => d.is_in_kind),
+        tiers: [...new Set(deals.map((d) => d.tier).filter((tier): tier is string => Boolean(tier)))],
+        offers: offers.filter((o) => o.supporter_slug === su.slug).length,
+      };
+    });
+  const cashTotal = shown.reduce((sum, su) => sum + su.cash_cents, 0);
+  const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
@@ -108,53 +121,36 @@ export default async function PartnersPage({
         {shown.length === 0 ? (
           <p className="mt-4 text-[15px] text-black/60">{content.supportersEmpty}</p>
         ) : (
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-            {shown.map((su) => {
-              const deals = sponsorships.filter((d) => d.supporter_slug === su.slug);
-              const theirOffers = offers.filter((o) => o.supporter_slug === su.slug);
-              const logo = supporterLogoUrl(su.logo_path);
-              return (
-                <li key={su.id} className="flex gap-4 rounded-lg bg-mist p-4">
-                  {logo ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- public bucket, arbitrary sizes
-                    <img src={logo} alt="" className="h-16 w-16 shrink-0 rounded-lg bg-paper object-contain" />
-                  ) : (
-                    <span aria-hidden className="type-display flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-paper text-[22px] text-sea">
-                      {su.name.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                  <div className="min-w-0">
-                    <p className="text-[16px] font-bold">
-                      {su.website ? (
-                        <a href={su.website} target="_blank" rel="noopener" className="hover:text-sea">{su.name}</a>
-                      ) : (
-                        su.name
-                      )}
-                    </p>
-                    {deals.length > 0 ? (
-                      <p className="mt-0.5 text-[14px] text-black/65">
-                        {content.sponsorLabel}
-                        {deals.some((d) => d.tier) ? ` · ${[...new Set(deals.map((d) => d.tier).filter(Boolean))].join(", ")}` : ""}
-                        {deals.every((d) => d.is_in_kind) ? ` · ${content.inKindLabel}` : ""}
-                      </p>
-                    ) : null}
-                    {theirOffers.length > 0 ? (
-                      <ul className="mt-1 space-y-0.5 text-[14px]">
-                        {theirOffers.map((offer) => (
-                          <li key={offer.slug}>
-                            <span className="text-black/55">{content.offersLabel}: </span>
-                            <Link href={`/izazovi/${offer.slug}`} className="font-semibold text-sea underline underline-offset-2">
-                              {offer.reward_label}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+          <>
+            {cashTotal > 0 ? (
+              <p className="mt-4 text-[15px]">
+                <span className="font-mono text-[20px] font-extrabold tabular-nums text-sea">{money(cashTotal)}</span>
+                <span className="ml-2 text-black/60">{content.cashTotalLabel}</span>
+              </p>
+            ) : null}
+            <div className="mt-6">
+              <SponsorGrid
+                sponsors={shown}
+                locale={locale as Locale}
+                inKindLabel={content.inKindLabel}
+                size="lg"
+                footer={(su) => {
+                  const theirOffers = offers.filter((o) => o.supporter_slug === su.slug);
+                  return theirOffers.length > 0 ? (
+                    <ul className="mt-1 space-y-0.5 text-[14px]">
+                      {theirOffers.map((offer) => (
+                        <li key={offer.slug}>
+                          <Link href={`/izazovi/${offer.slug}`} className="font-semibold text-sea underline underline-offset-2">
+                            {offer.reward_label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null;
+                }}
+              />
+            </div>
+          </>
         )}
       </section>
 

@@ -29,6 +29,16 @@ const supporterSchema = z.object({
   isActive: z.boolean(),
   /** Object path in the supporter-logos bucket; undefined leaves it as is. */
   logoPath: z.string().trim().max(300).nullable().optional(),
+  /** A new supporter's first gift, recorded as a signed sponsorship. */
+  sponsorship: z
+    .object({
+      amountCents: z.number().int().min(0).max(MAX_CENTS).nullable(),
+      isInKind: z.boolean(),
+      tier: z.string().trim().max(60).nullable(),
+      campaignId: z.string().uuid().nullable(),
+      eventId: z.string().uuid().nullable(),
+    })
+    .optional(),
 });
 
 export async function saveSupporter(input: unknown): Promise<SupporterActionResult> {
@@ -74,8 +84,29 @@ export async function saveSupporter(input: unknown): Promise<SupporterActionResu
     await supabase.from("perk_challenges").update({ partner_name: data.name }).eq("supporter_id", data.id);
     await supabase.from("sponsors").update({ name: data.name }).eq("supporter_id", data.id);
   }
+  if (!data.id && data.sponsorship) {
+    const gift = data.sponsorship;
+    const { error: giftError } = await supabase.from("sponsors").insert({
+      supporter_id: saved.id,
+      name: saved.name,
+      website: data.website,
+      tier: gift.tier,
+      campaign_id: gift.campaignId,
+      event_id: gift.eventId,
+      amount_cents: gift.isInKind ? null : gift.amountCents,
+      is_in_kind: gift.isInKind,
+      status: "signed",
+    });
+    if (giftError) {
+      // The supporter exists; the gift can be added from its panel.
+      console.error("[admin] first sponsorship failed:", giftError.code);
+      return { ok: false, error: "server", supporter: saved };
+    }
+  }
   revalidatePath("/[locale]/admin", "layout");
   revalidatePath("/[locale]/partneri", "page");
+  revalidatePath("/[locale]", "page");
+  revalidatePath("/[locale]/transparentnost", "page");
   return { ok: true, supporter: saved };
 }
 

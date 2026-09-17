@@ -89,5 +89,8 @@ select * from (values
      exists (select 1 from information_schema.role_table_grants
              where table_schema = 'public' and table_name = 'supporters'
                and grantee = 'authenticated' and privilege_type = 'DELETE'))
+  ,('20260917000035_sponsor_amounts_public',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'v_public_year_supporters' and column_name = 'cash_cents'))
 ) as m (migration, applied)
 order by migration;
