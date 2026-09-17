@@ -3,6 +3,8 @@ export interface PublicSponsor {
   id: string;
   name: string;
   slug: string;
+  /** An organisation (sponsor, shown with its logo) or an individual (donor, listed by name). */
+  kind: "sponsor" | "donor";
   logo_path: string | null;
   website: string | null;
   /** Cash given, in cents; 0 when everything was in kind or an offer. */

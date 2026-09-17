@@ -114,7 +114,7 @@ async function fetchLedger(year: number | null) {
       ? supabase.from("v_public_events").select("slug, name, starts_at, venue, kind").gte("starts_at", from).lt("starts_at", to).order("starts_at")
       : Promise.resolve({ data: [] as EventRow[] }),
     year
-      ? supabase.from("v_public_year_supporters").select("id, name, slug, logo_path, website, cash_cents, in_kind, tiers, offers").eq("year", year)
+      ? supabase.from("v_public_year_supporters").select("id, name, slug, kind, logo_path, website, cash_cents, in_kind, tiers, offers").eq("year", year)
       : Promise.resolve({ data: [] as SupporterRow[] }),
   ]);
   return {
@@ -162,7 +162,10 @@ export default async function LedgerPage({
   const thisYear = new Date().getFullYear();
   const year = godina === "sve" ? null : /^\d{4}$/.test(godina ?? "") ? Number(godina) : thisYear;
 
-  const { summary, opsCents, inRows, outRows, adjustments, yearStats, yearReports, events, supporters } = await fetchLedger(year);
+  const { summary, opsCents, inRows, outRows, adjustments, yearStats, yearReports, events, supporters: yearSupporters } = await fetchLedger(year);
+  // Organisations are sponsors, shown with their logos; individuals are donors, listed by name.
+  const supporters = yearSupporters.filter((su) => su.kind === "sponsor");
+  const individualDonors = yearSupporters.filter((su) => su.kind === "donor");
   const years = yearStats.map((row) => row.year).filter((y) => y >= FOUNDING_YEAR);
   if (year !== null && !years.includes(year) && yearStats.length > 0) notFound();
   const derived = year !== null ? (yearStats.find((row) => row.year === year) ?? null) : null;
@@ -189,7 +192,11 @@ export default async function LedgerPage({
   const legacySupporters = legacy ? (report?.supporters ?? []) : [];
   const sponsorCash = supporters.reduce((sum, su) => sum + su.cash_cents, 0);
   const legacyBeneficiaries = legacy ? (report?.beneficiaries_list ?? []) : [];
-  const legacyDonors = legacy ? (report?.donors_list ?? []) : [];
+  // The donor wall: individuals recorded as supporters plus the list of a legacy year, largest gift first.
+  const donors = [
+    ...individualDonors.map((su) => ({ name: su.name, amount_cents: su.cash_cents > 0 ? su.cash_cents : null })),
+    ...(legacy ? (report?.donors_list ?? []) : []),
+  ].sort((a, b) => (b.amount_cents ?? -1) - (a.amount_cents ?? -1) || a.name.localeCompare(b.name));
   const tense = year === null ? "all" : year < thisYear ? "past" : year === thisYear ? "current" : "future";
   // unallocated_cents can transiently go negative (a disbursement published
   // while its matching credits are still pending approval) — the flagship
@@ -450,12 +457,12 @@ export default async function LedgerPage({
             ) : null}
           </section>
 
-          {/* the donor wall of a year recorded before the ledger */}
-          {legacyDonors.length > 0 ? (
+          {/* the donor wall: individuals, by name */}
+          {donors.length > 0 ? (
             <section className="mt-7">
               <h3 className="type-eyebrow text-sea/80">{tYears("donorsHeading")}</h3>
               <ul className="mt-2 flex flex-wrap gap-2">
-                {legacyDonors.map((donor, index) => (
+                {donors.map((donor, index) => (
                   <li key={`${donor.name}-${index}`} className="inline-flex items-baseline gap-2 rounded-lg bg-mist px-3 py-2 text-[14px]">
                     <span className="font-semibold">{donor.name}</span>
                     {donor.amount_cents != null ? <span className="font-mono text-[13px] tabular-nums text-black/60">{money(donor.amount_cents)}</span> : null}

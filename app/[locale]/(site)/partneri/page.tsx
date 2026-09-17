@@ -17,6 +17,7 @@ interface SupporterRow {
   id: string;
   name: string;
   slug: string;
+  kind: "sponsor" | "donor";
   logo_path: string | null;
   website: string | null;
 }
@@ -39,7 +40,7 @@ async function loadSupporters() {
   try {
     const supabase = await createClient();
     const [{ data: supporters }, { data: sponsorships }, { data: offers }] = await Promise.all([
-      supabase.from("v_public_supporters").select("id, name, slug, logo_path, website").order("name"),
+      supabase.from("v_public_supporters").select("id, name, slug, kind, logo_path, website").eq("kind", "sponsor").order("name"),
       supabase.from("v_public_sponsors").select("supporter_slug, tier, is_in_kind, amount_cents"),
       supabase.from("v_public_perk_challenges").select("slug, supporter_slug, reward_label, title"),
     ]);

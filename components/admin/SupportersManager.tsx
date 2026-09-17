@@ -27,6 +27,7 @@ export interface SupporterRow {
   notes: string | null;
   is_active: boolean;
   logo_path: string | null;
+  kind: "sponsor" | "donor";
 }
 
 export interface SponsorshipRow {
@@ -77,6 +78,7 @@ export function SupporterForm({
   const t = useTranslations("admin");
   const router = useRouter();
   const [name, setName] = useState(supporter?.name ?? "");
+  const [kind, setKind] = useState<SupporterRow["kind"]>(supporter?.kind ?? "sponsor");
   // A new supporter usually comes with a gift: amount and where, in one go.
   const [giftAmount, setGiftAmount] = useState("");
   const [giftInKind, setGiftInKind] = useState(false);
@@ -135,6 +137,7 @@ export function SupporterForm({
     const result = await saveSupporter({
       id: supporter?.id,
       name,
+      kind,
       website: website.trim() || null,
       contactName: contactName.trim() || null,
       contactEmail: contactEmail.trim() || null,
@@ -155,9 +158,23 @@ export function SupporterForm({
 
   return (
     <form id={formId} onSubmit={submit}>
+      <fieldset className="mb-4">
+        <legend className={labelClass}>{t("suKind")}</legend>
+        <div className="mt-1.5 grid gap-2 sm:grid-cols-2">
+          {(["sponsor", "donor"] as const).map((value) => (
+            <label key={value} className={`flex cursor-pointer items-start gap-2.5 rounded-lg px-3.5 py-3 text-[14.5px] ${kind === value ? "bg-paper ring-2 ring-sea" : "bg-paper/60 hover:bg-paper"}`}>
+              <input type="radio" name="suKind" value={value} checked={kind === value} onChange={() => setKind(value)} className="mt-1 h-4 w-4 accent-red" />
+              <span>
+                <span className="block font-bold">{t(`suKindValue.${value}`)}</span>
+                <span className="block text-[13.5px] text-black/60">{t(`suKindHint.${value}`)}</span>
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="suName" className={labelClass}>{t("suName")}</label>
+          <label htmlFor="suName" className={labelClass}>{kind === "donor" ? t("suNameDonor") : t("suName")}</label>
           <input id="suName" type="text" required value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
         </div>
         <div>
@@ -451,6 +468,19 @@ export function SupportersManager({
       header: t("table.colName"),
       cell: (s) => <span className="block max-w-[220px] truncate font-semibold">{s.name}</span>,
       sort: (s) => s.name,
+    },
+    {
+      key: "kind",
+      header: t("suKind"),
+      cell: (s) => (s.kind === "donor" ? <Chip>{t("suKindValue.donor")}</Chip> : <Chip tone="sea">{t("suKindValue.sponsor")}</Chip>),
+      sort: (s) => s.kind,
+      filter: {
+        options: [
+          { value: "sponsor", label: t("suKindValue.sponsor") },
+          { value: "donor", label: t("suKindValue.donor") },
+        ],
+        match: (s, value) => s.kind === value,
+      },
     },
     {
       key: "status",
