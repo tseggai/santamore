@@ -3,6 +3,8 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ProposalsList, type PublicProposal } from "@/components/proposals/ProposalsList";
+import { ProposePane } from "@/components/proposals/ProposePane";
+import type { PublicCriterion } from "@/components/proposals/ProposeForm";
 import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
@@ -48,13 +50,22 @@ export default async function CampaignsIndexPage({
   let proposals: PublicProposal[] = [];
   let myVotes: string[] = [];
   let signedIn = false;
+  let criteria: PublicCriterion[] = [];
   try {
     const supabase = await createClient();
-    const [{ data: proposalRows }, { data: voteRows }, { data: auth }] = await Promise.all([
+    const [{ data: proposalRows }, { data: voteRows }, { data: auth }, { data: criteriaRows }] = await Promise.all([
       supabase.from("v_public_cause_proposals").select("*").order("vote_rank").order("created_at").limit(100),
       supabase.from("v_my_cause_votes").select("proposal_id"),
       supabase.auth.getUser(),
+      supabase.from("v_public_cause_criteria").select("*"),
     ]);
+    const lang = locale as Locale;
+    criteria = ((criteriaRows ?? []) as { id: string; disqualify_on: boolean; question_me: string; question_en: string; question_ru: string; reason_me: string; reason_en: string; reason_ru: string }[]).map((row) => ({
+      id: row.id,
+      disqualify_on: row.disqualify_on,
+      question: row[`question_${lang}`],
+      reason: row[`reason_${lang}`],
+    }));
     proposals = ((proposalRows ?? []) as PublicProposal[]).sort((a, b) => (a.status === "chosen" ? 1 : 0) - (b.status === "chosen" ? 1 : 0) || a.vote_rank - b.vote_rank);
     myVotes = (voteRows ?? []).map((row) => row.proposal_id as string);
     signedIn = Boolean(auth.user);
@@ -76,14 +87,17 @@ export default async function CampaignsIndexPage({
   const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
 
   return (
-    <div className="mx-auto max-w-3xl px-5 py-14">
+    <div className="mx-auto max-w-6xl px-5 py-14">
       <h1 className="type-display text-4xl">{t("title")}</h1>
       <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-black/70">{t("sub")}</p>
 
+      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div>
+
       {campaigns.length === 0 ? (
-        <p className="mt-8 text-[15px] text-black/60">{t("empty")}</p>
+        <p className="text-[15px] text-black/60">{t("empty")}</p>
       ) : (
-        <ul className="mt-8 space-y-3">
+        <ul className="space-y-3">
           {campaigns.map((campaign) => {
             const pct =
               campaign.goal_cents && campaign.goal_cents > 0
@@ -136,21 +150,23 @@ export default async function CampaignsIndexPage({
         </ul>
       )}
 
-      {/* what the community proposes, ranked by votes */}
-      <section id="prijedlozi" className="mt-14 scroll-mt-6 border-t-[0.5px] border-line pt-10">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="type-eyebrow text-sea/80">{tProposals("eyebrow")}</p>
-            <h2 className="type-display mt-2 text-3xl">{tProposals("listHeading")}</h2>
-            <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-black/65">{tProposals("listSub")}</p>
+      </div>
+
+      {/* the community's say: always in view beside the causes */}
+      <aside id="prijedlozi" className="scroll-mt-6 lg:sticky lg:top-6 lg:self-start">
+        <div className="rounded-brand bg-mist px-5 py-5">
+          <p className="type-eyebrow text-sea/80">{tProposals("eyebrow")}</p>
+          <h2 className="mt-2 text-[20px] font-bold leading-snug">{tProposals("listHeading")}</h2>
+          <p className="mt-2 text-[14px] leading-relaxed text-black/65">{tProposals("listSub")}</p>
+          <div className="mt-4">
+            <ProposePane signedIn={signedIn} criteria={criteria} />
           </div>
-          <Link href="/kampanje/predlozi" className="inline-flex h-11 items-center gap-1.5 rounded-lg bg-red px-5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark">
-            <span aria-hidden className="text-[18px] leading-none">+</span>
-            {tProposals("proposeCta")}
-          </Link>
         </div>
-        <ProposalsList proposals={proposals} myVotes={myVotes} signedIn={signedIn} />
-      </section>
+        <div className="mt-2 max-h-[60vh] overflow-y-auto pr-1 lg:max-h-[calc(100vh-22rem)]">
+          <ProposalsList proposals={proposals} myVotes={myVotes} signedIn={signedIn} />
+        </div>
+      </aside>
+      </div>
     </div>
   );
 }

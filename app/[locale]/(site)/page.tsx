@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { DonateButton } from "@/components/donate/DonateButton";
 import { InboundForm } from "@/components/forms/InboundForm";
+import { HeroSlides, type HeroSlide } from "@/components/home/HeroSlides";
 import { LeaderboardList, type LeaderboardEntry } from "@/components/Leaderboard";
 import { landingContent } from "@/content/site/landing";
 import { formatCents } from "@/lib/money";
@@ -23,10 +23,10 @@ async function fetchLanding() {
       supabase.from("v_public_ledger_summary").select("received_cents, disbursed_cents").single(),
       supabase
         .from("v_public_events")
-        .select("slug, name, starts_at, kind, venue, campaign_slug")
+        .select("slug, name, starts_at, kind, venue, campaign_slug, cover_path")
         .gte("starts_at", nowIso)
         .order("starts_at", { ascending: true })
-        .limit(1),
+        .limit(4),
       supabase
         .from("v_leaderboard")
         .select("slug, title, raised_cents")
@@ -40,7 +40,7 @@ async function fetchLanding() {
         .limit(8),
       supabase
         .from("v_public_campaigns")
-        .select("slug, title, goal_cents, raised_cents, donor_count")
+        .select("slug, title, goal_cents, raised_cents, donor_count, cover_path, ends_at")
         .order("starts_at", { ascending: false })
         .limit(3),
       supabase
@@ -53,18 +53,18 @@ async function fetchLanding() {
     return {
       receivedCents: summary.data?.received_cents ?? 0,
       disbursedCents: summary.data?.disbursed_cents ?? 0,
-      nextEvent: (events.data?.[0] ?? null) as { slug: string; name: string; starts_at: string; kind: "race" | "challenge" | "social"; venue: string | null; campaign_slug: string | null } | null,
+      events: (events.data ?? []) as { slug: string; name: string; starts_at: string; kind: "race" | "challenge" | "social"; venue: string | null; campaign_slug: string | null; cover_path: string | null }[],
       board: board.data ?? [],
       chapters: chapters.data ?? [],
       gallery: gallery.data ?? [],
-      causes: (causes.data ?? []) as { slug: string; title: string; goal_cents: number | null; raised_cents: number; donor_count: number }[],
+      causes: (causes.data ?? []) as { slug: string; title: string; goal_cents: number | null; raised_cents: number; donor_count: number; cover_path: string | null; ends_at: string | null }[],
       proposals: (proposals.data ?? []) as { id: string; title: string; vote_count: number; vote_rank: number }[],
     };
   } catch {
     return {
       receivedCents: 0,
       disbursedCents: 0,
-      nextEvent: null,
+      events: [],
       board: [],
       chapters: [],
       gallery: [],
@@ -88,331 +88,275 @@ export default async function HomePage({
     getTranslations("events"),
   ]);
   const content = landingContent[locale as Locale];
-  const { receivedCents, disbursedCents, nextEvent, board, chapters, gallery, causes, proposals } = await fetchLanding();
+  const { receivedCents, disbursedCents, events, board, chapters, gallery, causes, proposals } = await fetchLanding();
 
-  const money = (cents: number) =>
-    formatCents(cents, locale as Locale, { trimWholeCents: true });
-  const dateFormat = new Intl.DateTimeFormat(htmlLang(locale as Locale), {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-  const daysToEvent = nextEvent
-    ? Math.max(
-        0,
-        Math.ceil((new Date(nextEvent.starts_at).getTime() - Date.now()) / 86_400_000),
-      )
-    : null;
+  const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
+  const dateFormat = new Intl.DateTimeFormat(htmlLang(locale as Locale), { day: "numeric", month: "long", year: "numeric" });
+  const shortDate = new Intl.DateTimeFormat(htmlLang(locale as Locale), { day: "numeric", month: "short" });
+  const kindLabel = (kind: "race" | "challenge" | "social") =>
+    kind === "challenge" ? tEvents("kindChallenge") : kind === "social" ? tEvents("kindSocial") : tEvents("kindRace");
+  const eventCta = (kind: "race" | "challenge" | "social") =>
+    kind === "challenge" ? tEvents("joinCta") : kind === "social" ? tEvents("goingCta") : tEvents("registerCta");
+  const daysTo = (iso: string) => Math.max(0, Math.ceil((new Date(iso).getTime() - Date.now()) / 86_400_000));
+  const now = Date.now();
+  const openCauses = causes.filter((cause) => !cause.ends_at || new Date(cause.ends_at).getTime() >= now);
+
+  // One slide per thing to act on: who we are, the next events, the open
+  // causes, the vote. Six at most, the intro first.
+  const slides: HeroSlide[] = [
+    {
+      id: "intro",
+      eyebrow: t("slideIntroEyebrow"),
+      title: t("title"),
+      text: t("sub"),
+      figure: money(receivedCents),
+      figureLabel: t("liveTotal"),
+      image: null,
+      primary: { href: "/podrzi", label: t("ctaDonate"), donate: true },
+      secondary: { href: "/dashboard/prikupljaj", label: t("ctaStartPage") },
+    },
+    ...events.slice(0, 2).map(
+      (event): HeroSlide => ({
+        id: `event-${event.slug}`,
+        eyebrow: `${t("nextEvent")} · ${kindLabel(event.kind)}`,
+        title: event.name,
+        text: `${dateFormat.format(new Date(event.starts_at))}${event.venue && !event.venue.includes("[[") ? ` · ${event.venue}` : ""}`,
+        figure: String(daysTo(event.starts_at)),
+        figureLabel: t("countdown", { count: daysTo(event.starts_at) }).replace(/^\d+\s*/, ""),
+        image: galleryImageUrl(event.cover_path),
+        primary: { href: `/dogadjaji/${event.slug}`, label: eventCta(event.kind) },
+        secondary: event.campaign_slug ? { href: `/dashboard/prikupljaj?cause=${event.campaign_slug}`, label: tEvents("wayRaise") } : undefined,
+      }),
+    ),
+    ...openCauses.slice(0, 2).map(
+      (cause): HeroSlide => ({
+        id: `cause-${cause.slug}`,
+        eyebrow: t("causesHeading"),
+        title: cause.title,
+        text: cause.goal_cents ? t("slideCauseText", { raised: money(cause.raised_cents), goal: money(cause.goal_cents) }) : t("slideCauseTextNoGoal", { raised: money(cause.raised_cents) }),
+        image: galleryImageUrl(cause.cover_path),
+        primary: { href: `/kampanje/${cause.slug}`, label: t("slideCauseCta") },
+        secondary: { href: `/dashboard/prikupljaj?cause=${cause.slug}`, label: t("ctaStartPage") },
+      }),
+    ),
+    {
+      id: "vote",
+      eyebrow: t("slideVoteEyebrow"),
+      title: t("proposalsHeading"),
+      text: proposals.length > 0 ? t("slideVoteText", { count: proposals.length }) : t("slideVoteTextEmpty"),
+      image: null,
+      primary: { href: "/kampanje?predlozi=1", label: t("proposalsCta") },
+      secondary: { href: "/kampanje#prijedlozi", label: t("proposalsVoteCta") },
+    },
+  ].slice(0, 6);
 
   const eyebrowClass = "font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80";
+  const card = "rounded-brand bg-mist px-5 py-5";
+  const more = "mt-4 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2";
 
   return (
-    <div className="mx-auto max-w-3xl px-5 pb-20">
-      {/* 1 — hero with the live total */}
-      <section className="py-16 sm:py-24">
-        <p className={eyebrowClass}>{t("eyebrow")}</p>
-        <h1 className="type-display mt-3 max-w-3xl text-4xl leading-[1.08] sm:text-6xl">
-          {t("title")}
-        </h1>
-        <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-black/70">
-          {t("sub")}
-        </p>
-        <p className="mt-6 font-mono text-[14px] text-sea">
-          <span className="font-mono text-3xl font-extrabold tabular-nums">{money(receivedCents)}</span>{" "}
-          {t("liveTotal")}
-        </p>
-        <div className="mt-7 flex flex-wrap gap-3">
-          <DonateButton
-            request={{ kind: "campaign" }}
-            href="/podrzi"
-            className="rounded-lg bg-red px-6 py-3.5 text-[16.5px] font-bold text-paper transition-colors hover:bg-red-dark"
-          >
-            {t("ctaDonate")}
-          </DonateButton>
-          <Link
-            href="/dashboard/prikupljaj"
-            className="rounded-lg bg-mist px-6 py-3.5 text-[15.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
-          >
-            {t("ctaStartPage")}
-          </Link>
-          <Link
-            href="/dogadjaji"
-            className="rounded-lg px-4 py-3.5 text-[15.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
-          >
-            {t("ctaEvents")} →
-          </Link>
-        </div>
-        <p className="mt-8 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13px] text-sea">
-          {t("heroPhotoNote")}
-        </p>
-      </section>
+    <div className="pb-20">
+      <HeroSlides slides={slides} />
 
-      {/* 2 — the next thing to do: the next event, with both ways in */}
-      {nextEvent ? (
-        <section className="border-t-[0.5px] border-line py-12">
-          <div className="rounded-brand bg-sea px-6 py-6 text-paper">
-            <p className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-paper/70">
-              {t("nextEvent")} · {nextEvent.kind === "challenge" ? tEvents("kindChallenge") : nextEvent.kind === "social" ? tEvents("kindSocial") : tEvents("kindRace")}
-            </p>
-            <p className="type-display mt-1 text-3xl">{nextEvent.name}</p>
-            <p className="mt-1 text-[14.5px] text-paper/75">
-              {dateFormat.format(new Date(nextEvent.starts_at))}
-              {nextEvent.venue && !nextEvent.venue.includes("[[") ? ` · ${nextEvent.venue}` : ""}
-              {daysToEvent !== null ? (
-                <>
-                  {" "}
-                  ·{" "}
-                  <span className="font-mono tabular-nums">
-                    {t("countdown", { count: daysToEvent })}
-                  </span>
-                </>
-              ) : null}
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <Link
-                href={`/dogadjaji/${nextEvent.slug}`}
-                className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark"
-              >
-                {nextEvent.kind === "challenge" ? tEvents("joinCta") : nextEvent.kind === "social" ? tEvents("goingCta") : tEvents("registerCta")}
-              </Link>
-              {nextEvent.campaign_slug ? (
-                <Link
-                  href={`/dashboard/prikupljaj?cause=${nextEvent.campaign_slug}`}
-                  className="rounded-lg bg-paper/15 px-6 py-3.5 text-[15.5px] font-semibold text-paper transition-colors hover:bg-paper/25"
-                >
-                  {tEvents("wayRaise")}
-                </Link>
-              ) : null}
-            </div>
-          </div>
-        </section>
-      ) : null}
-
-      {/* 3 — what we are raising for right now */}
-      {causes.length > 0 ? (
-        <section className="border-t-[0.5px] border-line py-12">
-          <p className={eyebrowClass}>{t("causesHeading")}</p>
-          <ul className="mt-4 space-y-3">
-            {causes.map((cause) => {
-              const pct = cause.goal_cents && cause.goal_cents > 0 ? Math.min(100, Math.round((cause.raised_cents / cause.goal_cents) * 100)) : null;
-              return (
-                <li key={cause.slug}>
-                  <Link href={`/kampanje/${cause.slug}`} className="block rounded-brand bg-mist px-5 py-4 transition-colors hover:bg-mist-2">
-                    <span className="flex flex-wrap items-baseline justify-between gap-2">
-                      <span className="type-display text-xl">{cause.title}</span>
-                      <span className="font-mono text-[14px] tabular-nums text-black/70">
-                        {money(cause.raised_cents)}
-                        {cause.goal_cents ? <span className="text-black/45"> / {money(cause.goal_cents)}</span> : null}
-                        {pct !== null ? <span className="text-sea"> · {pct}%</span> : null}
-                      </span>
-                    </span>
-                    {pct !== null ? (
-                      <span className="mt-2 block h-[6px] overflow-hidden rounded-[3px] bg-mist-2">
-                        <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
-                      </span>
-                    ) : null}
-                  </Link>
+      <div className="mx-auto max-w-6xl px-5">
+        {/* row 1 — the promise, the mechanism, the vote */}
+        <div className="grid gap-4 py-12 md:grid-cols-3">
+          <section className={card}>
+            <p className={eyebrowClass}>{t("proofHeading")}</p>
+            <p className="mt-3 font-mono text-3xl font-extrabold tabular-nums">{money(receivedCents)}</p>
+            <p className="text-[14px] text-black/65">{t("proofReceived")}</p>
+            <p className="mt-3 font-mono text-3xl font-extrabold tabular-nums">{money(disbursedCents)}</p>
+            <p className="text-[14px] text-black/65">{t("proofDisbursed")}</p>
+            <ul className="mt-4 space-y-1.5 border-t-[0.5px] border-line pt-4">
+              {content.funds.slice(0, 2).map((line) => (
+                <li key={line} className="flex gap-2.5 text-[14px] leading-relaxed text-black/75">
+                  <span aria-hidden className="mt-[8px] h-[6px] w-[6px] shrink-0 rounded-full bg-red" />
+                  {line}
                 </li>
-              );
-            })}
-          </ul>
-          <Link
-            href="/kampanje"
-            className="mt-4 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
-          >
-            {t("causesCta")} →
-          </Link>
-        </section>
-      ) : null}
+              ))}
+            </ul>
+            <Link href="/transparentnost" className={more}>{content.fundsCta} →</Link>
+          </section>
 
-      {/* 3b — causes the community proposes: the vote is open to everyone */}
-      <section className="border-t-[0.5px] border-line py-12">
-        <p className={eyebrowClass}>{t("proposalsEyebrow")}</p>
-        <h2 className="type-display mt-2 text-2xl sm:text-3xl">{t("proposalsHeading")}</h2>
-        <p className="mt-2 max-w-xl text-[15.5px] leading-relaxed text-black/70">{t("proposalsSub")}</p>
-        {proposals.length > 0 ? (
-          <ol className="mt-5 space-y-2">
-            {proposals.map((proposal) => (
-              <li key={proposal.id} className="flex items-center gap-4 rounded-brand bg-mist px-5 py-3.5">
-                <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-paper font-mono text-[13px] font-bold tabular-nums">
-                  <span aria-hidden className="text-[11px] leading-none text-red">▲</span>
-                  {proposal.vote_count}
-                </span>
-                <span className="min-w-0 flex-1 truncate text-[16px] font-semibold">{proposal.title}</span>
-                {proposal.vote_rank <= 5 ? (
-                  <span className="hidden rounded-full bg-sea px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper sm:inline">{t("proposalsShortlist")}</span>
-                ) : null}
-              </li>
-            ))}
-          </ol>
-        ) : null}
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/kampanje/predlozi" className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark">
-            {t("proposalsCta")}
-          </Link>
-          <Link href="/kampanje#prijedlozi" className="rounded-lg bg-mist px-6 py-3.5 text-[15.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea">
-            {t("proposalsVoteCta")} →
-          </Link>
-        </div>
-      </section>
+          <section className={card}>
+            <p className={eyebrowClass}>{t("howHeading")}</p>
+            <ol className="mt-3 space-y-3">
+              {content.steps.map((step, index) => (
+                <li key={step.title} className="flex gap-3">
+                  <span className="font-mono text-[12px] text-red">0{index + 1}</span>
+                  <span>
+                    <span className="block text-[15.5px] font-bold">{step.title}</span>
+                    <span className="block text-[14px] leading-relaxed text-black/65">{step.desc}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </section>
 
-      {/* 3 — how it works */}
-      <section className="border-t-[0.5px] border-line py-12">
-        <p className={eyebrowClass}>{t("howHeading")}</p>
-        <div className="mt-5 grid gap-6 sm:grid-cols-3">
-          {content.steps.map((step, index) => (
-            <div key={step.title} className="rounded-brand bg-mist px-5 py-4">
-              <span className="font-mono text-[12px] text-red">0{index + 1}</span>
-              <p className="type-display mt-1 text-xl">{step.title}</p>
-              <p className="mt-2 text-[14px] leading-relaxed text-black/65">{step.desc}</p>
+          <section className={card}>
+            <p className={eyebrowClass}>{t("proposalsEyebrow")}</p>
+            <h2 className="mt-2 text-[18px] font-bold leading-snug">{t("proposalsHeading")}</h2>
+            {proposals.length > 0 ? (
+              <ol className="mt-3 space-y-1.5">
+                {proposals.map((proposal) => (
+                  <li key={proposal.id} className="flex items-center gap-3 rounded-lg bg-paper px-3 py-2">
+                    <span className="font-mono text-[13px] font-bold tabular-nums text-red">▲ {proposal.vote_count}</span>
+                    <span className="min-w-0 flex-1 truncate text-[14.5px] font-semibold">{proposal.title}</span>
+                  </li>
+                ))}
+              </ol>
+            ) : (
+              <p className="mt-2 text-[14px] leading-relaxed text-black/65">{t("slideVoteTextEmpty")}</p>
+            )}
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link href="/kampanje?predlozi=1" className="inline-flex h-10 items-center rounded-lg bg-red px-4 text-[14.5px] font-bold text-paper hover:bg-red-dark">{t("proposalsCta")}</Link>
+              <Link href="/kampanje#prijedlozi" className="inline-flex h-10 items-center rounded-lg bg-paper px-4 text-[14.5px] font-semibold hover:bg-mist-2">{t("proposalsVoteCta")} →</Link>
             </div>
-          ))}
+          </section>
         </div>
-      </section>
 
-      {/* 5 — the proof: last year, the two funds, the live ledger */}
-      <section className="border-t-[0.5px] border-line py-12">
-        <p className={eyebrowClass}>{t("proofHeading")}</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-brand bg-mist px-5 py-4">
-            <p className="font-mono text-3xl font-extrabold tabular-nums">{money(receivedCents)}</p>
-            <p className="mt-1 text-[14px] text-black/65">{t("proofReceived")}</p>
-          </div>
-          <div className="rounded-brand bg-mist px-5 py-4">
-            <p className="font-mono text-3xl font-extrabold tabular-nums">{money(disbursedCents)}</p>
-            <p className="mt-1 text-[14px] text-black/65">{t("proofDisbursed")}</p>
-          </div>
-        </div>
-        <div className="mt-6 grid gap-6 sm:grid-cols-3">
-          {content.triad.map((item) => (
-            <div key={item.big}>
-              <p className="type-display text-4xl text-red">{item.big}</p>
-              <p className="mt-1.5 max-w-xs text-[14px] leading-relaxed text-black/70">{item.label}</p>
-            </div>
-          ))}
-        </div>
-        <ul className="mt-6 max-w-2xl space-y-2">
-          {content.funds.map((line) => (
-            <li key={line} className="flex gap-2.5 text-[15px] leading-relaxed">
-              <span aria-hidden className="mt-[9px] h-[6px] w-[6px] shrink-0 rounded-full bg-red" />
-              {line}
-            </li>
-          ))}
-        </ul>
-        <Link
-          href="/transparentnost"
-          className="mt-5 inline-block rounded-lg bg-mist px-5 py-3 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
-        >
-          {content.fundsCta}
-        </Link>
-      </section>
-      {/* 6 — live leaderboard preview */}
-      {board.length > 0 ? (
-        <section className="border-t-[0.5px] border-line py-12">
-          <p className={eyebrowClass}>{tLb("title")}</p>
-          <div className="max-w-xl">
-            <LeaderboardList
-              locale={locale as Locale}
-              entries={board.map(
-                (row): LeaderboardEntry => ({
-                  slug: row.slug,
-                  title: row.title,
-                  raisedCents: row.raised_cents,
-                  href: `/f/${row.slug}`,
-                }),
-              )}
-            />
-          </div>
-          <Link
-            href="/dashboard/prikupljaj"
-            className="mt-4 inline-block rounded-lg bg-mist px-5 py-3 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
-          >
-            {tLb("cta")}
-          </Link>
-        </section>
-      ) : null}
+        {/* row 2 — what is coming, what we raise for */}
+        <div className="grid gap-4 border-t-[0.5px] border-line py-12 md:grid-cols-2">
+          <section>
+            <p className={eyebrowClass}>{t("eventsHeading")}</p>
+            {events.length === 0 ? (
+              <p className="mt-3 text-[14.5px] text-black/60">{tEvents("noUpcoming")}</p>
+            ) : (
+              <ul className="mt-3 overflow-hidden rounded-brand bg-mist">
+                {events.map((event) => (
+                  <li key={event.slug} className="border-t-[0.5px] border-line first:border-t-0">
+                    <Link href={`/dogadjaji/${event.slug}`} className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-mist-2">
+                      <span className="w-14 shrink-0 font-mono text-[13px] tabular-nums text-black/60">{shortDate.format(new Date(event.starts_at))}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-[15.5px] font-bold">{event.name}</span>
+                        <span className="block text-[13px] text-black/55">{kindLabel(event.kind)}{event.venue && !event.venue.includes("[[") ? ` · ${event.venue}` : ""}</span>
+                      </span>
+                      <span className="shrink-0 text-[14px] font-semibold text-sea">{eventCta(event.kind)} →</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <Link href="/dogadjaji" className={more}>{t("ctaEvents")} →</Link>
+          </section>
 
-      {/* 7 — gallery strip (renders once photos with consent exist) */}
-      {gallery.length > 0 ? (
-        <section className="border-t-[0.5px] border-line py-12">
-          <p className={eyebrowClass}>{t("galleryHeading")}</p>
-          <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
-            {gallery.map((item) => {
-              const src = galleryImageUrl(item.storage_path);
-              if (!src) return null;
-              return (
-                <Image
-                  key={item.id}
-                  src={src}
-                  alt={item.caption ?? ""}
-                  width={280}
-                  height={200}
-                  className="h-[180px] w-[250px] shrink-0 rounded-brand bg-mist object-cover"
+          <section>
+            <p className={eyebrowClass}>{t("causesHeading")}</p>
+            {causes.length === 0 ? (
+              <p className="mt-3 text-[14.5px] text-black/60">—</p>
+            ) : (
+              <ul className="mt-3 space-y-2">
+                {causes.map((cause) => {
+                  const pct = cause.goal_cents && cause.goal_cents > 0 ? Math.min(100, Math.round((cause.raised_cents / cause.goal_cents) * 100)) : null;
+                  return (
+                    <li key={cause.slug}>
+                      <Link href={`/kampanje/${cause.slug}`} className="block rounded-brand bg-mist px-5 py-3.5 transition-colors hover:bg-mist-2">
+                        <span className="flex flex-wrap items-baseline justify-between gap-2">
+                          <span className="text-[15.5px] font-bold">{cause.title}</span>
+                          <span className="font-mono text-[13.5px] tabular-nums text-black/70">
+                            {money(cause.raised_cents)}
+                            {cause.goal_cents ? <span className="text-black/45"> / {money(cause.goal_cents)}</span> : null}
+                          </span>
+                        </span>
+                        {pct !== null ? (
+                          <span className="mt-2 block h-[5px] overflow-hidden rounded-[3px] bg-mist-2">
+                            <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
+                          </span>
+                        ) : null}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            <Link href="/kampanje" className={more}>{t("causesCta")} →</Link>
+          </section>
+        </div>
+
+        {/* row 3 — people: fundraisers, chapters, the record so far */}
+        <div className="grid gap-4 border-t-[0.5px] border-line py-12 md:grid-cols-2">
+          <section>
+            <p className={eyebrowClass}>{t("fundraisersHeading")}</p>
+            {board.length === 0 ? (
+              <p className="mt-3 text-[14.5px] text-black/60">{tLb("emptyIndividuals")}</p>
+            ) : (
+              <div className="mt-3">
+                <LeaderboardList
+                  locale={locale as Locale}
+                  entries={board.map(
+                    (row): LeaderboardEntry => ({ slug: row.slug, title: row.title, raisedCents: row.raised_cents, href: `/f/${row.slug}` }),
+                  )}
                 />
-              );
-            })}
-          </div>
-          <Link
-            href="/galerija"
-            className="mt-3 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
-          >
-            {t("galleryCta")}
-          </Link>
-        </section>
-      ) : null}
-
-      {/* 8 — chapters */}
-      {chapters.length > 0 ? (
-        <section className="border-t-[0.5px] border-line py-12">
-          <p className={eyebrowClass}>{t("chaptersHeading")}</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            {chapters.map((chapter) => (
-              <div
-                key={chapter.slug}
-                className="rounded-brand bg-mist px-5 py-3.5"
-              >
-                <p className="text-[15.5px] font-semibold">{chapter.name}</p>
-                <p className="mt-0.5 font-mono text-[13.5px] tabular-nums text-sea">
-                  {money(chapter.raised_cents)}
-                </p>
               </div>
-            ))}
+            )}
+            <Link href="/prikupljaci" className={more}>{tLb("cta")} →</Link>
+          </section>
+
+          <section>
+            <p className={eyebrowClass}>{t("triadHeading")}</p>
+            <div className="mt-3 grid grid-cols-3 gap-3">
+              {content.triad.map((item) => (
+                <div key={item.big} className="rounded-brand bg-mist px-4 py-4">
+                  <p className="type-display text-3xl text-red">{item.big}</p>
+                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-black/70">{item.label}</p>
+                </div>
+              ))}
+            </div>
+            {chapters.length > 0 ? (
+              <>
+                <p className={`${eyebrowClass} mt-8`}>{t("chaptersHeading")}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {chapters.map((chapter) => (
+                    <div key={chapter.slug} className="rounded-brand bg-mist px-4 py-3">
+                      <p className="text-[15px] font-semibold">{chapter.name}</p>
+                      <p className="font-mono text-[13.5px] tabular-nums text-sea">{money(chapter.raised_cents)}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : null}
+          </section>
+        </div>
+
+        {/* gallery strip (renders once photos with consent exist) */}
+        {gallery.length > 0 ? (
+          <section className="border-t-[0.5px] border-line py-12">
+            <p className={eyebrowClass}>{t("galleryHeading")}</p>
+            <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
+              {gallery.map((item) => {
+                const src = galleryImageUrl(item.storage_path);
+                if (!src) return null;
+                return <Image key={item.id} src={src} alt={item.caption ?? ""} width={280} height={200} className="h-[180px] w-[250px] shrink-0 rounded-brand bg-mist object-cover" />;
+              })}
+            </div>
+            <Link href="/galerija" className={more}>{t("galleryCta")} →</Link>
+          </section>
+        ) : null}
+
+        {/* partners and the story — placeholders until consented material exists */}
+        <div className="grid gap-4 border-t-[0.5px] border-line py-12 md:grid-cols-2">
+          <section>
+            <p className={eyebrowClass}>{t("partnersHeading")}</p>
+            <p className="mt-3 rounded-brand bg-mist px-4 py-3 text-[13.5px] text-sea">{t("partnersNote")}</p>
+            <Link href="/partneri" className={more}>{t("partnersCta")} →</Link>
+          </section>
+          <section>
+            <p className={eyebrowClass}>{t("storyHeading")}</p>
+            <p className="mt-3 rounded-brand bg-mist px-4 py-3 text-[13.5px] text-sea">{t("storyNote")}</p>
+          </section>
+        </div>
+
+        {/* newsletter + monthly donor club */}
+        <section className="border-t-[0.5px] border-line py-12">
+          <div className="max-w-xl">
+            <p className={eyebrowClass}>{t("newsletterHeading")}</p>
+            <p className="mt-2 text-[15px] leading-relaxed text-black/70">{t("newsletterSub")}</p>
+            <div className="mt-4">
+              <InboundForm kind="newsletter" compact />
+            </div>
           </div>
         </section>
-      ) : null}
-
-      {/* 9 — partner wall (placeholder until real, consented logos exist) */}
-      <section className="border-t-[0.5px] border-line py-12">
-        <p className={eyebrowClass}>{t("partnersHeading")}</p>
-        <p className="mt-4 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13.5px] text-sea">
-          {t("partnersNote")}
-        </p>
-        <Link
-          href="/partneri"
-          className="mt-3 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"
-        >
-          {t("partnersCta")}
-        </Link>
-      </section>
-
-      {/* 10 — beneficiary story (needs a real story with consent) */}
-      <section className="border-t-[0.5px] border-line py-12">
-        <p className={eyebrowClass}>{t("storyHeading")}</p>
-        <p className="mt-4 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13.5px] text-sea">
-          {t("storyNote")}
-        </p>
-      </section>
-
-      {/* 11 — newsletter + monthly donor club */}
-      <section className="border-t-[0.5px] border-line py-12">
-        <p className={eyebrowClass}>{t("newsletterHeading")}</p>
-        <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-black/70">
-          {t("newsletterSub")}
-        </p>
-        <div className="mt-4">
-          <InboundForm kind="newsletter" compact />
-        </div>
-      </section>
+      </div>
     </div>
   );
 }
