@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
@@ -90,6 +91,7 @@ export function YearsManager({ rows }: { rows: YearRow[] }) {
 
 function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
   const t = useTranslations("admin");
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const r = row.report;
   const [headline, setHeadline] = useState(r?.headline ?? "");
@@ -113,7 +115,6 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
     supporters: r?.figures?.supporters?.toString() ?? "",
   });
   const [eventsText, setEventsText] = useState((r?.events ?? []).map((e) => [e.name, e.date ?? "", e.venue ?? ""].filter(Boolean).join(" · ")).join("\n"));
-  const [supportersText, setSupportersText] = useState((r?.supporters ?? []).join(", "));
   const [beneficiariesText, setBeneficiariesText] = useState((r?.beneficiariesList ?? []).map((b) => (b.amount_cents != null ? `${b.label} · ${euros(b.amount_cents)}` : b.label)).join("\n"));
   const [donorsText, setDonorsText] = useState((r?.donorsList ?? []).map((d) => (d.amount_cents != null ? `${d.name} · ${euros(d.amount_cents)}` : d.name)).join("\n"));
   const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
@@ -153,7 +154,8 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
         const [name, date, venue] = line.split("·").map((part) => part.trim());
         return { name: name ?? "", date: date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null, venue: venue || null };
       }),
-      supporters: supportersText.split(",").map((v) => v.trim()).filter(Boolean),
+      // Sponsors come from the supporter records; the typed list is retired.
+      supporters: [],
       beneficiariesList: lines(beneficiariesText).map((line) => {
         const [label, amount] = line.split("·").map((part) => part.trim());
         return { label: label ?? "", amount_cents: amount ? (parseEurosToCents(amount) ?? null) : null };
@@ -237,10 +239,12 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
         <textarea id="yEvents" rows={3} value={eventsText} onChange={(e) => setEventsText(e.target.value)} className={`${inputClass} font-mono text-[14px]`} />
         <p className="mt-1 text-[13px] text-black/50">{t("yearEventsHint")}</p>
       </div>
-      <div>
-        <label htmlFor="ySupporters" className={labelClass}>{t("yearSupportersList")}</label>
-        <input id="ySupporters" type="text" value={supportersText} onChange={(e) => setSupportersText(e.target.value)} className={inputClass} />
-        <p className="mt-1 text-[13px] text-black/50">{t("yearSupportersHint")}</p>
+      <div className="rounded-lg bg-paper px-3.5 py-3">
+        <p className={labelClass}>{t("yearSponsors")}</p>
+        <p className="mt-1 text-[13.5px] text-black/60">
+          {t("yearSponsorsNote", { count: row.supporters })}{" "}
+          <Link href={`/${locale}/admin/podrska`} className="font-semibold text-sea underline underline-offset-2">{t("yearSponsorsLink")}</Link>
+        </p>
       </div>
       <div>
         <label htmlFor="yBeneficiariesList" className={labelClass}>{t("yearBeneficiariesList")}</label>

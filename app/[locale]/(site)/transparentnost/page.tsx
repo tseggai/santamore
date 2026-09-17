@@ -189,7 +189,6 @@ export default async function LedgerPage({
       }
     : null;
   const legacyEvents = legacy ? (report?.events ?? []) : [];
-  const legacySupporters = legacy ? (report?.supporters ?? []) : [];
   const sponsorCash = supporters.reduce((sum, su) => sum + su.cash_cents, 0);
   const legacyBeneficiaries = legacy ? (report?.beneficiaries_list ?? []) : [];
   // The donor wall: individuals recorded as supporters plus the list of a legacy year, largest gift first.
@@ -438,23 +437,13 @@ export default async function LedgerPage({
                 </p>
               ) : null}
             </div>
-            {supporters.length === 0 && legacySupporters.length === 0 ? (
+            {supporters.length === 0 ? (
               <p className="mt-2 text-[14px] text-black/55">{tYears("noSupporters")}</p>
-            ) : null}
-            {supporters.length > 0 ? (
+            ) : (
               <div className="mt-3">
                 <SponsorGrid sponsors={supporters} locale={locale as Locale} inKindLabel={tYears("inKind")} />
               </div>
-            ) : null}
-            {legacySupporters.length > 0 ? (
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {legacySupporters.map((name) => (
-                  <li key={`legacy-${name}`}>
-                    <span className="inline-flex items-center rounded-lg bg-mist px-3 py-2 text-[14px] font-semibold">{name}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+            )}
           </section>
 
           {/* the donor wall: individuals, by name */}
