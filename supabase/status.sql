@@ -95,5 +95,8 @@ select * from (values
   ,('20260917000036_supporter_kind',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'supporters' and column_name = 'kind'))
+  ,('20260917000037_sponsor_details',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'v_public_sponsors' and column_name = 'campaign_title'))
 ) as m (migration, applied)
 order by migration;

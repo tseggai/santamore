@@ -400,7 +400,7 @@ export default async function HomePage({
           )}
           {data.sponsors.length > 0 ? (
             <div className="mt-8">
-              <SponsorGrid sponsors={data.sponsors} locale={locale as Locale} inKindLabel={tYears("inKind")} size="lg" />
+              <SponsorGrid sponsors={data.sponsors} inKindLabel={tYears("inKind")} size="lg" />
             </div>
           ) : (
             <div className="mt-8 rounded-brand bg-mist px-5 py-5">

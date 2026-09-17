@@ -1622,7 +1622,15 @@
     "donorsHeading": "Donatori",
     "noDonors": "—",
     "inKind": "u robi",
-    "sponsorCash": "u novčanim sponzorstvima"
+    "sponsorCash": "u novčanim sponzorstvima",
+    "close": "Zatvori",
+    "sponsorEyebrow": "Sponzor",
+    "donorEyebrow": "Donator",
+    "giftGeneral": "Opšta podrška",
+    "giftSponsorNote": "Sponzorstva idu u Operativni fond: plaćaju naš tim da donacije ne moraju.",
+    "giftDonationNote": "Donacije idu u Fond uticaja: 100% stiže do korisnika, ni cent na plate ili režije.",
+    "wentTo": "Otišlo je",
+    "offerLabel": "Ponuda"
   },
   "proposals": {
     "title": "Predloži cilj",

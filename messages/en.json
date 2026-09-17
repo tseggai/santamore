@@ -1622,7 +1622,15 @@
     "donorsHeading": "Donors",
     "noDonors": "—",
     "inKind": "in kind",
-    "sponsorCash": "in cash sponsorships"
+    "sponsorCash": "in cash sponsorships",
+    "close": "Close",
+    "sponsorEyebrow": "Sponsor",
+    "donorEyebrow": "Donor",
+    "giftGeneral": "General support",
+    "giftSponsorNote": "Sponsorships go to the Operations Fund: they pay for our team so donations never have to.",
+    "giftDonationNote": "Donations go to the Impact Fund: 100% reaches the beneficiaries, not one cent to salaries or overhead.",
+    "wentTo": "Went to",
+    "offerLabel": "Offer"
   },
   "proposals": {
     "title": "Propose a cause",

@@ -7,7 +7,6 @@ import { SponsorGrid, type PublicSponsor } from "@/components/partners/SponsorGr
 import { partnersContent } from "@/content/site/partners";
 import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
-import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 
 // Live supporters on every request.
@@ -27,6 +26,9 @@ interface SponsorshipRow {
   tier: string | null;
   is_in_kind: boolean;
   amount_cents: number | null;
+  campaign_title: string | null;
+  event_name: string | null;
+  starts_at: string | null;
 }
 
 interface OfferRow {
@@ -41,7 +43,7 @@ async function loadSupporters() {
     const supabase = await createClient();
     const [{ data: supporters }, { data: sponsorships }, { data: offers }] = await Promise.all([
       supabase.from("v_public_supporters").select("id, name, slug, kind, logo_path, website").eq("kind", "sponsor").order("name"),
-      supabase.from("v_public_sponsors").select("supporter_slug, tier, is_in_kind, amount_cents"),
+      supabase.from("v_public_sponsors").select("supporter_slug, tier, is_in_kind, amount_cents, campaign_title, event_name, starts_at"),
       supabase.from("v_public_perk_challenges").select("slug, supporter_slug, reward_label, title"),
     ]);
     return {
@@ -88,6 +90,14 @@ export default async function PartnersPage({
         in_kind: deals.some((d) => d.is_in_kind),
         tiers: [...new Set(deals.map((d) => d.tier).filter((tier): tier is string => Boolean(tier)))],
         offers: offers.filter((o) => o.supporter_slug === su.slug).length,
+        gifts: deals.map((d) => ({
+          amount_cents: d.is_in_kind ? null : d.amount_cents,
+          in_kind: d.is_in_kind,
+          tier: d.tier,
+          target: d.event_name ?? d.campaign_title,
+          date: d.starts_at,
+        })),
+        offerLinks: offers.filter((o) => o.supporter_slug === su.slug).map((o) => ({ href: `/izazovi/${o.slug}`, label: o.reward_label })),
       };
     });
   const cashTotal = shown.reduce((sum, su) => sum + su.cash_cents, 0);
@@ -130,26 +140,7 @@ export default async function PartnersPage({
               </p>
             ) : null}
             <div className="mt-6">
-              <SponsorGrid
-                sponsors={shown}
-                locale={locale as Locale}
-                inKindLabel={content.inKindLabel}
-                size="lg"
-                footer={(su) => {
-                  const theirOffers = offers.filter((o) => o.supporter_slug === su.slug);
-                  return theirOffers.length > 0 ? (
-                    <ul className="mt-1 space-y-0.5 text-[14px]">
-                      {theirOffers.map((offer) => (
-                        <li key={offer.slug}>
-                          <Link href={`/izazovi/${offer.slug}`} className="font-semibold text-sea underline underline-offset-2">
-                            {offer.reward_label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null;
-                }}
-              />
+              <SponsorGrid sponsors={shown} inKindLabel={content.inKindLabel} size="lg" />
             </div>
           </>
         )}
