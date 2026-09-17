@@ -33,6 +33,8 @@ export function ProposeForm({ criteria }: { criteria: PublicCriterion[] }) {
   const [amount, setAmount] = useState("");
   const [state, setState] = useState<"idle" | "busy" | "error" | "done" | "rejected">("idle");
   const [reasons, setReasons] = useState<string[]>([]);
+  // Two screens: the questions, then — only once they pass — the proposal.
+  const [step, setStep] = useState<1 | 2>(1);
 
   const answered = allAnswered(criteria, answers);
   const failed = failedCriteria(criteria, answers);
@@ -70,12 +72,13 @@ export function ProposeForm({ criteria }: { criteria: PublicCriterion[] }) {
     setAnswers({});
     setReasons([]);
     setState("idle");
+    setStep(1);
   };
 
   const fieldClass = "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
   const labelClass = "text-[14px] font-semibold";
   const choice = (active: boolean) =>
-    `rounded-lg px-4 py-2 text-[14.5px] font-semibold transition-colors ${active ? "bg-ink text-paper" : "bg-paper hover:bg-mist-2"}`;
+    `rounded-lg px-4 py-2 text-[14.5px] font-semibold transition-colors ${active ? "bg-ink text-paper" : "bg-mist hover:bg-mist-2"}`;
 
   if (state === "done") {
     return (
@@ -112,65 +115,92 @@ export function ProposeForm({ criteria }: { criteria: PublicCriterion[] }) {
     );
   }
 
+  const stepLine = (
+    <p className="font-mono text-[12px] text-red">
+      {String(step).padStart(2, "0")} / 02
+    </p>
+  );
+
+  if (step === 1) {
+    return (
+      <div className="space-y-5">
+        {stepLine}
+        <section>
+          <h2 className="text-[16px] font-bold">{t("screeningHeading")}</h2>
+          <p className="mt-1 text-[14px] leading-relaxed text-black/60">{t("screeningSub")}</p>
+          <ol className="mt-4 space-y-4">
+            {criteria.map((criterion, index) => (
+              <li key={criterion.id} className="rounded-lg bg-paper px-4 py-3">
+                <p className="text-[15px] leading-relaxed">
+                  <span className="mr-2 font-mono text-[12px] text-red">{String(index + 1).padStart(2, "0")}</span>
+                  {criterion.question}
+                </p>
+                <div role="group" aria-label={criterion.question} className="mt-2 flex gap-1.5">
+                  <button type="button" aria-pressed={answers[criterion.id] === true} onClick={() => setAnswers((a) => ({ ...a, [criterion.id]: true }))} className={choice(answers[criterion.id] === true)}>
+                    {t("yes")}
+                  </button>
+                  <button type="button" aria-pressed={answers[criterion.id] === false} onClick={() => setAnswers((a) => ({ ...a, [criterion.id]: false }))} className={choice(answers[criterion.id] === false)}>
+                    {t("no")}
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <button
+          type="button"
+          disabled={!answered}
+          onClick={() => setStep(2)}
+          className="w-full rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60 sm:w-auto"
+        >
+          {t("continue")} →
+        </button>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={submit} className="space-y-6">
-      <section className="rounded-lg bg-mist px-5 py-5">
-        <h2 className="text-[16px] font-bold">{t("screeningHeading")}</h2>
-        <p className="mt-1 text-[14px] leading-relaxed text-black/60">{t("screeningSub")}</p>
-        <ol className="mt-4 space-y-4">
-          {criteria.map((criterion, index) => (
-            <li key={criterion.id}>
-              <p className="text-[15px] leading-relaxed">
-                <span className="mr-2 font-mono text-[12px] text-red">{String(index + 1).padStart(2, "0")}</span>
-                {criterion.question}
-              </p>
-              <div role="group" aria-label={criterion.question} className="mt-2 flex gap-1.5">
-                <button type="button" aria-pressed={answers[criterion.id] === true} onClick={() => setAnswers((a) => ({ ...a, [criterion.id]: true }))} className={choice(answers[criterion.id] === true)}>
-                  {t("yes")}
-                </button>
-                <button type="button" aria-pressed={answers[criterion.id] === false} onClick={() => setAnswers((a) => ({ ...a, [criterion.id]: false }))} className={choice(answers[criterion.id] === false)}>
-                  {t("no")}
-                </button>
-              </div>
-            </li>
-          ))}
-        </ol>
-      </section>
-
-      <section className={answered ? "" : "opacity-50"}>
+      {stepLine}
+      <section>
         <h2 className="text-[16px] font-bold">{t("detailsHeading")}</h2>
         <div className="mt-3 space-y-4">
           <div>
             <label htmlFor="prTitle" className={labelClass}>{t("titleLabel")}</label>
-            <input id="prTitle" type="text" required minLength={4} maxLength={120} disabled={!answered} value={title} onChange={(e) => setTitle(e.target.value)} className={fieldClass} />
+            <input id="prTitle" type="text" required minLength={4} maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} className={fieldClass} />
           </div>
           <div>
             <label htmlFor="prSummary" className={labelClass}>{t("summaryLabel")}</label>
-            <textarea id="prSummary" required minLength={40} maxLength={2000} rows={5} disabled={!answered} value={summary} onChange={(e) => setSummary(e.target.value)} className={fieldClass} />
+            <textarea id="prSummary" required minLength={40} maxLength={2000} rows={5} value={summary} onChange={(e) => setSummary(e.target.value)} className={fieldClass} />
             <p className="mt-1 text-[13px] text-black/55">{t("summaryHint")}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="prLocation" className={labelClass}>{t("locationLabel")}</label>
-              <input id="prLocation" type="text" maxLength={120} disabled={!answered} value={location} onChange={(e) => setLocation(e.target.value)} className={fieldClass} />
+              <input id="prLocation" type="text" maxLength={120} value={location} onChange={(e) => setLocation(e.target.value)} className={fieldClass} />
             </div>
             <div>
               <label htmlFor="prBeneficiary" className={labelClass}>{t("beneficiaryLabel")}</label>
-              <input id="prBeneficiary" type="text" maxLength={200} disabled={!answered} value={beneficiary} onChange={(e) => setBeneficiary(e.target.value)} className={fieldClass} />
+              <input id="prBeneficiary" type="text" maxLength={200} value={beneficiary} onChange={(e) => setBeneficiary(e.target.value)} className={fieldClass} />
             </div>
           </div>
           <div>
             <label htmlFor="prAmount" className={labelClass}>{t("amountLabel")}</label>
-            <input id="prAmount" type="text" inputMode="decimal" disabled={!answered} value={amount} onChange={(e) => setAmount(e.target.value)} className={`${fieldClass} font-mono sm:max-w-xs`} />
+            <input id="prAmount" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} className={`${fieldClass} font-mono sm:max-w-xs`} />
             <p className="mt-1 text-[13px] text-black/55">{t("amountHint")}</p>
           </div>
         </div>
       </section>
 
       {state === "error" ? <p role="alert" className="text-[14px] font-semibold text-red-dark">{tDonate("errServer")}</p> : null}
-      <button type="submit" disabled={!answered || state === "busy"} className="w-full rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60 sm:w-auto">
-        {t("submit")}
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <button type="submit" disabled={state === "busy"} className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60">
+          {t("submit")}
+        </button>
+        <button type="button" onClick={() => setStep(1)} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
+          ← {t("back")}
+        </button>
+      </div>
     </form>
   );
 }

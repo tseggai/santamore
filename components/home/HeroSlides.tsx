@@ -205,14 +205,15 @@ export function HeroSlides({ slides }: { slides: HeroSlide[] }) {
           >
             {slide.image ? <Image src={slide.image} alt="" fill priority={i === 0} sizes="100vw" className="object-cover" /> : null}
             <div className={`absolute inset-0 ${slide.image ? "bg-gradient-to-r from-sea via-sea/80 to-sea/40" : "bg-gradient-to-br from-sea to-sea-2"}`} />
-            <div className="relative mx-auto grid w-full max-w-6xl items-center gap-8 px-5 pb-24 pt-14 sm:pb-28 sm:pt-16 lg:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.8fr)] lg:gap-14">
+            {/* the same column as every content page; only the picture runs edge to edge */}
+            <div className="relative mx-auto grid w-full max-w-3xl items-center gap-8 px-5 pb-24 pt-14 sm:pb-28 sm:pt-16 md:grid-cols-[minmax(0,1fr)_260px] md:gap-10">
               <div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-paper/15 px-3 py-1 font-mono text-[11.5px] uppercase tracking-[0.16em] text-paper">
                   <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-red" />
                   {slide.chip}
                 </span>
                 <p className="mt-4 font-mono text-[12px] uppercase tracking-[0.16em] text-paper/70">{slide.eyebrow}</p>
-                <h2 className="type-display mt-2 text-4xl leading-[1.08] sm:text-5xl lg:text-6xl">{slide.title}</h2>
+                <h2 className="type-display mt-2 text-4xl leading-[1.08] sm:text-5xl">{slide.title}</h2>
                 <p className="mt-4 max-w-2xl text-[16.5px] leading-relaxed text-paper/80">{slide.text}</p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   {button(slide.primary, "red")}
@@ -226,7 +227,7 @@ export function HeroSlides({ slides }: { slides: HeroSlide[] }) {
       })}
 
       {count > 1 ? (
-        <div className="absolute inset-x-0 bottom-0 z-[2] mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-5 pb-6">
+        <div className="absolute inset-x-0 bottom-0 z-[2] mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-5 pb-6">
           <div role="tablist" aria-label={t("slideshow")} className="flex gap-2">
             {slides.map((slide, i) => (
               <button
