@@ -961,6 +961,8 @@
     "suCreate": "Add supporter",
     "suNew": "New supporter",
     "suEmpty": "No supporters yet.",
+    "suDelete": "Delete",
+    "suDeleteConfirm": "{count, plural, one {Delete this supporter?} other {Delete # supporters?}} Their sponsorships are removed too and their logo is deleted; challenge offers keep the name. This cannot be undone. To hide one from the site instead, deactivate it.",
     "suInactive": "Inactive",
     "suSponsorChip": "{count, plural, one {# sponsorship} other {# sponsorships}}",
     "suOfferChip": "{count, plural, one {# offer} other {# offers}}",

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState, type FormEvent } from "react";
 
-import { saveSponsorship, saveSupporter, setSupportersActive } from "@/app/[locale]/admin/(protected)/podrska/actions";
+import { deleteSupporters, saveSponsorship, saveSupporter, setSupportersActive } from "@/app/[locale]/admin/(protected)/podrska/actions";
 import type { Option } from "@/components/admin/EventForm";
 import { downscaleToPng } from "@/lib/images";
 import { formatCents, parseEurosToCents } from "@/lib/money";
@@ -370,6 +370,20 @@ export function SupportersManager({
     clear?.();
     router.refresh();
   };
+  // Deleting is for a supporter added by mistake; hiding one is "deactivate".
+  const remove = async (ids: string[], clear?: () => void) => {
+    if (!window.confirm(t("suDeleteConfirm", { count: ids.length }))) return;
+    setBusy(true);
+    const result = await deleteSupporters({ ids }).catch(() => null);
+    setBusy(false);
+    if (!result?.ok) {
+      window.alert(t("actionError"));
+      return;
+    }
+    clear?.();
+    if (ids.includes(open)) close();
+    router.refresh();
+  };
 
   const columns: Column<SupporterRow>[] = [
     {
@@ -526,6 +540,11 @@ export function SupportersManager({
             <button type="button" onClick={close} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
               {t("cancel")}
             </button>
+            {supporter ? (
+              <button type="button" disabled={busy} onClick={() => remove([supporter.id])} className="ml-auto rounded-lg px-3 py-2.5 text-[14.5px] font-semibold text-red-dark transition-colors hover:bg-mist-2 disabled:opacity-60">
+                {t("suDelete")}
+              </button>
+            ) : null}
           </div>
         </div>
       </SidePanel>
@@ -562,12 +581,16 @@ export function SupportersManager({
             <button type="button" disabled={busy} onClick={() => setActive([s.id], !s.is_active)} className={rowButton}>
               {s.is_active ? t("table.deactivate") : t("table.activate")}
             </button>
+            <button type="button" disabled={busy} onClick={() => remove([s.id])} className={`${rowButton} text-red-dark`}>
+              {t("suDelete")}
+            </button>
           </>
         )}
         bulkActions={(ids, clear) => (
           <>
             <button type="button" disabled={busy} onClick={() => setActive(ids, true, clear)} className={bulkButton}>{t("table.activate")}</button>
             <button type="button" disabled={busy} onClick={() => setActive(ids, false, clear)} className={bulkButton}>{t("table.deactivate")}</button>
+            <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={`${bulkButton} text-red-dark`}>{t("suDelete")}</button>
           </>
         )}
       />

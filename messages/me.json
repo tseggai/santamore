@@ -961,6 +961,8 @@
     "suCreate": "Dodaj podržavaoca",
     "suNew": "Novi podržavalac",
     "suEmpty": "Još nema podržavalaca.",
+    "suDelete": "Obriši",
+    "suDeleteConfirm": "{count, plural, one {Obrisati ovog podržavaoca?} few {Obrisati # podržavaoca?} other {Obrisati # podržavalaca?}} Brišu se i njegova sponzorstva i logo; ponude na izazovima zadržavaju ime. Ovo se ne može poništiti. Ako ga samo želite sakriti sa sajta, deaktivirajte ga.",
     "suInactive": "Neaktivan",
     "suSponsorChip": "{count, plural, one {# sponzorstvo} few {# sponzorstva} other {# sponzorstava}}",
     "suOfferChip": "{count, plural, one {# ponuda} few {# ponude} other {# ponuda}}",
