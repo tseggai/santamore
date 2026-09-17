@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { aboutContent } from "@/content/site/about";
 import { howContent } from "@/content/site/how";
@@ -33,6 +33,7 @@ export default async function AboutPage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const content = aboutContent[locale as Locale];
+  const tNav = await getTranslations("nav");
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
@@ -84,6 +85,23 @@ export default async function AboutPage({
         </div>
       </section>
 
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
+        <p className={eyebrowClass}>{content.planHeading}</p>
+        <div className="mt-4 space-y-4">
+          {content.plan.map((paragraph) => (
+            <p key={paragraph} className="text-[16px] leading-relaxed">
+              {paragraph}
+            </p>
+          ))}
+        </div>
+        <Link
+          href="/transparentnost"
+          className="mt-5 inline-flex h-11 items-center rounded-lg bg-mist px-5 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea"
+        >
+          {tNav("ledger")} →
+        </Link>
+      </section>
+
       <section className="mt-12 rounded-brand bg-sea px-6 py-6 text-paper">
         <h2 className="type-display text-2xl">{content.committeeHeading}</h2>
         <div className="mt-3 space-y-3">
@@ -99,6 +117,19 @@ export default async function AboutPage({
         >
           {howContent[locale as Locale].heroEyebrow} →
         </Link>
+      </section>
+
+      <section className="mt-12 border-t-[0.5px] border-line pt-10">
+        <p className={eyebrowClass}>{content.teamHeading}</p>
+        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed">{content.teamLead}</p>
+        <ul className="mt-5 grid gap-4 sm:grid-cols-2">
+          {content.team.map((member) => (
+            <li key={member.name} className="rounded-brand bg-mist px-5 py-4">
+              <p className="type-display text-xl">{member.name}</p>
+              <p className="mt-2 text-[14.5px] leading-relaxed text-black/70">“{member.quote}”</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <p className="mt-10 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13px] text-sea">
