@@ -3,6 +3,18 @@
 
 /** Downscale an image file to a JPEG blob, longest edge capped at maxEdge px. */
 export async function downscaleToJpeg(file: File, maxEdge = 1600): Promise<Blob> {
+  return downscale(file, maxEdge, "image/jpeg", 0.85);
+}
+
+/**
+ * Logos and other artwork with transparency: PNG keeps the alpha channel
+ * that JPEG would flatten to black.
+ */
+export async function downscaleToPng(file: File, maxEdge = 800): Promise<Blob> {
+  return downscale(file, maxEdge, "image/png");
+}
+
+async function downscale(file: File, maxEdge: number, type: "image/jpeg" | "image/png", quality?: number): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
   const scale = Math.min(1, maxEdge / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement("canvas");
@@ -14,8 +26,8 @@ export async function downscaleToJpeg(file: File, maxEdge = 1600): Promise<Blob>
   return new Promise((resolve, reject) => {
     canvas.toBlob(
       (blob) => (blob ? resolve(blob) : reject(new Error("encode failed"))),
-      "image/jpeg",
-      0.85,
+      type,
+      quality,
     );
   });
 }
