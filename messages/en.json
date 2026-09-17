@@ -1168,7 +1168,9 @@
     "yearSupportersList": "Supporters that year",
     "yearSupportersHint": "Comma-separated names.",
     "yearBeneficiariesList": "Where the money went",
-    "yearBeneficiariesListHint": "One per line: label · euros, e.g. “Family in Tivat, medical costs · 1200”"
+    "yearBeneficiariesListHint": "One per line: label · euros, e.g. “Family in Tivat, medical costs · 1200”",
+    "yearDonorsList": "Donors (donor wall)",
+    "yearDonorsHint": "One per line: name · euros. Write Anonymous for anyone who chose not to be named."
   },
   "forms": {
     "nameLabel": "Full name",
@@ -1601,7 +1603,9 @@
     "ledgerHeading": "The ledger for {year}",
     "ledgerHeadingAll": "The full ledger",
     "legacyNote": "Recorded before this ledger existed. Figures as reported by the team, not derived row by row.",
-    "pickYearLabel": "Year"
+    "pickYearLabel": "Year",
+    "donorsHeading": "Donors",
+    "noDonors": "—"
   },
   "proposals": {
     "title": "Propose a cause",

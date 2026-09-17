@@ -39,6 +39,7 @@ const schema = z.object({
   events: z.array(z.object({ name: z.string().trim().min(1).max(160), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(), venue: z.string().trim().max(160).nullable() })).max(50).default([]),
   supporters: z.array(z.string().trim().min(1).max(160)).max(100).default([]),
   beneficiariesList: z.array(z.object({ label: z.string().trim().min(1).max(200), amount_cents: z.number().int().min(0).nullable() })).max(100).default([]),
+  donorsList: z.array(z.object({ name: z.string().trim().min(1).max(120), amount_cents: z.number().int().min(0).nullable() })).max(2000).default([]),
 });
 
 export async function saveYearReport(input: unknown): Promise<YearReportResult> {
@@ -61,6 +62,7 @@ export async function saveYearReport(input: unknown): Promise<YearReportResult> 
       events: data.events,
       supporters: data.supporters,
       beneficiaries_list: data.beneficiariesList,
+      donors_list: data.donorsList,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "year" },

@@ -79,6 +79,7 @@ interface YearReport {
   events?: { name: string; date: string | null; venue: string | null }[];
   supporters?: string[];
   beneficiaries_list?: { label: string; amount_cents: number | null }[];
+  donors_list?: { name: string; amount_cents: number | null }[];
 }
 interface EventRow {
   slug: string;
@@ -192,6 +193,7 @@ export default async function LedgerPage({
   const legacyEvents = legacy ? (report?.events ?? []) : [];
   const legacySupporters = legacy ? (report?.supporters ?? []) : [];
   const legacyBeneficiaries = legacy ? (report?.beneficiaries_list ?? []) : [];
+  const legacyDonors = legacy ? (report?.donors_list ?? []) : [];
   const tense = year === null ? "all" : year < thisYear ? "past" : year === thisYear ? "current" : "future";
   // unallocated_cents can transiently go negative (a disbursement published
   // while its matching credits are still pending approval) — the flagship
@@ -459,6 +461,21 @@ export default async function LedgerPage({
               </ul>
             )}
           </section>
+
+          {/* the donor wall of a year recorded before the ledger */}
+          {legacyDonors.length > 0 ? (
+            <section className="mt-7">
+              <h3 className="type-eyebrow text-sea/80">{tYears("donorsHeading")}</h3>
+              <ul className="mt-2 flex flex-wrap gap-2">
+                {legacyDonors.map((donor, index) => (
+                  <li key={`${donor.name}-${index}`} className="inline-flex items-baseline gap-2 rounded-lg bg-mist px-3 py-2 text-[14px]">
+                    <span className="font-semibold">{donor.name}</span>
+                    {donor.amount_cents != null ? <span className="font-mono text-[13px] tabular-nums text-black/60">{money(donor.amount_cents)}</span> : null}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
 
           {/* where the money went, in the public form */}
           <section className="mt-7">

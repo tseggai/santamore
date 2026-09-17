@@ -22,6 +22,7 @@ export interface YearReport {
   events: { name: string; date: string | null; venue: string | null }[];
   supporters: string[];
   beneficiariesList: { label: string; amount_cents: number | null }[];
+  donorsList: { name: string; amount_cents: number | null }[];
 }
 
 export interface YearRow {
@@ -114,6 +115,7 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
   const [eventsText, setEventsText] = useState((r?.events ?? []).map((e) => [e.name, e.date ?? "", e.venue ?? ""].filter(Boolean).join(" · ")).join("\n"));
   const [supportersText, setSupportersText] = useState((r?.supporters ?? []).join(", "));
   const [beneficiariesText, setBeneficiariesText] = useState((r?.beneficiariesList ?? []).map((b) => (b.amount_cents != null ? `${b.label} · ${euros(b.amount_cents)}` : b.label)).join("\n"));
+  const [donorsText, setDonorsText] = useState((r?.donorsList ?? []).map((d) => (d.amount_cents != null ? `${d.name} · ${euros(d.amount_cents)}` : d.name)).join("\n"));
   const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
 
   const toInt = (text: string) => (text.trim() === "" ? null : Number.parseInt(text, 10));
@@ -155,6 +157,10 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
       beneficiariesList: lines(beneficiariesText).map((line) => {
         const [label, amount] = line.split("·").map((part) => part.trim());
         return { label: label ?? "", amount_cents: amount ? (parseEurosToCents(amount) ?? null) : null };
+      }),
+      donorsList: lines(donorsText).map((line) => {
+        const [name, amount] = line.split("·").map((part) => part.trim());
+        return { name: name ?? "", amount_cents: amount ? (parseEurosToCents(amount) ?? null) : null };
       }),
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
@@ -240,6 +246,11 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
         <label htmlFor="yBeneficiariesList" className={labelClass}>{t("yearBeneficiariesList")}</label>
         <textarea id="yBeneficiariesList" rows={3} value={beneficiariesText} onChange={(e) => setBeneficiariesText(e.target.value)} className={`${inputClass} font-mono text-[14px]`} />
         <p className="mt-1 text-[13px] text-black/50">{t("yearBeneficiariesListHint")}</p>
+      </div>
+      <div>
+        <label htmlFor="yDonors" className={labelClass}>{t("yearDonorsList")}</label>
+        <textarea id="yDonors" rows={5} value={donorsText} onChange={(e) => setDonorsText(e.target.value)} className={`${inputClass} font-mono text-[14px]`} />
+        <p className="mt-1 text-[13px] text-black/50">{t("yearDonorsHint")}</p>
       </div>
       <label className="flex items-center gap-2 text-[14.5px]">
         <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} className="h-4 w-4 accent-red" />

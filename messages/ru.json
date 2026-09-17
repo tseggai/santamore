@@ -1169,7 +1169,9 @@
     "yearSupportersList": "Партнёры того года",
     "yearSupportersHint": "Имена через запятую.",
     "yearBeneficiariesList": "Куда ушли деньги",
-    "yearBeneficiariesListHint": "По одному в строке: описание · евро, напр. «Семья в Тивате, лечение · 1200»"
+    "yearBeneficiariesListHint": "По одному в строке: описание · евро, напр. «Семья в Тивате, лечение · 1200»",
+    "yearDonorsList": "Доноры (стена доноров)",
+    "yearDonorsHint": "По одному в строке: имя · евро. Пишите «Аноним» для тех, кто не хотел быть названным."
   },
   "forms": {
     "nameLabel": "Имя и фамилия",
@@ -1602,7 +1604,9 @@
     "ledgerHeading": "Книга за {year}",
     "ledgerHeadingAll": "Вся книга",
     "legacyNote": "Записано до появления этой книги. Цифры по отчёту команды, а не выведенные построчно.",
-    "pickYearLabel": "Год"
+    "pickYearLabel": "Год",
+    "donorsHeading": "Доноры",
+    "noDonors": "—"
   },
   "proposals": {
     "title": "Предложить цель",

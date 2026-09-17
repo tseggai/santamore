@@ -1168,7 +1168,9 @@
     "yearSupportersList": "Podržavaoci te godine",
     "yearSupportersHint": "Imena odvojena zarezom.",
     "yearBeneficiariesList": "Kuda je novac otišao",
-    "yearBeneficiariesListHint": "Jedan po redu: opis · euri, npr. „Porodica u Tivtu, liječenje · 1200”"
+    "yearBeneficiariesListHint": "Jedan po redu: opis · euri, npr. „Porodica u Tivtu, liječenje · 1200”",
+    "yearDonorsList": "Donatori (zid donatora)",
+    "yearDonorsHint": "Jedan po redu: ime · euri. Napiši Anonimno za one koji nisu htjeli da budu imenovani."
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -1601,7 +1603,9 @@
     "ledgerHeading": "Knjiga za {year}.",
     "ledgerHeadingAll": "Cijela knjiga",
     "legacyNote": "Zabilježeno prije nego što je ova knjiga postojala. Cifre kako ih je tim prijavio, ne izvedene red po red.",
-    "pickYearLabel": "Godina"
+    "pickYearLabel": "Godina",
+    "donorsHeading": "Donatori",
+    "noDonors": "—"
   },
   "proposals": {
     "title": "Predloži cilj",

@@ -78,5 +78,10 @@ select * from (values
   ,('20260917000030_year_report_legacy',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'year_reports' and column_name = 'is_legacy'))
+  ,('20260917000031_year_report_donors',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'year_reports' and column_name = 'donors_list'))
+  ,('20260917000032_seed_santamore_25',
+     exists (select 1 from public.campaigns where slug = 'santamore-25'))
 ) as m (migration, applied)
 order by migration;

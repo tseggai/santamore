@@ -29,6 +29,7 @@ interface ReportRow {
   events: { name: string; date: string | null; venue: string | null }[];
   supporters: string[];
   beneficiaries_list: { label: string; amount_cents: number | null }[];
+  donors_list: { name: string; amount_cents: number | null }[];
 }
 
 /**
@@ -70,6 +71,7 @@ export default async function YearsPage({ params }: { params: Promise<{ locale: 
             events: report.events ?? [],
             supporters: report.supporters ?? [],
             beneficiariesList: report.beneficiaries_list ?? [],
+            donorsList: report.donors_list ?? [],
           }
         : null,
     };
