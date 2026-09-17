@@ -27,11 +27,11 @@
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  /* Nunito for body, UI and figures; Cinzel Decorative for display
-     (owner decision 2026-09-11). Cinzel has no Cyrillic — the stack falls
+  /* Nunito for body, UI and figures; Julius Sans One for display
+     (owner decision 2026-09-17). Julius has no Cyrillic — the stack falls
      through to Nunito for those glyphs. */
   --font-brand: var(--font-nunito), "Helvetica Neue", Helvetica, system-ui, sans-serif;
-  --font-display: var(--font-cinzel), var(--font-brand);
+  --font-display: var(--font-display-face), var(--font-brand);
   --font-body: var(--font-brand);
   --font-sans: var(--font-brand);
   --font-mono: var(--font-brand);
@@ -75,7 +75,7 @@
 }
 
 /* ── Type styles: the whole site's text is set from here ─────────────────
-   Display: Cinzel Decorative capitals with room to breathe.
+   Display: Julius Sans One capitals with room to breathe.
    Eyebrow: the small tracked caps above a heading.
    Figure: money, references, distances — same face, tabular digits.
    Caption: fine print and explanatory text, the only place under 14px. */

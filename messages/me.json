@@ -1150,7 +1150,25 @@
     "no": "Ne",
     "cpLocation": "Gdje",
     "evChapter": "Ogranak",
-    "dtPickDate": "Izaberi datum"
+    "dtPickDate": "Izaberi datum",
+    "yearLegacy": "Zabilježeno prije ove knjige (cifre ispod zamjenjuju izvedene)",
+    "yearFigures": "Cifre za godinu",
+    "yearFiguresHint": "Prazno polje zadržava cifru koju knjiga izvodi. Novac u eurima.",
+    "figReceived": "Primljene donacije (€)",
+    "figDisbursed": "Predato (€)",
+    "figOperations": "Operativni fond (€)",
+    "figDonors": "Donatori",
+    "figRunners": "Trkači",
+    "figPages": "Stranice za prikupljanje",
+    "figTeams": "Timovi",
+    "figEvents": "Događaji",
+    "figSupporters": "Podržavaoci",
+    "yearEventsList": "Događaji te godine",
+    "yearEventsHint": "Jedan po redu: naziv · GGGG-MM-DD · lokacija",
+    "yearSupportersList": "Podržavaoci te godine",
+    "yearSupportersHint": "Imena odvojena zarezom.",
+    "yearBeneficiariesList": "Kuda je novac otišao",
+    "yearBeneficiariesListHint": "Jedan po redu: opis · euri, npr. „Porodica u Tivtu, liječenje · 1200”"
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -1581,7 +1599,9 @@
     "noBeneficiaries": "Još nema objavljenih predaja za ovu godinu.",
     "noReport": "Priča ove godine još nije napisana.",
     "ledgerHeading": "Knjiga za {year}.",
-    "ledgerHeadingAll": "Cijela knjiga"
+    "ledgerHeadingAll": "Cijela knjiga",
+    "legacyNote": "Zabilježeno prije nego što je ova knjiga postojala. Cifre kako ih je tim prijavio, ne izvedene red po red.",
+    "pickYearLabel": "Godina"
   },
   "proposals": {
     "title": "Predloži cilj",

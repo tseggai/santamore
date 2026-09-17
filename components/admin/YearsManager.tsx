@@ -6,7 +6,7 @@ import { useState, type FormEvent } from "react";
 
 import { saveYearReport } from "@/app/[locale]/admin/(protected)/novac/godine/actions";
 import { SidePanel } from "@/components/console/SidePanel";
-import { formatCents } from "@/lib/money";
+import { formatCents, parseEurosToCents } from "@/lib/money";
 import type { Locale } from "@/i18n/routing";
 
 export interface YearReport {
@@ -17,6 +17,11 @@ export interface YearReport {
   beneficiaries: number | null;
   venues: string[];
   isPublic: boolean;
+  isLegacy: boolean;
+  figures: Record<string, number>;
+  events: { name: string; date: string | null; venue: string | null }[];
+  supporters: string[];
+  beneficiariesList: { label: string; amount_cents: number | null }[];
 }
 
 export interface YearRow {
@@ -93,9 +98,29 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
   const [beneficiaries, setBeneficiaries] = useState(r?.beneficiaries != null ? String(r.beneficiaries) : "");
   const [venues, setVenues] = useState((r?.venues ?? []).join(", "));
   const [isPublic, setIsPublic] = useState(r?.isPublic ?? false);
+  const [isLegacy, setIsLegacy] = useState(r?.isLegacy ?? false);
+  const euros = (cents: number | undefined) => (cents === undefined ? "" : (cents / 100).toFixed(2).replace(/\.00$/, ""));
+  const [fig, setFig] = useState({
+    received: euros(r?.figures?.received_cents),
+    disbursed: euros(r?.figures?.disbursed_cents),
+    operations: euros(r?.figures?.operations_cents),
+    donors: r?.figures?.donors?.toString() ?? "",
+    runners: r?.figures?.runners?.toString() ?? "",
+    pages: r?.figures?.pages?.toString() ?? "",
+    teams: r?.figures?.teams?.toString() ?? "",
+    events: r?.figures?.events?.toString() ?? "",
+    supporters: r?.figures?.supporters?.toString() ?? "",
+  });
+  const [eventsText, setEventsText] = useState((r?.events ?? []).map((e) => [e.name, e.date ?? "", e.venue ?? ""].filter(Boolean).join(" · ")).join("\n"));
+  const [supportersText, setSupportersText] = useState((r?.supporters ?? []).join(", "));
+  const [beneficiariesText, setBeneficiariesText] = useState((r?.beneficiariesList ?? []).map((b) => (b.amount_cents != null ? `${b.label} · ${euros(b.amount_cents)}` : b.label)).join("\n"));
   const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
 
   const toInt = (text: string) => (text.trim() === "" ? null : Number.parseInt(text, 10));
+  const setF = (key: keyof typeof fig, value: string) => setFig((f) => ({ ...f, [key]: value }));
+  const cents = (text: string) => (text.trim() === "" ? undefined : (parseEurosToCents(text) ?? undefined));
+  const int = (text: string) => (text.trim() === "" ? undefined : Number.parseInt(text, 10));
+  const lines = (text: string) => text.split("\n").map((l) => l.trim()).filter(Boolean);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -110,6 +135,27 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
       beneficiaries: toInt(beneficiaries),
       venues: venues.split(",").map((v) => v.trim()).filter(Boolean),
       isPublic,
+      isLegacy,
+      figures: {
+        received_cents: cents(fig.received),
+        disbursed_cents: cents(fig.disbursed),
+        operations_cents: cents(fig.operations),
+        donors: int(fig.donors),
+        runners: int(fig.runners),
+        pages: int(fig.pages),
+        teams: int(fig.teams),
+        events: int(fig.events),
+        supporters: int(fig.supporters),
+      },
+      events: lines(eventsText).map((line) => {
+        const [name, date, venue] = line.split("·").map((part) => part.trim());
+        return { name: name ?? "", date: date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null, venue: venue || null };
+      }),
+      supporters: supportersText.split(",").map((v) => v.trim()).filter(Boolean),
+      beneficiariesList: lines(beneficiariesText).map((line) => {
+        const [label, amount] = line.split("·").map((part) => part.trim());
+        return { label: label ?? "", amount_cents: amount ? (parseEurosToCents(amount) ?? null) : null };
+      }),
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       router.refresh();
@@ -151,6 +197,49 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
         <label htmlFor="yVenues" className={labelClass}>{t("yearVenues")}</label>
         <input id="yVenues" type="text" value={venues} onChange={(e) => setVenues(e.target.value)} className={inputClass} />
         <p className="mt-1 text-[13px] text-black/50">{t("yearVenuesHint")}</p>
+      </div>
+      <label className="flex items-start gap-2.5 text-[14.5px]">
+        <input type="checkbox" checked={isLegacy} onChange={(e) => setIsLegacy(e.target.checked)} className="mt-0.5 h-4 w-4 accent-red" />
+        {t("yearLegacy")}
+      </label>
+      <fieldset className="rounded-lg bg-paper px-4 py-3">
+        <legend className="px-1 text-[13.5px] font-semibold">{t("yearFigures")}</legend>
+        <p className="text-[13px] text-black/55">{t("yearFiguresHint")}</p>
+        <div className="mt-2 grid gap-3 sm:grid-cols-3">
+          {(
+            [
+              ["received", "figReceived"],
+              ["disbursed", "figDisbursed"],
+              ["operations", "figOperations"],
+              ["donors", "figDonors"],
+              ["runners", "figRunners"],
+              ["pages", "figPages"],
+              ["teams", "figTeams"],
+              ["events", "figEvents"],
+              ["supporters", "figSupporters"],
+            ] as const
+          ).map(([key, label]) => (
+            <div key={key}>
+              <label htmlFor={`fig-${key}`} className="text-[13px] font-semibold">{t(label)}</label>
+              <input id={`fig-${key}`} type="text" inputMode="decimal" value={fig[key]} onChange={(e) => setF(key, e.target.value)} className={`${inputClass} bg-mist font-mono`} />
+            </div>
+          ))}
+        </div>
+      </fieldset>
+      <div>
+        <label htmlFor="yEvents" className={labelClass}>{t("yearEventsList")}</label>
+        <textarea id="yEvents" rows={3} value={eventsText} onChange={(e) => setEventsText(e.target.value)} className={`${inputClass} font-mono text-[14px]`} />
+        <p className="mt-1 text-[13px] text-black/50">{t("yearEventsHint")}</p>
+      </div>
+      <div>
+        <label htmlFor="ySupporters" className={labelClass}>{t("yearSupportersList")}</label>
+        <input id="ySupporters" type="text" value={supportersText} onChange={(e) => setSupportersText(e.target.value)} className={inputClass} />
+        <p className="mt-1 text-[13px] text-black/50">{t("yearSupportersHint")}</p>
+      </div>
+      <div>
+        <label htmlFor="yBeneficiariesList" className={labelClass}>{t("yearBeneficiariesList")}</label>
+        <textarea id="yBeneficiariesList" rows={3} value={beneficiariesText} onChange={(e) => setBeneficiariesText(e.target.value)} className={`${inputClass} font-mono text-[14px]`} />
+        <p className="mt-1 text-[13px] text-black/50">{t("yearBeneficiariesListHint")}</p>
       </div>
       <label className="flex items-center gap-2 text-[14.5px]">
         <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} className="h-4 w-4 accent-red" />

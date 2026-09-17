@@ -74,6 +74,11 @@ interface YearReport {
   volunteers: number | null;
   beneficiaries: number | null;
   venues: string[];
+  is_legacy?: boolean;
+  figures?: Partial<Record<"received_cents" | "disbursed_cents" | "operations_cents" | "donors" | "runners" | "pages" | "teams" | "events" | "supporters", number>>;
+  events?: { name: string; date: string | null; venue: string | null }[];
+  supporters?: string[];
+  beneficiaries_list?: { label: string; amount_cents: number | null }[];
 }
 interface EventRow {
   slug: string;
@@ -164,8 +169,29 @@ export default async function LedgerPage({
   const { summary, opsCents, inRows, outRows, adjustments, yearStats, yearReports, events, supporters } = await fetchLedger(year);
   const years = yearStats.map((row) => row.year).filter((y) => y >= FOUNDING_YEAR);
   if (year !== null && !years.includes(year) && yearStats.length > 0) notFound();
-  const stats = year !== null ? (yearStats.find((row) => row.year === year) ?? null) : null;
+  const derived = year !== null ? (yearStats.find((row) => row.year === year) ?? null) : null;
   const report = year !== null ? (yearReports.find((row) => row.year === year) ?? null) : null;
+  // A year recorded before the ledger: the report's figures stand in for
+  // the derived ones wherever they are set.
+  const legacy = Boolean(report?.is_legacy);
+  const f = legacy ? (report?.figures ?? {}) : {};
+  const stats: YearStats | null = derived
+    ? {
+        ...derived,
+        received_cents: f.received_cents ?? derived.received_cents,
+        disbursed_cents: f.disbursed_cents ?? derived.disbursed_cents,
+        operations_cents: f.operations_cents ?? derived.operations_cents,
+        donor_count: f.donors ?? derived.donor_count,
+        runner_count: f.runners ?? derived.runner_count,
+        page_count: f.pages ?? derived.page_count,
+        team_count: f.teams ?? derived.team_count,
+        event_count: f.events ?? derived.event_count,
+        supporter_count: f.supporters ?? derived.supporter_count,
+      }
+    : null;
+  const legacyEvents = legacy ? (report?.events ?? []) : [];
+  const legacySupporters = legacy ? (report?.supporters ?? []) : [];
+  const legacyBeneficiaries = legacy ? (report?.beneficiaries_list ?? []) : [];
   const tense = year === null ? "all" : year < thisYear ? "past" : year === thisYear ? "current" : "future";
   // unallocated_cents can transiently go negative (a disbursement published
   // while its matching credits are still pending approval) — the flagship
@@ -240,10 +266,12 @@ export default async function LedgerPage({
         { label: tYears("beneficiaries"), value: count(report?.beneficiaries ?? stats.beneficiary_count) },
       ]
     : [];
-  const venues = [...new Set([...events.flatMap((e) => (e.venue ? [e.venue] : [])), ...(report?.venues ?? [])])];
-  // Hand-overs of the year grouped by their public label.
+  const venues = [...new Set([...events.flatMap((e) => (e.venue ? [e.venue] : [])), ...legacyEvents.flatMap((e) => (e.venue ? [e.venue] : [])), ...(report?.venues ?? [])])];
+  // Hand-overs of the year grouped by their public label, plus what a
+  // legacy report lists.
   const byLabel = new Map<string, number>();
   for (const row of outRows) byLabel.set(row.beneficiary_label, (byLabel.get(row.beneficiary_label) ?? 0) + row.amount_cents);
+  for (const row of legacyBeneficiaries) byLabel.set(row.label, (byLabel.get(row.label) ?? 0) + (row.amount_cents ?? 0));
   const beneficiaries = [...byLabel].map(([label, cents]) => ({ label, cents })).sort((a, b) => b.cents - a.cents);
   const prose = "prose-santamore mt-2 text-[15.5px] leading-relaxed text-black/80 [&_p]:mt-3 [&_p:first-child]:mt-0 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mt-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-sea [&_a]:underline [&_strong]:font-bold";
 
@@ -287,7 +315,7 @@ export default async function LedgerPage({
       </h2>
       {tense !== "all" ? (
         <p className="mt-1.5 text-[14.5px] leading-relaxed text-black/60">
-          {tense === "past" ? tYears("pastLead") : tense === "current" ? tYears("currentLead") : tYears("futureLead")}
+          {legacy ? tYears("legacyNote") : tense === "past" ? tYears("pastLead") : tense === "current" ? tYears("currentLead") : tYears("futureLead")}
         </p>
       ) : null}
 
@@ -366,10 +394,17 @@ export default async function LedgerPage({
           {/* events and where they happened */}
           <section className="mt-7">
             <h3 className="type-eyebrow text-sea/80">{tYears("eventsHeading")}</h3>
-            {events.length === 0 ? (
+            {events.length === 0 && legacyEvents.length === 0 ? (
               <p className="mt-2 text-[14px] text-black/55">{tYears("noEvents")}</p>
             ) : (
               <ul className="mt-2 overflow-hidden rounded-lg bg-mist">
+                {legacyEvents.map((event) => (
+                  <li key={`legacy-${event.name}`} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t-[0.5px] border-line px-4 py-2.5 text-[14.5px] first:border-t-0">
+                    <span className="font-mono text-[13px] tabular-nums text-black/60">{event.date ? formatShortDate(event.date, locale as Locale) : "—"}</span>
+                    <span className="font-semibold">{event.name}</span>
+                    {event.venue ? <span className="text-black/55">· {event.venue}</span> : null}
+                  </li>
+                ))}
                 {events.map((event) => (
                   <li key={event.slug} className="border-t-[0.5px] border-line first:border-t-0">
                     <Link href={`/dogadjaji/${event.slug}`} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-2.5 text-[14.5px] transition-colors hover:bg-mist-2">
@@ -391,10 +426,15 @@ export default async function LedgerPage({
           {/* who stood behind the year */}
           <section className="mt-7">
             <h3 className="type-eyebrow text-sea/80">{tYears("supportersHeading")}</h3>
-            {supporters.length === 0 ? (
+            {supporters.length === 0 && legacySupporters.length === 0 ? (
               <p className="mt-2 text-[14px] text-black/55">{tYears("noSupporters")}</p>
             ) : (
               <ul className="mt-2 flex flex-wrap gap-2">
+                {legacySupporters.map((name) => (
+                  <li key={`legacy-${name}`}>
+                    <span className="inline-flex items-center rounded-lg bg-mist px-3 py-2 text-[14px] font-semibold">{name}</span>
+                  </li>
+                ))}
                 {supporters.map((su) => {
                   const logo = supporterLogoUrl(su.logo_path);
                   const inner = (

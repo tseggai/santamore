@@ -22,6 +22,23 @@ const schema = z.object({
   beneficiaries: z.number().int().min(0).max(1_000_000).nullable(),
   venues: z.array(z.string().trim().min(1).max(120)).max(50),
   isPublic: z.boolean(),
+  isLegacy: z.boolean().default(false),
+  figures: z
+    .object({
+      received_cents: z.number().int().min(0).optional(),
+      disbursed_cents: z.number().int().min(0).optional(),
+      operations_cents: z.number().int().min(0).optional(),
+      donors: z.number().int().min(0).optional(),
+      runners: z.number().int().min(0).optional(),
+      pages: z.number().int().min(0).optional(),
+      teams: z.number().int().min(0).optional(),
+      events: z.number().int().min(0).optional(),
+      supporters: z.number().int().min(0).optional(),
+    })
+    .default({}),
+  events: z.array(z.object({ name: z.string().trim().min(1).max(160), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(), venue: z.string().trim().max(160).nullable() })).max(50).default([]),
+  supporters: z.array(z.string().trim().min(1).max(160)).max(100).default([]),
+  beneficiariesList: z.array(z.object({ label: z.string().trim().min(1).max(200), amount_cents: z.number().int().min(0).nullable() })).max(100).default([]),
 });
 
 export async function saveYearReport(input: unknown): Promise<YearReportResult> {
@@ -39,6 +56,11 @@ export async function saveYearReport(input: unknown): Promise<YearReportResult> 
       beneficiaries: data.beneficiaries,
       venues: data.venues,
       is_public: data.isPublic,
+      is_legacy: data.isLegacy,
+      figures: data.figures,
+      events: data.events,
+      supporters: data.supporters,
+      beneficiaries_list: data.beneficiariesList,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "year" },

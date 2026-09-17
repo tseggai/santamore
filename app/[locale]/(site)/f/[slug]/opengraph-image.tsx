@@ -86,7 +86,7 @@ export default async function OpengraphImage({
               marginTop: 28,
               fontFamily: OG_DISPLAY_FAMILY,
               fontSize: 60,
-              fontWeight: 700,
+              fontWeight: 400,
               lineHeight: 1.15,
               maxWidth: 780,
             }}

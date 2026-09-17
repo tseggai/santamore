@@ -32,7 +32,7 @@ red #F35353 · red-dark #D93B3B · ink #36434B · paper #FFFFFF
 sea #0E3A46 · sea-2 #15505F · mist #F1F5F6 · mist-2 #E3EBED · sand #F6F3EE
 ```
 
-Display: **Cinzel Decorative** (capitals by design; no Cyrillic — the stack falls
+Display: **Julius Sans One** (capitals by design; no Cyrillic — the stack falls
 through to Nunito). Everything else: **Nunito** — body 500/16px, figures (money,
 references, distances) at 600–800 with tabular digits via `font-mono`; a money
 figure is never set in the display face. Type styles live in `app/globals.css`

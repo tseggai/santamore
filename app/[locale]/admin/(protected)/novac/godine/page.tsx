@@ -24,6 +24,11 @@ interface ReportRow {
   beneficiaries: number | null;
   venues: string[];
   is_public: boolean;
+  is_legacy: boolean;
+  figures: Record<string, number>;
+  events: { name: string; date: string | null; venue: string | null }[];
+  supporters: string[];
+  beneficiaries_list: { label: string; amount_cents: number | null }[];
 }
 
 /**
@@ -60,6 +65,11 @@ export default async function YearsPage({ params }: { params: Promise<{ locale: 
             beneficiaries: report.beneficiaries,
             venues: report.venues ?? [],
             isPublic: report.is_public,
+            isLegacy: report.is_legacy ?? false,
+            figures: report.figures ?? {},
+            events: report.events ?? [],
+            supporters: report.supporters ?? [],
+            beneficiariesList: report.beneficiaries_list ?? [],
           }
         : null,
     };

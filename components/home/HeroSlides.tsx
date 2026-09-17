@@ -37,18 +37,18 @@ function Countdown({ startsAt }: { startsAt: string }) {
     return () => clearInterval(timer);
   }, []);
   const left = new Date(startsAt).getTime() - now;
-  if (left <= 0) return <p className="mt-3 text-[14px] font-semibold text-sea">{t("cdStarted")}</p>;
+  if (left <= 0) return <p className="text-[14px] font-semibold text-paper">{t("cdStarted")}</p>;
   const days = Math.floor(left / 86_400_000);
   const hours = Math.floor((left % 86_400_000) / 3_600_000);
   const minutes = Math.floor((left % 3_600_000) / 60_000);
   const cell = (value: number, label: string) => (
-    <span className="flex flex-col items-center rounded-lg bg-mist px-3 py-2">
+    <span className="flex min-w-[4rem] flex-col items-center rounded-lg bg-paper/10 px-3 py-2 text-paper">
       <span className="font-mono text-[22px] font-extrabold tabular-nums leading-none">{String(value).padStart(2, "0")}</span>
-      <span className="mt-1 text-[11px] uppercase tracking-[0.12em] text-black/55">{label}</span>
+      <span className="mt-1 text-[11px] uppercase tracking-[0.12em] text-paper/60">{label}</span>
     </span>
   );
   return (
-    <div className="mt-3 grid grid-cols-3 gap-1.5" aria-label={`${days} ${t("cdDays")} ${hours} ${t("cdHours")} ${minutes} ${t("cdMinutes")}`}>
+    <div className="flex gap-1.5" aria-label={`${days} ${t("cdDays")} ${hours} ${t("cdHours")} ${minutes} ${t("cdMinutes")}`}>
       {cell(days, t("cdDays"))}
       {cell(hours, t("cdHours"))}
       {cell(minutes, t("cdMinutes"))}
@@ -58,27 +58,27 @@ function Countdown({ startsAt }: { startsAt: string }) {
 
 function Card({ card }: { card: HeroCard }) {
   const t = useTranslations("home");
-  const box = "rounded-brand bg-paper p-5 text-black shadow-[0_24px_60px_rgba(14,58,70,0.25)]";
+  // On the sea: a quiet strip, not a box — a hairline above, paper text.
+  const strip = "mt-6 border-t border-paper/25 pt-5";
   if (card.type === "total") {
     return (
-      <div className={box}>
-        <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-black/55">{t("liveTotal")}</p>
-        <p className="mt-2 font-mono text-4xl font-extrabold tabular-nums">{card.value}</p>
-        <p className="mt-1 text-[13.5px] text-black/60">{card.label}</p>
+      <div className={strip}>
+        <p className="font-mono text-4xl font-extrabold tabular-nums text-paper">{card.value}</p>
+        <p className="mt-1 text-[13.5px] text-paper/70">{card.label}</p>
       </div>
     );
   }
   if (card.type === "event") {
     return (
-      <div className={box}>
+      <div className={`${strip} flex flex-wrap items-center gap-x-8 gap-y-4`}>
         <div className="flex items-center gap-4">
           <span className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-lg bg-red text-paper">
             <span className="font-mono text-[26px] font-extrabold leading-none tabular-nums">{card.day}</span>
             <span className="mt-0.5 text-[11px] font-bold uppercase tracking-[0.12em]">{card.month}</span>
           </span>
           <span className="min-w-0">
-            <span className="block text-[15px] font-bold">{card.weekday}</span>
-            <span className="block text-[13.5px] text-black/60">{card.kind}{card.venue ? ` · ${card.venue}` : ""}</span>
+            <span className="block text-[15px] font-bold text-paper">{card.weekday}</span>
+            <span className="block text-[13.5px] text-paper/70">{card.kind}{card.venue ? ` · ${card.venue}` : ""}</span>
           </span>
         </div>
         <Countdown startsAt={card.startsAt} />
@@ -87,33 +87,33 @@ function Card({ card }: { card: HeroCard }) {
   }
   if (card.type === "progress") {
     return (
-      <div className={box}>
-        <p className="font-mono text-[32px] font-extrabold tabular-nums leading-none">{card.raised}</p>
-        <p className="mt-1.5 text-[13.5px] text-black/60">
-          {card.goalLine ? <>{card.goalLine} · </> : null}
-          <span className="font-mono tabular-nums">{card.donors}</span> {t("donorsShort")}
+      <div className={strip}>
+        <p className="flex flex-wrap items-baseline gap-x-3">
+          <span className="font-mono text-[32px] font-extrabold tabular-nums leading-none text-paper">{card.raised}</span>
+          <span className="text-[13.5px] text-paper/70">
+            {card.goalLine ? <>{card.goalLine} · </> : null}
+            <span className="font-mono tabular-nums">{card.donors}</span> {t("donorsShort")}
+          </span>
         </p>
         {card.pct !== null ? (
           <>
-            <span className="mt-3 block h-[8px] overflow-hidden rounded-[4px] bg-mist-2">
-              <span className="block h-full rounded-[4px] bg-sea" style={{ width: `${Math.max(2, card.pct)}%` }} />
+            <span className="mt-3 block h-[8px] max-w-md overflow-hidden rounded-[4px] bg-paper/20">
+              <span className="block h-full rounded-[4px] bg-red" style={{ width: `${Math.max(2, card.pct)}%` }} />
             </span>
-            <p className="mt-1.5 font-mono text-[13px] tabular-nums text-sea">{card.pct}% {t("goalReached")}</p>
+            <p className="mt-1.5 font-mono text-[13px] tabular-nums text-paper/80">{card.pct}% {t("goalReached")}</p>
           </>
         ) : null}
       </div>
     );
   }
   return (
-    <div className={box}>
-      {card.items.length === 0 ? (
-        <p className="text-[14px] leading-relaxed text-black/65">{card.empty}</p>
-      ) : (
-        <ol className="space-y-1.5">
+    <div className={strip}>
+      {card.items.length === 0 ? null : (
+        <ol className="flex flex-wrap gap-2">
           {card.items.map((item) => (
-            <li key={item.title} className="flex items-center gap-3 rounded-lg bg-mist px-3 py-2">
+            <li key={item.title} className="flex items-center gap-2.5 rounded-lg bg-paper/10 px-3 py-2">
               <span className="font-mono text-[13px] font-bold tabular-nums text-red">▲ {item.count}</span>
-              <span className="min-w-0 flex-1 truncate text-[14.5px] font-semibold">{item.title}</span>
+              <span className="max-w-[16rem] truncate text-[14.5px] font-semibold text-paper">{item.title}</span>
             </li>
           ))}
         </ol>
@@ -206,7 +206,7 @@ export function HeroSlides({ slides }: { slides: HeroSlide[] }) {
             {slide.image ? <Image src={slide.image} alt="" fill priority={i === 0} sizes="100vw" className="object-cover" /> : null}
             <div className={`absolute inset-0 ${slide.image ? "bg-gradient-to-r from-sea via-sea/80 to-sea/40" : "bg-gradient-to-br from-sea to-sea-2"}`} />
             {/* the same column as every content page; only the picture runs edge to edge */}
-            <div className="relative mx-auto grid w-full max-w-3xl items-center gap-8 px-5 pb-24 pt-14 sm:pb-28 sm:pt-16 md:grid-cols-[minmax(0,1fr)_260px] md:gap-10">
+            <div className="relative mx-auto w-full max-w-3xl px-5 pb-24 pt-14 sm:pb-28 sm:pt-16">
               <div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-paper/15 px-3 py-1 font-mono text-[11.5px] uppercase tracking-[0.16em] text-paper">
                   <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-red" />
@@ -215,12 +215,12 @@ export function HeroSlides({ slides }: { slides: HeroSlide[] }) {
                 <p className="mt-4 font-mono text-[12px] uppercase tracking-[0.16em] text-paper/70">{slide.eyebrow}</p>
                 <h2 className="type-display mt-2 text-4xl leading-[1.08] sm:text-5xl">{slide.title}</h2>
                 <p className="mt-4 max-w-2xl text-[16.5px] leading-relaxed text-paper/80">{slide.text}</p>
+                <Card card={slide.card} />
                 <div className="mt-7 flex flex-wrap gap-3">
                   {button(slide.primary, "red")}
                   {slide.secondary ? button(slide.secondary, "ghost") : null}
                 </div>
               </div>
-              <Card card={slide.card} />
             </div>
           </div>
         );

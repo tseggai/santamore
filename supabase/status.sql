@@ -75,5 +75,8 @@ select * from (values
              where table_schema = 'public' and table_name = 'events' and column_name = 'hosting'))
   ,('20260916000029_cause_proposals',
      to_regclass('public.cause_proposals') is not null)
+  ,('20260917000030_year_report_legacy',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'year_reports' and column_name = 'is_legacy'))
 ) as m (migration, applied)
 order by migration;
