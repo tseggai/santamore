@@ -57,7 +57,7 @@ export default async function ChallengePage({
     challenge.daily_cap !== null ? Math.max(0, challenge.daily_cap - challenge.issued_today) : null;
 
   return (
-    <div className="mx-auto max-w-xl px-5 py-12">
+    <div className="mx-auto max-w-3xl px-5 py-12">
       <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
         {challenge.partner_url ? (
           <a href={challenge.partner_url} rel="noopener" target="_blank" className="underline underline-offset-2 hover:text-sea">

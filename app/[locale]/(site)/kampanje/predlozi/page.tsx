@@ -49,7 +49,7 @@ export default async function ProposeCausePage({ params }: { params: Promise<{ l
   }));
 
   return (
-    <div className="mx-auto max-w-2xl px-5 py-14">
+    <div className="mx-auto max-w-3xl px-5 py-14">
       <p className="text-[13.5px]">
         <Link href="/kampanje" className="font-semibold text-sea underline underline-offset-2">← {t("eyebrow")}</Link>
       </p>

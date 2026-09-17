@@ -47,7 +47,7 @@ export default async function DonatePage({
   const data = await loadDonateTarget({ kind: "campaign", slug: kampanja });
   if (!data) {
     return (
-      <div className="mx-auto max-w-xl px-5 py-20">
+      <div className="mx-auto max-w-3xl px-5 py-20">
         <h1 className="type-display text-3xl">{t("payVerb")}</h1>
         <p className="mt-5 rounded-brand bg-mist px-5 py-4 text-[15px] text-sea">
           {t("errServer")}
