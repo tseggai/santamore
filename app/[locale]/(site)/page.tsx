@@ -19,7 +19,7 @@ async function fetchLanding() {
   try {
     const supabase = await createClient();
     const nowIso = new Date().toISOString();
-    const [summary, events, board, chapters, gallery, causes] = await Promise.all([
+    const [summary, events, board, chapters, gallery, causes, proposals] = await Promise.all([
       supabase.from("v_public_ledger_summary").select("received_cents, disbursed_cents").single(),
       supabase
         .from("v_public_events")
@@ -43,6 +43,12 @@ async function fetchLanding() {
         .select("slug, title, goal_cents, raised_cents, donor_count")
         .order("starts_at", { ascending: false })
         .limit(3),
+      supabase
+        .from("v_public_cause_proposals")
+        .select("id, title, vote_count, vote_rank, status")
+        .in("status", ["open", "shortlisted"])
+        .order("vote_rank", { ascending: true })
+        .limit(3),
     ]);
     return {
       receivedCents: summary.data?.received_cents ?? 0,
@@ -52,6 +58,7 @@ async function fetchLanding() {
       chapters: chapters.data ?? [],
       gallery: gallery.data ?? [],
       causes: (causes.data ?? []) as { slug: string; title: string; goal_cents: number | null; raised_cents: number; donor_count: number }[],
+      proposals: (proposals.data ?? []) as { id: string; title: string; vote_count: number; vote_rank: number }[],
     };
   } catch {
     return {
@@ -62,6 +69,7 @@ async function fetchLanding() {
       chapters: [],
       gallery: [],
       causes: [],
+      proposals: [],
     };
   }
 }
@@ -80,7 +88,7 @@ export default async function HomePage({
     getTranslations("events"),
   ]);
   const content = landingContent[locale as Locale];
-  const { receivedCents, disbursedCents, nextEvent, board, chapters, gallery, causes } = await fetchLanding();
+  const { receivedCents, disbursedCents, nextEvent, board, chapters, gallery, causes, proposals } = await fetchLanding();
 
   const money = (cents: number) =>
     formatCents(cents, locale as Locale, { trimWholeCents: true });
@@ -216,6 +224,37 @@ export default async function HomePage({
           </Link>
         </section>
       ) : null}
+
+      {/* 3b — causes the community proposes: the vote is open to everyone */}
+      <section className="border-t-[0.5px] border-line py-12">
+        <p className={eyebrowClass}>{t("proposalsEyebrow")}</p>
+        <h2 className="type-display mt-2 text-2xl sm:text-3xl">{t("proposalsHeading")}</h2>
+        <p className="mt-2 max-w-xl text-[15.5px] leading-relaxed text-black/70">{t("proposalsSub")}</p>
+        {proposals.length > 0 ? (
+          <ol className="mt-5 space-y-2">
+            {proposals.map((proposal) => (
+              <li key={proposal.id} className="flex items-center gap-4 rounded-brand bg-mist px-5 py-3.5">
+                <span className="flex h-11 w-11 shrink-0 flex-col items-center justify-center rounded-lg bg-paper font-mono text-[13px] font-bold tabular-nums">
+                  <span aria-hidden className="text-[11px] leading-none text-red">▲</span>
+                  {proposal.vote_count}
+                </span>
+                <span className="min-w-0 flex-1 truncate text-[16px] font-semibold">{proposal.title}</span>
+                {proposal.vote_rank <= 5 ? (
+                  <span className="hidden rounded-full bg-sea px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper sm:inline">{t("proposalsShortlist")}</span>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        ) : null}
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/kampanje/predlozi" className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark">
+            {t("proposalsCta")}
+          </Link>
+          <Link href="/kampanje#prijedlozi" className="rounded-lg bg-mist px-6 py-3.5 text-[15.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea">
+            {t("proposalsVoteCta")} →
+          </Link>
+        </div>
+      </section>
 
       {/* 3 — how it works */}
       <section className="border-t-[0.5px] border-line py-12">

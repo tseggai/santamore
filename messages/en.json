@@ -14,7 +14,8 @@
     "menu": "Menu",
     "campaigns": "Causes",
     "challenges": "Challenges",
-    "myPage": "My fundraising page"
+    "myPage": "My fundraising page",
+    "menuClose": "Close menu"
   },
   "home": {
     "eyebrow": "Montenegrin non-profit · Tivat",
@@ -47,7 +48,13 @@
     "causesCta": "All causes",
     "proofHeading": "Every euro, in public",
     "proofReceived": "received so far",
-    "proofDisbursed": "handed over, with the paperwork"
+    "proofDisbursed": "handed over, with the paperwork",
+    "proposalsEyebrow": "Your say",
+    "proposalsHeading": "Which cause should we take on next?",
+    "proposalsSub": "Anyone can propose a need in Montenegro. Members vote proposals up, the top five make the shortlist, and we choose one and publish every euro that reaches it.",
+    "proposalsShortlist": "Shortlist",
+    "proposalsCta": "Propose a cause",
+    "proposalsVoteCta": "See and vote"
   },
   "footer": {
     "orgHeading": "Organisation",
