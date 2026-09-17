@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState, type FormEvent } from "react";
 
-import { saveSponsorship, saveSupporter, setSupportersActive } from "@/app/[locale]/admin/(protected)/podrska/actions";
+import { deleteSupporters, saveSponsorship, saveSupporter, setSupportersActive } from "@/app/[locale]/admin/(protected)/podrska/actions";
 import type { Option } from "@/components/admin/EventForm";
 import { downscaleToPng } from "@/lib/images";
 import { formatCents, parseEurosToCents } from "@/lib/money";
@@ -62,16 +62,27 @@ export function SupporterForm({
   onDone,
   onCreated,
   formId,
+  campaigns = [],
+  events = [],
 }: {
   supporter: SupporterRow | null;
   onDone: () => void;
   onCreated?: (created: { id: string; name: string }) => void;
   /** When set, the panel renders the Save/Cancel footer for this form id. */
   formId?: string;
+  /** For a new supporter: the cause or event their first gift goes on. */
+  campaigns?: Option[];
+  events?: Option[];
 }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [name, setName] = useState(supporter?.name ?? "");
+  // A new supporter usually comes with a gift: amount and where, in one go.
+  const [giftAmount, setGiftAmount] = useState("");
+  const [giftInKind, setGiftInKind] = useState(false);
+  const [giftTier, setGiftTier] = useState("");
+  const [giftCampaignId, setGiftCampaignId] = useState("");
+  const [giftEventId, setGiftEventId] = useState("");
   const [website, setWebsite] = useState(supporter?.website ?? "");
   const [contactName, setContactName] = useState(supporter?.contact_name ?? "");
   const [contactEmail, setContactEmail] = useState(supporter?.contact_email ?? "");
@@ -106,6 +117,20 @@ export function SupporterForm({
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (state === "busy" || logoBusy) return;
+    const giftCents = giftAmount.trim() === "" ? null : parseEurosToCents(giftAmount);
+    if (giftAmount.trim() !== "" && giftCents === null) {
+      setState("invalid");
+      return;
+    }
+    const gift = !supporter && (giftCents !== null || giftInKind)
+      ? {
+          amountCents: giftInKind ? null : giftCents,
+          isInKind: giftInKind,
+          tier: giftTier.trim() || null,
+          campaignId: giftCampaignId || null,
+          eventId: giftEventId || null,
+        }
+      : undefined;
     setState("busy");
     const result = await saveSupporter({
       id: supporter?.id,
@@ -117,6 +142,7 @@ export function SupporterForm({
       notes: notes.trim() || null,
       isActive: active,
       ...(logoPath !== undefined ? { logoPath } : {}),
+      ...(gift ? { sponsorship: gift } : {}),
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       router.refresh();
@@ -193,6 +219,40 @@ export function SupporterForm({
           {t("suActive")}
         </label>
       </div>
+      {supporter ? null : (
+        <fieldset className="mt-5 rounded-lg bg-paper p-4">
+          <legend className="px-1 text-[14.5px] font-bold">{t("suGiftHeading")}</legend>
+          <p className="text-[13.5px] text-black/60">{t("suGiftHint")}</p>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="suGiftAmount" className={labelClass}>{t("spAmount")}</label>
+              <input id="suGiftAmount" type="text" inputMode="decimal" value={giftAmount} onChange={(e) => setGiftAmount(e.target.value)} disabled={giftInKind} placeholder="500" className={`${inputClass} font-mono disabled:opacity-50`} />
+            </div>
+            <div>
+              <label htmlFor="suGiftTier" className={labelClass}>{t("spTier")}</label>
+              <input id="suGiftTier" type="text" value={giftTier} onChange={(e) => setGiftTier(e.target.value)} placeholder={t("spTierHint")} className={inputClass} />
+            </div>
+            <div>
+              <label htmlFor="suGiftCampaign" className={labelClass}>{t("spCampaign")}</label>
+              <select id="suGiftCampaign" value={giftCampaignId} onChange={(e) => setGiftCampaignId(e.target.value)} className={inputClass}>
+                <option value="">—</option>
+                {campaigns.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="suGiftEvent" className={labelClass}>{t("spEvent")}</label>
+              <select id="suGiftEvent" value={giftEventId} onChange={(e) => setGiftEventId(e.target.value)} className={inputClass}>
+                <option value="">—</option>
+                {events.map((ev) => <option key={ev.id} value={ev.id}>{ev.name}</option>)}
+              </select>
+            </div>
+            <label className="flex items-center gap-2 text-[14.5px] sm:col-span-2">
+              <input type="checkbox" checked={giftInKind} onChange={(e) => setGiftInKind(e.target.checked)} className="h-4 w-4 accent-red" />
+              {t("spInKind")}
+            </label>
+          </div>
+        </fieldset>
+      )}
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
       {formId ? null : (
@@ -233,13 +293,13 @@ function SponsorshipForm({
   const [eventId, setEventId] = useState(sponsorship?.event_id ?? "");
   const [amount, setAmount] = useState(sponsorship?.amount_cents ? String(sponsorship.amount_cents / 100) : "");
   const [inKind, setInKind] = useState(sponsorship?.is_in_kind ?? false);
-  const [status, setStatus] = useState<SponsorshipRow["status"]>(sponsorship?.status ?? "prospect");
+  const [status, setStatus] = useState<SponsorshipRow["status"]>(sponsorship?.status ?? "signed");
   const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    const amountCents = amount.trim() === "" ? null : parseEurosToCents(amount);
-    if (amount.trim() !== "" && amountCents === null) {
+    const amountCents = inKind || amount.trim() === "" ? null : parseEurosToCents(amount);
+    if (!inKind && amount.trim() !== "" && amountCents === null) {
       setState("invalid");
       return;
     }
@@ -267,15 +327,13 @@ function SponsorshipForm({
     <form onSubmit={submit}>
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="spTier" className={labelClass}>{t("spTier")}</label>
-          <input id="spTier" type="text" value={tier} onChange={(e) => setTier(e.target.value)} placeholder={t("spTierHint")} className={inputClass} />
+          <label htmlFor="spAmount" className={labelClass}>{t("spAmount")}</label>
+          <input id="spAmount" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} disabled={inKind} placeholder="500" className={`${inputClass} font-mono disabled:opacity-50`} />
         </div>
-        <div>
-          <label htmlFor="spStatus" className={labelClass}>{t("spStatus")}</label>
-          <select id="spStatus" value={status} onChange={(e) => setStatus(e.target.value as SponsorshipRow["status"])} className={inputClass}>
-            {STATUSES.map((s) => <option key={s} value={s}>{t(`spStatusValue.${s}`)}</option>)}
-          </select>
-        </div>
+        <label className="flex items-center gap-2 self-end pb-2.5 text-[14.5px]">
+          <input type="checkbox" checked={inKind} onChange={(e) => setInKind(e.target.checked)} className="h-4 w-4 accent-red" />
+          {t("spInKind")}
+        </label>
         <div>
           <label htmlFor="spCampaign" className={labelClass}>{t("spCampaign")}</label>
           <select id="spCampaign" value={campaignId} onChange={(e) => setCampaignId(e.target.value)} className={inputClass}>
@@ -291,20 +349,22 @@ function SponsorshipForm({
           </select>
         </div>
         <div>
+          <label htmlFor="spTier" className={labelClass}>{t("spTier")}</label>
+          <input id="spTier" type="text" value={tier} onChange={(e) => setTier(e.target.value)} placeholder={t("spTierHint")} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor="spStatus" className={labelClass}>{t("spStatus")}</label>
+          <select id="spStatus" value={status} onChange={(e) => setStatus(e.target.value as SponsorshipRow["status"])} className={inputClass}>
+            {STATUSES.map((s) => <option key={s} value={s}>{t(`spStatusValue.${s}`)}</option>)}
+          </select>
+        </div>
+        <div>
           <label htmlFor="spChapter" className={labelClass}>{t("disbChapter")}</label>
           <select id="spChapter" value={chapterId} onChange={(e) => setChapterId(e.target.value)} className={inputClass}>
             <option value="">—</option>
             {chapters.map((ch) => <option key={ch.id} value={ch.id}>{ch.name}</option>)}
           </select>
         </div>
-        <div>
-          <label htmlFor="spAmount" className={labelClass}>{t("spAmount")}</label>
-          <input id="spAmount" type="text" inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value)} className={`${inputClass} font-mono`} />
-        </div>
-        <label className="flex items-center gap-2 text-[14.5px] sm:col-span-2">
-          <input type="checkbox" checked={inKind} onChange={(e) => setInKind(e.target.checked)} className="h-4 w-4 accent-red" />
-          {t("spInKind")}
-        </label>
       </div>
       <p className="mt-2 text-[13px] text-black/55">{t("spOpsNote")}</p>
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
@@ -368,6 +428,20 @@ export function SupportersManager({
     await setSupportersActive({ ids, active }).catch(() => null);
     setBusy(false);
     clear?.();
+    router.refresh();
+  };
+  // Deleting is for a supporter added by mistake; hiding one is "deactivate".
+  const remove = async (ids: string[], clear?: () => void) => {
+    if (!window.confirm(t("suDeleteConfirm", { count: ids.length }))) return;
+    setBusy(true);
+    const result = await deleteSupporters({ ids }).catch(() => null);
+    setBusy(false);
+    if (!result?.ok) {
+      window.alert(t("actionError"));
+      return;
+    }
+    clear?.();
+    if (ids.includes(open)) close();
     router.refresh();
   };
 
@@ -457,13 +531,18 @@ export function SupportersManager({
 
       <SidePanel open={open !== ""} title={open === "new" ? t("suNew") : (supporter?.name ?? "")} onClose={close} wide>
         <div>
-          <SupporterForm key={open} supporter={supporter} onDone={close} formId="supporter-form" />
+          <SupporterForm key={open} supporter={supporter} onDone={close} formId="supporter-form" campaigns={campaigns} events={events} />
 
           {supporter ? (
             <>
               <div className="mt-6 border-t-[0.5px] border-line pt-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className={labelClass}>{t("suDealsHeading")}</p>
+                  <p className={labelClass}>
+                    {t("suDealsHeading")}
+                    {signedCents(supporter.id) > 0 ? (
+                      <span className="ml-2 font-mono text-[14px] font-bold tabular-nums text-sea">{t("suGiven", { amount: money(signedCents(supporter.id)) })}</span>
+                    ) : null}
+                  </p>
                   <button type="button" onClick={() => setDealPanel({ supporterId: supporter.id, deal: null })} className={ghost}>+ {t("spNew")}</button>
                 </div>
                 {deals.length === 0 ? (
@@ -526,6 +605,11 @@ export function SupportersManager({
             <button type="button" onClick={close} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
               {t("cancel")}
             </button>
+            {supporter ? (
+              <button type="button" disabled={busy} onClick={() => remove([supporter.id])} className="ml-auto rounded-lg px-3 py-2.5 text-[14.5px] font-semibold text-red-dark transition-colors hover:bg-mist-2 disabled:opacity-60">
+                {t("suDelete")}
+              </button>
+            ) : null}
           </div>
         </div>
       </SidePanel>
@@ -562,12 +646,16 @@ export function SupportersManager({
             <button type="button" disabled={busy} onClick={() => setActive([s.id], !s.is_active)} className={rowButton}>
               {s.is_active ? t("table.deactivate") : t("table.activate")}
             </button>
+            <button type="button" disabled={busy} onClick={() => remove([s.id])} className={`${rowButton} text-red-dark`}>
+              {t("suDelete")}
+            </button>
           </>
         )}
         bulkActions={(ids, clear) => (
           <>
             <button type="button" disabled={busy} onClick={() => setActive(ids, true, clear)} className={bulkButton}>{t("table.activate")}</button>
             <button type="button" disabled={busy} onClick={() => setActive(ids, false, clear)} className={bulkButton}>{t("table.deactivate")}</button>
+            <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={`${bulkButton} text-red-dark`}>{t("suDelete")}</button>
           </>
         )}
       />

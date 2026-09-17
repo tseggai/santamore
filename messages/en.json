@@ -38,8 +38,6 @@
     "partnersHeading": "Partners",
     "partnersNote": "[[PLACEHOLDER: partner logos, grouped by tier, once contracts and logo permissions exist]]",
     "partnersCta": "Become a partner",
-    "storyHeading": "Who your euro reached",
-    "storyNote": "[[PLACEHOLDER: one beneficiary story, told with written consent]]",
     "newsletterHeading": "News and the monthly donor club",
     "newsletterSub": "A short letter when something real happens — an event opens, a hand-over is published. No noise.",
     "ctaStartPage": "Start a fundraising page",
@@ -96,9 +94,10 @@
     "recordLead": "Where we started, what we promised, and where we work.",
     "galleryTitle": "From our events",
     "galleryLead": "Photographs from the runs, the swims and the hand-overs.",
-    "partnersTitle": "Partners and stories",
-    "partnersLead": "The companies that pay for our team so donations never have to, and the people your euro reached.",
-    "newsletterTitle": "Stay close"
+    "partnersTitle": "The partners behind us",
+    "partnersLead": "The companies that pay for our team so donations never have to — with what each one gave.",
+    "newsletterTitle": "Stay close",
+    "partnersOfYear": "Partners of {year}"
   },
   "footer": {
     "orgHeading": "Organisation",
@@ -603,7 +602,7 @@
       "emailsCopied": "Copied",
       "exportCsv": "Export CSV",
       "colLanguages": "Languages",
-      "colSigned": "Signed"
+      "colSigned": "Given"
     },
     "confirmCash": "Confirm hand-in",
     "railCash": "cash",
@@ -961,6 +960,11 @@
     "suCreate": "Add supporter",
     "suNew": "New supporter",
     "suEmpty": "No supporters yet.",
+    "suDelete": "Delete",
+    "suDeleteConfirm": "{count, plural, one {Delete this supporter?} other {Delete # supporters?}} Their sponsorships are removed too and their logo is deleted; challenge offers keep the name. This cannot be undone. To hide one from the site instead, deactivate it.",
+    "suGiftHeading": "What they gave",
+    "suGiftHint": "Optional. Recorded as a signed sponsorship; more can be added from the supporter's panel.",
+    "suGiven": "{amount} given",
     "suInactive": "Inactive",
     "suSponsorChip": "{count, plural, one {# sponsorship} other {# sponsorships}}",
     "suOfferChip": "{count, plural, one {# offer} other {# offers}}",
@@ -1605,7 +1609,9 @@
     "legacyNote": "Recorded before this ledger existed. Figures as reported by the team, not derived row by row.",
     "pickYearLabel": "Year",
     "donorsHeading": "Donors",
-    "noDonors": "—"
+    "noDonors": "—",
+    "inKind": "in kind",
+    "sponsorCash": "in cash sponsorships"
   },
   "proposals": {
     "title": "Propose a cause",

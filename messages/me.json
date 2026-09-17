@@ -38,8 +38,6 @@
     "partnersHeading": "Partneri",
     "partnersNote": "[[PLACEHOLDER: logotipi partnera, grupisani po nivou, kad postoje ugovori i dozvole za logo]]",
     "partnersCta": "Postani partner",
-    "storyHeading": "Do koga je stigao tvoj euro",
-    "storyNote": "[[PLACEHOLDER: jedna priča korisnika, ispričana uz pisanu saglasnost]]",
     "newsletterHeading": "Novosti i klub mjesečnih donatora",
     "newsletterSub": "Kratko pismo kad se desi nešto stvarno — otvori se događaj, objavi se primopredaja. Bez buke.",
     "ctaStartPage": "Otvori stranicu za prikupljanje",
@@ -96,9 +94,10 @@
     "recordLead": "Gdje smo počeli, šta smo obećali i gdje radimo.",
     "galleryTitle": "Sa naših događaja",
     "galleryLead": "Fotografije s trka, plivanja i predaja.",
-    "partnersTitle": "Partneri i priče",
-    "partnersLead": "Firme koje plaćaju naš tim da donacije ne moraju, i ljudi do kojih je tvoj euro stigao.",
-    "newsletterTitle": "Ostani blizu"
+    "partnersTitle": "Partneri koji stoje iza nas",
+    "partnersLead": "Firme koje plaćaju naš tim da donacije ne moraju — i koliko je svaka dala.",
+    "newsletterTitle": "Ostani blizu",
+    "partnersOfYear": "Partneri {year}."
   },
   "footer": {
     "orgHeading": "Organizacija",
@@ -603,7 +602,7 @@
       "emailsCopied": "Kopirano",
       "exportCsv": "Izvezi CSV",
       "colLanguages": "Jezici",
-      "colSigned": "Potpisano"
+      "colSigned": "Dato"
     },
     "confirmCash": "Potvrdi primopredaju",
     "railCash": "keš",
@@ -961,6 +960,11 @@
     "suCreate": "Dodaj podržavaoca",
     "suNew": "Novi podržavalac",
     "suEmpty": "Još nema podržavalaca.",
+    "suDelete": "Obriši",
+    "suDeleteConfirm": "{count, plural, one {Obrisati ovog podržavaoca?} few {Obrisati # podržavaoca?} other {Obrisati # podržavalaca?}} Brišu se i njegova sponzorstva i logo; ponude na izazovima zadržavaju ime. Ovo se ne može poništiti. Ako ga samo želite sakriti sa sajta, deaktivirajte ga.",
+    "suGiftHeading": "Šta su dali",
+    "suGiftHint": "Nije obavezno. Bilježi se kao potpisano sponzorstvo; još ih možete dodati iz panela podržavaoca.",
+    "suGiven": "{amount} dato",
     "suInactive": "Neaktivan",
     "suSponsorChip": "{count, plural, one {# sponzorstvo} few {# sponzorstva} other {# sponzorstava}}",
     "suOfferChip": "{count, plural, one {# ponuda} few {# ponude} other {# ponuda}}",
@@ -1605,7 +1609,9 @@
     "legacyNote": "Zabilježeno prije nego što je ova knjiga postojala. Cifre kako ih je tim prijavio, ne izvedene red po red.",
     "pickYearLabel": "Godina",
     "donorsHeading": "Donatori",
-    "noDonors": "—"
+    "noDonors": "—",
+    "inKind": "u robi",
+    "sponsorCash": "u novčanim sponzorstvima"
   },
   "proposals": {
     "title": "Predloži cilj",

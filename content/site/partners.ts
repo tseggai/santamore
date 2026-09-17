@@ -31,6 +31,7 @@ export interface PartnersContent {
   sponsorLabel: string;
   inKindLabel: string;
   offersLabel: string;
+  cashTotalLabel: string;
 }
 
 export const partnersContent: Record<Locale, PartnersContent> = {
@@ -109,6 +110,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     supportersEmpty: "Prvi partneri se objavljuju ovdje čim potpišemo.",
     sponsorLabel: "Sponzor",
     inKindLabel: "u robi",
+    cashTotalLabel: "u novčanim sponzorstvima do sada",
     offersLabel: "Ponuda za trkače",
     formHeading: "Postanite partner",
     formLead:
@@ -189,6 +191,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     supportersEmpty: "The first partners appear here as soon as we sign.",
     sponsorLabel: "Sponsor",
     inKindLabel: "in kind",
+    cashTotalLabel: "in cash sponsorships so far",
     offersLabel: "Offer for runners",
     formHeading: "Become a partner",
     formLead:
@@ -269,6 +272,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     supportersEmpty: "Первые партнёры появятся здесь, как только подпишем.",
     sponsorLabel: "Спонсор",
     inKindLabel: "натурой",
+    cashTotalLabel: "денежных спонсорств на сегодня",
     offersLabel: "Предложение для бегунов",
     formHeading: "Стать партнёром",
     formLead:

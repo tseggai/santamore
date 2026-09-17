@@ -7,6 +7,7 @@ import { InboundForm } from "@/components/forms/InboundForm";
 import { HeroSlides, type HeroSlide } from "@/components/home/HeroSlides";
 import { ProposalsList, type PublicProposal } from "@/components/proposals/ProposalsList";
 import { LeaderboardList, type LeaderboardEntry } from "@/components/Leaderboard";
+import { SponsorGrid, type PublicSponsor } from "@/components/partners/SponsorGrid";
 import { landingContent } from "@/content/site/landing";
 import { formatCents } from "@/lib/money";
 import { galleryImageUrl } from "@/lib/storage";
@@ -20,7 +21,7 @@ async function fetchLanding() {
   try {
     const supabase = await createClient();
     const nowIso = new Date().toISOString();
-    const [summary, events, board, chapters, gallery, causes, proposals] = await Promise.all([
+    const [summary, events, board, chapters, gallery, causes, proposals, sponsors] = await Promise.all([
       supabase.from("v_public_ledger_summary").select("received_cents, disbursed_cents").single(),
       supabase
         .from("v_public_events")
@@ -50,7 +51,15 @@ async function fetchLanding() {
         .in("status", ["open", "shortlisted"])
         .order("vote_rank", { ascending: true })
         .limit(5),
+      // The most recent year with sponsors: what the site shows as "our partners".
+      supabase
+        .from("v_public_year_supporters")
+        .select("year, id, name, slug, logo_path, website, cash_cents, in_kind, tiers, offers")
+        .order("year", { ascending: false })
+        .limit(60),
     ]);
+    const sponsorRows = (sponsors.data ?? []) as (PublicSponsor & { year: number })[];
+    const sponsorYear = sponsorRows[0]?.year ?? null;
     return {
       receivedCents: summary.data?.received_cents ?? 0,
       disbursedCents: summary.data?.disbursed_cents ?? 0,
@@ -60,6 +69,8 @@ async function fetchLanding() {
       gallery: gallery.data ?? [],
       causes: (causes.data ?? []) as { slug: string; title: string; goal_cents: number | null; raised_cents: number; donor_count: number; cover_path: string | null; ends_at: string | null }[],
       proposals: (proposals.data ?? []) as PublicProposal[],
+      sponsors: sponsorYear ? sponsorRows.filter((row) => row.year === sponsorYear) : [],
+      sponsorYear,
     };
   } catch {
     return {
@@ -71,6 +82,8 @@ async function fetchLanding() {
       gallery: [],
       causes: [],
       proposals: [],
+      sponsors: [] as PublicSponsor[],
+      sponsorYear: null,
     };
   }
 }
@@ -83,13 +96,15 @@ export default async function HomePage({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const [t, tLb, tEvents] = await Promise.all([
+  const [t, tLb, tEvents, tYears] = await Promise.all([
     getTranslations("home"),
     getTranslations("leaderboard"),
     getTranslations("events"),
+    getTranslations("years"),
   ]);
   const content = landingContent[locale as Locale];
-  const { receivedCents, disbursedCents, events, board, chapters, gallery, causes, proposals } = await fetchLanding();
+  const data = await fetchLanding();
+  const { receivedCents, disbursedCents, events, board, chapters, gallery, causes, proposals } = data;
   const [tCampaigns, tRunner] = await Promise.all([getTranslations("campaigns"), getTranslations("runner")]);
 
   const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
@@ -375,19 +390,22 @@ export default async function HomePage({
           </section>
         ) : null}
 
-        {/* partners and the story — placeholders until consented material exists */}
+        {/* the partners: every sponsor of the latest year, with what they gave */}
         <section className={section}>
-          {header(t("partnersHeading"), t("partnersTitle"), t("partnersLead"))}
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-brand bg-mist px-5 py-5">
-              <p className={eyebrowClass}>{t("partnersHeading")}</p>
-              <p className="mt-3 text-[13.5px] text-sea">{t("partnersNote")}</p>
+          {header(
+            data.sponsorYear ? t("partnersOfYear", { year: data.sponsorYear }) : t("partnersHeading"),
+            t("partnersTitle"),
+            t("partnersLead"),
+          )}
+          {data.sponsors.length > 0 ? (
+            <div className="mt-8">
+              <SponsorGrid sponsors={data.sponsors} locale={locale as Locale} inKindLabel={tYears("inKind")} size="lg" />
             </div>
-            <div className="rounded-brand bg-mist px-5 py-5">
-              <p className={eyebrowClass}>{t("storyHeading")}</p>
-              <p className="mt-3 text-[13.5px] text-sea">{t("storyNote")}</p>
+          ) : (
+            <div className="mt-8 rounded-brand bg-mist px-5 py-5">
+              <p className="text-[14px] text-sea">{t("partnersNote")}</p>
             </div>
-          </div>
+          )}
           <div>
             <Link href="/partneri" className={more}>{t("partnersCta")} →</Link>
           </div>

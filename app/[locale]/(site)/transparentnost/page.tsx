@@ -7,9 +7,10 @@ import remarkGfm from "remark-gfm";
 
 import { LedgerTabs, type LedgerRow } from "@/components/ledger/LedgerTabs";
 import { YearTabs } from "@/components/ledger/YearTabs";
+import { SponsorGrid, type PublicSponsor } from "@/components/partners/SponsorGrid";
 import { formatShortDate } from "@/lib/dates";
 import { formatCents, formatSignedCents } from "@/lib/money";
-import { disbursementDocUrl, supporterLogoUrl } from "@/lib/storage";
+import { disbursementDocUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
@@ -88,13 +89,7 @@ interface EventRow {
   venue: string | null;
   kind: string;
 }
-interface SupporterRow {
-  id: string;
-  name: string;
-  slug: string;
-  logo_path: string | null;
-  website: string | null;
-}
+type SupporterRow = PublicSponsor;
 
 /**
  * The ledger, whole or for one calendar year. Year rows are read straight
@@ -119,7 +114,7 @@ async function fetchLedger(year: number | null) {
       ? supabase.from("v_public_events").select("slug, name, starts_at, venue, kind").gte("starts_at", from).lt("starts_at", to).order("starts_at")
       : Promise.resolve({ data: [] as EventRow[] }),
     year
-      ? supabase.from("v_public_year_supporters").select("id, name, slug, logo_path, website").eq("year", year).order("name")
+      ? supabase.from("v_public_year_supporters").select("id, name, slug, logo_path, website, cash_cents, in_kind, tiers, offers").eq("year", year)
       : Promise.resolve({ data: [] as SupporterRow[] }),
   ]);
   return {
@@ -192,6 +187,7 @@ export default async function LedgerPage({
     : null;
   const legacyEvents = legacy ? (report?.events ?? []) : [];
   const legacySupporters = legacy ? (report?.supporters ?? []) : [];
+  const sponsorCash = supporters.reduce((sum, su) => sum + su.cash_cents, 0);
   const legacyBeneficiaries = legacy ? (report?.beneficiaries_list ?? []) : [];
   const legacyDonors = legacy ? (report?.donors_list ?? []) : [];
   const tense = year === null ? "all" : year < thisYear ? "past" : year === thisYear ? "current" : "future";
@@ -425,41 +421,33 @@ export default async function LedgerPage({
             ) : null}
           </section>
 
-          {/* who stood behind the year */}
+          {/* who stood behind the year, and what each gave */}
           <section className="mt-7">
-            <h3 className="type-eyebrow text-sea/80">{tYears("supportersHeading")}</h3>
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 className="type-eyebrow text-sea/80">{tYears("supportersHeading")}</h3>
+              {sponsorCash > 0 ? (
+                <p className="text-[14px] text-black/60">
+                  <span className="font-mono text-[15px] font-bold tabular-nums text-sea">{money(sponsorCash)}</span> {tYears("sponsorCash")}
+                </p>
+              ) : null}
+            </div>
             {supporters.length === 0 && legacySupporters.length === 0 ? (
               <p className="mt-2 text-[14px] text-black/55">{tYears("noSupporters")}</p>
-            ) : (
-              <ul className="mt-2 flex flex-wrap gap-2">
+            ) : null}
+            {supporters.length > 0 ? (
+              <div className="mt-3">
+                <SponsorGrid sponsors={supporters} locale={locale as Locale} inKindLabel={tYears("inKind")} />
+              </div>
+            ) : null}
+            {legacySupporters.length > 0 ? (
+              <ul className="mt-3 flex flex-wrap gap-2">
                 {legacySupporters.map((name) => (
                   <li key={`legacy-${name}`}>
                     <span className="inline-flex items-center rounded-lg bg-mist px-3 py-2 text-[14px] font-semibold">{name}</span>
                   </li>
                 ))}
-                {supporters.map((su) => {
-                  const logo = supporterLogoUrl(su.logo_path);
-                  const inner = (
-                    <>
-                      {logo ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={logo} alt="" className="h-6 w-6 rounded object-contain" />
-                      ) : null}
-                      <span>{su.name}</span>
-                    </>
-                  );
-                  return (
-                    <li key={su.id}>
-                      {su.website ? (
-                        <a href={su.website} target="_blank" rel="noopener" className="inline-flex items-center gap-2 rounded-lg bg-mist px-3 py-2 text-[14px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea">{inner}</a>
-                      ) : (
-                        <span className="inline-flex items-center gap-2 rounded-lg bg-mist px-3 py-2 text-[14px] font-semibold">{inner}</span>
-                      )}
-                    </li>
-                  );
-                })}
               </ul>
-            )}
+            ) : null}
           </section>
 
           {/* the donor wall of a year recorded before the ledger */}

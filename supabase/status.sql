@@ -85,5 +85,12 @@ select * from (values
      exists (select 1 from public.campaigns where slug = 'santamore-25'))
   ,('20260917000033_seed_santamore_25_donors',
      exists (select 1 from public.year_reports where year = 2025 and jsonb_array_length(donors_list) > 0))
+  ,('20260917000034_supporters_delete',
+     exists (select 1 from information_schema.role_table_grants
+             where table_schema = 'public' and table_name = 'supporters'
+               and grantee = 'authenticated' and privilege_type = 'DELETE'))
+  ,('20260917000035_sponsor_amounts_public',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'v_public_year_supporters' and column_name = 'cash_cents'))
 ) as m (migration, applied)
 order by migration;
