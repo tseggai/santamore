@@ -54,7 +54,8 @@ async function fetchLanding() {
       // The most recent year with sponsors: what the site shows as "our partners".
       supabase
         .from("v_public_year_supporters")
-        .select("year, id, name, slug, logo_path, website, cash_cents, in_kind, tiers, offers")
+        .select("year, id, name, slug, kind, logo_path, website, cash_cents, in_kind, tiers, offers")
+        .eq("kind", "sponsor")
         .order("year", { ascending: false })
         .limit(60),
     ]);

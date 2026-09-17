@@ -92,5 +92,8 @@ select * from (values
   ,('20260917000035_sponsor_amounts_public',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'v_public_year_supporters' and column_name = 'cash_cents'))
+  ,('20260917000036_supporter_kind',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'supporters' and column_name = 'kind'))
 ) as m (migration, applied)
 order by migration;

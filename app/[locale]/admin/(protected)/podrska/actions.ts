@@ -21,6 +21,8 @@ export interface SupporterActionResult {
 const supporterSchema = z.object({
   id: z.string().uuid().optional(),
   name: z.string().trim().min(2).max(120),
+  /** An organisation (sponsor) or an individual (donor). */
+  kind: z.enum(["sponsor", "donor"]).default("sponsor"),
   website: z.string().trim().url().max(300).nullable(),
   contactName: z.string().trim().max(120).nullable(),
   contactEmail: z.string().trim().email().max(120).nullable(),
@@ -48,6 +50,7 @@ export async function saveSupporter(input: unknown): Promise<SupporterActionResu
   const supabase = await createClient();
   const row = {
     name: data.name,
+    kind: data.kind,
     website: data.website,
     contact_name: data.contactName,
     contact_email: data.contactEmail,

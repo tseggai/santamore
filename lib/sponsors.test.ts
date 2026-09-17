@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { sortSponsors, type PublicSponsor } from "./sponsors";
 
-const base = { slug: "", logo_path: null, website: null, tiers: [] as string[] };
+const base = { slug: "", kind: "sponsor" as const, logo_path: null, website: null, tiers: [] as string[] };
 const row = (id: string, extra: Partial<PublicSponsor>): PublicSponsor => ({
   id,
   name: id,
