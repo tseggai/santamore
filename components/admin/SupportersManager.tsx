@@ -6,7 +6,7 @@ import { useRef, useState, type FormEvent } from "react";
 
 import { saveSponsorship, saveSupporter, setSupportersActive } from "@/app/[locale]/admin/(protected)/podrska/actions";
 import type { Option } from "@/components/admin/EventForm";
-import { downscaleToJpeg } from "@/lib/images";
+import { downscaleToPng } from "@/lib/images";
 import { formatCents, parseEurosToCents } from "@/lib/money";
 import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
 import { PageHeader } from "@/components/console/PageHeader";
@@ -90,9 +90,10 @@ export function SupporterForm({
   const uploadLogo = async (file: File) => {
     setLogoBusy(true);
     try {
-      const blob = await downscaleToJpeg(file, 800);
-      const path = `${logoFolder}/logo-${Date.now()}.jpg`;
-      const { error } = await createClient().storage.from("supporter-logos").upload(path, blob, { contentType: "image/jpeg" });
+      // PNG: a logo on a transparent background must stay transparent.
+      const blob = await downscaleToPng(file, 800);
+      const path = `${logoFolder}/logo-${Date.now()}.png`;
+      const { error } = await createClient().storage.from("supporter-logos").upload(path, blob, { contentType: "image/png" });
       if (error) throw error;
       setLogoPath(path);
     } catch {

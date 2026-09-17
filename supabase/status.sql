@@ -83,5 +83,7 @@ select * from (values
              where table_schema = 'public' and table_name = 'year_reports' and column_name = 'donors_list'))
   ,('20260917000032_seed_santamore_25',
      exists (select 1 from public.campaigns where slug = 'santamore-25'))
+  ,('20260917000033_seed_santamore_25_donors',
+     exists (select 1 from public.year_reports where year = 2025 and jsonb_array_length(donors_list) > 0))
 ) as m (migration, applied)
 order by migration;
