@@ -1619,6 +1619,8 @@
     "signInTitle": "Sign in to propose",
     "signInSub": "One email. A proposal carries a name, and a member votes once.",
     "byName": "proposed by {name}",
-    "rankLabel": "#{rank}"
+    "rankLabel": "#{rank}",
+    "continue": "Continue",
+    "back": "Back to the questions"
   }
 }

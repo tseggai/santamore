@@ -1619,6 +1619,8 @@
     "signInTitle": "Prijavi se da predložiš",
     "signInSub": "Jedan email. Prijedlog nosi ime, a član glasa jednom.",
     "byName": "predložio/la {name}",
-    "rankLabel": "#{rank}"
+    "rankLabel": "#{rank}",
+    "continue": "Nastavi",
+    "back": "Nazad na pitanja"
   }
 }
