@@ -45,7 +45,7 @@ export default async function GalleryPage({
   const images = toGalleryImages(rows);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-14">
+    <div className="mx-auto max-w-3xl px-5 py-14">
       <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
         {t("eyebrow")}
       </p>

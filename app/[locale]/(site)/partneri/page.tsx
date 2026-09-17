@@ -80,7 +80,7 @@ export default async function PartnersPage({
   );
 
   return (
-    <div className="mx-auto max-w-4xl px-5 py-14">
+    <div className="mx-auto max-w-3xl px-5 py-14">
       <p className={eyebrowClass}>{content.heroEyebrow}</p>
       <h1 className="type-display mt-3 max-w-2xl text-4xl leading-[1.1] sm:text-5xl">
         {content.heroTitle}

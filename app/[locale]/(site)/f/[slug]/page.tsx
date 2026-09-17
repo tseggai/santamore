@@ -91,7 +91,7 @@ export default async function FundraiserPage({
     "font-semibold text-black underline decoration-black/30 underline-offset-[3px] transition-colors hover:text-sea";
 
   return (
-    <div className="mx-auto max-w-xl px-5 py-10">
+    <div className="mx-auto max-w-3xl px-5 py-10">
       {/* runner head: a photo you can actually recognise, name, where they
           run and with whom, and the two actions at header level */}
       <header className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">

@@ -87,11 +87,11 @@ export default async function CampaignsIndexPage({
   const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-14">
+    <div className="mx-auto max-w-3xl px-5 py-14">
       <h1 className="type-display text-4xl">{t("title")}</h1>
       <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-black/70">{t("sub")}</p>
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
       <div>
 
       {campaigns.length === 0 ? (

@@ -97,7 +97,7 @@ export default async function TeamPage({
   const photo = fundraiserPhotoUrl(team.photo_path);
 
   return (
-    <div className="mx-auto max-w-xl px-5 py-10">
+    <div className="mx-auto max-w-3xl px-5 py-10">
       <header className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-7">
         <Avatar src={photo} name={team.name} size={136} priority className="sm:mt-1" />
         <div className="min-w-0 flex-1">

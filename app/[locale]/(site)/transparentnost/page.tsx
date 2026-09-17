@@ -267,7 +267,7 @@ export default async function LedgerPage({
   );
 
   return (
-    <div className="mx-auto max-w-xl px-5 py-12">
+    <div className="mx-auto max-w-3xl px-5 py-12">
       <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
         {t("eyebrow")}
       </p>

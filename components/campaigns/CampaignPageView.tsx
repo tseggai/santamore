@@ -64,7 +64,7 @@ export function CampaignPageView({
     "font-semibold text-black underline decoration-black/30 underline-offset-[3px] transition-colors hover:text-sea";
 
   return (
-    <div className={`mx-auto max-w-xl px-5 py-12 ${preview ? "pointer-events-none select-none" : ""}`}>
+    <div className={`mx-auto max-w-3xl px-5 py-12 ${preview ? "pointer-events-none select-none" : ""}`}>
       <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
         {t("eyebrow")}
         {campaign.chapter_name ? <> · {campaign.chapter_name}</> : null}
