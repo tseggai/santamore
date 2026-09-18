@@ -204,14 +204,8 @@ export function HeroSlides({ slides }: { slides: HeroSlide[] }) {
             className={`absolute inset-0 flex flex-col justify-end transition-opacity duration-700 motion-reduce:transition-none sm:justify-center ${active ? "z-[1] opacity-100" : "pointer-events-none opacity-0"}`}
           >
             {slide.image ? <Image src={slide.image} alt="" fill priority={i === 0} sizes="100vw" className="object-cover" /> : null}
-            {/* the text sits on a solid sea band (left on wide screens, bottom on a phone); the photo stays clear beside it */}
-            <div
-              className={`absolute inset-0 ${
-                slide.image
-                  ? "bg-gradient-to-t from-sea from-45% via-sea/85 via-62% to-sea/5 sm:bg-gradient-to-r sm:from-sea sm:from-38% sm:via-sea/90 sm:via-56% sm:to-sea/0"
-                  : "bg-gradient-to-br from-sea to-sea-2"
-              }`}
-            />
+            {/* one flat tint over the whole photo: the picture stays visible, the text stays legible */}
+            <div className={`absolute inset-0 ${slide.image ? "bg-black/50" : "bg-sea"}`} />
             {/* the same column as every content page; only the picture runs edge to edge */}
             <div className="relative mx-auto w-full max-w-3xl px-5 pb-24 pt-[calc(56px+64px)] sm:pb-28 sm:pt-[calc(64px+76px)]">
               <div>
