@@ -535,7 +535,6 @@ export function SupportersManager({
       filter: {
         options: [
           { value: "deals", label: t("table.hasSponsorship") },
-          { value: "offers", label: t("table.hasOffer") },
           { value: "none", label: t("table.hasNeither") },
         ],
         match: (s, value) =>
@@ -549,7 +548,6 @@ export function SupportersManager({
       cell: (s) => (signedCents(s.id) > 0 ? money(signedCents(s.id)) : "—"),
       sort: (s) => signedCents(s.id),
     },
-    { key: "offers", header: t("table.colOffers"), align: "center", cell: (s) => offersOf(s.id).length || "—", sort: (s) => offersOf(s.id).length },
     {
       key: "website",
       header: t("table.colWebsite"),
