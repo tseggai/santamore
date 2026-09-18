@@ -25,6 +25,7 @@ interface SponsorshipRow {
   supporter_slug: string | null;
   tier: string | null;
   is_in_kind: boolean;
+  fund: "operations" | "impact";
   amount_cents: number | null;
   campaign_title: string | null;
   event_name: string | null;
@@ -43,7 +44,7 @@ async function loadSupporters() {
     const supabase = await createClient();
     const [{ data: supporters }, { data: sponsorships }, { data: offers }] = await Promise.all([
       supabase.from("v_public_supporters").select("id, name, slug, kind, logo_path, website").eq("kind", "sponsor").order("name"),
-      supabase.from("v_public_sponsors").select("supporter_slug, tier, is_in_kind, amount_cents, campaign_title, event_name, starts_at"),
+      supabase.from("v_public_sponsors").select("supporter_slug, tier, is_in_kind, fund, amount_cents, campaign_title, event_name, starts_at"),
       supabase.from("v_public_perk_challenges").select("slug, supporter_slug, reward_label, title"),
     ]);
     return {
@@ -96,6 +97,7 @@ export default async function PartnersPage({
           tier: d.tier,
           target: d.event_name ?? d.campaign_title,
           date: d.starts_at,
+          fund: d.fund,
         })),
         offerLinks: offers.filter((o) => o.supporter_slug === su.slug).map((o) => ({ href: `/izazovi/${o.slug}`, label: o.reward_label })),
       };

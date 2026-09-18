@@ -101,5 +101,8 @@ select * from (values
   ,('20260918000038_years_recorded',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'sponsors' and column_name = 'year'))
+  ,('20260918000039_sponsor_fund',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'sponsors' and column_name = 'fund'))
 ) as m (migration, applied)
 order by migration;

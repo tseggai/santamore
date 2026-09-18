@@ -866,6 +866,12 @@
     "spTierHint": "npr. zlatni, srebrni, medijski",
     "spYear": "Godina",
     "spYearHint": "Godina za koju se ovaj ugovor računa na sajtu.",
+    "spFund": "Koji fond",
+    "spFundValue": {
+      "operations": "Operativni fond — plaća tim",
+      "impact": "Fond uticaja — predat korisnicima, kao donacije"
+    },
+    "spFundHint": "Sponzorstva podrazumijevano idu u operativu. Izaberite Fond uticaja kad je novac otišao korisnicima; onda se računa kao prikupljeno.",
     "spCampaign": "Cilj",
     "spEvent": "Događaj",
     "spStatus": "Status",
@@ -1648,7 +1654,11 @@
     "noPages": "Nema stranice za prikupljanje na ciljevima ove godine.",
     "noTeams": "Nema tima na ciljevima ove godine.",
     "members": "{count, plural, one {# član} few {# člana} other {# članova}}",
-    "noVolunteers": "Za ovu godinu još nema zabilježenog volontera."
+    "noVolunteers": "Za ovu godinu još nema zabilježenog volontera.",
+    "sponsorAllImpact": "sve predato korisnicima",
+    "sponsorPartImpact": "{amount} od toga predato korisnicima",
+    "giftImpactNote": "Ovo sponzorstvo je otišlo u Fond uticaja: u cjelini predato korisnicima, kao donacija, bez zadržavanja za operativu.",
+    "giftMixedNote": "Dio je umjesto toga otišao korisnicima."
   },
   "proposals": {
     "title": "Predloži cilj",

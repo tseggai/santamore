@@ -866,6 +866,12 @@
     "spTierHint": "e.g. gold, silver, media",
     "spYear": "Year",
     "spYearHint": "The year this deal counts for on the site.",
+    "spFund": "Which fund",
+    "spFundValue": {
+      "operations": "Operations Fund — pays for the team",
+      "impact": "Impact Fund — handed to beneficiaries, like donations"
+    },
+    "spFundHint": "Sponsorships fund operations by default. Choose Impact Fund when the money went to the beneficiaries; it then counts as raised.",
     "spCampaign": "Cause",
     "spEvent": "Event",
     "spStatus": "Status",
@@ -1648,7 +1654,11 @@
     "noPages": "No fundraising page on this year's causes.",
     "noTeams": "No team on this year's causes.",
     "members": "{count, plural, one {# member} other {# members}}",
-    "noVolunteers": "No volunteer recorded for this year yet."
+    "noVolunteers": "No volunteer recorded for this year yet.",
+    "sponsorAllImpact": "all of it handed to the beneficiaries",
+    "sponsorPartImpact": "{amount} of it handed to the beneficiaries",
+    "giftImpactNote": "This sponsorship went to the Impact Fund: handed to the beneficiaries in full, like a donation, with nothing held back for operations.",
+    "giftMixedNote": "Part of it went to the beneficiaries instead."
   },
   "proposals": {
     "title": "Propose a cause",

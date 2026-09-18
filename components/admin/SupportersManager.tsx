@@ -41,6 +41,7 @@ export interface SponsorshipRow {
   is_in_kind: boolean;
   status: "prospect" | "negotiating" | "signed" | "active" | "ended";
   year: number | null;
+  fund: "operations" | "impact";
 }
 
 interface OfferRow {
@@ -317,6 +318,7 @@ function SponsorshipForm({
   const [eventId, setEventId] = useState(sponsorship?.event_id ?? "");
   const [amount, setAmount] = useState(sponsorship?.amount_cents ? String(sponsorship.amount_cents / 100) : "");
   const [year, setYear] = useState(sponsorship?.year != null ? String(sponsorship.year) : String(new Date().getFullYear()));
+  const [fund, setFund] = useState<SponsorshipRow["fund"]>(sponsorship?.fund ?? "operations");
   const [inKind, setInKind] = useState(sponsorship?.is_in_kind ?? false);
   const [status, setStatus] = useState<SponsorshipRow["status"]>(sponsorship?.status ?? "signed");
   const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
@@ -340,6 +342,7 @@ function SponsorshipForm({
       isInKind: inKind,
       status,
       year: /^\d{4}$/.test(year.trim()) ? Number(year.trim()) : null,
+      fund,
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       router.refresh();
@@ -360,6 +363,14 @@ function SponsorshipForm({
           <input type="checkbox" checked={inKind} onChange={(e) => setInKind(e.target.checked)} className="h-4 w-4 accent-red" />
           {t("spInKind")}
         </label>
+        <div className="sm:col-span-2">
+          <label htmlFor="spFund" className={labelClass}>{t("spFund")}</label>
+          <select id="spFund" value={fund} onChange={(e) => setFund(e.target.value as SponsorshipRow["fund"])} disabled={inKind} className={`${inputClass} disabled:opacity-50`}>
+            <option value="operations">{t("spFundValue.operations")}</option>
+            <option value="impact">{t("spFundValue.impact")}</option>
+          </select>
+          <p className="mt-1 text-[13px] text-black/50">{t("spFundHint")}</p>
+        </div>
         <div>
           <label htmlFor="spCampaign" className={labelClass}>{t("spCampaign")}</label>
           <select id="spCampaign" value={campaignId} onChange={(e) => setCampaignId(e.target.value)} className={inputClass}>
