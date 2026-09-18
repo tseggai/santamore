@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
 import { saveSitePage } from "@/app/[locale]/admin/(protected)/sadrzaj/pages-actions";
+import { TranslateBar } from "@/components/admin/TranslateBar";
 import { SidePanel } from "@/components/console/SidePanel";
 import { PAGE_FIELDS, parseField, serializeField, type PageContent, type SitePage } from "@/lib/site-pages";
 import { routing, type Locale } from "@/i18n/routing";
@@ -114,6 +115,12 @@ function PageEditor({ page, rows, shipped, locale, onDone }: { page: SitePage; r
           </button>
         ))}
       </div>
+      <TranslateBar
+        className="mt-3"
+        source={tab}
+        getFields={() => Object.fromEntries(fields.map((spec) => [spec.key, drafts[tab][spec.key] ?? ""]))}
+        apply={(loc, translated) => setDrafts((d) => ({ ...d, [loc]: { ...d[loc], ...translated } }))}
+      />
       <div className="mt-4 space-y-4">
         {fields.map((spec) => {
           const id = `sp-${page}-${spec.key}`;

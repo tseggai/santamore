@@ -7,6 +7,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { deleteBeneficiary, saveBeneficiary } from "@/app/[locale]/admin/(protected)/sadrzaj/beneficiaries-actions";
 import { Chip, DataTable, Thumb, rowButton, type Column } from "@/components/console/DataTable";
 import { SidePanel } from "@/components/console/SidePanel";
+import { TranslateBar } from "@/components/admin/TranslateBar";
 import { downscaleToJpeg } from "@/lib/images";
 import { beneficiaryPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -212,6 +213,12 @@ function BeneficiaryForm({ row, causes, onDone }: { row: BeneficiaryRow | null; 
           </div>
           <textarea rows={8} maxLength={6000} value={story[tab]} onChange={(e) => setStory((s) => ({ ...s, [tab]: e.target.value }))} className={inputClass} />
           <p className="mt-1 text-[13px] text-black/50">{t("bnStoryHint")}</p>
+          <TranslateBar
+            className="mt-2"
+            source={tab}
+            getFields={() => ({ story: story[tab] })}
+            apply={(loc, fields) => setStory((s) => ({ ...s, [loc]: fields.story ?? s[loc] }))}
+          />
         </div>
         <div>
           <label htmlFor="bnOrder" className={labelClass}>{t("memberOrder")}</label>
