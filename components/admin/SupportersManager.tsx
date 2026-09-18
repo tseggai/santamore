@@ -455,8 +455,14 @@ export function SupportersManager({
   const campaignName = new Map(campaigns.map((c) => [c.id, c.name]));
   const eventName = new Map(events.map((e) => [e.id, e.name]));
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
-  const dealsOf = (id: string) => sponsorships.filter((d) => d.supporter_id === id);
+  // The year in view: "all", or one year the deals name. Sponsorships and
+  // Given follow it, and only supporters with a deal that year are listed.
+  const [yearFilter, setYearFilter] = useState<"all" | number>("all");
+  const dealYears = [...new Set(sponsorships.map((d) => d.year).filter((y): y is number => y != null))].sort((a, b) => b - a);
+  const inYear = (d: SponsorshipRow) => yearFilter === "all" || d.year === yearFilter;
+  const dealsOf = (id: string) => sponsorships.filter((d) => d.supporter_id === id && inYear(d));
   const offersOf = (id: string) => offers.filter((o) => o.supporter_id === id);
+  const listed = yearFilter === "all" ? supporters : supporters.filter((s) => dealsOf(s.id).length > 0);
   const signedCents = (id: string) =>
     dealsOf(id)
       .filter((d) => (d.status === "signed" || d.status === "active") && !d.is_in_kind)
@@ -688,23 +694,28 @@ export function SupportersManager({
       </SidePanel>
 
       <DataTable
-        rows={supporters}
+        rows={listed}
         getId={(s) => s.id}
         columns={columns}
         leading={(s) => <Thumb src={supporterLogoUrl(s.logo_path)} initial={s.name.charAt(0).toUpperCase()} />}
         onOpen={(s) => openSupporter(s.id)}
         searchText={(s) => `${s.name} ${s.website ?? ""} ${s.contact_name ?? ""} ${s.contact_email ?? ""}`}
         emptyLabel={t("suEmpty")}
+        filterSlot={
+          <label className="inline-flex items-center gap-2 text-[14px]">
+            <span className="text-black/60">{t("spYear")}</span>
+            <select
+              value={String(yearFilter)}
+              onChange={(e) => setYearFilter(e.target.value === "all" ? "all" : Number(e.target.value))}
+              className="rounded-lg bg-mist px-3 py-2 text-[14px] font-semibold outline-none ring-sea/40 focus:ring-2"
+            >
+              <option value="all">{t("spYearAll")}</option>
+              {dealYears.map((y) => <option key={y} value={String(y)}>{y}</option>)}
+            </select>
+          </label>
+        }
         rowActions={(s) => (
-          <>
-            <button type="button" onClick={() => setDealPanel({ supporterId: s.id, deal: null })} className={rowButton}>+ {t("spNew")}</button>
-            <button type="button" disabled={busy} onClick={() => setActive([s.id], !s.is_active)} className={rowButton}>
-              {s.is_active ? t("table.deactivate") : t("table.activate")}
-            </button>
-            <button type="button" disabled={busy} onClick={() => remove([s.id])} className={`${rowButton} text-red-dark`}>
-              {t("suDelete")}
-            </button>
-          </>
+          <button type="button" onClick={() => setDealPanel({ supporterId: s.id, deal: null })} className={rowButton}>+ {t("spNew")}</button>
         )}
         bulkActions={(ids, clear) => (
           <>
