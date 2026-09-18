@@ -14,10 +14,12 @@ export const dynamic = "force-dynamic";
  */
 export default async function AdminCampaignsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ uredi?: string }>;
 }) {
-  const { locale } = await params;
+  const [{ locale }, { uredi }] = await Promise.all([params, searchParams]);
   const t = await getTranslations("admin");
   const supabase = await createClient();
 
@@ -66,6 +68,7 @@ export default async function AdminCampaignsPage({
         locale={locale as Locale}
         campaigns={rows}
         chapters={(chapters ?? []) as { id: string; name: string }[]}
+        initialOpenId={uredi ?? ""}
       />
     </div>
   );

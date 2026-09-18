@@ -3,13 +3,17 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { DisbursementForm, type ChapterOption } from "@/components/admin/DisbursementForm";
+import { DisbursementForm, type CauseOption, type ChapterOption } from "@/components/admin/DisbursementForm";
 import { SidePanel } from "@/components/console/SidePanel";
 
-/** "+ New disbursement" opens the draft form in a slide-over over the lists. */
-export function DisbursementPanel({ chapters }: { chapters: ChapterOption[] }) {
+/**
+ * "+ New disbursement" opens the draft form in a slide-over over the lists.
+ * A year report's "Record a hand-over" link lands here with the cause
+ * preset, so the panel starts open.
+ */
+export function DisbursementPanel({ chapters, causes, initialCauseId = "" }: { chapters: ChapterOption[]; causes: CauseOption[]; initialCauseId?: string }) {
   const t = useTranslations("admin");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(initialCauseId !== "");
 
   return (
     <>
@@ -21,7 +25,7 @@ export function DisbursementPanel({ chapters }: { chapters: ChapterOption[] }) {
         + {t("disbNew")}
       </button>
       <SidePanel open={open} title={t("disbNewHeading")} onClose={() => setOpen(false)}>
-        <DisbursementForm key={String(open)} chapters={chapters} onDone={() => setOpen(false)} />
+        <DisbursementForm key={String(open)} chapters={chapters} causes={causes} initialCauseId={initialCauseId} onDone={() => setOpen(false)} />
       </SidePanel>
     </>
   );

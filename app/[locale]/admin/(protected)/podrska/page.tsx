@@ -23,7 +23,7 @@ export default async function AdminSupportersPage({
   const [{ data: supporters }, { data: sponsorships }, { data: offers }, { data: chapters }, { data: campaigns }, { data: events }] =
     await Promise.all([
       supabase.from("supporters").select("*").order("name"),
-      supabase.from("sponsors").select("id, supporter_id, tier, chapter_id, campaign_id, event_id, amount_cents, is_in_kind, status").limit(1000),
+      supabase.from("sponsors").select("id, supporter_id, tier, chapter_id, campaign_id, event_id, amount_cents, is_in_kind, status, year").limit(1000),
       supabase.from("perk_challenges").select("id, supporter_id, title, reward_label, is_active, event_id").limit(1000),
       supabase.from("chapters").select("id, name").order("name"),
       supabase.from("campaigns").select("id, title").order("title"),

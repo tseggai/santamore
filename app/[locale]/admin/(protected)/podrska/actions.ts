@@ -39,6 +39,7 @@ const supporterSchema = z.object({
       tier: z.string().trim().max(60).nullable(),
       campaignId: z.string().uuid().nullable(),
       eventId: z.string().uuid().nullable(),
+      year: z.number().int().min(2000).max(2100),
     })
     .optional(),
 });
@@ -99,6 +100,7 @@ export async function saveSupporter(input: unknown): Promise<SupporterActionResu
       amount_cents: gift.isInKind ? null : gift.amountCents,
       is_in_kind: gift.isInKind,
       status: "signed",
+      year: gift.year,
     });
     if (giftError) {
       // The supporter exists; the gift can be added from its panel.
@@ -123,6 +125,8 @@ const sponsorshipSchema = z.object({
   amountCents: z.number().int().min(0).max(MAX_CENTS).nullable(),
   isInKind: z.boolean(),
   status: z.enum(["prospect", "negotiating", "signed", "active", "ended"]),
+  /** The year the deal belongs to on the site; null follows the cause or event's date. */
+  year: z.number().int().min(2000).max(2100).nullable(),
 });
 
 /**
@@ -151,6 +155,7 @@ export async function saveSponsorship(input: unknown): Promise<SupporterActionRe
     amount_cents: data.amountCents,
     is_in_kind: data.isInKind,
     status: data.status,
+    year: data.year,
   };
   const { error } = data.id
     ? await supabase.from("sponsors").update(row).eq("id", data.id).select("id").single()

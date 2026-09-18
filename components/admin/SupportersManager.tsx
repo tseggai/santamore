@@ -40,6 +40,7 @@ export interface SponsorshipRow {
   amount_cents: number | null;
   is_in_kind: boolean;
   status: "prospect" | "negotiating" | "signed" | "active" | "ended";
+  year: number | null;
 }
 
 interface OfferRow {
@@ -85,6 +86,7 @@ export function SupporterForm({
   const [giftTier, setGiftTier] = useState("");
   const [giftCampaignId, setGiftCampaignId] = useState("");
   const [giftEventId, setGiftEventId] = useState("");
+  const [giftYear, setGiftYear] = useState(String(new Date().getFullYear()));
   const [website, setWebsite] = useState(supporter?.website ?? "");
   const [contactName, setContactName] = useState(supporter?.contact_name ?? "");
   const [contactEmail, setContactEmail] = useState(supporter?.contact_email ?? "");
@@ -131,6 +133,7 @@ export function SupporterForm({
           tier: giftTier.trim() || null,
           campaignId: giftCampaignId || null,
           eventId: giftEventId || null,
+          year: /^\d{4}$/.test(giftYear.trim()) ? Number(giftYear.trim()) : new Date().getFullYear(),
         }
       : undefined;
     setState("busy");
@@ -246,6 +249,10 @@ export function SupporterForm({
               <input id="suGiftAmount" type="text" inputMode="decimal" value={giftAmount} onChange={(e) => setGiftAmount(e.target.value)} disabled={giftInKind} placeholder="500" className={`${inputClass} font-mono disabled:opacity-50`} />
             </div>
             <div>
+              <label htmlFor="suGiftYear" className={labelClass}>{t("spYear")}</label>
+              <input id="suGiftYear" type="text" inputMode="numeric" pattern="[0-9]{4}" value={giftYear} onChange={(e) => setGiftYear(e.target.value)} className={`${inputClass} font-mono`} />
+            </div>
+            <div>
               <label htmlFor="suGiftTier" className={labelClass}>{t("spTier")}</label>
               <input id="suGiftTier" type="text" value={giftTier} onChange={(e) => setGiftTier(e.target.value)} placeholder={t("spTierHint")} className={inputClass} />
             </div>
@@ -309,6 +316,7 @@ function SponsorshipForm({
   const [campaignId, setCampaignId] = useState(sponsorship?.campaign_id ?? "");
   const [eventId, setEventId] = useState(sponsorship?.event_id ?? "");
   const [amount, setAmount] = useState(sponsorship?.amount_cents ? String(sponsorship.amount_cents / 100) : "");
+  const [year, setYear] = useState(sponsorship?.year != null ? String(sponsorship.year) : String(new Date().getFullYear()));
   const [inKind, setInKind] = useState(sponsorship?.is_in_kind ?? false);
   const [status, setStatus] = useState<SponsorshipRow["status"]>(sponsorship?.status ?? "signed");
   const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
@@ -331,6 +339,7 @@ function SponsorshipForm({
       amountCents,
       isInKind: inKind,
       status,
+      year: /^\d{4}$/.test(year.trim()) ? Number(year.trim()) : null,
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       router.refresh();
@@ -364,6 +373,11 @@ function SponsorshipForm({
             <option value="">—</option>
             {events.map((ev) => <option key={ev.id} value={ev.id}>{ev.name}</option>)}
           </select>
+        </div>
+        <div>
+          <label htmlFor="spYear" className={labelClass}>{t("spYear")}</label>
+          <input id="spYear" type="text" inputMode="numeric" pattern="[0-9]{4}" required value={year} onChange={(e) => setYear(e.target.value)} className={`${inputClass} font-mono`} />
+          <p className="mt-1 text-[13px] text-black/50">{t("spYearHint")}</p>
         </div>
         <div>
           <label htmlFor="spTier" className={labelClass}>{t("spTier")}</label>
