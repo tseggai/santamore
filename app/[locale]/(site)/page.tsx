@@ -206,7 +206,11 @@ export default async function HomePage({
 
   return (
     <div>
-      <HeroSlides slides={slides} />
+      {/* the hero starts under the transparent header, full height */}
+      {/* negative margin = header height incl. its hairline (py-3 + 40px logo; sm: py-4 + 44px) */}
+      <div className="-mt-[65px] sm:-mt-[77px]">
+        <HeroSlides slides={slides} />
+      </div>
 
       <div className="mx-auto max-w-3xl px-5">
         {/* the promise */}

@@ -127,6 +127,8 @@ const sponsorshipSchema = z.object({
   status: z.enum(["prospect", "negotiating", "signed", "active", "ended"]),
   /** The year the deal belongs to on the site; null follows the cause or event's date. */
   year: z.number().int().min(2000).max(2100).nullable(),
+  /** Operations Fund by default; impact when the money went to beneficiaries. */
+  fund: z.enum(["operations", "impact"]).default("operations"),
 });
 
 /**
@@ -156,6 +158,7 @@ export async function saveSponsorship(input: unknown): Promise<SupporterActionRe
     is_in_kind: data.isInKind,
     status: data.status,
     year: data.year,
+    fund: data.fund,
   };
   const { error } = data.id
     ? await supabase.from("sponsors").update(row).eq("id", data.id).select("id").single()

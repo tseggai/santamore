@@ -49,6 +49,9 @@ export function GiftDialog({
   }, [open]);
 
   const total = gifts.reduce((sum, g) => sum + (g.amount_cents ?? 0), 0);
+  const cash = gifts.filter((g) => g.amount_cents != null && g.amount_cents > 0);
+  const allImpact = cash.length > 0 && cash.every((g) => g.fund === "impact");
+  const mixed = cash.some((g) => g.fund === "impact") && !allImpact;
   const inKindOnly = total === 0 && gifts.some((g) => g.in_kind);
 
   return (
@@ -109,7 +112,7 @@ export function GiftDialog({
             ))}
           </ul>
 
-          <p className="mt-3 text-[13.5px] leading-relaxed text-black/60">{note}</p>
+          <p className="mt-3 text-[13.5px] leading-relaxed text-black/60">{allImpact ? t("giftImpactNote") : mixed ? `${note} ${t("giftMixedNote")}` : note}</p>
           {extra}
           {website ? (
             <a href={website} target="_blank" rel="noopener" className="mt-3 inline-block text-[14px] font-semibold text-sea underline underline-offset-2">

@@ -8,6 +8,8 @@ export interface GiftDetail {
   target: string | null;
   /** ISO date of the cause or event, when known. */
   date: string | null;
+  /** Where the money went: the Operations Fund, or the beneficiaries. */
+  fund?: "operations" | "impact";
 }
 
 /** One supporter as the public site shows it: who, and what they gave. */
@@ -21,6 +23,8 @@ export interface PublicSponsor {
   website: string | null;
   /** Cash given, in cents; 0 when everything was in kind or an offer. */
   cash_cents: number;
+  /** The part of cash_cents that went to beneficiaries rather than operations. */
+  impact_cents?: number;
   in_kind: boolean;
   tiers: string[];
   offers: number;

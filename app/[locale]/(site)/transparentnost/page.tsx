@@ -114,6 +114,7 @@ interface DealRow {
   supporter_id: string | null;
   tier: string | null;
   is_in_kind: boolean;
+  fund: "operations" | "impact";
   amount_cents: number | null;
   campaign_title: string | null;
   event_name: string | null;
@@ -143,10 +144,10 @@ async function fetchLedger(year: number | null) {
       ? supabase.from("v_public_events").select("slug, name, starts_at, venue, kind").gte("starts_at", from).lt("starts_at", to).order("starts_at")
       : Promise.resolve({ data: [] as EventRow[] }),
     year
-      ? supabase.from("v_public_year_supporters").select("id, name, slug, kind, logo_path, website, cash_cents, in_kind, tiers, offers").eq("year", year)
+      ? supabase.from("v_public_year_supporters").select("id, name, slug, kind, logo_path, website, cash_cents, impact_cents, in_kind, tiers, offers").eq("year", year)
       : Promise.resolve({ data: [] as SupporterRow[] }),
     year
-      ? supabase.from("v_public_sponsors").select("supporter_id, tier, is_in_kind, amount_cents, campaign_title, event_name, starts_at").eq("year", year)
+      ? supabase.from("v_public_sponsors").select("supporter_id, tier, is_in_kind, fund, amount_cents, campaign_title, event_name, starts_at").eq("year", year)
       : Promise.resolve({ data: [] as DealRow[] }),
     year
       ? supabase.from("v_public_campaigns").select("slug, title, starts_at").gte("starts_at", from).lt("starts_at", to).order("starts_at")
@@ -166,7 +167,7 @@ async function fetchLedger(year: number | null) {
   for (const d of (deals.data ?? []) as DealRow[]) {
     if (!d.supporter_id) continue;
     const list = giftsOf.get(d.supporter_id) ?? [];
-    list.push({ amount_cents: d.is_in_kind ? null : d.amount_cents, in_kind: d.is_in_kind, tier: d.tier, target: d.event_name ?? d.campaign_title, date: d.starts_at });
+    list.push({ amount_cents: d.is_in_kind ? null : d.amount_cents, in_kind: d.is_in_kind, tier: d.tier, target: d.event_name ?? d.campaign_title, date: d.starts_at, fund: d.fund });
     giftsOf.set(d.supporter_id, list);
   }
   return {
@@ -243,6 +244,8 @@ export default async function LedgerPage({
     ...recordedDonorRows,
   ]);
   const sponsorCash = supporters.reduce((sum, su) => sum + su.cash_cents, 0);
+  // Sponsorship cash that went to beneficiaries counts as raised, not as operations.
+  const sponsorImpact = supporters.reduce((sum, su) => sum + (su.impact_cents ?? 0), 0);
   const listSum = (rows: { amount_cents: number | null }[]) => rows.reduce((sum, row) => sum + (row.amount_cents ?? 0), 0);
   // Hand-overs of the year grouped by their public label: the ledger's
   // published rows plus what was recorded before the ledger.
@@ -444,6 +447,12 @@ export default async function LedgerPage({
               {sponsorCash > 0 ? (
                 <p className="mb-3 text-[14px] text-black/60">
                   <span className="font-mono text-[15px] font-bold tabular-nums text-sea">{money(sponsorCash)}</span> {tYears("sponsorCash")}
+                  {sponsorImpact > 0 ? (
+                    <>
+                      {" · "}
+                      {sponsorImpact === sponsorCash ? tYears("sponsorAllImpact") : tYears("sponsorPartImpact", { amount: money(sponsorImpact) })}
+                    </>
+                  ) : null}
                 </p>
               ) : null}
               {supporters.length === 0 ? emptyLine(tYears("noSupporters")) : <SponsorGrid sponsors={supporters} inKindLabel={tYears("inKind")} />}
