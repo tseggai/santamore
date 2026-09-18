@@ -25,7 +25,8 @@
       "faq": "Česta pitanja",
       "volunteer": "Volontiraj",
       "apply": "Prijava za pomoć",
-      "contact": "Kontakt"
+      "contact": "Kontakt",
+      "beneficiaries": "Korisnici"
     }
   },
   "home": {
@@ -129,7 +130,8 @@
       "contact": "Kontakt",
       "how": "Kako radimo",
       "campaigns": "Ciljevi",
-      "challenges": "Izazovi"
+      "challenges": "Izazovi",
+      "beneficiaries": "Korisnici"
     },
     "cards": "[[PLACEHOLDER: logotipi prihvaćenih kartica]]",
     "note": "Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori."
@@ -1075,10 +1077,23 @@
     "galleryEmptyScoped": "Još nema fotografija.",
     "evOfferPending": "Čuva se uz događaj",
     "evOffersQueuedHint": "Ponude koje ovdje dodaš čuvaju se čim se događaj napravi.",
-    "galleryLooseHeading": "Fotografije bez događaja ili cilja",
-    "galleryLooseHint": "Sve ostalo stoji uz svoj događaj ili cilj. Otvori ga da urediš fotografije.",
     "sitePagesHeading": "Stranice",
     "sitePagesHint": "Stranice O nama i Kako radimo, na sva tri jezika. Prazno polje prikazuje isporučeni tekst.",
+    "bnHeading": "Korisnici",
+    "bnHint": "Do koga je novac stigao: priča na svakom jeziku, fotografija uz saglasnost, sajt i cilj koji ih je dosegao. Objavljeni se prikazuju na stranici Korisnici i na svom cilju.",
+    "bnNew": "Novi korisnik",
+    "bnCreate": "Dodaj korisnika",
+    "bnEmpty": "Još nema korisnika.",
+    "bnPublished": "Objavljeno",
+    "bnDraft": "Nacrt",
+    "bnLanguages": "Priča na",
+    "bnName": "Naziv",
+    "bnWebsiteHint": "Dugme „Više o korisniku“ vodi ovdje.",
+    "bnCauseHint": "Cilj čiji je novac stigao do njih; priča se onda prikazuje i na tom cilju.",
+    "bnStory": "Priča",
+    "bnStoryHint": "Običan tekst ili Markdown. Prazan jezik prikazuje prvi napisani.",
+    "bnPublish": "Objavljeno na sajtu",
+    "bnDeleteConfirm": "Obrisati „{name}“ i fotografiju? Ovo se ne može poništiti.",
     "sitePage": {
       "about": "O nama",
       "how": "Kako radimo"
@@ -1496,7 +1511,9 @@
     "ledgerFull": "Pogledaj cijelu knjigu",
     "viaPage": "preko {title}",
     "close": "Zatvori",
-    "raiseCta": "Prikupljaj za ovaj cilj"
+    "raiseCta": "Prikupljaj za ovaj cilj",
+    "beneficiariesHeading": "Do koga je ovaj cilj stigao",
+    "beneficiaryMore": "Više o njima"
   },
   "perks": {
     "title": "Izazovi partnera",
@@ -1781,5 +1798,13 @@
     "rankLabel": "#{rank}",
     "continue": "Nastavi",
     "back": "Nazad na pitanja"
+  },
+  "beneficiaries": {
+    "eyebrow": "Korisnici",
+    "title": "Do koga je stigao tvoj euro",
+    "sub": "Centri, domovi i porodice do kojih su naši ciljevi stigli, njihovim i našim riječima. Svaka predaja njima stoji u javnoj knjizi.",
+    "empty": "Prve priče se pojavljuju ovdje kad objavimo predaju.",
+    "more": "Više o njima",
+    "cause": "Cilj"
   }
 }

@@ -28,3 +28,8 @@ export function galleryImageUrl(path: string | null): string | null {
 export function teamPhotoUrl(path: string | null): string | null {
   return publicStorageUrl("team-photos", path);
 }
+
+/** Beneficiary photos, published with consent. */
+export function beneficiaryPhotoUrl(path: string | null): string | null {
+  return publicStorageUrl("beneficiary-photos", path);
+}

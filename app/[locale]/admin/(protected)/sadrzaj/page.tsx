@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
-import { GalleryManager, type GalleryAdminItem } from "@/components/admin/GalleryManager";
+import { BeneficiariesManager, type BeneficiaryRow } from "@/components/admin/BeneficiariesManager";
 import { PostsManager } from "@/components/admin/PostsManager";
 import { SitePagesManager, type SitePageRow } from "@/components/admin/SitePagesManager";
 import { aboutContent } from "@/content/site/about";
@@ -23,25 +23,21 @@ export default async function AdminContentPage({
   const t = await getTranslations("admin");
   const supabase = await createClient();
 
-  const [{ data: postsData }, { data: galleryData }, { data: sitePagesData }] =
+  const [{ data: postsData }, { data: beneficiariesData }, { data: sitePagesData }, { data: causesData }] =
     await Promise.all([
       supabase
         .from("posts")
         .select("id, locale, slug, title, excerpt, body_md, cover_path, published_at")
         .order("published_at", { ascending: false, nullsFirst: true })
         .limit(100),
-      supabase
-        .from("gallery_items")
-        .select("id, storage_path, caption, credit, is_published, event_id, campaign_id")
-        .is("event_id", null)
-        .is("campaign_id", null)
-        .order("sort_order", { ascending: false })
-        .limit(120),
+      supabase.from("beneficiaries").select("*").order("sort_order").order("name").limit(500),
       supabase.from("site_pages").select("page, locale, content, updated_at"),
+      supabase.from("campaigns").select("id, title").order("starts_at", { ascending: false }).limit(300),
     ]);
 
   const posts = (postsData ?? []) as EditablePost[];
-  const gallery = (galleryData ?? []) as GalleryAdminItem[];
+  const beneficiaries = (beneficiariesData ?? []) as BeneficiaryRow[];
+  const causes = ((causesData ?? []) as { id: string; title: string }[]).map((c) => ({ id: c.id, title: c.title }));
 
   const sitePages = (sitePagesData ?? []) as SitePageRow[];
   const shipped = {
@@ -61,9 +57,9 @@ export default async function AdminContentPage({
         <PostsManager posts={posts} initialPostId={postId} title={t("contentTitle")} lead={t("contentLead")} />
       </div>
 
-      <h2 className="mt-12 text-[16px] font-bold">{t("galleryLooseHeading")}</h2>
-      <p className="mt-1 text-[14px] text-black/60">{t("galleryLooseHint")}</p>
-      <GalleryManager items={gallery} />
+      <div className="mt-12">
+        <BeneficiariesManager rows={beneficiaries} causes={causes} />
+      </div>
     </div>
   );
 }

@@ -23,6 +23,7 @@ const NAV_ITEMS = [
 const ABOUT_ITEMS = [
   { href: "/o-nama", key: "about" },
   { href: "/kako-radimo", key: "how" },
+  { href: "/korisnici", key: "beneficiaries" },
   { href: "/partneri", key: "partners" },
   { href: "/vijesti", key: "news" },
   { href: "/galerija", key: "gallery" },

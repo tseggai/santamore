@@ -13,6 +13,7 @@ const SITE_LINKS = [
   { href: "/transparentnost", key: "ledger" },
   { href: "/podrzi", key: "donate" },
   { href: "/prikupljaci", key: "fundraisers" },
+  { href: "/korisnici", key: "beneficiaries" },
   { href: "/partneri", key: "partners" },
   { href: "/vijesti", key: "news" },
   { href: "/cesta-pitanja", key: "faq" },

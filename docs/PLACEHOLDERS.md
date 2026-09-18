@@ -32,4 +32,4 @@ text are never invented — see CLAUDE.md.
 | Official "Connect with Strava" button asset and "Powered by Strava" mark | `components/dashboard/StravaPanel.tsx` uses a text button in Strava orange until the official PNG/SVG from developers.strava.com/guidelines is added to `public/brand/` | Strava brand guidelines compliance before launch |
 | Legal review of the perks use of Strava data against the Strava API Agreement (per-user display rule, deletion on deauthorisation) | `docs/STRAVA.md` § Compliance | Before the first partner challenge goes live |
 | Partner cafe name, reward wording, daily capacity and PIN | `/admin/izazovi` form | First live challenge |
-
+| Santamore 25 event date (seeded as the cause's December 2025 placeholder) | Admin → Events → Santamore 25 → date | `/dogadjaji`, 2025 on Transparency |
