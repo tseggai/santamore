@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 
+import { BeneficiaryStories, type PublicBeneficiary } from "@/components/beneficiaries/BeneficiaryStories";
 import { CauseLedgerDialog } from "@/components/campaigns/CauseLedgerDialog";
 import { DonateButton } from "@/components/donate/DonateButton";
 import type { GalleryImage } from "@/components/gallery/GalleryGrid";
@@ -35,6 +36,8 @@ export interface CampaignView {
   events: CampaignEventItem[];
   cover_path?: string | null;
   gallery?: GalleryImage[];
+  /** Who this cause reached, with their stories. */
+  beneficiaries?: PublicBeneficiary[];
 }
 
 /**
@@ -185,6 +188,15 @@ export function CampaignPageView({
           {t("fundraisersLink")}
         </Link>
       </p>
+
+      {campaign.beneficiaries && campaign.beneficiaries.length > 0 ? (
+        <section className="mt-12 border-t-[0.5px] border-line pt-10">
+          <p className="type-eyebrow text-sea/80">{t("beneficiariesHeading")}</p>
+          <div className="mt-6">
+            <BeneficiaryStories rows={campaign.beneficiaries} locale={locale} labels={{ more: t("beneficiaryMore"), cause: "" }} showCause={false} />
+          </div>
+        </section>
+      ) : null}
 
       {campaign.gallery && campaign.gallery.length > 0 ? (
         <PublicGallery images={campaign.gallery} heading={t("galleryHeading")} />

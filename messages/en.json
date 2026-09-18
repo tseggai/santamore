@@ -25,7 +25,8 @@
       "faq": "FAQ",
       "volunteer": "Volunteer",
       "apply": "Apply for help",
-      "contact": "Contact"
+      "contact": "Contact",
+      "beneficiaries": "Beneficiaries"
     }
   },
   "home": {
@@ -129,7 +130,8 @@
       "contact": "Contact",
       "how": "How we work",
       "campaigns": "Causes",
-      "challenges": "Challenges"
+      "challenges": "Challenges",
+      "beneficiaries": "Beneficiaries"
     },
     "cards": "[[PLACEHOLDER: accepted card brand logos]]",
     "note": "Not one cent of donations goes to salaries or overhead. Sponsors pay for those."
@@ -1075,10 +1077,23 @@
     "galleryEmptyScoped": "No photos yet.",
     "evOfferPending": "Saved with the event",
     "evOffersQueuedHint": "Offers you add here are saved the moment the event is created.",
-    "galleryLooseHeading": "Photos without an event or cause",
-    "galleryLooseHint": "Everything else lives with its event or cause. Open one to manage its photos.",
     "sitePagesHeading": "Pages",
     "sitePagesHint": "The About us and How we work pages, in all three languages. A field left empty shows the shipped text.",
+    "bnHeading": "Beneficiaries",
+    "bnHint": "Who the money reached: a story in each language, a photo with consent, their website and the cause that reached them. Published ones appear on the Beneficiaries page and on their cause.",
+    "bnNew": "New beneficiary",
+    "bnCreate": "Add beneficiary",
+    "bnEmpty": "No beneficiaries yet.",
+    "bnPublished": "Published",
+    "bnDraft": "Draft",
+    "bnLanguages": "Story in",
+    "bnName": "Name",
+    "bnWebsiteHint": "The “More about” button links here.",
+    "bnCauseHint": "The cause whose money reached them; the story then shows on that cause too.",
+    "bnStory": "Story",
+    "bnStoryHint": "Plain text or Markdown. A language left empty shows the first one written.",
+    "bnPublish": "Published on the site",
+    "bnDeleteConfirm": "Delete “{name}” and their photo? This cannot be undone.",
     "sitePage": {
       "about": "About us",
       "how": "How we work"
@@ -1496,7 +1511,9 @@
     "ledgerFull": "See the full ledger",
     "viaPage": "via {title}",
     "close": "Close",
-    "raiseCta": "Raise money for this cause"
+    "raiseCta": "Raise money for this cause",
+    "beneficiariesHeading": "Who this cause reached",
+    "beneficiaryMore": "More about them"
   },
   "perks": {
     "title": "Partner challenges",
@@ -1781,5 +1798,13 @@
     "rankLabel": "#{rank}",
     "continue": "Continue",
     "back": "Back to the questions"
+  },
+  "beneficiaries": {
+    "eyebrow": "Beneficiaries",
+    "title": "Who your euro reached",
+    "sub": "The centres, homes and families our causes reached, in their own words and ours. Every hand-over to them sits in the public ledger.",
+    "empty": "The first stories appear here once a hand-over is published.",
+    "more": "More about them",
+    "cause": "Cause"
   }
 }

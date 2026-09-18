@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
+import type { PublicBeneficiary } from "@/components/beneficiaries/BeneficiaryStories";
 import {
   CampaignPageView,
   type CampaignEventItem,
@@ -16,7 +17,7 @@ export const dynamic = "force-dynamic";
 async function fetchCampaign(slug: string): Promise<CampaignView | null> {
   try {
     const supabase = await createClient();
-    const [{ data: campaign }, { data: events }, { data: galleryRows }] = await Promise.all([
+    const [{ data: campaign }, { data: events }, { data: galleryRows }, { data: beneficiaryRows }] = await Promise.all([
       supabase
         .from("v_public_campaigns")
         .select(
@@ -35,12 +36,18 @@ async function fetchCampaign(slug: string): Promise<CampaignView | null> {
         .eq("campaign_slug", slug)
         .order("sort_order", { ascending: true })
         .limit(120),
+      supabase
+        .from("v_public_beneficiaries")
+        .select("id, slug, name, website, photo_path, story, campaign_slug, campaign_title")
+        .eq("campaign_slug", slug)
+        .order("sort_order"),
     ]);
     if (!campaign) return null;
     return {
       ...(campaign as Omit<CampaignView, "events">),
       events: (events ?? []) as CampaignEventItem[],
       gallery: toGalleryImages((galleryRows ?? []) as PublicGalleryRow[]),
+      beneficiaries: (beneficiaryRows ?? []) as PublicBeneficiary[],
     };
   } catch {
     return null;
