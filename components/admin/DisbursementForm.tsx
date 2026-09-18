@@ -13,6 +13,11 @@ export interface ChapterOption {
   name: string;
 }
 
+export interface CauseOption {
+  id: string;
+  title: string;
+}
+
 type State = "idle" | "busy" | "error";
 
 const inputClass =
@@ -23,7 +28,7 @@ const inputClass =
  * disbursement-docs bucket (staff-only write policy) before the insert, so
  * the row is born with its proof attached.
  */
-export function DisbursementForm({ chapters, onDone }: { chapters: ChapterOption[]; onDone?: () => void }) {
+export function DisbursementForm({ chapters, causes = [], initialCauseId = "", onDone }: { chapters: ChapterOption[]; causes?: CauseOption[]; initialCauseId?: string; onDone?: () => void }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [state, setState] = useState<State>("idle");
@@ -61,6 +66,7 @@ export function DisbursementForm({ chapters, onDone }: { chapters: ChapterOption
     const decidedRaw = String(form.get("decided") ?? "");
     const result = await createDisbursement({
       chapterId: String(form.get("chapter") ?? ""),
+      campaignId: String(form.get("cause") ?? "") || null,
       label: String(form.get("label") ?? ""),
       privateNote: String(form.get("note") ?? ""),
       category: String(form.get("category") ?? ""),
@@ -91,6 +97,16 @@ export function DisbursementForm({ chapters, onDone }: { chapters: ChapterOption
             </option>
           ))}
         </select>
+      </label>
+      <label className="text-[14px] font-semibold">
+        {t("disbCause")}
+        <select name="cause" defaultValue={initialCauseId} className={inputClass}>
+          <option value="">—</option>
+          {causes.map((cause) => (
+            <option key={cause.id} value={cause.id}>{cause.title}</option>
+          ))}
+        </select>
+        <span className="mt-1 block text-[13px] font-normal text-black/50">{t("disbCauseHint")}</span>
       </label>
       <label className="text-[14px] font-semibold">
         {t("disbLabel")}

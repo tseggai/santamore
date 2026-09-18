@@ -15,6 +15,8 @@ export interface ActionResult {
 
 const createSchema = z.object({
   chapterId: z.string().uuid(),
+  /** The cause the money came from; a hand-over then counts for that cause and its year. */
+  campaignId: z.string().uuid().nullable().optional(),
   label: z.string().trim().min(3).max(200),
   privateNote: z.string().trim().max(2000).optional(),
   category: z.string().trim().max(80).optional(),
@@ -33,6 +35,7 @@ export async function createDisbursement(input: unknown): Promise<ActionResult> 
   const supabase = await createClient();
   const { error } = await supabase.from("disbursements").insert({
     chapter_id: data.chapterId,
+    campaign_id: data.campaignId ?? null,
     beneficiary_label: data.label,
     beneficiary_private_note: data.privateNote || null,
     category: data.category || null,

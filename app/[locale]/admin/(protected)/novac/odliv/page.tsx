@@ -29,14 +29,16 @@ function one<T>(value: T | T[] | null): T | null {
 
 export default async function AdminDisbursementsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ cilj?: string }>;
 }) {
-  const { locale } = await params;
+  const [{ locale }, { cilj }] = await Promise.all([params, searchParams]);
   const t = await getTranslations("admin");
   const supabase = await createClient();
 
-  const [{ data: chaptersData }, { data: rowsData }] = await Promise.all([
+  const [{ data: chaptersData }, { data: rowsData }, { data: causesData }] = await Promise.all([
     supabase.from("chapters").select("id, name").order("name"),
     supabase
       .from("disbursements")
@@ -45,6 +47,7 @@ export default async function AdminDisbursementsPage({
       )
       .order("published_at", { ascending: false, nullsFirst: true })
       .limit(200),
+    supabase.from("campaigns").select("id, title").order("starts_at", { ascending: false }).limit(200),
   ]);
   const chapters = (chaptersData ?? []) as ChapterOption[];
   const rows = (rowsData ?? []) as unknown as DisbursementRow[];
@@ -124,7 +127,11 @@ export default async function AdminDisbursementsPage({
       {chapters.length === 0 ? (
         <p className="mt-2 text-[14.5px] text-black/60">{t("disbNoChapters")}</p>
       ) : (
-        <DisbursementPanel chapters={chapters} />
+        <DisbursementPanel
+          chapters={chapters}
+          causes={((causesData ?? []) as { id: string; title: string }[]).map((c) => ({ id: c.id, title: c.title }))}
+          initialCauseId={cilj && /^[0-9a-f-]{36}$/.test(cilj) ? cilj : ""}
+        />
       )}
 
       <h2 className="mt-10 text-[16px] font-bold">{t("disbDraftHeading")}</h2>
