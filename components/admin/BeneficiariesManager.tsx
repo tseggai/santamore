@@ -80,11 +80,7 @@ export function BeneficiariesManager({ rows, causes }: { rows: BeneficiaryRow[];
 
   return (
     <>
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="text-[16px] font-bold">{t("bnHeading")}</h2>
-          <p className="mt-1 max-w-2xl text-[14px] text-black/60">{t("bnHint")}</p>
-        </div>
+      <div className="flex justify-end">
         <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
           + {t("bnNew")}
         </button>

@@ -154,7 +154,7 @@ export async function approveRegistrationFee(input: unknown): Promise<ActionResu
   if (error) return { ok: false };
 
   revalidatePath("/[locale]/admin/novac", "layout");
-  revalidatePath("/[locale]/admin/prijave", "page");
+  revalidatePath("/[locale]/admin/dogadjaji", "layout");
   return { ok: true };
 }
 

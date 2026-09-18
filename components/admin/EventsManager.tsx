@@ -42,9 +42,12 @@ export function EventsManager({
   dateLabels,
   title,
   lead,
+  initialOpenId = "",
 }: {
   title: string;
   lead: string;
+  /** An event to open straight away, e.g. from the Photos overview. */
+  initialOpenId?: string;
   events: EventListRow[];
   chapters: Option[];
   campaigns: Option[];
@@ -55,7 +58,7 @@ export function EventsManager({
 }) {
   const t = useTranslations("admin");
   const router = useRouter();
-  const [open, setOpen] = useState<"" | "new" | string>("");
+  const [open, setOpen] = useState<"" | "new" | string>(events.some((e) => e.id === initialOpenId) ? initialOpenId : "");
   const [busy, setBusy] = useState<string | null>(null);
   const openEvent = events.find((candidate) => candidate.id === open) ?? null;
 
@@ -120,7 +123,7 @@ export function EventsManager({
       header: t("table.colRegistrations"),
       align: "center",
       cell: (e) => (
-        <Link href={`/admin/prijave?event=${e.id}`} className="underline underline-offset-2 hover:text-sea">{e.registrations}</Link>
+        <Link href={`/admin/dogadjaji/prijave?event=${e.id}`} className="underline underline-offset-2 hover:text-sea">{e.registrations}</Link>
       ),
       sort: (e) => e.registrations,
     },

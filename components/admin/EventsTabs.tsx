@@ -4,14 +4,14 @@ import { useTranslations } from "next-intl";
 
 import { SectionTabs } from "@/components/console/SectionTabs";
 
-export function CausesTabs() {
+export function EventsTabs() {
   const t = useTranslations("admin");
   return (
     <SectionTabs
-      ariaLabel={t("navCampaigns")}
+      ariaLabel={t("navEvents")}
       tabs={[
-        { href: "/admin/kampanje", label: t("causesTabCauses"), exact: true },
-        { href: "/admin/kampanje/prijedlozi", label: t("causesTabProposals") },
+        { href: "/admin/dogadjaji", label: t("eventsTabEvents"), exact: true },
+        { href: "/admin/dogadjaji/prijave", label: t("eventsTabRegistrations") },
       ]}
     />
   );

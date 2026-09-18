@@ -34,10 +34,12 @@ interface EventRow {
 /** Brief §4: /admin/dogadjaji — create and edit events. Staff session; RLS enforces. */
 export default async function AdminEventsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ uredi?: string }>;
 }) {
-  const { locale } = await params;
+  const [{ locale }, { uredi }] = await Promise.all([params, searchParams]);
   const t = await getTranslations("admin");
   const supabase = await createClient();
 
@@ -136,6 +138,7 @@ export default async function AdminEventsPage({
         supporters={(supporters ?? []) as { id: string; name: string }[]}
         webhook={webhook}
         dateLabels={dateLabels}
+        initialOpenId={uredi ?? ""}
       />
     </div>
   );

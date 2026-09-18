@@ -45,6 +45,6 @@ export async function saveSitePage(input: unknown): Promise<SitePageResult> {
   }
   revalidatePath("/[locale]/o-nama", "page");
   revalidatePath("/[locale]/kako-radimo", "page");
-  revalidatePath("/[locale]/admin/sadrzaj", "page");
+  revalidatePath("/[locale]/admin/podesavanja", "layout");
   return { ok: true };
 }

@@ -74,7 +74,7 @@ export async function savePost(input: unknown): Promise<ActionResult> {
     if (error) return { ok: false, detail: error.code === "23505" ? "slug" : error.message };
   }
 
-  revalidatePath("/[locale]/admin/sadrzaj", "page");
+  revalidatePath("/[locale]/admin/podesavanja", "layout");
   revalidatePath("/[locale]/vijesti", "layout");
   return { ok: true };
 }
@@ -121,7 +121,7 @@ export async function addGalleryItems(input: unknown): Promise<ActionResult> {
 }
 
 function revalidateGallery() {
-  revalidatePath("/[locale]/admin/sadrzaj", "page");
+  revalidatePath("/[locale]/admin/podesavanja", "layout");
   revalidatePath("/[locale]/admin/dogadjaji", "page");
   revalidatePath("/[locale]/admin/kampanje", "page");
   revalidatePath("/[locale]/galerija", "page");
@@ -246,7 +246,7 @@ export async function savePostGroup(input: unknown): Promise<PostGroupResult> {
     ids[locale] = saved.id;
   }
 
-  revalidatePath("/[locale]/admin/sadrzaj", "page");
+  revalidatePath("/[locale]/admin/podesavanja", "layout");
   revalidatePath("/[locale]/vijesti", "layout");
   return { ok: true, ids };
 }

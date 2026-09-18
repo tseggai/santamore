@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { createCauseInline, createChapter, saveEvent } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
+import { Link } from "@/i18n/navigation";
+import { createChapter, saveEvent } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
 import { DateTimeField } from "@/components/admin/DateTimeField";
 import { CoverField } from "@/components/admin/CoverField";
 import { GalleryManager, type GalleryAdminItem } from "@/components/admin/GalleryManager";
@@ -133,10 +134,8 @@ export function EventForm({
   const [chapterId, setChapterId] = useState(event?.chapter_id ?? initialChapters[0]?.id ?? "");
   const [newChapter, setNewChapter] = useState<string | null>(null);
   const [chapterBusy, setChapterBusy] = useState(false);
-  const [campaigns, setCampaigns] = useState(initialCampaigns);
+  const campaigns = initialCampaigns;
   const [campaignId, setCampaignId] = useState(event?.campaign_id ?? "");
-  const [newCause, setNewCause] = useState<{ title: string; goal: string } | null>(null);
-  const [causeBusy, setCauseBusy] = useState(false);
   const [startsAt, setStartsAt] = useState(toLocalInput(event?.starts_at ?? null));
   const [endsAt, setEndsAt] = useState(toLocalInput(event?.ends_at ?? null));
   const [venue, setVenue] = useState(event?.venue ?? "");
@@ -200,25 +199,6 @@ export function EventForm({
       setChapters((list) => [...list, result.chapter!]);
       setChapterId(result.chapter.id);
       setNewChapter(null);
-    } else {
-      setState("error");
-    }
-  };
-
-  const addCause = async () => {
-    if (!newCause || newCause.title.trim().length < 2 || !chapterId) return;
-    const goal = newCause.goal.trim() === "" ? null : eurosToCents(newCause.goal);
-    if (newCause.goal.trim() !== "" && goal === null) {
-      setState("invalid");
-      return;
-    }
-    setCauseBusy(true);
-    const result = await createCauseInline({ title: newCause.title.trim(), goalCents: goal, chapterId }).catch(() => ({ ok: false as const }));
-    setCauseBusy(false);
-    if (result.ok && "cause" in result && result.cause) {
-      setCampaigns((list) => [...list, result.cause!]);
-      setCampaignId(result.cause.id);
-      setNewCause(null);
     } else {
       setState("error");
     }
@@ -396,32 +376,16 @@ export function EventForm({
         </div>
         <div>
           <label htmlFor="evCampaign" className={labelClass}>{t("evCampaign")}</label>
-          {newCause === null ? (
-            <>
-              <select id="evCampaign" value={campaignId} onChange={(e) => setCampaignId(e.target.value)} className={inputClass}>
-                <option value="">{t("evCauseNone")}</option>
-                {campaigns.map((campaign) => (
-                  <option key={campaign.id} value={campaign.id}>{campaign.name}</option>
-                ))}
-              </select>
-              <p className="mt-1 text-[13px] text-black/55">{t("evCauseHint")}</p>
-              <button type="button" onClick={() => setNewCause({ title: name, goal: "" })} className="mt-1.5 text-[13.5px] font-semibold text-sea underline underline-offset-2">
-                {t("evNewCause")}
-              </button>
-            </>
-          ) : (
-            <div className="mt-1 space-y-2">
-              <input type="text" value={newCause.title} onChange={(e) => setNewCause({ ...newCause, title: e.target.value })} placeholder={t("evCauseTitle")} aria-label={t("evCauseTitle")} className={`${inputClass} mt-0`} />
-              <div className="flex gap-2">
-                <span className="flex flex-1 items-center gap-1">
-                  <span aria-hidden className="text-black/50">€</span>
-                  <input type="text" inputMode="decimal" value={newCause.goal} onChange={(e) => setNewCause({ ...newCause, goal: e.target.value })} placeholder={t("evCauseGoal")} aria-label={t("evCauseGoal")} className={`${inputClass} mt-0 font-mono`} />
-                </span>
-                <button type="button" disabled={causeBusy} onClick={addCause} className="shrink-0 rounded-lg bg-ink px-3 py-2 text-[14px] font-bold text-paper disabled:opacity-60">{t("evChapterCreate")}</button>
-                <button type="button" onClick={() => setNewCause(null)} className="shrink-0 rounded-lg bg-paper px-3 py-2 text-[14px] font-semibold">{t("cancel")}</button>
-              </div>
-            </div>
-          )}
+          <select id="evCampaign" value={campaignId} onChange={(e) => setCampaignId(e.target.value)} className={inputClass}>
+            <option value="">{t("evCauseNone")}</option>
+            {campaigns.map((campaign) => (
+              <option key={campaign.id} value={campaign.id}>{campaign.name}</option>
+            ))}
+          </select>
+          <p className="mt-1 text-[13px] text-black/55">{t("evCauseHint")}</p>
+          <Link href="/admin/kampanje" className="mt-1.5 inline-block text-[13.5px] font-semibold text-sea underline underline-offset-2">
+            {t("evNewCause")} →
+          </Link>
           <p className="mt-1 text-[13px] text-black/55">{t("evCampaignHint")}</p>
         </div>
       </div>
