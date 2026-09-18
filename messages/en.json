@@ -8,14 +8,25 @@
   "nav": {
     "events": "Events",
     "fundraisers": "Fundraisers",
-    "ledger": "Transparency",
+    "ledger": "Money",
     "about": "About us",
     "donate": "Donate",
     "menu": "Menu",
     "campaigns": "Causes",
     "challenges": "Challenges",
     "myPage": "My fundraising page",
-    "menuClose": "Close menu"
+    "menuClose": "Close menu",
+    "aboutMenu": {
+      "about": "About us",
+      "how": "How we work",
+      "partners": "Partners",
+      "news": "News",
+      "gallery": "Gallery",
+      "faq": "FAQ",
+      "volunteer": "Volunteer",
+      "apply": "Apply for help",
+      "contact": "Contact"
+    }
   },
   "home": {
     "eyebrow": "Montenegrin non-profit · Tivat",
@@ -122,7 +133,7 @@
       "about": "About us",
       "events": "Events",
       "gallery": "Gallery",
-      "ledger": "Transparency",
+      "ledger": "Money",
       "donate": "Donate",
       "fundraisers": "Fundraisers",
       "partners": "Partners",
@@ -866,6 +877,7 @@
     "spTierHint": "e.g. gold, silver, media",
     "spYear": "Year",
     "spYearHint": "The year this deal counts for on the site.",
+    "spYearAll": "All years",
     "spFund": "Which fund",
     "spFundValue": {
       "operations": "Operations Fund — pays for the team",

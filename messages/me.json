@@ -8,14 +8,25 @@
   "nav": {
     "events": "Događaji",
     "fundraisers": "Prikupljači",
-    "ledger": "Transparentnost",
+    "ledger": "Novac",
     "about": "O nama",
     "donate": "Podrži",
     "menu": "Meni",
     "campaigns": "Ciljevi",
     "challenges": "Izazovi",
     "myPage": "Moja stranica za prikupljanje",
-    "menuClose": "Zatvori meni"
+    "menuClose": "Zatvori meni",
+    "aboutMenu": {
+      "about": "O nama",
+      "how": "Kako radimo",
+      "partners": "Partneri",
+      "news": "Vijesti",
+      "gallery": "Galerija",
+      "faq": "Česta pitanja",
+      "volunteer": "Volontiraj",
+      "apply": "Prijava za pomoć",
+      "contact": "Kontakt"
+    }
   },
   "home": {
     "eyebrow": "Crnogorska neprofitna organizacija · Tivat",
@@ -122,7 +133,7 @@
       "about": "O nama",
       "events": "Događaji",
       "gallery": "Galerija",
-      "ledger": "Transparentnost",
+      "ledger": "Novac",
       "donate": "Podrži",
       "fundraisers": "Prikupljači",
       "partners": "Partneri",
@@ -866,6 +877,7 @@
     "spTierHint": "npr. zlatni, srebrni, medijski",
     "spYear": "Godina",
     "spYearHint": "Godina za koju se ovaj ugovor računa na sajtu.",
+    "spYearAll": "Sve godine",
     "spFund": "Koji fond",
     "spFundValue": {
       "operations": "Operativni fond — plaća tim",
