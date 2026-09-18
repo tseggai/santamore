@@ -8,6 +8,7 @@ import remarkGfm from "remark-gfm";
 import { LedgerTabs, type LedgerRow } from "@/components/ledger/LedgerTabs";
 import { YearTabs } from "@/components/ledger/YearTabs";
 import { DonorWall } from "@/components/ledger/DonorWall";
+import { YearSections, type YearSection } from "@/components/ledger/YearSections";
 import { SponsorGrid } from "@/components/partners/SponsorGrid";
 import { groupDonors, type GiftDetail, type PublicSponsor } from "@/lib/sponsors";
 import { formatShortDate } from "@/lib/dates";
@@ -77,12 +78,29 @@ interface YearReport {
   volunteers: number | null;
   beneficiaries: number | null;
   venues: string[];
-  is_legacy?: boolean;
-  figures?: Partial<Record<"received_cents" | "disbursed_cents" | "operations_cents" | "donors" | "runners" | "pages" | "teams" | "events" | "supporters", number>>;
   events?: { name: string; date: string | null; venue: string | null }[];
   supporters?: string[];
   beneficiaries_list?: { label: string; amount_cents: number | null }[];
   donors_list?: { name: string; amount_cents: number | null }[];
+  volunteers_list?: string[];
+}
+interface PageRow {
+  slug: string;
+  title: string;
+  raised_cents: number;
+  campaign_slug: string | null;
+}
+interface TeamRow {
+  slug: string;
+  name: string;
+  raised_cents: number;
+  member_count: number;
+  campaign_slug: string | null;
+}
+interface CampaignRow {
+  slug: string;
+  title: string;
+  starts_at: string | null;
 }
 interface EventRow {
   slug: string;
@@ -113,7 +131,7 @@ async function fetchLedger(year: number | null) {
   const to = year ? `${year + 1}-01-01` : null;
   const windowed = <T extends { gte: (c: string, v: string) => T; lt: (c: string, v: string) => T }>(q: T) =>
     from && to ? q.gte("entry_date", from).lt("entry_date", to) : q;
-  const [summary, ops, inRows, outRows, adjustments, yearStats, yearReports, events, supporters, deals] = await Promise.all([
+  const [summary, ops, inRows, outRows, adjustments, yearStats, yearReports, events, supporters, deals, campaignsOfYear] = await Promise.all([
     supabase.from("v_public_ledger_summary").select("*").single(),
     supabase.from("v_public_ops_total").select("*").single(),
     windowed(supabase.from("v_public_ledger_in").select("*")).order("entry_date", { ascending: false }).limit(year ? 1000 : 150),
@@ -130,7 +148,19 @@ async function fetchLedger(year: number | null) {
     year
       ? supabase.from("v_public_sponsors").select("supporter_id, tier, is_in_kind, amount_cents, campaign_title, event_name, starts_at").eq("year", year)
       : Promise.resolve({ data: [] as DealRow[] }),
+    year
+      ? supabase.from("v_public_campaigns").select("slug, title, starts_at").gte("starts_at", from).lt("starts_at", to).order("starts_at")
+      : Promise.resolve({ data: [] as CampaignRow[] }),
   ]);
+  // The year's causes, and the pages and teams raising for them.
+  const causes = (campaignsOfYear.data ?? []) as CampaignRow[];
+  const causeSlugs = causes.map((c) => c.slug);
+  const [pages, teams] = causeSlugs.length > 0
+    ? await Promise.all([
+        supabase.from("v_leaderboard").select("slug, title, raised_cents, campaign_slug").in("campaign_slug", causeSlugs).order("raised_cents", { ascending: false }).limit(200),
+        supabase.from("v_leaderboard_teams").select("slug, name, raised_cents, member_count, campaign_slug").in("campaign_slug", causeSlugs).order("raised_cents", { ascending: false }).limit(200),
+      ])
+    : [{ data: [] as PageRow[] }, { data: [] as TeamRow[] }];
   // Each supporter's gifts of the year, for the detail behind a tile or chip.
   const giftsOf = new Map<string, GiftDetail[]>();
   for (const d of (deals.data ?? []) as DealRow[]) {
@@ -154,6 +184,9 @@ async function fetchLedger(year: number | null) {
     yearReports: (yearReports.data ?? []) as YearReport[],
     events: (events.data ?? []) as EventRow[],
     supporters: ((supporters.data ?? []) as SupporterRow[]).map((su) => ({ ...su, gifts: giftsOf.get(su.id) ?? [] })),
+    causes,
+    pages: (pages.data ?? []) as PageRow[],
+    teams: (teams.data ?? []) as TeamRow[],
   };
 }
 
@@ -184,7 +217,7 @@ export default async function LedgerPage({
   const thisYear = new Date().getFullYear();
   const year = godina === "sve" ? null : /^\d{4}$/.test(godina ?? "") ? Number(godina) : thisYear;
 
-  const { summary, opsCents, inRows, outRows, adjustments, yearStats, yearReports, events, supporters: yearSupporters } = await fetchLedger(year);
+  const { summary, opsCents, inRows, outRows, adjustments, yearStats, yearReports, events, supporters: yearSupporters, pages, teams } = await fetchLedger(year);
   // Organisations are sponsors, shown with their logos; individuals are donors, listed by name.
   const supporters = yearSupporters.filter((su) => su.kind === "sponsor");
   const individualDonors = yearSupporters.filter((su) => su.kind === "donor");
@@ -192,42 +225,42 @@ export default async function LedgerPage({
   if (year !== null && !years.includes(year) && yearStats.length > 0) notFound();
   const derived = year !== null ? (yearStats.find((row) => row.year === year) ?? null) : null;
   const report = year !== null ? (yearReports.find((row) => row.year === year) ?? null) : null;
-  // A year recorded before the ledger: the report's figures stand in for
-  // the derived ones wherever they are set.
-  const legacy = Boolean(report?.is_legacy);
-  const f = legacy ? (report?.figures ?? {}) : {};
-  const legacyEvents = legacy ? (report?.events ?? []) : [];
-  const legacyBeneficiaries = legacy ? (report?.beneficiaries_list ?? []) : [];
-  const legacyDonorRows = legacy ? (report?.donors_list ?? []) : [];
-  // The donor wall: individuals recorded as supporters plus the list of a
-  // legacy year, one chip per name with every gift behind it.
+  // What the report records that the ledger cannot: lists from a year
+  // before the ledger existed, and the volunteers by name.
+  const recordedEvents = report?.events ?? [];
+  const recordedHandOvers = report?.beneficiaries_list ?? [];
+  const recordedDonorRows = report?.donors_list ?? [];
+  const volunteers = report?.volunteers_list ?? [];
+  const recordedOutsideLedger = recordedDonorRows.length > 0 || recordedHandOvers.length > 0;
+  // The donor wall: individuals recorded as supporters plus the recorded
+  // list, one chip per name with every gift behind it.
   const donors = groupDonors([
     ...individualDonors.flatMap((su) =>
       (su.gifts ?? []).length > 0
         ? (su.gifts ?? []).map((g) => ({ name: su.name, amount_cents: g.amount_cents, target: g.target, date: g.date }))
         : [{ name: su.name, amount_cents: su.cash_cents > 0 ? su.cash_cents : null }],
     ),
-    ...legacyDonorRows,
+    ...recordedDonorRows,
   ]);
   const sponsorCash = supporters.reduce((sum, su) => sum + su.cash_cents, 0);
   const listSum = (rows: { amount_cents: number | null }[]) => rows.reduce((sum, row) => sum + (row.amount_cents ?? 0), 0);
-  // A legacy year's figures: a typed figure wins; else what the report's
-  // lists add up to; else what the ledger derives. Sponsors are the tiles.
-  const legacyOr = (typed: number | undefined, fromList: number | null, fromLedger: number) =>
-    typed ?? (legacy && fromList !== null ? fromList : fromLedger);
+  // Hand-overs of the year grouped by their public label: the ledger's
+  // published rows plus what was recorded before the ledger.
+  const byLabel = new Map<string, number>();
+  for (const row of outRows) byLabel.set(row.beneficiary_label, (byLabel.get(row.beneficiary_label) ?? 0) + row.amount_cents);
+  for (const row of recordedHandOvers) byLabel.set(row.label, (byLabel.get(row.label) ?? 0) + (row.amount_cents ?? 0));
+  const beneficiaries = [...byLabel].map(([label, cents]) => ({ label, cents })).sort((a, b) => b.cents - a.cents);
+  // Every figure derives from a record: the ledger, the events, the
+  // supporter records, and the report's lists. Nothing overrides them.
   const stats: YearStats | null = derived
     ? {
         ...derived,
-        received_cents: legacyOr(f.received_cents, legacyDonorRows.length > 0 ? listSum(legacyDonorRows) : null, derived.received_cents),
-        disbursed_cents: legacyOr(f.disbursed_cents, legacyBeneficiaries.length > 0 ? listSum(legacyBeneficiaries) : null, derived.disbursed_cents),
-        operations_cents: f.operations_cents ?? derived.operations_cents,
-        donor_count: legacyOr(f.donors, donors.length > 0 ? donors.length : null, derived.donor_count),
-        runner_count: f.runners ?? derived.runner_count,
-        page_count: f.pages ?? derived.page_count,
-        team_count: f.teams ?? derived.team_count,
-        event_count: legacyOr(f.events, legacyEvents.length > 0 ? legacyEvents.length : null, derived.event_count),
-        supporter_count: f.supporters ?? (supporters.length > 0 ? supporters.length : derived.supporter_count),
-        beneficiary_count: legacyBeneficiaries.length > 0 ? legacyBeneficiaries.length : derived.beneficiary_count,
+        received_cents: derived.received_cents + listSum(recordedDonorRows),
+        disbursed_cents: derived.disbursed_cents + listSum(recordedHandOvers),
+        donor_count: derived.donor_count + groupDonors(recordedDonorRows).length,
+        event_count: derived.event_count + recordedEvents.length,
+        supporter_count: supporters.length,
+        beneficiary_count: beneficiaries.length,
       }
     : null;
   const tense = year === null ? "all" : year < thisYear ? "past" : year === thisYear ? "current" : "future";
@@ -292,26 +325,149 @@ export default async function LedgerPage({
   moneyOut.sort((a, b) => b.date.localeCompare(a.date));
 
   const count = (n: number) => new Intl.NumberFormat(locale).format(n);
-  const figures = stats
+  const venues = [...new Set([...events.flatMap((e) => (e.venue ? [e.venue] : [])), ...recordedEvents.flatMap((e) => (e.venue ? [e.venue] : [])), ...(report?.venues ?? [])])];
+  const prose = "prose-santamore mt-2 text-[15.5px] leading-relaxed text-black/80 [&_p]:mt-3 [&_p:first-child]:mt-0 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mt-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-sea [&_a]:underline [&_strong]:font-bold";
+
+  const emptyLine = (text: string) => <p className="text-[14px] text-black/55">{text}</p>;
+  const listBox = "overflow-hidden rounded-lg bg-mist";
+  const rowClass = "flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t-[0.5px] border-line px-4 py-2.5 text-[14.5px] first:border-t-0";
+  const handOverList =
+    beneficiaries.length === 0 ? (
+      <p className="mt-2 text-[14px] text-black/55">{tYears("noBeneficiaries")}</p>
+    ) : (
+      <ul className={`mt-2 ${listBox}`}>
+        {beneficiaries.map((row) => (
+          <li key={row.label} className="flex items-baseline justify-between gap-3 border-t-[0.5px] border-line px-4 py-2.5 text-[14.5px] first:border-t-0">
+            <span>{row.label}</span>
+            <span className="whitespace-nowrap font-mono tabular-nums">{money(row.cents)}</span>
+          </li>
+        ))}
+      </ul>
+    );
+  const eventList = (
+    <>
+      {events.length === 0 && recordedEvents.length === 0 ? (
+        emptyLine(tYears("noEvents"))
+      ) : (
+        <ul className={listBox}>
+          {recordedEvents.map((event) => (
+            <li key={`recorded-${event.name}`} className={rowClass}>
+              <span className="font-mono text-[13px] tabular-nums text-black/60">{event.date ? formatShortDate(event.date, locale as Locale) : "—"}</span>
+              <span className="font-semibold">{event.name}</span>
+              {event.venue ? <span className="text-black/55">· {event.venue}</span> : null}
+            </li>
+          ))}
+          {events.map((event) => (
+            <li key={event.slug} className="border-t-[0.5px] border-line first:border-t-0">
+              <Link href={`/dogadjaji/${event.slug}`} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-2.5 text-[14.5px] transition-colors hover:bg-mist-2">
+                <span className="font-mono text-[13px] tabular-nums text-black/60">{event.starts_at ? formatShortDate(event.starts_at, locale as Locale) : "—"}</span>
+                <span className="font-semibold">{event.name}</span>
+                {event.venue ? <span className="text-black/55">· {event.venue}</span> : null}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+      {venues.length > 0 ? (
+        <p className="mt-2 text-[13.5px] text-black/60">
+          <span className="font-semibold">{tYears("venuesHeading")}:</span> {venues.join(" · ")}
+        </p>
+      ) : null}
+    </>
+  );
+  const sections: YearSection[] = stats
     ? [
-        { label: tYears("donors"), value: count(stats.donor_count) },
-        { label: tYears("runners"), value: count(stats.runner_count) },
-        { label: tYears("pages"), value: count(stats.page_count) },
-        { label: tYears("teams"), value: count(stats.team_count) },
-        { label: tYears("events"), value: count(stats.event_count) },
-        { label: tYears("supporters"), value: count(stats.supporter_count) },
-        { label: tYears("volunteers"), value: report?.volunteers != null ? count(report.volunteers) : "—" },
-        { label: tYears("beneficiaries"), value: count(report?.beneficiaries ?? stats.beneficiary_count) },
+        {
+          key: "donors",
+          label: tYears("donors"),
+          value: count(stats.donor_count),
+          content: donors.length > 0 ? <DonorWall donors={donors} wentTo={beneficiaries.map((row) => row.label)} /> : emptyLine(tYears("noDonorsYet")),
+        },
+        {
+          key: "runners",
+          label: tYears("runners"),
+          value: count(stats.runner_count),
+          content: (
+            <>
+              <p className="text-[14.5px] text-black/70">{tYears("runnersNote", { count: stats.runner_count })}</p>
+              <div className="mt-3">{eventList}</div>
+            </>
+          ),
+        },
+        {
+          key: "pages",
+          label: tYears("pages"),
+          value: count(stats.page_count),
+          content:
+            pages.length === 0 ? (
+              emptyLine(tYears("noPages"))
+            ) : (
+              <ul className={listBox}>
+                {pages.map((page) => (
+                  <li key={page.slug} className="border-t-[0.5px] border-line first:border-t-0">
+                    <Link href={`/f/${page.slug}`} className="flex items-baseline justify-between gap-3 px-4 py-2.5 text-[14.5px] transition-colors hover:bg-mist-2">
+                      <span className="font-semibold">{page.title}</span>
+                      <span className="whitespace-nowrap font-mono tabular-nums">{money(page.raised_cents)}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ),
+        },
+        {
+          key: "teams",
+          label: tYears("teams"),
+          value: count(stats.team_count),
+          content:
+            teams.length === 0 ? (
+              emptyLine(tYears("noTeams"))
+            ) : (
+              <ul className={listBox}>
+                {teams.map((team) => (
+                  <li key={team.slug} className="border-t-[0.5px] border-line first:border-t-0">
+                    <Link href={`/t/${team.slug}`} className="flex items-baseline justify-between gap-3 px-4 py-2.5 text-[14.5px] transition-colors hover:bg-mist-2">
+                      <span className="font-semibold">{team.name} <span className="font-normal text-black/55">· {tYears("members", { count: team.member_count })}</span></span>
+                      <span className="whitespace-nowrap font-mono tabular-nums">{money(team.raised_cents)}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ),
+        },
+        { key: "events", label: tYears("events"), value: count(stats.event_count), content: eventList },
+        {
+          key: "sponsors",
+          label: tYears("supporters"),
+          value: count(stats.supporter_count),
+          content: (
+            <>
+              {sponsorCash > 0 ? (
+                <p className="mb-3 text-[14px] text-black/60">
+                  <span className="font-mono text-[15px] font-bold tabular-nums text-sea">{money(sponsorCash)}</span> {tYears("sponsorCash")}
+                </p>
+              ) : null}
+              {supporters.length === 0 ? emptyLine(tYears("noSupporters")) : <SponsorGrid sponsors={supporters} inKindLabel={tYears("inKind")} />}
+            </>
+          ),
+        },
+        {
+          key: "volunteers",
+          label: tYears("volunteers"),
+          value: count(volunteers.length),
+          content:
+            volunteers.length === 0 ? (
+              emptyLine(tYears("noVolunteers"))
+            ) : (
+              <ul className="flex flex-wrap gap-2">
+                {volunteers.map((name) => (
+                  <li key={name} className="rounded-lg bg-mist px-3 py-2 text-[14px] font-semibold">{name}</li>
+                ))}
+              </ul>
+            ),
+        },
+        { key: "beneficiaries", label: tYears("beneficiaries"), value: count(stats.beneficiary_count), content: handOverList },
       ]
     : [];
-  const venues = [...new Set([...events.flatMap((e) => (e.venue ? [e.venue] : [])), ...legacyEvents.flatMap((e) => (e.venue ? [e.venue] : [])), ...(report?.venues ?? [])])];
-  // Hand-overs of the year grouped by their public label, plus what a
-  // legacy report lists.
-  const byLabel = new Map<string, number>();
-  for (const row of outRows) byLabel.set(row.beneficiary_label, (byLabel.get(row.beneficiary_label) ?? 0) + row.amount_cents);
-  for (const row of legacyBeneficiaries) byLabel.set(row.label, (byLabel.get(row.label) ?? 0) + (row.amount_cents ?? 0));
-  const beneficiaries = [...byLabel].map(([label, cents]) => ({ label, cents })).sort((a, b) => b.cents - a.cents);
-  const prose = "prose-santamore mt-2 text-[15.5px] leading-relaxed text-black/80 [&_p]:mt-3 [&_p:first-child]:mt-0 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:mt-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:text-sea [&_a]:underline [&_strong]:font-bold";
 
   const heroRow = (label: string, cents: number, big = false) => (
     <div
@@ -353,7 +509,8 @@ export default async function LedgerPage({
       </h2>
       {tense !== "all" ? (
         <p className="mt-1.5 text-[14.5px] leading-relaxed text-black/60">
-          {legacy ? tYears("legacyNote") : tense === "past" ? tYears("pastLead") : tense === "current" ? tYears("currentLead") : tYears("futureLead")}
+          {tense === "past" ? tYears("pastLead") : tense === "current" ? tYears("currentLead") : tYears("futureLead")}
+          {recordedOutsideLedger ? ` ${tYears("legacyNote")}` : ""}
         </p>
       ) : null}
 
@@ -400,111 +557,43 @@ export default async function LedgerPage({
           {/* where the money went, in the public form */}
           <section className="mt-5">
             <h3 className="type-eyebrow text-sea/80">{tYears("beneficiariesHeading")}</h3>
-            {beneficiaries.length === 0 ? (
-              <p className="mt-2 text-[14px] text-black/55">{tYears("noBeneficiaries")}</p>
-            ) : (
-              <ul className="mt-2 overflow-hidden rounded-lg bg-mist">
-                {beneficiaries.map((row) => (
-                  <li key={row.label} className="flex items-baseline justify-between gap-3 border-t-[0.5px] border-line px-4 py-2.5 text-[14.5px] first:border-t-0">
-                    <span>{row.label}</span>
-                    <span className="whitespace-nowrap font-mono tabular-nums">{money(row.cents)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
+            {handOverList}
           </section>
 
-          {/* the year in figures */}
-          <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {figures.map((figure) => (
-              <div key={figure.label} className="rounded-lg bg-mist px-3.5 py-3">
-                <p className="text-[12.5px] font-semibold text-black/55">{figure.label}</p>
-                <p className="mt-0.5 font-mono text-[22px] tabular-nums">{figure.value}</p>
-              </div>
-            ))}
+          {/* the year in figures: each tile opens what stands behind it */}
+          <div className="mt-5">
+            <YearSections
+              story={{
+                key: "story",
+                label: tense === "past" ? tYears("pastTitle", { year: String(year) }) : tense === "current" ? tYears("currentTitle", { year: String(year) }) : tYears("futureTitle", { year: String(year) }),
+                content: (
+                  <>
+                    {report?.headline ? <p className="text-[18px] font-bold leading-snug">{report.headline}</p> : null}
+                    {tense !== "future" && report?.summary_md ? (
+                      <section className="mt-4">
+                        <h3 className="type-eyebrow text-sea/80">{tYears("summaryHeading")}</h3>
+                        <div className={prose}>
+                          <Markdown remarkPlugins={[remarkGfm]}>{report.summary_md}</Markdown>
+                        </div>
+                      </section>
+                    ) : null}
+                    {tense !== "past" && report?.plan_md ? (
+                      <section className="mt-4">
+                        <h3 className="type-eyebrow text-sea/80">{tYears("planHeading")}</h3>
+                        <div className={prose}>
+                          <Markdown remarkPlugins={[remarkGfm]}>{report.plan_md}</Markdown>
+                        </div>
+                      </section>
+                    ) : null}
+                    {!report?.headline && !report?.summary_md && !report?.plan_md ? (
+                      <p className="text-[14px] text-black/50">{tYears("noReport")}</p>
+                    ) : null}
+                  </>
+                ),
+              }}
+              sections={sections}
+            />
           </div>
-
-          {/* the story and the plan, in our words */}
-          {report?.headline ? <p className="mt-7 text-[18px] font-bold leading-snug">{report.headline}</p> : null}
-          {tense !== "future" && report?.summary_md ? (
-            <section className="mt-5">
-              <h3 className="type-eyebrow text-sea/80">{tYears("summaryHeading")}</h3>
-              <div className={prose}>
-                <Markdown remarkPlugins={[remarkGfm]}>{report.summary_md}</Markdown>
-              </div>
-            </section>
-          ) : null}
-          {tense !== "past" && report?.plan_md ? (
-            <section className="mt-5">
-              <h3 className="type-eyebrow text-sea/80">{tYears("planHeading")}</h3>
-              <div className={prose}>
-                <Markdown remarkPlugins={[remarkGfm]}>{report.plan_md}</Markdown>
-              </div>
-            </section>
-          ) : null}
-          {!report?.headline && !report?.summary_md && !report?.plan_md ? (
-            <p className="mt-5 text-[14px] text-black/50">{tYears("noReport")}</p>
-          ) : null}
-
-          {/* events and where they happened */}
-          <section className="mt-7">
-            <h3 className="type-eyebrow text-sea/80">{tYears("eventsHeading")}</h3>
-            {events.length === 0 && legacyEvents.length === 0 ? (
-              <p className="mt-2 text-[14px] text-black/55">{tYears("noEvents")}</p>
-            ) : (
-              <ul className="mt-2 overflow-hidden rounded-lg bg-mist">
-                {legacyEvents.map((event) => (
-                  <li key={`legacy-${event.name}`} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t-[0.5px] border-line px-4 py-2.5 text-[14.5px] first:border-t-0">
-                    <span className="font-mono text-[13px] tabular-nums text-black/60">{event.date ? formatShortDate(event.date, locale as Locale) : "—"}</span>
-                    <span className="font-semibold">{event.name}</span>
-                    {event.venue ? <span className="text-black/55">· {event.venue}</span> : null}
-                  </li>
-                ))}
-                {events.map((event) => (
-                  <li key={event.slug} className="border-t-[0.5px] border-line first:border-t-0">
-                    <Link href={`/dogadjaji/${event.slug}`} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-2.5 text-[14.5px] transition-colors hover:bg-mist-2">
-                      <span className="font-mono text-[13px] tabular-nums text-black/60">{event.starts_at ? formatShortDate(event.starts_at, locale as Locale) : "—"}</span>
-                      <span className="font-semibold">{event.name}</span>
-                      {event.venue ? <span className="text-black/55">· {event.venue}</span> : null}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-            {venues.length > 0 ? (
-              <p className="mt-2 text-[13.5px] text-black/60">
-                <span className="font-semibold">{tYears("venuesHeading")}:</span> {venues.join(" · ")}
-              </p>
-            ) : null}
-          </section>
-
-          {/* who stood behind the year, and what each gave */}
-          <section className="mt-7">
-            <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h3 className="type-eyebrow text-sea/80">{tYears("supportersHeading")}</h3>
-              {sponsorCash > 0 ? (
-                <p className="text-[14px] text-black/60">
-                  <span className="font-mono text-[15px] font-bold tabular-nums text-sea">{money(sponsorCash)}</span> {tYears("sponsorCash")}
-                </p>
-              ) : null}
-            </div>
-            {supporters.length === 0 ? (
-              <p className="mt-2 text-[14px] text-black/55">{tYears("noSupporters")}</p>
-            ) : (
-              <div className="mt-3">
-                <SponsorGrid sponsors={supporters} inKindLabel={tYears("inKind")} />
-              </div>
-            )}
-          </section>
-
-          {/* the donor wall: one chip per name, the gifts behind it */}
-          {donors.length > 0 ? (
-            <section className="mt-7">
-              <h3 className="type-eyebrow text-sea/80">{tYears("donorsHeading")}</h3>
-              <DonorWall donors={donors} wentTo={beneficiaries.map((row) => row.label)} />
-            </section>
-          ) : null}
-
         </>
       ) : null}
 

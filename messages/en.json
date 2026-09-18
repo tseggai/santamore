@@ -1629,7 +1629,7 @@
     "noReport": "The story of this year is not written yet.",
     "ledgerHeading": "The ledger for {year}",
     "ledgerHeadingAll": "The full ledger",
-    "legacyNote": "Recorded before this ledger existed. Figures as reported by the team, not derived row by row.",
+    "legacyNote": "Some of this year's figures were recorded by the team before this ledger existed, not derived row by row.",
     "pickYearLabel": "Year",
     "donorsHeading": "Donors",
     "noDonors": "—",
@@ -1642,7 +1642,13 @@
     "giftSponsorNote": "Sponsorships go to the Operations Fund: they pay for our team so donations never have to.",
     "giftDonationNote": "Donations go to the Impact Fund: 100% reaches the beneficiaries, not one cent to salaries or overhead.",
     "wentTo": "Went to",
-    "offerLabel": "Offer"
+    "offerLabel": "Offer",
+    "noDonorsYet": "No donor recorded for this year yet.",
+    "runnersNote": "{count, plural, =0 {No confirmed registration at this year's events.} one {# confirmed registration at this year's events.} other {# confirmed registrations at this year's events.}}",
+    "noPages": "No fundraising page on this year's causes.",
+    "noTeams": "No team on this year's causes.",
+    "members": "{count, plural, one {# member} other {# members}}",
+    "noVolunteers": "No volunteer recorded for this year yet."
   },
   "proposals": {
     "title": "Propose a cause",

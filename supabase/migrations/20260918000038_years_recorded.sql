@@ -222,3 +222,22 @@ order by y.year;
 
 
 grant select on public.v_public_year_stats to anon, authenticated;
+
+-- The leaderboard names its cause's slug, so a year's pages can be listed
+-- from the public campaigns of that year (column appended; shape kept).
+create or replace view public.v_leaderboard
+  with (security_invoker = off, security_barrier = on) as
+select
+  ft.id,
+  ft.slug,
+  ft.title,
+  ft.photo_path,
+  ft.event_id,
+  ft.team_id,
+  ft.raised_cents,
+  ft.donor_count,
+  rank() over (partition by ft.campaign_id order by ft.raised_cents desc) as rank,
+  ft.campaign_id,
+  (select c.slug from public.campaigns c where c.id = ft.campaign_id) as campaign_slug
+from public.v_fundraiser_totals ft;
+grant select on public.v_leaderboard to anon, authenticated;

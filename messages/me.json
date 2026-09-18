@@ -1629,7 +1629,7 @@
     "noReport": "Priča ove godine još nije napisana.",
     "ledgerHeading": "Knjiga za {year}.",
     "ledgerHeadingAll": "Cijela knjiga",
-    "legacyNote": "Zabilježeno prije nego što je ova knjiga postojala. Cifre kako ih je tim prijavio, ne izvedene red po red.",
+    "legacyNote": "Dio brojki ove godine tim je zabilježio prije nego što je ova knjiga postojala, nisu izvedene red po red.",
     "pickYearLabel": "Godina",
     "donorsHeading": "Donatori",
     "noDonors": "—",
@@ -1642,7 +1642,13 @@
     "giftSponsorNote": "Sponzorstva idu u Operativni fond: plaćaju naš tim da donacije ne moraju.",
     "giftDonationNote": "Donacije idu u Fond uticaja: 100% stiže do korisnika, ni cent na plate ili režije.",
     "wentTo": "Otišlo je",
-    "offerLabel": "Ponuda"
+    "offerLabel": "Ponuda",
+    "noDonorsYet": "Za ovu godinu još nema zabilježenog donatora.",
+    "runnersNote": "{count, plural, =0 {Nema potvrđenih prijava na događajima ove godine.} one {# potvrđena prijava na događajima ove godine.} few {# potvrđene prijave na događajima ove godine.} other {# potvrđenih prijava na događajima ove godine.}}",
+    "noPages": "Nema stranice za prikupljanje na ciljevima ove godine.",
+    "noTeams": "Nema tima na ciljevima ove godine.",
+    "members": "{count, plural, one {# član} few {# člana} other {# članova}}",
+    "noVolunteers": "Za ovu godinu još nema zabilježenog volontera."
   },
   "proposals": {
     "title": "Predloži cilj",
