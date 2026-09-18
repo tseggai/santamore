@@ -15,11 +15,13 @@ export const dynamic = "force-dynamic";
 
 interface TeamRow {
   id: string;
+  kind: "officer" | "staff" | "board" | "committee" | "volunteer";
   full_name: string;
   title: string | null;
   quote: string | null;
   photo_path: string | null;
-  team_order: number;
+  years: number[];
+  sort_order: number;
 }
 
 export async function generateMetadata({
@@ -46,14 +48,17 @@ export default async function AboutPage({
   const content: AboutContent = await loadSitePage("about", locale as Locale, aboutContent[locale as Locale]);
   const tNav = await getTranslations("nav");
   // The team: members who agreed to appear, else the shipped names and words.
-  let team: TeamRow[] = [];
+  let people: TeamRow[] = [];
   try {
     const supabase = await createClient();
-    const { data } = await supabase.from("v_public_team").select("id, full_name, title, quote, photo_path, team_order").order("team_order").order("full_name");
-    team = (data ?? []) as TeamRow[];
+    const { data } = await supabase.from("v_public_team").select("id, kind, full_name, title, quote, photo_path, years, sort_order").order("sort_order").order("full_name");
+    people = (data ?? []) as TeamRow[];
   } catch {
-    team = [];
+    people = [];
   }
+  // Officers, staff and the bodies in the grid; volunteers by name below it.
+  const team = people.filter((member) => member.kind !== "volunteer");
+  const volunteers = people.filter((member) => member.kind === "volunteer");
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
@@ -167,6 +172,19 @@ export default async function AboutPage({
                 </li>
               ))}
         </ul>
+        {volunteers.length > 0 ? (
+          <div className="mt-6">
+            <p className={eyebrowClass}>{tNav("aboutMenu.volunteer")}</p>
+            <ul className="mt-2 flex flex-wrap gap-2">
+              {volunteers.map((member) => (
+                <li key={member.id} className="rounded-lg bg-mist px-3 py-2 text-[14px] font-semibold">
+                  {member.full_name}
+                  {member.years.length > 0 ? <span className="ml-1.5 font-mono text-[12.5px] font-medium tabular-nums text-black/50">{member.years.join(", ")}</span> : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </section>
 
       <p className="mt-10 max-w-xl rounded-brand bg-mist px-4 py-3 text-[13px] text-sea">

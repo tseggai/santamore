@@ -247,7 +247,7 @@ Also: `robots.txt`, `sitemap.xml`, per-page OpenGraph images (dynamic for fundra
 /admin/dogadjaji        Events (with their photos and offers) · registrations (waivers, sizes, bibs, CSV)
 /admin/korisnici        Beneficiaries: stories, photos, websites, the cause that reached them
 /admin/podrska          Supporters: sponsors and individual donors, sponsorships by year and fund
-/admin/clanovi          Members: pages, registrations, team profiles, access levels
+/admin/clanovi          People: team (officers, staff, board, committee, volunteers) · accounts (pages, registrations, access levels)
 /admin/poruke           Inbox
 /admin/podesavanja      Settings: editorial pages · news · photos overview · demo data
 ```

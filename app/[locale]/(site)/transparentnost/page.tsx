@@ -132,7 +132,7 @@ async function fetchLedger(year: number | null) {
   const to = year ? `${year + 1}-01-01` : null;
   const windowed = <T extends { gte: (c: string, v: string) => T; lt: (c: string, v: string) => T }>(q: T) =>
     from && to ? q.gte("entry_date", from).lt("entry_date", to) : q;
-  const [summary, ops, inRows, outRows, adjustments, yearStats, yearReports, events, supporters, deals, campaignsOfYear] = await Promise.all([
+  const [summary, ops, inRows, outRows, adjustments, yearStats, yearReports, events, supporters, deals, campaignsOfYear, volunteerRows] = await Promise.all([
     supabase.from("v_public_ledger_summary").select("*").single(),
     supabase.from("v_public_ops_total").select("*").single(),
     windowed(supabase.from("v_public_ledger_in").select("*")).order("entry_date", { ascending: false }).limit(year ? 1000 : 150),
@@ -152,6 +152,9 @@ async function fetchLedger(year: number | null) {
     year
       ? supabase.from("v_public_campaigns").select("slug, title, starts_at").gte("starts_at", from).lt("starts_at", to).order("starts_at")
       : Promise.resolve({ data: [] as CampaignRow[] }),
+    year
+      ? supabase.from("v_public_team").select("full_name, years").eq("kind", "volunteer").contains("years", [year]).order("sort_order").order("full_name")
+      : Promise.resolve({ data: [] as { full_name: string; years: number[] }[] }),
   ]);
   // The year's causes, and the pages and teams raising for them.
   const causes = (campaignsOfYear.data ?? []) as CampaignRow[];
@@ -188,6 +191,7 @@ async function fetchLedger(year: number | null) {
     causes,
     pages: (pages.data ?? []) as PageRow[],
     teams: (teams.data ?? []) as TeamRow[],
+    volunteers: ((volunteerRows.data ?? []) as { full_name: string }[]).map((row) => row.full_name),
   };
 }
 
@@ -218,7 +222,7 @@ export default async function LedgerPage({
   const thisYear = new Date().getFullYear();
   const year = godina === "sve" ? null : /^\d{4}$/.test(godina ?? "") ? Number(godina) : thisYear;
 
-  const { summary, opsCents, inRows, outRows, adjustments, yearStats, yearReports, events, supporters: yearSupporters, pages, teams } = await fetchLedger(year);
+  const { summary, opsCents, inRows, outRows, adjustments, yearStats, yearReports, events, supporters: yearSupporters, pages, teams, volunteers: teamVolunteers } = await fetchLedger(year);
   // Organisations are sponsors, shown with their logos; individuals are donors, listed by name.
   const supporters = yearSupporters.filter((su) => su.kind === "sponsor");
   const individualDonors = yearSupporters.filter((su) => su.kind === "donor");
@@ -231,7 +235,8 @@ export default async function LedgerPage({
   const recordedEvents = report?.events ?? [];
   const recordedHandOvers = report?.beneficiaries_list ?? [];
   const recordedDonorRows = report?.donors_list ?? [];
-  const volunteers = report?.volunteers_list ?? [];
+  // Volunteers: team records active that year, plus names recorded on the report.
+  const volunteers = [...new Set([...teamVolunteers, ...(report?.volunteers_list ?? [])])];
   const recordedOutsideLedger = recordedDonorRows.length > 0 || recordedHandOvers.length > 0;
   // The donor wall: individuals recorded as supporters plus the recorded
   // list, one chip per name with every gift behind it.

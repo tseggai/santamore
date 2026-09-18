@@ -2,12 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useRef, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 
 import { saveMemberProfile } from "@/app/[locale]/admin/(protected)/clanovi/actions";
-import { downscaleToJpeg } from "@/lib/images";
-import { teamPhotoUrl } from "@/lib/storage";
-import { createClient } from "@/lib/supabase/client";
 
 import { DataTable, Thumb, bulkButton, type Column } from "@/components/console/DataTable";
 import { formatShortDate } from "@/lib/dates";
@@ -356,51 +353,28 @@ const inputClass = "mt-1 w-full rounded-lg bg-paper px-3.5 py-2.5 text-[15px] ou
 const labelClass = "text-[13.5px] font-semibold";
 
 /**
- * The member's public profile (what /o-nama shows when "on the team" is
- * ticked) and their access level. Read-only for anyone but an admin.
+ * The account's name and access level. What the person shows on /o-nama
+ * lives on their team record (People → Team). Read-only for anyone but an admin.
  */
 function ProfileForm({ member, canManage }: { member: MemberRow; canManage: boolean }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [fullName, setFullName] = useState(member.full_name ?? "");
-  const [title, setTitle] = useState(member.title ?? "");
-  const [quote, setQuote] = useState(member.quote ?? "");
-  const [photoPath, setPhotoPath] = useState<string | null>(member.photo_path ?? null);
-  const [isTeam, setIsTeam] = useState(member.is_team ?? false);
-  const [teamOrder, setTeamOrder] = useState(String(member.team_order ?? 0));
   const [role, setRole] = useState<MemberRow["role"]>(member.role);
   const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "forbidden">("idle");
-  const [photoBusy, setPhotoBusy] = useState(false);
-  const photoInput = useRef<HTMLInputElement>(null);
-  const photo = teamPhotoUrl(photoPath);
-
-  const uploadPhoto = async (file: File) => {
-    setPhotoBusy(true);
-    try {
-      const blob = await downscaleToJpeg(file, 800);
-      const path = `${member.id}/photo-${Date.now()}.jpg`;
-      const { error } = await createClient().storage.from("team-photos").upload(path, blob, { contentType: "image/jpeg" });
-      if (error) throw error;
-      setPhotoPath(path);
-    } catch {
-      setState("error");
-    } finally {
-      setPhotoBusy(false);
-    }
-  };
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (state === "busy" || photoBusy) return;
+    if (state === "busy") return;
     setState("busy");
     const result = await saveMemberProfile({
       id: member.id,
       fullName,
-      title: title.trim() || null,
-      quote: quote.trim() || null,
-      photoPath,
-      isTeam,
-      teamOrder: Number.parseInt(teamOrder, 10) || 0,
+      title: null,
+      quote: null,
+      photoPath: null,
+      isTeam: false,
+      teamOrder: 0,
       role,
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
@@ -415,7 +389,10 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
   return (
     <form onSubmit={submit} className="rounded-lg bg-mist p-4">
       <p className="type-eyebrow text-black/60">{t("memberProfileHeading")}</p>
-      <p className="mt-1 text-[13.5px] text-black/60">{canManage ? t("memberProfileHint") : t("memberProfileReadOnly")}</p>
+      <p className="mt-1 text-[13.5px] text-black/60">
+        {canManage ? t("memberProfileHint") : t("memberProfileReadOnly")}{" "}
+        <Link href="/admin/clanovi" className="font-semibold text-sea underline underline-offset-2">{t("memberTeamLink")}</Link>
+      </p>
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="mpName" className={labelClass}>{t("memberName")}</label>
@@ -430,48 +407,13 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
           </select>
           <p className="mt-1 text-[13px] text-black/50">{t(`memberAccessHint.${role}`)}</p>
         </div>
-        <div>
-          <label htmlFor="mpTitle" className={labelClass}>{t("memberTitle")}</label>
-          <input id="mpTitle" type="text" maxLength={120} disabled={disabled} value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("memberTitleHint")} className={`${inputClass} disabled:opacity-60`} />
-        </div>
-        <div>
-          <label htmlFor="mpOrder" className={labelClass}>{t("memberOrder")}</label>
-          <input id="mpOrder" type="number" min={0} max={999} disabled={disabled} value={teamOrder} onChange={(e) => setTeamOrder(e.target.value)} className={`${inputClass} font-mono disabled:opacity-60`} />
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="mpQuote" className={labelClass}>{t("memberQuote")}</label>
-          <textarea id="mpQuote" rows={3} maxLength={600} disabled={disabled} value={quote} onChange={(e) => setQuote(e.target.value)} className={`${inputClass} disabled:opacity-60`} />
-        </div>
-        <div className="flex items-center gap-3 sm:col-span-2">
-          {photo ? (
-            // eslint-disable-next-line @next/next/no-img-element -- public bucket, arbitrary sizes
-            <img src={photo} alt="" className="h-14 w-14 rounded-lg object-cover" />
-          ) : (
-            <span aria-hidden className="flex h-14 w-14 items-center justify-center rounded-lg bg-paper text-[20px] text-sea">{(member.full_name ?? "?").charAt(0).toUpperCase()}</span>
-          )}
-          <div className="flex flex-wrap gap-2">
-            <input ref={photoInput} type="file" accept="image/*" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) void uploadPhoto(f); e.target.value = ""; }} />
-            <button type="button" disabled={disabled || photoBusy} onClick={() => photoInput.current?.click()} className="rounded-lg bg-paper px-3 py-2 text-[14px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-60">
-              {photoBusy ? "…" : photo ? t("memberPhotoReplace") : t("memberPhotoAdd")}
-            </button>
-            {photo ? (
-              <button type="button" disabled={disabled} onClick={() => setPhotoPath(null)} className="rounded-lg bg-paper px-3 py-2 text-[14px] font-semibold text-red-dark transition-colors hover:bg-mist-2 disabled:opacity-60">
-                {t("memberPhotoRemove")}
-              </button>
-            ) : null}
-          </div>
-        </div>
-        <label className="flex items-center gap-2 text-[14.5px] sm:col-span-2">
-          <input type="checkbox" disabled={disabled} checked={isTeam} onChange={(e) => setIsTeam(e.target.checked)} className="h-4 w-4 accent-red" />
-          {t("memberOnTeam")}
-        </label>
       </div>
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "forbidden" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("memberForbidden")}</p> : null}
       {state === "saved" ? <p role="status" className="mt-3 text-[14px] font-semibold text-sea">{t("memberSaved")}</p> : null}
       {canManage ? (
         <div className="mt-4">
-          <button type="submit" disabled={state === "busy" || photoBusy} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
+          <button type="submit" disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
             {t("evSave")}
           </button>
         </div>

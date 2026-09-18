@@ -24,7 +24,7 @@ text are never invented — see CLAUDE.md.
 | Russian donate/admin/email/dashboard strings — native review | `messages/ru.json` (new `donate.*`, `email.*`, `admin.*`, `dashboard.*`, `leaderboard.*` keys, drafted) | Same `_review` flag as the rest of ru.json |
 | Legal drafts — every `[[PLACEHOLDER]]` inside `content/legal/*.ts` + lawyer review of all 8 | `content/legal/` | Go-live (acquirer inspects these pages) |
 | Plausible site domain, when analytics is wanted | `.env.example` → `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`; unset = no analytics and no consent banner | Optional analytics (Task 6) |
-| Board, grants-committee and team names + photos with consent | Team: Admin → Members → a member's panel ("Show on the About us page"); board/committee wording: Admin → Settings → Pages → About us | `/o-nama` team section |
+| Board, grants-committee and team names + photos with consent | Team: Admin → People → Team ("Show on the About us page"); board/committee wording: Admin → Settings → Pages → About us | `/o-nama` team section |
 | Photos with consent for the landing hero and `/galerija` | `v_public_gallery` is empty; landing + gallery render placeholder notes until staff publish items | Landing §12, gallery |
 | Beneficiary story with consent | `app/[locale]/page.tsx` story section renders a placeholder note | Landing §12 |
 | Demo data (`/admin/demo`): invented runners, teams, pages and **approved donations** that show in the public ledger | `demo_records` registry, `lib/demo/pools.ts` | **Purge before launch** with the "Purge demo data" button (calls `purge_demo_data()`) |
