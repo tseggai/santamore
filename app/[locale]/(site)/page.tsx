@@ -3,14 +3,12 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { InboundForm } from "@/components/forms/InboundForm";
 import { HeroSlides, type HeroSlide } from "@/components/home/HeroSlides";
 import { ProposalsList, type PublicProposal } from "@/components/proposals/ProposalsList";
-import { LeaderboardList, type LeaderboardEntry } from "@/components/Leaderboard";
 import { SponsorGrid, type PublicSponsor } from "@/components/partners/SponsorGrid";
 import { landingContent } from "@/content/site/landing";
 import { formatCents } from "@/lib/money";
-import { galleryImageUrl } from "@/lib/storage";
+import { fundraiserPhotoUrl, galleryImageUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, routing, type Locale } from "@/i18n/routing";
@@ -21,30 +19,29 @@ async function fetchLanding() {
   try {
     const supabase = await createClient();
     const nowIso = new Date().toISOString();
-    const [summary, events, board, chapters, gallery, causes, proposals, sponsors] = await Promise.all([
+    const [summary, events, board, gallery, causes, proposals, sponsors] = await Promise.all([
       supabase.from("v_public_ledger_summary").select("received_cents, disbursed_cents").single(),
       supabase
         .from("v_public_events")
-        .select("slug, name, starts_at, kind, venue, campaign_slug, cover_path")
+        .select("slug, name, starts_at, kind, venue, campaign_slug, campaign_title, cover_path")
         .gte("starts_at", nowIso)
         .order("starts_at", { ascending: true })
-        .limit(4),
+        .limit(12),
       supabase
         .from("v_leaderboard")
-        .select("slug, title, raised_cents")
-        .order("rank", { ascending: true })
-        .limit(5),
-      supabase.from("v_chapter_totals").select("name, slug, raised_cents"),
+        .select("slug, title, raised_cents, donor_count, photo_path")
+        .order("raised_cents", { ascending: false })
+        .limit(6),
       supabase
         .from("v_public_gallery")
-        .select("id, storage_path, caption")
+        .select("id, storage_path, caption, event_slug, campaign_slug")
         .order("sort_order", { ascending: true })
-        .limit(8),
+        .limit(60),
       supabase
         .from("v_public_campaigns")
         .select("slug, title, goal_cents, raised_cents, donor_count, cover_path, ends_at")
         .order("starts_at", { ascending: false })
-        .limit(3),
+        .limit(6),
       supabase
         .from("v_public_cause_proposals")
         .select("*")
@@ -64,10 +61,9 @@ async function fetchLanding() {
     return {
       receivedCents: summary.data?.received_cents ?? 0,
       disbursedCents: summary.data?.disbursed_cents ?? 0,
-      events: (events.data ?? []) as { slug: string; name: string; starts_at: string; kind: "race" | "challenge" | "social"; venue: string | null; campaign_slug: string | null; cover_path: string | null }[],
-      board: board.data ?? [],
-      chapters: chapters.data ?? [],
-      gallery: gallery.data ?? [],
+      events: (events.data ?? []) as { slug: string; name: string; starts_at: string; kind: "race" | "challenge" | "social"; venue: string | null; campaign_slug: string | null; campaign_title: string | null; cover_path: string | null }[],
+      board: (board.data ?? []) as { slug: string; title: string; raised_cents: number; donor_count: number; photo_path: string | null }[],
+      gallery: (gallery.data ?? []) as { id: string; storage_path: string; caption: string | null; event_slug: string | null; campaign_slug: string | null }[],
       causes: (causes.data ?? []) as { slug: string; title: string; goal_cents: number | null; raised_cents: number; donor_count: number; cover_path: string | null; ends_at: string | null }[],
       proposals: (proposals.data ?? []) as PublicProposal[],
       sponsors: sponsorYear ? sponsorRows.filter((row) => row.year === sponsorYear) : [],
@@ -77,10 +73,9 @@ async function fetchLanding() {
     return {
       receivedCents: 0,
       disbursedCents: 0,
-      events: [],
-      board: [],
-      chapters: [],
-      gallery: [],
+      events: [] as { slug: string; name: string; starts_at: string; kind: "race" | "challenge" | "social"; venue: string | null; campaign_slug: string | null; campaign_title: string | null; cover_path: string | null }[],
+      board: [] as { slug: string; title: string; raised_cents: number; donor_count: number; photo_path: string | null }[],
+      gallery: [] as { id: string; storage_path: string; caption: string | null; event_slug: string | null; campaign_slug: string | null }[],
       causes: [],
       proposals: [],
       sponsors: [] as PublicSponsor[],
@@ -105,7 +100,7 @@ export default async function HomePage({
   ]);
   const content = landingContent[locale as Locale];
   const data = await fetchLanding();
-  const { receivedCents, disbursedCents, events, board, chapters, gallery, causes, proposals } = data;
+  const { receivedCents, disbursedCents, events, board, gallery, causes, proposals } = data;
   const [tCampaigns, tRunner] = await Promise.all([getTranslations("campaigns"), getTranslations("runner")]);
 
   const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
@@ -195,7 +190,23 @@ export default async function HomePage({
   // Every section below the slides: full height, one clear header, room to breathe.
   const section = "flex min-h-[calc(100dvh-72px)] flex-col justify-center border-t-[0.5px] border-line py-20";
   const eyebrowClass = "font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80";
-  const more = "mt-6 inline-flex h-11 items-center rounded-lg bg-mist px-5 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea";
+  const primary = "inline-flex h-11 items-center rounded-lg bg-red px-5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark";
+  const secondary = "inline-flex h-11 items-center rounded-lg bg-mist px-5 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea";
+  // Upcoming events grouped by the cause they raise for (events without one
+  // last), each group with the photos published on that cause or its events.
+  const causeBySlug = new Map(causes.map((cause) => [cause.slug, cause]));
+  const eventGroups = [...new Set(events.map((event) => event.campaign_slug ?? ""))]
+    .sort((a, b) => Number(a === "") - Number(b === ""))
+    .map((slug) => {
+      const groupEvents = events.filter((event) => (event.campaign_slug ?? "") === slug);
+      const eventSlugs = new Set(groupEvents.map((event) => event.slug));
+      return {
+        key: slug || "no-cause",
+        cause: slug ? (causeBySlug.get(slug) ?? { slug, title: groupEvents[0]?.campaign_title ?? slug, goal_cents: null, raised_cents: 0, donor_count: 0, cover_path: null, ends_at: null }) : null,
+        events: groupEvents,
+        photos: gallery.filter((item) => (slug && item.campaign_slug === slug) || (item.event_slug != null && eventSlugs.has(item.event_slug))),
+      };
+    });
   const header = (eyebrow: string, title: string, lead: string) => (
     <header className="max-w-2xl">
       <p className={eyebrowClass}>{eyebrow}</p>
@@ -213,9 +224,27 @@ export default async function HomePage({
       </div>
 
       <div className="mx-auto max-w-3xl px-5">
-        {/* the promise */}
+        {/* 1 · what we do: a cause is proposed, we raise for it, every euro is published */}
         <section className={section}>
-          {header(t("proofHeading"), t("proofTitle"), t("proofLead"))}
+          {header(t("chipIntro"), t("whatTitle"), t("whatLead"))}
+          <p className="mt-5 max-w-2xl text-[16px] leading-relaxed text-black/70">{t("proposalsLead")}</p>
+          {proposals.length > 0 ? (
+            <div className="mt-6">
+              <p className={eyebrowClass}>{t("proposalsShortlist")}</p>
+              <div className="mt-2">
+                <ProposalsList proposals={proposals} myVotes={[]} signedIn={false} />
+              </div>
+            </div>
+          ) : null}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/kampanje?predlozi=1" className={primary}>{t("proposalsCta")}</Link>
+            <Link href="/kampanje#prijedlozi" className={secondary}>{t("proposalsVoteCta")} →</Link>
+          </div>
+        </section>
+
+        {/* 2 · how it works: every euro, in public */}
+        <section className={section}>
+          {header(t("howHeading"), t("proofTitle"), t("proofLead"))}
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
             <div className="rounded-brand bg-mist px-5 py-5">
               <p className="font-mono text-4xl font-extrabold tabular-nums">{money(receivedCents)}</p>
@@ -234,168 +263,130 @@ export default async function HomePage({
               </li>
             ))}
           </ul>
-          <div>
-            <Link href="/transparentnost" className={more}>{content.fundsCta} →</Link>
-          </div>
-        </section>
-
-        {/* how it works */}
-        <section className={section}>
-          {header(t("howHeading"), t("howTitle"), t("howLead"))}
-          <ol className="mt-8 grid gap-3 sm:grid-cols-3">
-            {content.steps.map((step, index) => (
-              <li key={step.title} className="rounded-brand bg-mist px-5 py-5">
-                <span className="font-mono text-[12px] text-red">0{index + 1}</span>
-                <p className="mt-2 text-[17px] font-bold leading-snug">{step.title}</p>
-                <p className="mt-2 text-[14px] leading-relaxed text-black/65">{step.desc}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        {/* your say */}
-        <section className={section}>
-          {header(t("proposalsEyebrow"), t("proposalsHeading"), t("proposalsLead"))}
-          <div className="mt-2">
-            <ProposalsList proposals={proposals} myVotes={[]} signedIn={false} />
-          </div>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/kampanje?predlozi=1" className="inline-flex h-11 items-center rounded-lg bg-red px-5 text-[15px] font-bold text-paper hover:bg-red-dark">{t("proposalsCta")}</Link>
-            <Link href="/kampanje#prijedlozi" className="inline-flex h-11 items-center rounded-lg bg-mist px-5 text-[15px] font-semibold hover:bg-mist-2 hover:text-sea">{t("proposalsVoteCta")} →</Link>
+            <Link href="/transparentnost" className={secondary}>{content.fundsCta} →</Link>
+            <Link href="/kampanje?predlozi=1" className={primary}>{t("proposalsCta")}</Link>
           </div>
         </section>
 
-        {/* coming up */}
+        {/* 3 · events, grouped by the cause they raise for, with their photos */}
         <section className={section}>
-          {header(t("nextEvent"), t("eventsTitle"), t("eventsLead"))}
-          {events.length === 0 ? (
+          {header(t("nextEvent"), t("eventsByCauseTitle"), t("eventsByCauseLead"))}
+          {eventGroups.length === 0 ? (
             <p className="mt-8 text-[15px] text-black/60">{tEvents("noUpcoming")}</p>
           ) : (
-            <ul className="mt-8 overflow-hidden rounded-brand bg-mist">
-              {events.map((event) => (
-                <li key={event.slug} className="border-t-[0.5px] border-line first:border-t-0">
-                  <Link href={`/dogadjaji/${event.slug}`} className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-mist-2">
-                    <span className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-paper">
-                      <span className="font-mono text-[18px] font-extrabold leading-none tabular-nums">{dayOf.format(new Date(event.starts_at))}</span>
-                      <span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-black/55">{monthOf.format(new Date(event.starts_at)).replace(".", "")}</span>
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[16px] font-bold">{event.name}</span>
-                      <span className="block text-[13.5px] text-black/55">{kindLabel(event.kind)}{cleanVenue(event.venue) ? ` · ${cleanVenue(event.venue)}` : ""} · {shortDate.format(new Date(event.starts_at))}</span>
-                    </span>
-                    <span className="shrink-0 text-[14px] font-semibold text-sea">{eventCta(event.kind)} →</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-          <div>
-            <Link href="/dogadjaji" className={more}>{t("ctaEvents")} →</Link>
-          </div>
-        </section>
-
-        {/* causes */}
-        <section className={section}>
-          {header(t("causesHeading"), t("causesTitle"), t("causesLead"))}
-          {causes.length === 0 ? (
-            <p className="mt-8 text-[15px] text-black/60">{tCampaigns("empty")}</p>
-          ) : (
-            <ul className="mt-8 space-y-3">
-              {causes.map((cause) => {
-                const pct = pctOf(cause.raised_cents, cause.goal_cents);
+            <div className="mt-8 space-y-6">
+              {eventGroups.map((group) => {
+                const cause = group.cause;
+                const pct = cause ? pctOf(cause.raised_cents, cause.goal_cents) : null;
+                const photos = group.photos.slice(0, 4);
                 return (
-                  <li key={cause.slug}>
-                    <Link href={`/kampanje/${cause.slug}`} className="block rounded-brand bg-mist px-5 py-4 transition-colors hover:bg-mist-2">
-                      <span className="flex flex-wrap items-baseline justify-between gap-2">
-                        <span className="type-display text-xl">{cause.title}</span>
-                        <span className="font-mono text-[14px] tabular-nums text-black/70">
-                          {money(cause.raised_cents)}
-                          {cause.goal_cents ? <span className="text-black/45"> / {money(cause.goal_cents)}</span> : null}
-                          {pct !== null ? <span className="text-sea"> · {pct}%</span> : null}
+                  <div key={group.key} className="grid gap-3 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+                    {/* the cause */}
+                    {cause ? (
+                      <Link href={`/kampanje/${cause.slug}`} className="flex flex-col rounded-brand bg-sea px-5 py-5 text-paper transition-opacity hover:opacity-95">
+                        <span className="font-mono text-[11.5px] uppercase tracking-[0.16em] text-paper/70">{t("chipCause")}</span>
+                        <span className="type-display mt-2 text-2xl leading-tight">{cause.title}</span>
+                        <span className="mt-auto block pt-5">
+                          <span className="block font-mono text-[15px] tabular-nums">
+                            {money(cause.raised_cents)}
+                            {cause.goal_cents ? <span className="text-paper/60"> / {money(cause.goal_cents)}</span> : null}
+                          </span>
+                          <span className="mt-0.5 block text-[13px] text-paper/70">
+                            <span className="font-mono tabular-nums">{cause.donor_count}</span> {tRunner("donors")}
+                            {pct !== null ? ` · ${pct}% ${t("goalReached")}` : ""}
+                          </span>
+                          {pct !== null ? (
+                            <span className="mt-2.5 block h-[6px] overflow-hidden rounded-[3px] bg-paper/20">
+                              <span className="block h-full rounded-[3px] bg-red" style={{ width: `${Math.max(2, pct)}%` }} />
+                            </span>
+                          ) : null}
+                          <span className="mt-4 inline-flex h-10 items-center rounded-lg bg-red px-4 text-[14.5px] font-bold text-paper">{t("slideCauseCta")}</span>
                         </span>
-                      </span>
-                      <span className="mt-1 block text-[13.5px] text-black/55">
-                        <span className="font-mono tabular-nums">{cause.donor_count}</span> {tRunner("donors")}
-                      </span>
-                      {pct !== null ? (
-                        <span className="mt-2.5 block h-[6px] overflow-hidden rounded-[3px] bg-mist-2">
-                          <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
-                        </span>
+                      </Link>
+                    ) : (
+                      <div className="flex flex-col rounded-brand bg-mist px-5 py-5">
+                        <span className={eyebrowClass}>{t("chipEvent")}</span>
+                        <span className="type-display mt-2 text-2xl leading-tight">{t("eventsNoCause")}</span>
+                        <span className="mt-3 text-[14px] leading-relaxed text-black/60">{t("eventsNoCauseLead")}</span>
+                      </div>
+                    )}
+                    {/* its events, and their photos */}
+                    <div className="flex flex-col gap-3">
+                      <ul className="overflow-hidden rounded-brand bg-mist">
+                        {group.events.map((event) => (
+                          <li key={event.slug} className="border-t-[0.5px] border-line first:border-t-0">
+                            <Link href={`/dogadjaji/${event.slug}`} className="flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-mist-2">
+                              <span className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-paper">
+                                <span className="font-mono text-[18px] font-extrabold leading-none tabular-nums">{dayOf.format(new Date(event.starts_at))}</span>
+                                <span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-black/55">{monthOf.format(new Date(event.starts_at)).replace(".", "")}</span>
+                              </span>
+                              <span className="min-w-0 flex-1">
+                                <span className="block truncate text-[15.5px] font-bold">{event.name}</span>
+                                <span className="block text-[13.5px] text-black/55">{kindLabel(event.kind)}{cleanVenue(event.venue) ? ` · ${cleanVenue(event.venue)}` : ""} · {shortDate.format(new Date(event.starts_at))}</span>
+                              </span>
+                              <span className="hidden shrink-0 text-[14px] font-semibold text-sea sm:inline">{eventCta(event.kind)} →</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                      {photos.length > 0 ? (
+                        <Link href="/galerija" className="group flex items-center gap-2 rounded-brand bg-mist p-2 transition-colors hover:bg-mist-2">
+                          {photos.map((item) => {
+                            const src = galleryImageUrl(item.storage_path);
+                            return src ? <Image key={item.id} src={src} alt={item.caption ?? ""} width={120} height={90} className="h-[64px] w-[84px] shrink-0 rounded-lg bg-paper object-cover" /> : null;
+                          })}
+                          <span className="ml-auto pr-2 text-[14px] font-semibold text-sea">{t("viewGallery")} →</span>
+                        </Link>
                       ) : null}
-                    </Link>
-                  </li>
+                    </div>
+                  </div>
                 );
               })}
-            </ul>
+            </div>
           )}
-          <div>
-            <Link href="/kampanje" className={more}>{t("causesCta")} →</Link>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/dogadjaji" className={secondary}>{t("ctaEvents")} →</Link>
+            <Link href="/kampanje" className={secondary}>{t("causesCta")} →</Link>
           </div>
         </section>
 
-        {/* fundraisers */}
+        {/* 4 · top fundraisers, as a grid */}
         <section className={section}>
           {header(tLb("title"), t("fundraisersTitle"), t("fundraisersLead"))}
           {board.length === 0 ? (
             <p className="mt-8 text-[15px] text-black/60">{tLb("emptyIndividuals")}</p>
           ) : (
-            <div className="mt-8">
-              <LeaderboardList
-                locale={locale as Locale}
-                entries={board.map((row): LeaderboardEntry => ({ slug: row.slug, title: row.title, raisedCents: row.raised_cents, href: `/f/${row.slug}` }))}
-              />
-            </div>
-          )}
-          <div className="flex flex-wrap gap-3">
-            <Link href="/dashboard/prikupljaj" className={`${more} bg-red text-paper hover:bg-red-dark hover:text-paper`}>{tLb("cta")}</Link>
-            <Link href="/prikupljaci" className={more}>{tLb("fundraisersTitle")} →</Link>
-          </div>
-        </section>
-
-        {/* the record so far, and where we work */}
-        <section className={section}>
-          {header(t("triadHeading"), t("recordTitle"), t("recordLead"))}
-          <div className="mt-8 grid grid-cols-3 gap-3">
-            {content.triad.map((item) => (
-              <div key={item.big} className="rounded-brand bg-mist px-4 py-5">
-                <p className="type-display text-3xl text-red sm:text-4xl">{item.big}</p>
-                <p className="mt-2 text-[13.5px] leading-relaxed text-black/70">{item.label}</p>
-              </div>
-            ))}
-          </div>
-          {chapters.length > 0 ? (
-            <>
-              <p className={`${eyebrowClass} mt-10`}>{t("chaptersHeading")}</p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                {chapters.map((chapter) => (
-                  <div key={chapter.slug} className="rounded-brand bg-mist px-5 py-3.5">
-                    <p className="text-[15.5px] font-semibold">{chapter.name}</p>
-                    <p className="font-mono text-[13.5px] tabular-nums text-sea">{money(chapter.raised_cents)}</p>
-                  </div>
-                ))}
-              </div>
-            </>
-          ) : null}
-        </section>
-
-        {/* gallery (renders once photos with consent exist) */}
-        {gallery.length > 0 ? (
-          <section className={section}>
-            {header(t("galleryHeading"), t("galleryTitle"), t("galleryLead"))}
-            <div className="mt-8 flex gap-3 overflow-x-auto pb-2">
-              {gallery.map((item) => {
-                const src = galleryImageUrl(item.storage_path);
-                if (!src) return null;
-                return <Image key={item.id} src={src} alt={item.caption ?? ""} width={280} height={200} className="h-[200px] w-[280px] shrink-0 rounded-brand bg-mist object-cover" />;
+            <ol className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {board.map((row, index) => {
+                const photo = fundraiserPhotoUrl(row.photo_path);
+                return (
+                  <li key={row.slug}>
+                    <Link href={`/f/${row.slug}`} className="flex h-full flex-col rounded-brand bg-mist p-3 transition-colors hover:bg-mist-2">
+                      <span className="relative block aspect-[4/3] overflow-hidden rounded-lg bg-paper">
+                        {photo ? (
+                          <Image src={photo} alt="" fill sizes="(min-width: 640px) 220px, 45vw" className="object-cover" />
+                        ) : (
+                          <span aria-hidden className="type-display absolute inset-0 flex items-center justify-center text-[32px] text-sea">{row.title.charAt(0).toUpperCase()}</span>
+                        )}
+                        <span className="absolute left-2 top-2 rounded-md bg-paper/90 px-1.5 py-0.5 font-mono text-[12px] font-bold tabular-nums text-sea">#{index + 1}</span>
+                      </span>
+                      <span className="mt-3 block truncate text-[15px] font-bold">{row.title}</span>
+                      <span className="mt-0.5 block font-mono text-[14px] font-bold tabular-nums text-sea">{money(row.raised_cents)}</span>
+                      <span className="block text-[13px] text-black/55"><span className="font-mono tabular-nums">{row.donor_count}</span> {tRunner("donors")}</span>
+                    </Link>
+                  </li>
+                );
               })}
-            </div>
-            <div>
-              <Link href="/galerija" className={more}>{t("galleryCta")} →</Link>
-            </div>
-          </section>
-        ) : null}
+            </ol>
+          )}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/dashboard/prikupljaj" className={primary}>{tLb("cta")}</Link>
+            <Link href="/prikupljaci" className={secondary}>{tLb("fundraisersTitle")} →</Link>
+          </div>
+        </section>
 
-        {/* the partners: every sponsor of the latest year, with what they gave */}
+        {/* 5 · the partners: every sponsor of the latest year, with what they gave */}
         <section className={section}>
           {header(
             data.sponsorYear ? t("partnersOfYear", { year: data.sponsorYear }) : t("partnersHeading"),
@@ -411,16 +402,8 @@ export default async function HomePage({
               <p className="text-[14px] text-sea">{t("partnersNote")}</p>
             </div>
           )}
-          <div>
-            <Link href="/partneri" className={more}>{t("partnersCta")} →</Link>
-          </div>
-        </section>
-
-        {/* newsletter + monthly donor club */}
-        <section className={`${section} min-h-0 py-20`}>
-          {header(t("newsletterHeading"), t("newsletterTitle"), t("newsletterSub"))}
-          <div className="mt-6 max-w-xl">
-            <InboundForm kind="newsletter" compact />
+          <div className="mt-6">
+            <Link href="/partneri" className={secondary}>{t("partnersCta")} →</Link>
           </div>
         </section>
       </div>
