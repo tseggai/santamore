@@ -190,7 +190,7 @@ export function HeroSlides({ slides }: { slides: HeroSlide[] }) {
         if (end - start > 48) go(index - 1);
         if (start - end > 48) go(index + 1);
       }}
-      className="relative min-h-[calc(100dvh-64px)] overflow-hidden bg-sea text-paper sm:min-h-[calc(100dvh-72px)]"
+      className="relative min-h-[100dvh] overflow-hidden bg-sea text-paper"
     >
       {slides.map((slide, i) => {
         const active = i === index;
@@ -206,7 +206,7 @@ export function HeroSlides({ slides }: { slides: HeroSlide[] }) {
             {slide.image ? <Image src={slide.image} alt="" fill priority={i === 0} sizes="100vw" className="object-cover" /> : null}
             <div className={`absolute inset-0 ${slide.image ? "bg-gradient-to-r from-sea via-sea/80 to-sea/40" : "bg-gradient-to-br from-sea to-sea-2"}`} />
             {/* the same column as every content page; only the picture runs edge to edge */}
-            <div className="relative mx-auto w-full max-w-3xl px-5 pb-24 pt-14 sm:pb-28 sm:pt-16">
+            <div className="relative mx-auto w-full max-w-3xl px-5 pb-24 pt-[calc(56px+64px)] sm:pb-28 sm:pt-[calc(64px+76px)]">
               <div>
                 <span className="inline-flex items-center gap-2 rounded-full bg-paper/15 px-3 py-1 font-mono text-[11.5px] uppercase tracking-[0.16em] text-paper">
                   <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-red" />

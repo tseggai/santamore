@@ -22,11 +22,14 @@ export function MobileMenu({
   consoleItem,
   openLabel,
   closeLabel,
+  light = false,
 }: {
   items: MenuItem[];
   consoleItem: MenuItem;
   openLabel: string;
   closeLabel: string;
+  /** On the transparent header over the landing hero. */
+  light?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -59,7 +62,9 @@ export function MobileMenu({
         aria-expanded={open}
         aria-controls={id}
         onClick={() => setOpen(true)}
-        className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-mist text-black transition-colors hover:bg-mist-2 md:hidden"
+        className={`inline-flex h-10 w-10 items-center justify-center rounded-lg transition-colors md:hidden ${
+          light ? "bg-paper/15 text-paper hover:bg-paper/25" : "bg-mist text-black hover:bg-mist-2"
+        }`}
       >
         <svg aria-hidden viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
           <path d="M3 5.5h14M3 10h14M3 14.5h14" />
