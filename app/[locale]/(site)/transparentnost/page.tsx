@@ -7,7 +7,9 @@ import remarkGfm from "remark-gfm";
 
 import { LedgerTabs, type LedgerRow } from "@/components/ledger/LedgerTabs";
 import { YearTabs } from "@/components/ledger/YearTabs";
-import { SponsorGrid, type PublicSponsor } from "@/components/partners/SponsorGrid";
+import { DonorWall } from "@/components/ledger/DonorWall";
+import { SponsorGrid } from "@/components/partners/SponsorGrid";
+import { groupDonors, type GiftDetail, type PublicSponsor } from "@/lib/sponsors";
 import { formatShortDate } from "@/lib/dates";
 import { formatCents, formatSignedCents } from "@/lib/money";
 import { disbursementDocUrl } from "@/lib/storage";
@@ -90,6 +92,15 @@ interface EventRow {
   kind: string;
 }
 type SupporterRow = PublicSponsor;
+interface DealRow {
+  supporter_id: string | null;
+  tier: string | null;
+  is_in_kind: boolean;
+  amount_cents: number | null;
+  campaign_title: string | null;
+  event_name: string | null;
+  starts_at: string | null;
+}
 
 /**
  * The ledger, whole or for one calendar year. Year rows are read straight
@@ -102,7 +113,7 @@ async function fetchLedger(year: number | null) {
   const to = year ? `${year + 1}-01-01` : null;
   const windowed = <T extends { gte: (c: string, v: string) => T; lt: (c: string, v: string) => T }>(q: T) =>
     from && to ? q.gte("entry_date", from).lt("entry_date", to) : q;
-  const [summary, ops, inRows, outRows, adjustments, yearStats, yearReports, events, supporters] = await Promise.all([
+  const [summary, ops, inRows, outRows, adjustments, yearStats, yearReports, events, supporters, deals] = await Promise.all([
     supabase.from("v_public_ledger_summary").select("*").single(),
     supabase.from("v_public_ops_total").select("*").single(),
     windowed(supabase.from("v_public_ledger_in").select("*")).order("entry_date", { ascending: false }).limit(year ? 1000 : 150),
@@ -116,7 +127,18 @@ async function fetchLedger(year: number | null) {
     year
       ? supabase.from("v_public_year_supporters").select("id, name, slug, kind, logo_path, website, cash_cents, in_kind, tiers, offers").eq("year", year)
       : Promise.resolve({ data: [] as SupporterRow[] }),
+    year
+      ? supabase.from("v_public_sponsors").select("supporter_id, tier, is_in_kind, amount_cents, campaign_title, event_name, starts_at").eq("year", year)
+      : Promise.resolve({ data: [] as DealRow[] }),
   ]);
+  // Each supporter's gifts of the year, for the detail behind a tile or chip.
+  const giftsOf = new Map<string, GiftDetail[]>();
+  for (const d of (deals.data ?? []) as DealRow[]) {
+    if (!d.supporter_id) continue;
+    const list = giftsOf.get(d.supporter_id) ?? [];
+    list.push({ amount_cents: d.is_in_kind ? null : d.amount_cents, in_kind: d.is_in_kind, tier: d.tier, target: d.event_name ?? d.campaign_title, date: d.starts_at });
+    giftsOf.set(d.supporter_id, list);
+  }
   return {
     summary: summary.data as {
       received_cents: number;
@@ -131,7 +153,7 @@ async function fetchLedger(year: number | null) {
     yearStats: (yearStats.data ?? []) as YearStats[],
     yearReports: (yearReports.data ?? []) as YearReport[],
     events: (events.data ?? []) as EventRow[],
-    supporters: (supporters.data ?? []) as SupporterRow[],
+    supporters: ((supporters.data ?? []) as SupporterRow[]).map((su) => ({ ...su, gifts: giftsOf.get(su.id) ?? [] })),
   };
 }
 
@@ -174,29 +196,40 @@ export default async function LedgerPage({
   // the derived ones wherever they are set.
   const legacy = Boolean(report?.is_legacy);
   const f = legacy ? (report?.figures ?? {}) : {};
+  const legacyEvents = legacy ? (report?.events ?? []) : [];
+  const legacyBeneficiaries = legacy ? (report?.beneficiaries_list ?? []) : [];
+  const legacyDonorRows = legacy ? (report?.donors_list ?? []) : [];
+  // The donor wall: individuals recorded as supporters plus the list of a
+  // legacy year, one chip per name with every gift behind it.
+  const donors = groupDonors([
+    ...individualDonors.flatMap((su) =>
+      (su.gifts ?? []).length > 0
+        ? (su.gifts ?? []).map((g) => ({ name: su.name, amount_cents: g.amount_cents, target: g.target, date: g.date }))
+        : [{ name: su.name, amount_cents: su.cash_cents > 0 ? su.cash_cents : null }],
+    ),
+    ...legacyDonorRows,
+  ]);
+  const sponsorCash = supporters.reduce((sum, su) => sum + su.cash_cents, 0);
+  const listSum = (rows: { amount_cents: number | null }[]) => rows.reduce((sum, row) => sum + (row.amount_cents ?? 0), 0);
+  // A legacy year's figures: a typed figure wins; else what the report's
+  // lists add up to; else what the ledger derives. Sponsors are the tiles.
+  const legacyOr = (typed: number | undefined, fromList: number | null, fromLedger: number) =>
+    typed ?? (legacy && fromList !== null ? fromList : fromLedger);
   const stats: YearStats | null = derived
     ? {
         ...derived,
-        received_cents: f.received_cents ?? derived.received_cents,
-        disbursed_cents: f.disbursed_cents ?? derived.disbursed_cents,
+        received_cents: legacyOr(f.received_cents, legacyDonorRows.length > 0 ? listSum(legacyDonorRows) : null, derived.received_cents),
+        disbursed_cents: legacyOr(f.disbursed_cents, legacyBeneficiaries.length > 0 ? listSum(legacyBeneficiaries) : null, derived.disbursed_cents),
         operations_cents: f.operations_cents ?? derived.operations_cents,
-        donor_count: f.donors ?? derived.donor_count,
+        donor_count: legacyOr(f.donors, donors.length > 0 ? donors.length : null, derived.donor_count),
         runner_count: f.runners ?? derived.runner_count,
         page_count: f.pages ?? derived.page_count,
         team_count: f.teams ?? derived.team_count,
-        event_count: f.events ?? derived.event_count,
-        supporter_count: f.supporters ?? derived.supporter_count,
+        event_count: legacyOr(f.events, legacyEvents.length > 0 ? legacyEvents.length : null, derived.event_count),
+        supporter_count: f.supporters ?? (supporters.length > 0 ? supporters.length : derived.supporter_count),
+        beneficiary_count: legacyBeneficiaries.length > 0 ? legacyBeneficiaries.length : derived.beneficiary_count,
       }
     : null;
-  const legacyEvents = legacy ? (report?.events ?? []) : [];
-  const legacySupporters = legacy ? (report?.supporters ?? []) : [];
-  const sponsorCash = supporters.reduce((sum, su) => sum + su.cash_cents, 0);
-  const legacyBeneficiaries = legacy ? (report?.beneficiaries_list ?? []) : [];
-  // The donor wall: individuals recorded as supporters plus the list of a legacy year, largest gift first.
-  const donors = [
-    ...individualDonors.map((su) => ({ name: su.name, amount_cents: su.cash_cents > 0 ? su.cash_cents : null })),
-    ...(legacy ? (report?.donors_list ?? []) : []),
-  ].sort((a, b) => (b.amount_cents ?? -1) - (a.amount_cents ?? -1) || a.name.localeCompare(b.name));
   const tense = year === null ? "all" : year < thisYear ? "past" : year === thisYear ? "current" : "future";
   // unallocated_cents can transiently go negative (a disbursement published
   // while its matching credits are still pending approval) — the flagship
@@ -364,6 +397,23 @@ export default async function LedgerPage({
 
       {stats ? (
         <>
+          {/* where the money went, in the public form */}
+          <section className="mt-5">
+            <h3 className="type-eyebrow text-sea/80">{tYears("beneficiariesHeading")}</h3>
+            {beneficiaries.length === 0 ? (
+              <p className="mt-2 text-[14px] text-black/55">{tYears("noBeneficiaries")}</p>
+            ) : (
+              <ul className="mt-2 overflow-hidden rounded-lg bg-mist">
+                {beneficiaries.map((row) => (
+                  <li key={row.label} className="flex items-baseline justify-between gap-3 border-t-[0.5px] border-line px-4 py-2.5 text-[14.5px] first:border-t-0">
+                    <span>{row.label}</span>
+                    <span className="whitespace-nowrap font-mono tabular-nums">{money(row.cents)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
           {/* the year in figures */}
           <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {figures.map((figure) => (
@@ -438,56 +488,23 @@ export default async function LedgerPage({
                 </p>
               ) : null}
             </div>
-            {supporters.length === 0 && legacySupporters.length === 0 ? (
+            {supporters.length === 0 ? (
               <p className="mt-2 text-[14px] text-black/55">{tYears("noSupporters")}</p>
-            ) : null}
-            {supporters.length > 0 ? (
+            ) : (
               <div className="mt-3">
-                <SponsorGrid sponsors={supporters} locale={locale as Locale} inKindLabel={tYears("inKind")} />
+                <SponsorGrid sponsors={supporters} inKindLabel={tYears("inKind")} />
               </div>
-            ) : null}
-            {legacySupporters.length > 0 ? (
-              <ul className="mt-3 flex flex-wrap gap-2">
-                {legacySupporters.map((name) => (
-                  <li key={`legacy-${name}`}>
-                    <span className="inline-flex items-center rounded-lg bg-mist px-3 py-2 text-[14px] font-semibold">{name}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+            )}
           </section>
 
-          {/* the donor wall: individuals, by name */}
+          {/* the donor wall: one chip per name, the gifts behind it */}
           {donors.length > 0 ? (
             <section className="mt-7">
               <h3 className="type-eyebrow text-sea/80">{tYears("donorsHeading")}</h3>
-              <ul className="mt-2 flex flex-wrap gap-2">
-                {donors.map((donor, index) => (
-                  <li key={`${donor.name}-${index}`} className="inline-flex items-baseline gap-2 rounded-lg bg-mist px-3 py-2 text-[14px]">
-                    <span className="font-semibold">{donor.name}</span>
-                    {donor.amount_cents != null ? <span className="font-mono text-[13px] tabular-nums text-black/60">{money(donor.amount_cents)}</span> : null}
-                  </li>
-                ))}
-              </ul>
+              <DonorWall donors={donors} wentTo={beneficiaries.map((row) => row.label)} />
             </section>
           ) : null}
 
-          {/* where the money went, in the public form */}
-          <section className="mt-7">
-            <h3 className="type-eyebrow text-sea/80">{tYears("beneficiariesHeading")}</h3>
-            {beneficiaries.length === 0 ? (
-              <p className="mt-2 text-[14px] text-black/55">{tYears("noBeneficiaries")}</p>
-            ) : (
-              <ul className="mt-2 overflow-hidden rounded-lg bg-mist">
-                {beneficiaries.map((row) => (
-                  <li key={row.label} className="flex items-baseline justify-between gap-3 border-t-[0.5px] border-line px-4 py-2.5 text-[14.5px] first:border-t-0">
-                    <span>{row.label}</span>
-                    <span className="whitespace-nowrap font-mono tabular-nums">{money(row.cents)}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
         </>
       ) : null}
 
