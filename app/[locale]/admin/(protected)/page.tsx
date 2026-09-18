@@ -223,7 +223,7 @@ export default async function AdminOverviewPage({
             </p>
           </Link>
           <Link
-            href="/admin/clanovi"
+            href="/admin/clanovi/nalozi"
             className="rounded-lg bg-mist px-4 py-3.5 transition-colors hover:bg-mist-2"
           >
             <p className="font-mono text-xl tabular-nums">

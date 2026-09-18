@@ -110,5 +110,7 @@ select * from (values
                  where table_schema = 'public' and table_name = 'profiles' and column_name = 'is_team'))
   ,('20260918000041_santamore25_event_beneficiaries',
      to_regclass('public.beneficiaries') is not null)
+  ,('20260918000042_team_members',
+     to_regclass('public.team_members') is not null)
 ) as m (migration, applied)
 order by migration;

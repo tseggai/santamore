@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
 import { savePostGroup } from "@/app/[locale]/admin/(protected)/sadrzaj/actions";
-import { translatePost } from "@/app/[locale]/admin/(protected)/sadrzaj/translate";
+import { TranslateBar } from "@/components/admin/TranslateBar";
 import { CoverField } from "@/components/admin/CoverField";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 import { PreviewFrame } from "@/components/admin/PreviewFrame";
@@ -73,15 +73,12 @@ export function PostEditor({ group, onSaved }: { group: PostGroup | null; onSave
   const [preview, setPreview] = useState(false);
   const [state, setState] = useState<State>("idle");
   const [detail, setDetail] = useState<string | null>(null);
-  const [translating, setTranslating] = useState(false);
-  const [translateNote, setTranslateNote] = useState<string | null>(null);
 
   const draft = drafts[tab];
   const setDraft = (patch: Partial<Draft>) => setDrafts((all) => ({ ...all, [tab]: { ...all[tab], ...patch } }));
   const filled = (l: Locale) => drafts[l].title.trim().length > 0 || drafts[l].body.trim().length > 0;
   const effectiveSlug = slug || slugify(drafts[routing.defaultLocale as Locale].title || draft.title);
   const dateLabel = formatShortDate(first?.published_at ?? new Date().toISOString(), uiLocale);
-  const sources = routing.locales.filter((l) => l !== tab && filled(l as Locale)) as Locale[];
 
   const save = async (publish: boolean) => {
     if (state === "busy") return;
@@ -102,20 +99,6 @@ export function PostEditor({ group, onSaved }: { group: PostGroup | null; onSave
     } else {
       setState(result.detail === "slug" ? "slug" : "error");
       setDetail(result.detail ?? null);
-    }
-  };
-
-  const translate = async (from: Locale) => {
-    setTranslating(true);
-    setTranslateNote(null);
-    const source = drafts[from];
-    const result = await translatePost({ from, to: tab, title: source.title, excerpt: source.excerpt, body: source.body }).catch(() => ({ ok: false as const, error: "server" as const }));
-    setTranslating(false);
-    if (result.ok) {
-      setDraft({ title: result.title, excerpt: result.excerpt, body: result.body });
-      setTranslateNote(t("postTranslated"));
-    } else {
-      setTranslateNote(result.error === "unconfigured" ? t("postTranslateUnconfigured") : `${t("actionError")} ${"detail" in result && result.detail ? result.detail : ""}`.trim());
     }
   };
 
@@ -153,10 +136,7 @@ export function PostEditor({ group, onSaved }: { group: PostGroup | null; onSave
             type="button"
             role="tab"
             aria-selected={tab === l}
-            onClick={() => {
-              setTab(l as Locale);
-              setTranslateNote(null);
-            }}
+            onClick={() => setTab(l as Locale)}
             className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-mono text-[13px] uppercase tracking-[0.08em] transition-colors ${
               tab === l ? "bg-ink text-paper" : "bg-paper hover:bg-mist-2"
             }`}
@@ -165,23 +145,12 @@ export function PostEditor({ group, onSaved }: { group: PostGroup | null; onSave
             <span aria-hidden className={`h-1.5 w-1.5 rounded-full ${filled(l as Locale) ? (tab === l ? "bg-red" : "bg-sea") : "bg-black/20"}`} />
           </button>
         ))}
-        {sources.length > 0 ? (
-          <span className="ml-auto flex flex-wrap items-center gap-1.5">
-            {sources.map((from) => (
-              <button
-                key={from}
-                type="button"
-                disabled={translating}
-                onClick={() => translate(from)}
-                className="rounded-lg bg-paper px-3 py-1.5 text-[13px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-50"
-              >
-                {translating ? "…" : t("postTranslateFrom", { locale: from.toUpperCase() })}
-              </button>
-            ))}
-          </span>
-        ) : null}
       </div>
-      {translateNote ? <p className="text-[13.5px] font-semibold text-sea">{translateNote}</p> : null}
+      <TranslateBar
+        source={tab}
+        getFields={() => ({ title: draft.title, excerpt: draft.excerpt, body: draft.body })}
+        apply={(loc, fields) => setDrafts((all) => ({ ...all, [loc]: { ...all[loc], title: fields.title ?? all[loc].title, excerpt: fields.excerpt ?? all[loc].excerpt, body: fields.body ?? all[loc].body } }))}
+      />
 
       <label className={labelClass}>
         {t("postTitle")}
