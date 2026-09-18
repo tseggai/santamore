@@ -40,6 +40,11 @@ export default async function AdminMembersPage({
       supabase.from("campaigns").select("id, title").limit(1000),
     ]);
 
+  // Access levels and team profiles are an admin's to change.
+  const { data: { user } } = await supabase.auth.getUser();
+  const me = ((members ?? []) as MemberRow[]).find((m) => m.id === user?.id);
+  const canManage = me?.role === "admin";
+
   const eventName = new Map(((events ?? []) as { id: string; name: string }[]).map((e) => [e.id, e.name]));
   const causeTitle = new Map(((causeRows ?? []) as { id: string; title: string }[]).map((c) => [c.id, c.title]));
   const memberPages: MemberPage[] = ((pages ?? []) as { id: string; user_id: string; slug: string; title: string; status: "draft" | "active" | "hidden"; goal_cents: number | null; campaign_id: string | null }[]).map((page) => ({
@@ -65,6 +70,7 @@ export default async function AdminMembersPage({
         pages={memberPages}
         registrations={memberRegistrations}
         teams={memberTeams}
+        canManage={canManage}
       />
 
     </div>

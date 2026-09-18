@@ -104,5 +104,9 @@ select * from (values
   ,('20260918000039_sponsor_fund',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'sponsors' and column_name = 'fund'))
+  ,('20260918000040_team_profiles_site_pages',
+     to_regclass('public.site_pages') is not null
+     and exists (select 1 from information_schema.columns
+                 where table_schema = 'public' and table_name = 'profiles' and column_name = 'is_team'))
 ) as m (migration, applied)
 order by migration;

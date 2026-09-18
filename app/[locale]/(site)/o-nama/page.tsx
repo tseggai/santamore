@@ -2,13 +2,24 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { aboutContent } from "@/content/site/about";
+import { aboutContent, type AboutContent } from "@/content/site/about";
 import { howContent } from "@/content/site/how";
+import { loadSitePage } from "@/lib/site-pages-server";
+import { teamPhotoUrl } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
+// Staff edit this page from the admin; the team comes from members' profiles.
+export const dynamic = "force-dynamic";
+
+interface TeamRow {
+  id: string;
+  full_name: string;
+  title: string | null;
+  quote: string | null;
+  photo_path: string | null;
+  team_order: number;
 }
 
 export async function generateMetadata({
@@ -18,7 +29,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const content = aboutContent[locale as Locale];
+  const content = await loadSitePage("about", locale as Locale, aboutContent[locale as Locale]);
   return { title: `${content.heroEyebrow} — Santamore`, description: content.heroLead };
 }
 
@@ -32,8 +43,17 @@ export default async function AboutPage({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const content = aboutContent[locale as Locale];
+  const content: AboutContent = await loadSitePage("about", locale as Locale, aboutContent[locale as Locale]);
   const tNav = await getTranslations("nav");
+  // The team: members who agreed to appear, else the shipped names and words.
+  let team: TeamRow[] = [];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.from("v_public_team").select("id, full_name, title, quote, photo_path, team_order").order("team_order").order("full_name");
+    team = (data ?? []) as TeamRow[];
+  } catch {
+    team = [];
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
@@ -123,12 +143,29 @@ export default async function AboutPage({
         <p className={eyebrowClass}>{content.teamHeading}</p>
         <p className="mt-4 max-w-2xl text-[16px] leading-relaxed">{content.teamLead}</p>
         <ul className="mt-5 grid gap-4 sm:grid-cols-2">
-          {content.team.map((member) => (
-            <li key={member.name} className="rounded-brand bg-mist px-5 py-4">
-              <p className="type-display text-xl">{member.name}</p>
-              <p className="mt-2 text-[14.5px] leading-relaxed text-black/70">“{member.quote}”</p>
-            </li>
-          ))}
+          {team.length > 0
+            ? team.map((member) => {
+                const photo = teamPhotoUrl(member.photo_path);
+                return (
+                  <li key={member.id} className="flex gap-4 rounded-brand bg-mist px-5 py-4">
+                    {photo ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- public bucket, arbitrary sizes
+                      <img src={photo} alt="" className="h-16 w-16 shrink-0 rounded-lg object-cover" />
+                    ) : null}
+                    <div className="min-w-0">
+                      <p className="type-display text-xl">{member.full_name}</p>
+                      {member.title ? <p className="mt-0.5 text-[14px] text-black/60">{member.title}</p> : null}
+                      {member.quote ? <p className="mt-2 text-[14.5px] leading-relaxed text-black/70">“{member.quote}”</p> : null}
+                    </div>
+                  </li>
+                );
+              })
+            : content.team.map((member) => (
+                <li key={member.name} className="rounded-brand bg-mist px-5 py-4">
+                  <p className="type-display text-xl">{member.name}</p>
+                  <p className="mt-2 text-[14.5px] leading-relaxed text-black/70">“{member.quote}”</p>
+                </li>
+              ))}
         </ul>
       </section>
 

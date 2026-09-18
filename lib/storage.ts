@@ -23,3 +23,8 @@ export function disbursementDocUrl(path: string | null): string | null {
 export function galleryImageUrl(path: string | null): string | null {
   return publicStorageUrl("gallery", path);
 }
+
+/** Team photos on /o-nama, published with the member's consent. */
+export function teamPhotoUrl(path: string | null): string | null {
+  return publicStorageUrl("team-photos", path);
+}
