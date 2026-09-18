@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { DonateButton } from "@/components/donate/DonateButton";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { MobileMenu } from "@/components/MobileMenu";
+import { NavDropdown } from "@/components/NavDropdown";
 import { Link, usePathname } from "@/i18n/navigation";
 import iconColor from "@/public/brand/SantamoreIcon-Color.png";
 import iconWhite from "@/public/brand/SantamoreIcon-White.png";
@@ -16,7 +17,19 @@ const NAV_ITEMS = [
   { href: "/kampanje", key: "campaigns" },
   { href: "/prikupljaci", key: "fundraisers" },
   { href: "/transparentnost", key: "ledger" },
+] as const;
+
+/** Everything about us, behind one "About us" item. */
+const ABOUT_ITEMS = [
   { href: "/o-nama", key: "about" },
+  { href: "/kako-radimo", key: "how" },
+  { href: "/partneri", key: "partners" },
+  { href: "/vijesti", key: "news" },
+  { href: "/galerija", key: "gallery" },
+  { href: "/cesta-pitanja", key: "faq" },
+  { href: "/volontiraj", key: "volunteer" },
+  { href: "/prijava-za-pomoc", key: "apply" },
+  { href: "/kontakt", key: "contact" },
 ] as const;
 
 /**
@@ -65,6 +78,11 @@ export default function Header() {
               {t(`nav.${item.key}`)}
             </Link>
           ))}
+          <NavDropdown
+            label={t("nav.about")}
+            items={ABOUT_ITEMS.map((item) => ({ href: item.href, label: t(`nav.aboutMenu.${item.key}`) }))}
+            className={`text-[15px] font-semibold ${link}`}
+          />
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -84,6 +102,7 @@ export default function Header() {
           {/* phone: everything else behind one button */}
           <MobileMenu
             items={NAV_ITEMS.map((item) => ({ href: item.href, label: t(`nav.${item.key}`) }))}
+            group={{ label: t("nav.about"), items: ABOUT_ITEMS.map((item) => ({ href: item.href, label: t(`nav.aboutMenu.${item.key}`) })) }}
             consoleItem={{ href: "/dashboard", label: t("nav.myPage") }}
             openLabel={t("nav.menu")}
             closeLabel={t("nav.menuClose")}

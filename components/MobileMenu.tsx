@@ -19,12 +19,15 @@ export interface MenuItem {
  */
 export function MobileMenu({
   items,
+  group,
   consoleItem,
   openLabel,
   closeLabel,
   light = false,
 }: {
   items: MenuItem[];
+  /** A labelled group of secondary pages under the main links. */
+  group?: { label: string; items: MenuItem[] };
   consoleItem: MenuItem;
   openLabel: string;
   closeLabel: string;
@@ -103,6 +106,16 @@ export function MobileMenu({
                   {item.label}
                 </Link>
               ))}
+              {group ? (
+                <>
+                  <p className="mt-3 px-3 pb-1 font-mono text-[11.5px] uppercase tracking-[0.16em] text-sea/80">{group.label}</p>
+                  {group.items.map((item) => (
+                    <Link key={item.href} href={item.href} className={`${linkClass} py-2 text-[15.5px]`}>
+                      {item.label}
+                    </Link>
+                  ))}
+                </>
+              ) : null}
             </nav>
             <div className="mt-auto border-t-[0.5px] border-line pt-3">
               <Link href={consoleItem.href} className={`${linkClass} text-sea`}>

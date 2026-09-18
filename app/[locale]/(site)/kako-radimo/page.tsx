@@ -2,13 +2,14 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
-import { howContent } from "@/content/site/how";
+import { howContent, type HowContent } from "@/content/site/how";
+import { loadSitePage } from "@/lib/site-pages-server";
+
+// Staff edit this page from the admin.
+export const dynamic = "force-dynamic";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 
-export function generateStaticParams() {
-  return routing.locales.map((locale) => ({ locale }));
-}
 
 export async function generateMetadata({
   params,
@@ -17,7 +18,7 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const content = howContent[locale as Locale];
+  const content = await loadSitePage("how", locale as Locale, howContent[locale as Locale]);
   return { title: `${content.heroEyebrow} — Santamore`, description: content.heroLead };
 }
 
@@ -31,7 +32,7 @@ export default async function HowPage({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const content = howContent[locale as Locale];
+  const content: HowContent = await loadSitePage("how", locale as Locale, howContent[locale as Locale]);
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
