@@ -8,13 +8,13 @@ import { Link } from "@/i18n/navigation";
 const ITEMS = [
   { href: "/admin", key: "navOverview", exact: true },
   { href: "/admin/novac", key: "navMoney", exact: false },
-  { href: "/admin/clanovi", key: "navMembers", exact: false },
-  { href: "/admin/dogadjaji", key: "navEvents", exact: false },
   { href: "/admin/kampanje", key: "navCampaigns", exact: false },
+  { href: "/admin/dogadjaji", key: "navEvents", exact: false },
+  { href: "/admin/korisnici", key: "navBeneficiaries", exact: false },
   { href: "/admin/podrska", key: "navSupporters", exact: false },
-  { href: "/admin/sadrzaj", key: "navContent", exact: false },
+  { href: "/admin/clanovi", key: "navMembers", exact: false },
   { href: "/admin/poruke", key: "navMessages", exact: false },
-  { href: "/admin/demo", key: "navDemo", exact: false },
+  { href: "/admin/podesavanja", key: "navSettings", exact: false },
 ] as const;
 
 /** Console nav: one vertical list, in the desktop rail and the phone drawer alike. */

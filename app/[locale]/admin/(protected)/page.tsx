@@ -211,7 +211,7 @@ export default async function AdminOverviewPage({
         <h2 className="text-[16px] font-bold">{t("stateHeading")}</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <Link
-            href="/admin/prijave"
+            href="/admin/dogadjaji/prijave"
             className="rounded-lg bg-mist px-4 py-3.5 transition-colors hover:bg-mist-2"
           >
             <p className="font-mono text-xl tabular-nums">

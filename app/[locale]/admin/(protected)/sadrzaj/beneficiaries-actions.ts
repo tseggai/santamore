@@ -54,7 +54,7 @@ export async function saveBeneficiary(input: unknown): Promise<BeneficiaryResult
     console.error("[admin] beneficiary save failed:", result.error?.code);
     return { ok: false, error: "server" };
   }
-  revalidatePath("/[locale]/admin/sadrzaj", "page");
+  revalidatePath("/[locale]/admin/korisnici", "page");
   revalidatePath("/[locale]/korisnici", "page");
   revalidatePath("/[locale]/kampanje", "layout");
   return { ok: true, beneficiary: result.data };
@@ -71,7 +71,7 @@ export async function deleteBeneficiary(input: unknown): Promise<BeneficiaryResu
   const { data: files } = await photos.list(parsed.data.id);
   if (files && files.length > 0) await photos.remove(files.map((file) => `${parsed.data.id}/${file.name}`));
   if (row?.photo_path && !row.photo_path.startsWith(`${parsed.data.id}/`)) await photos.remove([row.photo_path]);
-  revalidatePath("/[locale]/admin/sadrzaj", "page");
+  revalidatePath("/[locale]/admin/korisnici", "page");
   revalidatePath("/[locale]/korisnici", "page");
   revalidatePath("/[locale]/kampanje", "layout");
   return { ok: true };

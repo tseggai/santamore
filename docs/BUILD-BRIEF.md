@@ -241,15 +241,21 @@ Also: `robots.txt`, `sitemap.xml`, per-page OpenGraph images (dynamic for fundra
 /dashboard/gotovina     Log cash I collected
 /dashboard/alati        Share toolkit
 
-/admin                  Revenue by stream, chapter, event
-/admin/donacije         Search, refund, resend receipt, SEPA reconciliation queue
-/admin/prijave          Registrations, waivers, sizes, bibs, CSV export
-/admin/prikupljaci      Approve, moderate, message, feature
-/admin/isplate          Record disbursement, upload proof, publish
-/admin/dogadjaji        Create and edit events
-/admin/sadrzaj          News, gallery uploads
-/admin/partneri         Sponsor pipeline, contracts, deliverables
+/admin                  Overview: revenue by stream, chapter, event; work queues
+/admin/novac            Money: summary · incoming (match, refund, receipts) · outgoing (hand-overs, proof, publish) · donor wall · years
+/admin/kampanje         Causes · proposals
+/admin/dogadjaji        Events (with their photos and offers) · registrations (waivers, sizes, bibs, CSV)
+/admin/korisnici        Beneficiaries: stories, photos, websites, the cause that reached them
+/admin/podrska          Supporters: sponsors and individual donors, sponsorships by year and fund
+/admin/clanovi          Members: pages, registrations, team profiles, access levels
+/admin/poruke           Inbox
+/admin/podesavanja      Settings: editorial pages · news · photos overview · demo data
 ```
+
+One place per record; a form that needs a cause, supporter or member picks
+an existing one and links to its section to add a new one. Old routes
+(`/admin/donacije`, `/admin/isplate`, `/admin/prijave`, `/admin/prikupljaci`,
+`/admin/partneri`, `/admin/sadrzaj`, `/admin/demo`) redirect.
 
 Admin gated on `profiles.role in ('admin','chapter_lead')`, enforced in **RLS and middleware**. Hiding UI is not access control.
 

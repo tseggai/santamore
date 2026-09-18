@@ -31,7 +31,7 @@ export async function setBibNumber(input: unknown): Promise<ActionResult> {
     .single();
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/prijave", "page");
+  revalidatePath("/[locale]/admin/dogadjaji", "layout");
   return { ok: true };
 }
 
@@ -52,6 +52,6 @@ export async function cancelRegistration(input: unknown): Promise<ActionResult> 
     .single();
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/prijave", "page");
+  revalidatePath("/[locale]/admin/dogadjaji", "layout");
   return { ok: true };
 }
