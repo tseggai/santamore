@@ -418,16 +418,19 @@ export function CampaignsManager({
   chapters,
   title,
   lead,
+  initialOpenId = "",
 }: {
   title: string;
   lead: string;
   locale: Locale;
   campaigns: CampaignRow[];
   chapters: Option[];
+  /** A cause to open straight away, e.g. from a year report's "Edit cause". */
+  initialOpenId?: string;
 }) {
   const t = useTranslations("admin");
   const router = useRouter();
-  const [open, setOpen] = useState<"" | "new" | string>("");
+  const [open, setOpen] = useState<"" | "new" | string>(campaigns.some((c) => c.id === initialOpenId) ? initialOpenId : "");
   const [busy, setBusy] = useState(false);
   const openCampaign = campaigns.find((candidate) => candidate.id === open) ?? null;
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
