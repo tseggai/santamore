@@ -8,6 +8,7 @@ import { deleteFundraiser, saveMemberProfile } from "@/app/[locale]/admin/(prote
 
 import { DataTable, Thumb, bulkButton, type Column } from "@/components/console/DataTable";
 import { formatShortDate } from "@/lib/dates";
+import { FocusChip } from "@/components/console/FocusChip";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
 
@@ -52,6 +53,7 @@ export interface MemberPage {
   goal_cents: number | null;
   event_name: string;
   team_id: string | null;
+  campaign_id: string | null;
 }
 
 export interface MemberRegistration {
@@ -131,7 +133,10 @@ export function MembersManager({
   teams,
   canManage = false,
   mode = "members",
+  focus = null,
 }: {
+  /** The list narrowed by a link from elsewhere, e.g. an event's pages. */
+  focus?: { label: string; clearHref: string } | null;
   locale: Locale;
   /** Which People tab this list is: sets the kinds the filter offers. */
   mode?: "all" | "fundraisers" | "members";
@@ -290,6 +295,7 @@ export function MembersManager({
         searchText={(m) => `${m.full_name ?? ""} ${m.email ?? ""}`}
         searchPlaceholder={t("memberSearch")}
         emptyLabel={t("membersEmpty")}
+        filterSlot={focus ? <FocusChip label={focus.label} clearHref={focus.clearHref} /> : undefined}
         bulkActions={(ids) => (
           <>
             <button type="button" onClick={() => copyEmails(ids)} className={bulkButton}>

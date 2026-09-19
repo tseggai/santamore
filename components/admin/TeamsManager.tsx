@@ -7,6 +7,7 @@ import { useState } from "react";
 import { deleteTeams } from "@/app/[locale]/admin/(protected)/clanovi/actions";
 import type { MemberTeam } from "@/components/admin/MembersManager";
 import { DataTable, bulkButton, type Column } from "@/components/console/DataTable";
+import { FocusChip } from "@/components/console/FocusChip";
 import { useDialog } from "@/components/console/useDialog";
 import { Link } from "@/i18n/navigation";
 
@@ -15,7 +16,7 @@ import { Link } from "@/i18n/navigation";
  * for, and how many pages they hold. Deleting is for a team made by
  * mistake; the database refuses one whose pages took donations.
  */
-export function TeamsManager({ teams, canManage }: { teams: MemberTeam[]; canManage: boolean }) {
+export function TeamsManager({ teams, canManage, focus = null }: { teams: MemberTeam[]; canManage: boolean; focus?: { label: string; clearHref: string } | null }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -65,6 +66,7 @@ export function TeamsManager({ teams, canManage }: { teams: MemberTeam[]; canMan
         onOpen={(tm) => window.open(`/t/${tm.slug}`, "_blank", "noopener")}
         searchText={(tm) => `${tm.name} ${tm.event_name} ${tm.captain_name}`}
         emptyLabel={t("tmEmpty")}
+        filterSlot={focus ? <FocusChip label={focus.label} clearHref={focus.clearHref} /> : undefined}
         bulkActions={canManage ? (ids, clear) => (
           <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button>
         ) : undefined}
