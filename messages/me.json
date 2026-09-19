@@ -1368,6 +1368,8 @@
     "yearBeneficiariesListHint": "Jedan po redu: opis · euri, npr. „Porodica u Tivtu, liječenje · 1200”",
     "yearDonorsList": "Donatori (zid donatora)",
     "yearDonorsHint": "Jedan po redu: ime · euri. Napiši Anonimno za one koji nisu htjeli da budu imenovani.",
+    "yearRecordedCause": "Ovi zabilježeni pokloni i isplate pripadaju cilju",
+    "yearRecordedCauseHint": "Cilj te godine. Njegov prikupljeni iznos onda uključuje listu donatora ispod i sponzorski novac predat korisnicima.",
     "peopleTabAll": "Svi",
     "allPeopleHint": "Svi odjednom: svaki nalog i svaki zapis u timu, jedan filter za sve vrste. Osoba bez naloga se otvara na kartici Tim.",
     "fundraisersPeopleHint": "Nalozi koji drže stranicu za prikupljanje: koliko je svako prikupio i njihove stranice za moderaciju."

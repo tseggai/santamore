@@ -20,6 +20,8 @@ export interface YearReport {
   beneficiariesList: { label: string; amount_cents: number | null }[];
   donorsList: { name: string; amount_cents: number | null }[];
   volunteersList: string[];
+  /** The cause the recorded donor list and hand-overs belong to. */
+  campaignId: string | null;
 }
 
 /** A cause of the year with what the ledger holds for it. */
@@ -134,6 +136,7 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
   const [beneficiariesText, setBeneficiariesText] = useState((r?.beneficiariesList ?? []).map((b) => (b.amount_cents != null ? `${b.label} · ${euros(b.amount_cents)}` : b.label)).join("\n"));
   const [donorsText, setDonorsText] = useState((r?.donorsList ?? []).map((d) => (d.amount_cents != null ? `${d.name} · ${euros(d.amount_cents)}` : d.name)).join("\n"));
   const [volunteersText, setVolunteersText] = useState((r?.volunteersList ?? []).join("\n"));
+  const [campaignId, setCampaignId] = useState(r?.campaignId ?? "");
   const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
 
   const lines = (text: string) => text.split("\n").map((l) => l.trim()).filter(Boolean);
@@ -163,6 +166,7 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
         return { name: name ?? "", amount_cents: amount ? (parseEurosToCents(amount) ?? null) : null };
       }),
       volunteersList: lines(volunteersText),
+      campaignId: campaignId || null,
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       router.refresh();
@@ -297,10 +301,20 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
       </div>
 
       {/* Donors: the wall of a year recorded before the ledger */}
-      <div className={`${section("donors")} mt-4`}>
+      <div className={`${section("donors")} mt-4 space-y-4`}>
+        <div className="rounded-lg bg-paper px-3.5 py-3">
+          <label htmlFor="yRecordedCause" className={labelClass}>{t("yearRecordedCause")}</label>
+          <select id="yRecordedCause" value={campaignId} onChange={(e) => setCampaignId(e.target.value)} className={inputClass}>
+            <option value="">—</option>
+            {row.causes.map((cause) => <option key={cause.id} value={cause.id}>{cause.title}</option>)}
+          </select>
+          <p className="mt-1 text-[13px] text-black/50">{t("yearRecordedCauseHint")}</p>
+        </div>
+        <div>
         <label htmlFor="yDonors" className={labelClass}>{t("yearDonorsList")}</label>
         <textarea id="yDonors" rows={14} value={donorsText} onChange={(e) => setDonorsText(e.target.value)} className={`${inputClass} font-mono text-[14px]`} />
         {hint(t("yearDonorsHint"))}
+        </div>
       </div>
 
       {/* Volunteers: by name */}

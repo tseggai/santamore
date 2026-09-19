@@ -112,5 +112,8 @@ select * from (values
      to_regclass('public.beneficiaries') is not null)
   ,('20260918000042_team_members',
      to_regclass('public.team_members') is not null)
+  ,('20260919000043_year_report_cause',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'year_reports' and column_name = 'campaign_id'))
 ) as m (migration, applied)
 order by migration;
