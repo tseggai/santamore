@@ -1026,8 +1026,8 @@
     "membersTitle": "Članovi",
     "membersHint": "Svaki nalog i šta osoba radi: sportista kad je Strava uključena, učesnik kad je prijavljen, kapiten, donator. Otvorite red za stranice, prijave, Stravu i nivo pristupa.",
     "peopleTitle": "Ljudi",
-    "peopleHint": "Tim, sa nalogom ili bez njega, i svaki nalog sa onim što osoba radi i smije.",
-    "peopleTabTeam": "Tim",
+    "peopleHint": "Osoblje, sa nalogom ili bez njega, svaki nalog sa onim što osoba radi i smije, i timovi za prikupljanje.",
+    "peopleTabTeam": "Osoblje",
     "peopleTabFundraisers": "Prikupljači",
     "peopleTabAccounts": "Članovi",
     "teamHint": "Rukovodstvo, tim, odbor, komisija i volonteri. Zapis stoji sam za sebe; nalog povežite samo da vežete nivo pristupa za osobu. Javni se prikazuju na stranici O nama; volonteri se računaju za godine u kojima su bili aktivni.",
@@ -1060,7 +1060,7 @@
     "teamChangeAccess": "Promijeni u Nalozima",
     "teamPublic": "Prikaži na stranici O nama",
     "teamDeleteConfirm": "Ukloniti „{name}“ iz tima? Nalog, ako postoji, ostaje.",
-    "memberTeamLink": "Javni profil je na kartici Tim.",
+    "memberTeamLink": "Javni profil je na kartici Osoblje.",
     "membersEmpty": "Niko ne odgovara.",
     "memberSearch": "Pretraži po imenu ili e-pošti",
     "memberFilter": {
@@ -1070,7 +1070,7 @@
       "participants": "Učesnici",
       "captains": "Kapiteni",
       "donors": "Donatori",
-      "team": "Tim"
+      "team": "Osoblje"
     },
     "memberRole": {
       "admin": "Admin",
@@ -1372,7 +1372,7 @@
     "yearRecordedCause": "Ovi zabilježeni pokloni i isplate pripadaju cilju",
     "yearRecordedCauseHint": "Cilj te godine. Njegov prikupljeni iznos onda uključuje listu donatora ispod i sponzorski novac predat korisnicima.",
     "peopleTabAll": "Svi",
-    "allPeopleHint": "Svi odjednom: svaki nalog i svaki zapis u timu, jedan filter za sve vrste. Osoba bez naloga se otvara na kartici Tim.",
+    "allPeopleHint": "Svi odjednom: svaki nalog i svaki zapis osoblja, jedan filter za sve vrste. Osoba bez naloga otvara se na kartici Osoblje.",
     "fundraisersPeopleHint": "Nalozi koji drže stranicu za prikupljanje: koliko je svako prikupio i njihove stranice za moderaciju.",
     "evDelete": "Obriši",
     "evDeleteConfirm": "{count, plural, one {Obrisati ovaj događaj?} few {Obrisati # događaja?} other {Obrisati # događaja?}} Neplaćene prijave i potvrde dolaska brišu se s njim; fotografije, sponzorstva i ponude ostaju. Ovo se ne može poništiti. Ako ga samo želiš sakriti sa sajta, povuci objavu.",
