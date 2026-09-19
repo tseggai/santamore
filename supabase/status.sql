@@ -123,5 +123,7 @@ select * from (values
   ,('20260919000046_event_registration_mode',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'events' and column_name = 'registration_mode'))
+  ,('20260919000047_is_admin',
+     to_regprocedure('public.is_admin()') is not null)
 ) as m (migration, applied)
 order by migration;

@@ -1387,7 +1387,9 @@
     "evRegModeOrganizer": "Kod organizatora — ovdje ljudi samo kažu da trče za Santamore",
     "evRegModeHere": "Ovdje — mi prijavljujemo tim i plaćamo organizatoru odjednom",
     "evRegModeOrganizerHint": "Dugme Prijavi se otvara link organizatora. Prijava ovdje je besplatna i služi samo za spisak tima, listu trkača i stranice za prikupljanje.",
-    "evRegModeHereHint": "Ljudi se prijavljuju i plaćaju ovdje. Cijenu organizatora po mjestu dodaj kao cjenovni razred iznad; startni brojevi dolaze iz fonda ispod."
+    "evRegModeHereHint": "Ljudi se prijavljuju i plaćaju ovdje. Cijenu organizatora po mjestu dodaj kao cjenovni razred iznad; startni brojevi dolaze iz fonda ispod.",
+    "dialogOk": "U redu",
+    "dialogDelete": "Obriši"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

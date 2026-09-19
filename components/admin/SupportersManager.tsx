@@ -11,6 +11,7 @@ import { formatCents, parseEurosToCents } from "@/lib/money";
 import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
 import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
+import { useDialog } from "@/components/console/useDialog";
 import { supporterLogoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 import { Link } from "@/i18n/navigation";
@@ -479,13 +480,14 @@ export function SupportersManager({
     router.refresh();
   };
   // Deleting is for a supporter added by mistake; hiding one is "deactivate".
+  const dialog = useDialog();
   const remove = async (ids: string[], clear?: () => void) => {
-    if (!window.confirm(t("suDeleteConfirm", { count: ids.length }))) return;
+    if (!(await dialog.confirm(t("suDeleteConfirm", { count: ids.length })))) return;
     setBusy(true);
     const result = await deleteSupporters({ ids }).catch(() => null);
     setBusy(false);
     if (!result?.ok) {
-      window.alert(t("actionError"));
+      await dialog.alert(t("actionError"));
       return;
     }
     clear?.();
@@ -578,6 +580,7 @@ export function SupportersManager({
 
   return (
     <div className="space-y-4">
+      {dialog.element}
       <PageHeader
         title={title}
         lead={lead}

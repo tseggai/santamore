@@ -13,6 +13,7 @@ import { ExternalIcon, EyeIcon } from "@/components/Icons";
 import { StravaWebhookButton } from "@/components/admin/StravaWebhookPanel";
 import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
+import { useDialog } from "@/components/console/useDialog";
 import type { WebhookStatus } from "@/app/[locale]/admin/(protected)/izazovi/actions";
 import { galleryImageUrl } from "@/lib/storage";
 import { Link } from "@/i18n/navigation";
@@ -78,14 +79,15 @@ export function EventsManager({
   // Deleting is for an event added by mistake; the database refuses one
   // with pages, teams, donations or paid registrations and says why.
   const [notice, setNotice] = useState<string[]>([]);
+  const dialog = useDialog();
   const remove = async (ids: string[], clear: () => void) => {
-    if (!window.confirm(t("evDeleteConfirm", { count: ids.length }))) return;
+    if (!(await dialog.confirm(t("evDeleteConfirm", { count: ids.length })))) return;
     setBusy("bulk");
     setNotice([]);
     const result = await deleteEvents({ ids }).catch(() => null);
     setBusy(null);
     if (!result?.ok) {
-      window.alert(result?.detail ? `${t("actionError")}\n\n${result.detail}` : t("actionError"));
+      await dialog.alert(t("actionError"), result?.detail);
       return;
     }
     setNotice(result.blocked.map((b) => t("evDeleteBlocked", { name: b.name, reason: t(`evDeleteReason_${b.reason}`, { count: b.count }) })));
@@ -151,6 +153,7 @@ export function EventsManager({
 
   return (
     <div className="space-y-4">
+      {dialog.element}
       <PageHeader
         title={title}
         lead={lead}
