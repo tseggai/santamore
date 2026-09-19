@@ -32,14 +32,14 @@ export interface DonateTargetData {
   photoUrl: string | null;
 }
 
-/** What a Donate button asks for; no slug means the flagship campaign. */
+/**
+ * What a Donate button asks for; no slug means the flagship cause, which
+ * is read from the records (see flagshipCause), never hard-coded.
+ */
 export interface DonateRequest {
   kind: "campaign" | "fundraiser";
   slug?: string;
 }
-
-// The flagship campaign when none is chosen.
-export const DEFAULT_CAMPAIGN_SLUG = "santa-run-2026";
 
 interface RawSuggested {
   amount_cents?: unknown;

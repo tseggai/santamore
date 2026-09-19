@@ -11,7 +11,9 @@ import { createClient } from "@/lib/supabase/server";
 
 export interface TeamActionResult {
   ok: boolean;
-  error?: "invalid" | "server";
+  error?: "invalid" | "server" | "account_taken";
+  /** The database's own words, for staff to act on. */
+  detail?: string;
 }
 
 const schema = z.object({
@@ -55,8 +57,9 @@ export async function saveTeamMember(input: unknown): Promise<TeamActionResult> 
     ? await supabase.from("team_members").update(row).eq("id", data.id)
     : await supabase.from("team_members").insert(row);
   if (error) {
-    console.error("[admin] team member save failed:", error.code);
-    return { ok: false, error: "server" };
+    console.error("[admin] team member save failed:", error.code, error.message);
+    if (error.code === "23505") return { ok: false, error: "account_taken", detail: `${error.code}: ${error.message}` };
+    return { ok: false, error: "server", detail: `${error.code}: ${error.message}` };
   }
   revalidatePath("/[locale]/admin/clanovi", "layout");
   revalidatePath("/[locale]/o-nama", "page");
@@ -69,7 +72,7 @@ export async function deleteTeamMember(input: unknown): Promise<TeamActionResult
   if (!parsed.success) return { ok: false, error: "invalid" };
   const supabase = await createClient();
   const { error } = await supabase.from("team_members").delete().eq("id", parsed.data.id);
-  if (error) return { ok: false, error: "server" };
+  if (error) return { ok: false, error: "server", detail: `${error.code}: ${error.message}` };
   const photos = supabase.storage.from("team-photos");
   const { data: files } = await photos.list(parsed.data.id);
   if (files && files.length > 0) await photos.remove(files.map((file) => `${parsed.data.id}/${file.name}`));

@@ -20,9 +20,7 @@ async function fetchCampaign(slug: string): Promise<CampaignView | null> {
     const [{ data: campaign }, { data: events }, { data: galleryRows }, { data: beneficiaryRows }] = await Promise.all([
       supabase
         .from("v_public_campaigns")
-        .select(
-          "slug, title, description, beneficiary_summary, goal_cents, raised_cents, donor_count, starts_at, ends_at, chapter_name, cover_path",
-        )
+        .select("*")
         .eq("slug", slug)
         .maybeSingle(),
       supabase

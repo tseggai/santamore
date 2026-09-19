@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { BeneficiaryStories, type PublicBeneficiary } from "@/components/beneficiaries/BeneficiaryStories";
 import { CauseLedgerDialog } from "@/components/campaigns/CauseLedgerDialog";
+import { CauseStatus } from "@/components/campaigns/CauseStatus";
 import { DonateButton } from "@/components/donate/DonateButton";
 import type { GalleryImage } from "@/components/gallery/GalleryGrid";
 import { PublicGallery } from "@/components/gallery/PublicGallery";
@@ -33,6 +34,8 @@ export interface CampaignView {
   starts_at: string | null;
   ends_at: string | null;
   chapter_name: string | null;
+  /** Hand-overs published or recorded for this cause; absent until migration 0044. */
+  disbursed_cents?: number | null;
   events: CampaignEventItem[];
   cover_path?: string | null;
   gallery?: GalleryImage[];
@@ -83,6 +86,7 @@ export function CampaignPageView({
           {campaign.ends_at ? dateFormat.format(new Date(campaign.ends_at)) : "…"}
         </p>
       ) : null}
+      <CauseStatus cause={campaign} className="mt-4" />
 
       <div className="mt-6">
         {campaign.goal_cents && campaign.goal_cents > 0 ? (

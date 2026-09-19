@@ -154,7 +154,8 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
   const [photoBusy, setPhotoBusy] = useState(false);
   const photoInput = useRef<HTMLInputElement>(null);
   const [folder] = useState(() => row?.id ?? `new-${crypto.randomUUID()}`);
-  const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
+  const [state, setState] = useState<"idle" | "busy" | "error" | "invalid" | "account_taken">("idle");
+  const [detail, setDetail] = useState<string | null>(null);
   const currentPhoto = photoPath === undefined ? (row?.photo_path ?? null) : photoPath;
   const photo = teamPhotoUrl(currentPhoto);
   const linked = userId ? accounts.find((a) => a.id === userId) : null;
@@ -183,6 +184,7 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
       return;
     }
     setState("busy");
+    setDetail(null);
     const result = await saveTeamMember({
       id: row?.id,
       kind,
@@ -202,7 +204,8 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
       router.refresh();
       onDone();
     } else {
-      setState(result.error === "invalid" ? "invalid" : "error");
+      setState(result.error === "invalid" ? "invalid" : result.error === "account_taken" ? "account_taken" : "error");
+      setDetail("detail" in result && result.detail ? result.detail : null);
     }
   };
 
@@ -293,7 +296,13 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
           {t("teamPublic")}
         </label>
       </div>
-      {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
+      {state === "error" ? (
+        <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">
+          {t("actionError")}
+          {detail ? <span className="mt-1 block font-mono text-[12.5px] font-normal text-black/60">{detail}</span> : null}
+        </p>
+      ) : null}
+      {state === "account_taken" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("teamAccountTaken")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
       <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-line bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
         <button type="submit" disabled={state === "busy" || photoBusy} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
