@@ -4,7 +4,9 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { deleteMyTeam } from "@/app/[locale]/dashboard/(protected)/actions";
 import { Avatar } from "@/components/Avatar";
+import { useDialog } from "@/components/console/useDialog";
 import { TeamPanel, type TeamOption } from "@/components/dashboard/TeamPanel";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { Link } from "@/i18n/navigation";
@@ -38,6 +40,22 @@ export function TeamsManager({
   const [eventId, setEventId] = useState(events[0]?.id ?? "");
 
   const chosen = events.find((event) => event.id === eventId) ?? null;
+  // The captain made the team, so the captain may delete it; the pages
+  // stay. The database refuses a team whose pages took donations.
+  const dialog = useDialog();
+  const [busy, setBusy] = useState<string | null>(null);
+  const remove = async (team: MyTeam) => {
+    if (!(await dialog.confirm(t("teamDeleteAsk", { name: team.name })))) return;
+    setBusy(team.id);
+    const result = await deleteMyTeam({ teamId: team.id }).catch(() => null);
+    setBusy(null);
+    if (!result?.ok) {
+      await dialog.alert(result?.blocked ? t("teamDeleteRefused", { count: result.blocked }) : t("teamDeleteFailed"));
+      return;
+    }
+    setOpen("");
+    router.refresh();
+  };
 
   const done = () => {
     setOpen("");
@@ -46,6 +64,7 @@ export function TeamsManager({
 
   return (
     <div className="mt-5 space-y-6">
+      {dialog.element}
       {teams.length === 0 ? (
         <p className="text-[14.5px] text-black/60">{t("teamsEmpty")}</p>
       ) : (
@@ -69,6 +88,14 @@ export function TeamsManager({
                   className="rounded-lg bg-paper px-2.5 py-1 text-[13px] font-semibold transition-colors hover:bg-mist-2"
                 >
                   {t("teamEdit")}
+                </button>
+                <button
+                  type="button"
+                  disabled={busy === team.id}
+                  onClick={() => void remove(team)}
+                  className="rounded-lg px-2.5 py-1 text-[13px] font-semibold text-red-dark transition-colors hover:bg-mist-2 disabled:opacity-60"
+                >
+                  {t("teamDeleteButton")}
                 </button>
               </div>
               {open === team.id ? (

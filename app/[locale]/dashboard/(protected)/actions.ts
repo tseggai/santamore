@@ -463,6 +463,38 @@ export async function updateTeam(
   return { ok: true, teamId: parsed.data.teamId };
 }
 
+/**
+ * A captain deletes their own team. The database (delete_team, migration
+ * 0050) unlinks the pages, keeps every euro, and refuses a team whose
+ * pages took donations; "blocked" carries that count.
+ */
+export async function deleteMyTeam(
+  input: unknown,
+): Promise<DashboardActionResult & { blocked?: number }> {
+  const parsed = z.object({ teamId: z.string().uuid() }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  const { supabase, user } = await currentUser();
+  if (!user) return { ok: false, error: "server" };
+  const { data: team } = await supabase.from("teams").select("photo_path").eq("id", parsed.data.teamId).eq("captain_id", user.id).maybeSingle();
+  if (!team) return { ok: false, error: "invalid" };
+
+  const { data, error } = await supabase.rpc("delete_team", { p_id: parsed.data.teamId });
+  if (error) {
+    console.error("[dashboard] team delete failed:", error.code, error.message);
+    return { ok: false, error: "server" };
+  }
+  const result = data as { ok: boolean; reason?: string; count?: number };
+  if (!result.ok) return { ok: false, error: "invalid", blocked: Number(result.count ?? 0) };
+
+  const photo = team.photo_path as string | null;
+  if (photo && ownsPhoto(user.id, photo)) await supabase.storage.from("fundraiser-photos").remove([photo]);
+  revalidatePath("/[locale]/dashboard", "layout");
+  revalidatePath("/[locale]/t/[slug]", "page");
+  revalidatePath("/[locale]/prikupljaci", "page");
+  return { ok: true };
+}
+
 export interface PageEditorData {
   fundraiser: {
     id: string;
