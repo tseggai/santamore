@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { PAGE_FIELDS, mergePageContent, parseField, serializeField } from "./site-pages";
+import { PAGE_FIELDS, isValidField, mergePageContent, parseField, pickIds, pickPeople, serializeField } from "./site-pages";
 
 const roles = PAGE_FIELDS.about.find((f) => f.key === "roles")!;
 const story = PAGE_FIELDS.about.find((f) => f.key === "story")!;
@@ -27,5 +27,26 @@ describe("site page fields", () => {
     expect(merged.heroTitle).toBe("Saved");
     expect(merged.story).toEqual(["a"]);
     expect(merged.roles).toEqual([{ name: "n", who: "w", desc: "d" }]);
+  });
+});
+
+describe("attachments", () => {
+  it("selects people by role or by name", () => {
+    const rows = [
+      { id: "a", kind: "board" },
+      { id: "b", kind: "staff" },
+      { id: "c", kind: "volunteer" },
+    ];
+    expect(pickPeople({ kinds: ["board"], ids: ["c"] }, rows).map((r) => r.id)).toEqual(["a", "c"]);
+    expect(pickPeople({ kinds: [], ids: [] }, rows)).toEqual([]);
+    expect(pickIds({ ids: ["c", "a", "zzz"] }, rows).map((r) => r.id)).toEqual(["c", "a"]);
+  });
+
+  it("validates attachment shapes and keeps them out of the textarea round trip", () => {
+    const board = PAGE_FIELDS.about.find((f) => f.key === "boardPeople")!;
+    expect(isValidField(board, { kinds: ["board"], ids: [] })).toBe(true);
+    expect(isValidField(board, { kinds: ["mayor"], ids: [] })).toBe(false);
+    expect(serializeField(board, { kinds: ["board"], ids: [] })).toBe("");
+    expect(parseField(board, "anything")).toBeUndefined();
   });
 });

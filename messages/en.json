@@ -1024,11 +1024,12 @@
     "spNew": "New sponsorship",
     "navMembers": "People",
     "membersTitle": "Members",
-    "membersHint": "Every account, and what each person is doing: athlete when Strava is on, fundraiser when they hold a page, participant when registered, captain, donor. Open a row for their pages, registrations and Strava.",
+    "membersHint": "Every account and what each person does: athlete when Strava is on, participant when registered, captain, donor. Open a row for their pages, registrations, Strava and access level.",
     "peopleTitle": "People",
     "peopleHint": "The team, with or without an account, and every account with what each person does and may do.",
     "peopleTabTeam": "Team",
-    "peopleTabAccounts": "Accounts",
+    "peopleTabFundraisers": "Fundraisers",
+    "peopleTabAccounts": "Members",
     "teamHint": "Officers, staff, board, committee and volunteers. A record stands on its own; link an account only to tie the access level to the person. Public ones appear on About us; volunteers count for the years they were active.",
     "teamNew": "New person",
     "teamCreate": "Add person",
@@ -1068,7 +1069,7 @@
       "participants": "Participants",
       "captains": "Captains",
       "donors": "Donors",
-      "staff": "Staff"
+      "team": "Team"
     },
     "memberRole": {
       "admin": "Admin",
@@ -1165,6 +1166,12 @@
     "sitePageLanguage": "Language",
     "sitePageLinesHint": "One entry per line.",
     "sitePageRecordsHint": "One per line, parts separated by “ · ”: {parts}",
+    "pageAttachHeading": "Attached to this page",
+    "pageAttachHint": "The same in every language. People come from People → Team, supporters from Supporters, beneficiaries from Beneficiaries; only public ones show on the site.",
+    "pickByRole": "Everyone with a role:",
+    "pickByName": "And by name:",
+    "pickNoPeople": "No one on the team yet. Add people under People → Team.",
+    "pickNone": "Nothing to pick yet.",
     "pagePart": {
       "name": "name",
       "who": "who",
@@ -1194,7 +1201,13 @@
         "plan": "Plan paragraphs",
         "teamHeading": "Team heading",
         "teamLead": "Team lead",
-        "peopleNote": "Note under the team"
+        "peopleNote": "Note under the team",
+        "boardPeople": "The board (shown under the structure)",
+        "committeePeople": "The grants committee (shown in the committee block)",
+        "teamPeople": "The team section (empty = officers, staff, board and committee)",
+        "volunteerPeople": "Volunteers (empty = everyone with the Volunteer role)",
+        "featuredBeneficiaries": "Beneficiary stories on this page",
+        "featuredSupporters": "Partners on this page"
       },
       "how": {
         "heroEyebrow": "Eyebrow",
@@ -1213,7 +1226,8 @@
         "ledgerCta": "Ledger button",
         "decideHeading": "Deciding heading",
         "decide": "How we decide",
-        "decideCta": "Deciding button"
+        "decideCta": "Deciding button",
+        "committeePeople": "The committee (shown under “how we decide”)"
       }
     },
     "postViewLive": "View",
@@ -1358,7 +1372,10 @@
     "yearBeneficiariesList": "Where the money went",
     "yearBeneficiariesListHint": "One per line: label · euros, e.g. “Family in Tivat, medical costs · 1200”",
     "yearDonorsList": "Donors (donor wall)",
-    "yearDonorsHint": "One per line: name · euros. Write Anonymous for anyone who chose not to be named."
+    "yearDonorsHint": "One per line: name · euros. Write Anonymous for anyone who chose not to be named.",
+    "peopleTabAll": "All",
+    "allPeopleHint": "Everyone at once: every account and every team record, one filter across all kinds. A person with no account opens on the Team tab.",
+    "fundraisersPeopleHint": "The accounts that hold a fundraising page: how much each raised, and their pages to moderate."
   },
   "forms": {
     "nameLabel": "Full name",
