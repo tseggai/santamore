@@ -39,6 +39,9 @@ export interface EventFormValues {
   cover_path?: string | null;
   hosting?: "own" | "external";
   external_url?: string | null;
+  /** External race: people register with the organiser, or we register the team here. */
+  registration_mode?: "organizer" | "here";
+  organizer_name?: string | null;
   bib_policy?: "none" | "we_buy";
   bib_capacity?: number | null;
   max_guests?: number;
@@ -149,6 +152,8 @@ export function EventForm({
   const [offersShirts, setOffersShirts] = useState(event?.offers_shirts ?? false);
   const [hosting, setHosting] = useState<"own" | "external">(event?.hosting ?? "own");
   const [externalUrl, setExternalUrl] = useState(event?.external_url ?? "");
+  const [registrationMode, setRegistrationMode] = useState<"organizer" | "here">(event?.registration_mode ?? "organizer");
+  const [organizerName, setOrganizerName] = useState(event?.organizer_name ?? "");
   const [weBuyBibs, setWeBuyBibs] = useState((event?.bib_policy ?? "none") === "we_buy");
   const [bibCapacity, setBibCapacity] = useState(event?.bib_capacity != null ? String(event.bib_capacity) : "");
   const [maxGuests, setMaxGuests] = useState(String(event?.max_guests ?? 0));
@@ -234,6 +239,8 @@ export function EventForm({
       coverPath,
       hosting,
       externalUrl: externalUrl.trim() || null,
+      registrationMode,
+      organizerName: organizerName.trim() || null,
       bibPolicy: weBuyBibs ? "we_buy" : "none",
       bibCapacity: bibCapacity.trim() === "" ? null : Number(bibCapacity),
       maxGuests: maxGuests.trim() === "" ? 0 : Number(maxGuests),
@@ -420,9 +427,22 @@ export function EventForm({
             {hosting === "external" ? (
               <>
                 <div>
+                  <label htmlFor="evOrganizer" className={labelClass}>{t("evOrganizerName")}</label>
+                  <input id="evOrganizer" value={organizerName} onChange={(e) => setOrganizerName(e.target.value)} maxLength={120} className={inputClass} />
+                </div>
+                <div>
                   <label htmlFor="evExternalUrl" className={labelClass}>{t("evExternalUrl")}</label>
                   <input id="evExternalUrl" type="url" value={externalUrl} onChange={(e) => setExternalUrl(e.target.value)} placeholder="https://" className={inputClass} />
                 </div>
+                <div>
+                  <label htmlFor="evRegMode" className={labelClass}>{t("evRegMode")}</label>
+                  <select id="evRegMode" value={registrationMode} onChange={(e) => setRegistrationMode(e.target.value as "organizer" | "here")} className={inputClass}>
+                    <option value="organizer">{t("evRegModeOrganizer")}</option>
+                    <option value="here">{t("evRegModeHere")}</option>
+                  </select>
+                  <p className="mt-1 text-[13px] text-black/55">{registrationMode === "here" ? t("evRegModeHereHint") : t("evRegModeOrganizerHint")}</p>
+                </div>
+                {registrationMode === "here" ? (
                 <label className="flex items-start gap-2.5 text-[14.5px]">
                   <input type="checkbox" checked={weBuyBibs} onChange={(e) => setWeBuyBibs(e.target.checked)} className="mt-0.5 h-4 w-4 accent-red" />
                   <span>
@@ -430,7 +450,8 @@ export function EventForm({
                     <span className="block text-[13px] text-black/55">{t("evBibsHint")}</span>
                   </span>
                 </label>
-                {weBuyBibs ? (
+                ) : null}
+                {registrationMode === "here" && weBuyBibs ? (
                   <div>
                     <label htmlFor="evBibCapacity" className={labelClass}>{t("evBibCapacity")}</label>
                     <input id="evBibCapacity" type="number" min={0} value={bibCapacity} onChange={(e) => setBibCapacity(e.target.value)} className={`${inputClass} font-mono`} />

@@ -64,6 +64,9 @@ export interface EventView {
   /** A race someone else organises ("Run for Santamore"). */
   hosting?: "own" | "external";
   external_url?: string | null;
+  /** External race: people register with the organiser (default) or we register the team here. */
+  registration_mode?: "organizer" | "here";
+  organizer_name?: string | null;
   bib_policy?: "none" | "we_buy";
   bib_capacity?: number | null;
   bibs_claimed?: number;
@@ -158,14 +161,20 @@ export function EventPageView({
 
   const dark = event.kind === "challenge";
   const external = event.kind === "race" && event.hosting === "external";
-  const bibsLeft = external && event.bib_policy === "we_buy" ? Math.max(0, (event.bib_capacity ?? 0) - (event.bibs_claimed ?? 0)) : null;
+  // With the organiser: they take the registration and the money; here
+  // people only say they run for Santamore. Otherwise we register the team.
+  const withOrganizer = external && (event.registration_mode ?? "organizer") === "organizer";
+  const organizer = event.organizer_name?.trim() || null;
+  const bibsLeft = external && !withOrganizer && event.bib_policy === "we_buy" ? Math.max(0, (event.bib_capacity ?? 0) - (event.bibs_claimed ?? 0)) : null;
   // Only tiers still on offer today; early-bird deadlines shown beside the price.
-  const tiersToday = activeTiers(event.tiers);
+  const tiersToday = withOrganizer ? [] : activeTiers(event.tiers);
+  const raceCta = external ? (withOrganizer ? t("runForUsCta") : t("registerCta")) : t("registerCta");
+  const organizerCta = organizer ? t("registerWithCta", { name: organizer }) : t("organizerLink");
 
   const registerButton =
     registrationState === "open" ? (
       preview ? (
-        <span className={primary}>{event.kind === "social" ? t("goingCta") : event.kind === "challenge" ? t("joinCta") : external ? t("joinTeamCta") : t("registerCta")}</span>
+        <span className={withOrganizer ? secondary : primary}>{event.kind === "social" ? t("goingCta") : event.kind === "challenge" ? t("joinCta") : raceCta}</span>
       ) : event.kind === "challenge" ? (
         <ChallengeJoin eventSlug={event.slug} eventName={event.name} state={event.join ?? { signedIn: false, stravaConnected: false }} className={primary} />
       ) : (
@@ -182,8 +191,8 @@ export function EventPageView({
             bibsLeft,
             maxGuests: event.max_guests ?? 0,
           }}
-          label={event.kind === "social" ? t("goingCta") : external ? t("joinTeamCta") : t("registerCta")}
-          className={primary}
+          label={event.kind === "social" ? t("goingCta") : raceCta}
+          className={withOrganizer ? secondary : primary}
         />
       )
     ) : null;
@@ -224,6 +233,7 @@ export function EventPageView({
           ? fact(t("factDistances"), <span className="font-mono tabular-nums">{event.distances.join(" · ")}</span>)
           : null}
         {event.kind === "social" && (event.going_count ?? 0) > 0 ? fact(t("factGoing"), t("goingCount", { count: event.going_count ?? 0 })) : null}
+        {external && organizer ? fact(t("factOrganizer"), organizer) : null}
         {event.kind === "challenge" && event.perks && event.perks.length > 0
           ? fact(t("factRewards"), t("rewardsCount", { count: event.perks.length }))
           : null}
@@ -238,20 +248,35 @@ export function EventPageView({
           <div>
             <p className={`type-eyebrow ${dark ? "text-paper/70" : "text-sea/80"}`}>{event.campaign_slug ? t("waysInHeading") : t("wayInHeading")}</p>
             <p className="mt-3 text-[16px] font-bold">
-              {event.kind === "social" ? t("wayGoing") : event.kind === "challenge" ? t("wayJoin") : external ? t("wayRunExternal") : t("wayRun")}
+              {event.kind === "social" ? t("wayGoing") : event.kind === "challenge" ? t("wayJoin") : withOrganizer ? t("wayRunOrganizer") : external ? t("wayRunTeam") : t("wayRun")}
             </p>
             <p className={`mt-1 text-[14.5px] leading-relaxed ${dark ? "text-paper/75" : "text-black/65"}`}>
-              {event.kind === "social" ? t("wayGoingSub") : event.kind === "challenge" ? t("wayJoinSub") : external ? t("wayRunExternalSub") : t("wayRunSub")}
+              {event.kind === "social"
+                ? t("wayGoingSub")
+                : event.kind === "challenge"
+                  ? t("wayJoinSub")
+                  : withOrganizer
+                    ? t("wayRunOrganizerSub", { name: organizer ?? t("theOrganizer") })
+                    : external
+                      ? t("wayRunTeamSub", { name: organizer ?? t("theOrganizer") })
+                      : t("wayRunSub")}
             </p>
-            {external && event.external_url && !preview ? (
+            {external && !withOrganizer && event.external_url && !preview ? (
               <a href={event.external_url} target="_blank" rel="noopener" className="mt-2 inline-block text-[14px] font-semibold text-sea underline underline-offset-2 hover:text-sea-2">
-                {t("organizerLink")} ↗
+                {t("organizerSite", { name: organizer ?? t("theOrganizer") })} ↗
               </a>
             ) : null}
             {bibsLeft !== null ? (
               <p className="mt-2 text-[13.5px] text-black/60">{bibsLeft > 0 ? t("bibsLeft", { count: bibsLeft }) : t("bibsGone")}</p>
             ) : null}
-            <div className="mt-3">
+            <div className="mt-3 flex flex-wrap gap-2">
+              {withOrganizer && registrationState === "open" && event.external_url ? (
+                preview ? (
+                  <span className={primary}>{organizerCta}</span>
+                ) : (
+                  <a href={event.external_url} target="_blank" rel="noopener" className={primary}>{organizerCta} ↗</a>
+                )
+              ) : null}
               {registerButton ?? (
                 <p className="rounded-lg bg-paper px-4 py-3 text-[14.5px] text-sea">
                   {registrationState === "before" ? t("registrationOpens", { date: fmt(event.registration_opens_at) }) : finished ? t("finishedNote") : t("registrationClosed")}

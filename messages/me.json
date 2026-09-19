@@ -1321,7 +1321,7 @@
     "evHosting": "Ko organizuje",
     "evHostingOwn": "Mi — prijava i plaćanje su ovdje",
     "evHostingExternal": "Neko drugi — trčimo za Santamore",
-    "evExternalUrl": "Link za prijavu kod organizatora",
+    "evExternalUrl": "Link organizatora (prijava ili stranica događaja)",
     "evBibs": "Kupujemo startne brojeve za tim",
     "evBibsHint": "Članovi ih mogu uzeti dok ih ima.",
     "evBibCapacity": "Broj startnih brojeva",
@@ -1381,7 +1381,13 @@
     "evDeleteReason_teams": "{count, plural, one {prijavio se jedan tim} few {prijavila su se # tima} other {prijavilo se # timova}}",
     "evDeleteReason_donations": "{count, plural, one {za njega je uplaćena jedna donacija} few {za njega su uplaćene # donacije} other {za njega je uplaćeno # donacija}}",
     "evDeleteReason_paid": "{count, plural, one {postoji jedna plaćena prijava} few {postoje # plaćene prijave} other {postoji # plaćenih prijava}}",
-    "evDeleteReason_missing": "više ne postoji"
+    "evDeleteReason_missing": "više ne postoji",
+    "evOrganizerName": "Organizator",
+    "evRegMode": "Prijava",
+    "evRegModeOrganizer": "Kod organizatora — ovdje ljudi samo kažu da trče za Santamore",
+    "evRegModeHere": "Ovdje — mi prijavljujemo tim i plaćamo organizatoru odjednom",
+    "evRegModeOrganizerHint": "Dugme Prijavi se otvara link organizatora. Prijava ovdje je besplatna i služi samo za spisak tima, listu trkača i stranice za prikupljanje.",
+    "evRegModeHereHint": "Ljudi se prijavljuju i plaćaju ovdje. Cijenu organizatora po mjestu dodaj kao cjenovni razred iznad; startni brojevi dolaze iz fonda ispod."
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -1539,7 +1545,16 @@
     "guestOf": "gost: {name}",
     "partyTotal": "Ukupno za {count} osobe",
     "externalNote": "Organizuju drugi · prijavljuješ se kod njih",
-    "ticketsHeading": "Ulaznice"
+    "ticketsHeading": "Ulaznice",
+    "runForUsCta": "Trčim ovo za Santamore",
+    "registerWithCta": "Prijavi se kod: {name}",
+    "theOrganizer": "organizator",
+    "factOrganizer": "Organizuje",
+    "wayRunOrganizer": "Prijavi se kod organizatora, trči za Santamore",
+    "wayRunOrganizerSub": "{name} organizuje ovu trku i prima prijave. Prijavi se kod njih, pa nam javi da trčiš u našim bojama — i prikupi novac za cilj ako želiš.",
+    "wayRunTeam": "Trči sa Santamore timom",
+    "wayRunTeamSub": "{name} organizuje ovu trku. Mi prijavljujemo tim i plaćamo mjesta odjednom, pa se prijavljuješ i plaćaš ovdje.",
+    "organizerSite": "Detalji događaja: {name}"
   },
   "gallery": {
     "eyebrow": "Galerija",

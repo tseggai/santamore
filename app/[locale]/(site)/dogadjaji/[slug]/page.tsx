@@ -147,6 +147,8 @@ export default async function EventPage({
     campaign_title: (event as { campaign_title?: string | null }).campaign_title ?? null,
     hosting: ((event as { hosting?: "own" | "external" }).hosting ?? "own"),
     external_url: (event as { external_url?: string | null }).external_url ?? null,
+    registration_mode: ((event as { registration_mode?: "organizer" | "here" }).registration_mode ?? "organizer"),
+    organizer_name: (event as { organizer_name?: string | null }).organizer_name ?? null,
     bib_policy: ((event as { bib_policy?: "none" | "we_buy" }).bib_policy ?? "none"),
     bib_capacity: (event as { bib_capacity?: number | null }).bib_capacity ?? null,
     bibs_claimed: Number((event as { bibs_claimed?: number }).bibs_claimed ?? 0),
