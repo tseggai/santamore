@@ -195,6 +195,8 @@ export type EventDeleteReason = "pages" | "teams" | "donations" | "paid" | "miss
 export interface EventDeleteResult {
   ok: boolean;
   error?: "invalid" | "server";
+  /** The database's own words when the call itself failed. */
+  detail?: string;
   /** Events that were refused, each with why (see delete_event, migration 0045). */
   blocked: { name: string; reason: EventDeleteReason; count: number }[];
   deleted: number;
@@ -219,7 +221,7 @@ export async function deleteEvents(input: unknown): Promise<EventDeleteResult> {
     const { data, error } = await supabase.rpc("delete_event", { p_id: id });
     if (error) {
       console.error("[admin] event delete failed:", error.code, error.message);
-      return { ok: false, error: "server", blocked, deleted };
+      return { ok: false, error: "server", detail: `${error.code}: ${error.message}`, blocked, deleted };
     }
     const result = data as { ok: boolean; reason?: EventDeleteReason; count?: number; name?: string };
     if (!result.ok) {
