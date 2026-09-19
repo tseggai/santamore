@@ -36,3 +36,13 @@ export function causeState(cause: CauseFigures, now: number = Date.now()): Cause
 export function openFirst<T extends CauseFigures>(causes: T[], now: number = Date.now()): T[] {
   return [...causes].sort((a, b) => Number(causeState(a, now).completed) - Number(causeState(b, now).completed));
 }
+
+/**
+ * The cause a bare Donate button gives to: the open one that started
+ * most recently, else the most recent cause of all. Rows arrive newest
+ * first, so the first open row wins.
+ */
+export function flagshipCause<T extends CauseFigures & { starts_at: string | null }>(causes: T[], now: number = Date.now()): T | null {
+  const newestFirst = [...causes].sort((a, b) => (b.starts_at ?? "").localeCompare(a.starts_at ?? ""));
+  return newestFirst.find((cause) => !causeState(cause, now).completed) ?? newestFirst[0] ?? null;
+}

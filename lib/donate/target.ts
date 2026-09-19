@@ -1,7 +1,7 @@
 import "server-only";
 
+import { flagshipCause } from "@/lib/cause-status";
 import {
-  DEFAULT_CAMPAIGN_SLUG,
   normalizeSuggested,
   type DonateRequest,
   type DonateTargetData,
@@ -19,7 +19,12 @@ interface CampaignRow {
   goal_cents: number;
   payment_reference: string;
   suggested_amounts: unknown;
+  raised_cents: number;
+  starts_at: string | null;
+  ends_at: string | null;
 }
+
+const CAMPAIGN_COLUMNS = "slug, title, description, goal_cents, payment_reference, suggested_amounts, raised_cents, starts_at, ends_at";
 
 interface FundraiserRow {
   slug: string;
@@ -72,13 +77,17 @@ export async function loadDonateTarget(request: DonateRequest): Promise<DonateTa
       };
     }
 
-    const slug = request.slug && SLUG.test(request.slug) ? request.slug : DEFAULT_CAMPAIGN_SLUG;
-    const { data } = await supabase
-      .from("v_public_campaigns")
-      .select("slug, title, description, goal_cents, payment_reference, suggested_amounts")
-      .eq("slug", slug)
-      .maybeSingle();
-    const row = data as CampaignRow | null;
+    // A named cause, or the flagship: the open cause that started most
+    // recently, else the latest one. Nothing is hard-coded.
+    let row: CampaignRow | null;
+    if (request.slug) {
+      if (!SLUG.test(request.slug)) return null;
+      const { data } = await supabase.from("v_public_campaigns").select(CAMPAIGN_COLUMNS).eq("slug", request.slug).maybeSingle();
+      row = data as CampaignRow | null;
+    } else {
+      const { data } = await supabase.from("v_public_campaigns").select(CAMPAIGN_COLUMNS).order("starts_at", { ascending: false, nullsFirst: false }).limit(20);
+      row = flagshipCause((data ?? []) as CampaignRow[]);
+    }
     if (!row) return null;
     return {
       ...common,
@@ -91,7 +100,7 @@ export async function loadDonateTarget(request: DonateRequest): Promise<DonateTa
         paymentReference: row.payment_reference,
       },
       suggested: normalizeSuggested(row.suggested_amounts),
-      backPath: row.slug === DEFAULT_CAMPAIGN_SLUG && !request.slug ? null : `/kampanje/${row.slug}`,
+      backPath: request.slug ? `/kampanje/${row.slug}` : null,
       photoUrl: null,
     };
   } catch (error) {

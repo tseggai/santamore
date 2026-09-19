@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { causeState, openFirst } from "./cause-status";
+import { causeState, flagshipCause, openFirst } from "./cause-status";
 
 const NOW = Date.parse("2026-09-19T12:00:00Z");
 
@@ -42,5 +42,23 @@ describe("openFirst", () => {
       { slug: "new-b", goal_cents: null, raised_cents: 1, ends_at: "2027-01-01T00:00:00Z" },
     ];
     expect(openFirst(rows, NOW).map((r) => r.slug)).toEqual(["new-a", "new-b", "old"]);
+  });
+});
+
+describe("flagshipCause", () => {
+  const open = { slug: "open", goal_cents: null, raised_cents: 0, ends_at: null, starts_at: "2026-06-01T00:00:00Z" };
+  const older = { slug: "older", goal_cents: null, raised_cents: 0, ends_at: null, starts_at: "2026-01-01T00:00:00Z" };
+  const done = { slug: "done", goal_cents: null, raised_cents: 1, ends_at: "2025-12-31T00:00:00Z", starts_at: "2025-11-01T00:00:00Z" };
+
+  it("prefers the open cause that started most recently", () => {
+    expect(flagshipCause([done, older, open], NOW)?.slug).toBe("open");
+  });
+
+  it("falls back to the most recent cause when none is open", () => {
+    expect(flagshipCause([done, { ...done, slug: "done-2", starts_at: "2024-11-01T00:00:00Z" }], NOW)?.slug).toBe("done");
+  });
+
+  it("is null without causes", () => {
+    expect(flagshipCause([], NOW)).toBeNull();
   });
 });
