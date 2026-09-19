@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { BeneficiaryStories, type PublicBeneficiary } from "@/components/beneficiaries/BeneficiaryStories";
 import { PeopleStrip, type PublicPerson } from "@/components/people/PeopleStrip";
+import { PageSections, loadAssetPools } from "@/components/site/PageSections";
 import { aboutContent, type AboutContent } from "@/content/site/about";
 import { pickIds, pickPeople, type IdPick, type PeoplePick } from "@/lib/site-pages";
 import { supporterLogoUrl } from "@/lib/storage";
@@ -33,8 +34,11 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const content = await loadSitePage("about", locale as Locale, aboutContent[locale as Locale]);
-  return { title: `${content.heroEyebrow} — Santamore`, description: content.heroLead };
+  const { sections, content } = await loadSitePage("about", locale as Locale, aboutContent[locale as Locale]);
+  const hero = sections?.find((s) => s.type === "hero")?.text;
+  const title = (hero && typeof hero.eyebrow === "string" && hero.eyebrow) || content.heroEyebrow;
+  const description = (hero && typeof hero.lead === "string" && hero.lead) || content.heroLead;
+  return { title: `${title} — Santamore`, description };
 }
 
 const eyebrowClass = "font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80";
@@ -47,8 +51,18 @@ export default async function AboutPage({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const content: AboutWithPicks = await loadSitePage("about", locale as Locale, aboutContent[locale as Locale]);
+  const loaded = await loadSitePage("about", locale as Locale, aboutContent[locale as Locale]);
+  const content: AboutWithPicks = loaded.content;
   const [tNav, tBeneficiaries] = await Promise.all([getTranslations("nav"), getTranslations("beneficiaries")]);
+  // Saved as sections: the page is whatever staff composed.
+  if (loaded.sections) {
+    const pools = await loadAssetPools(loaded.sections);
+    return (
+      <div className="mx-auto max-w-3xl px-5 py-14">
+        <PageSections sections={loaded.sections} pools={pools} locale={locale as Locale} labels={{ more: tBeneficiaries("more"), cause: tBeneficiaries("cause") }} />
+      </div>
+    );
+  }
   // The team: members who agreed to appear, else the shipped names and words.
   let people: TeamRow[] = [];
   try {
