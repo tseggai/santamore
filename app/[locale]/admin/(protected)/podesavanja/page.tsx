@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SitePagesManager, type PickOptions, type SitePageRow } from "@/components/admin/SitePagesManager";
 import { aboutContent } from "@/content/site/about";
 import { howContent } from "@/content/site/how";
-import type { PageContent } from "@/lib/site-pages";
+import { sectionsFromAbout, sectionsFromHow, type Section } from "@/lib/site-sections";
 import { createClient } from "@/lib/supabase/server";
 import type { Locale } from "@/i18n/routing";
 
@@ -26,9 +26,10 @@ export default async function SettingsPagesPage({ params }: { params: Promise<{ 
     supporters: (supporters ?? []) as PickOptions["supporters"],
     beneficiaries: (beneficiaries ?? []) as PickOptions["beneficiaries"],
   };
-  const shipped = {
-    about: aboutContent as unknown as Record<Locale, PageContent>,
-    how: howContent as unknown as Record<Locale, PageContent>,
+  const locales = ["me", "en", "ru"] as const;
+  const shipped: { about: Record<Locale, Section[]>; how: Record<Locale, Section[]> } = {
+    about: Object.fromEntries(locales.map((loc) => [loc, sectionsFromAbout(aboutContent[loc])])) as Record<Locale, Section[]>,
+    how: Object.fromEntries(locales.map((loc) => [loc, sectionsFromHow(howContent[loc])])) as Record<Locale, Section[]>,
   };
   return (
     <div className="pb-8">

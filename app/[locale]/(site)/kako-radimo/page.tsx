@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { PeopleStrip, type PublicPerson } from "@/components/people/PeopleStrip";
+import { PageSections, loadAssetPools } from "@/components/site/PageSections";
 import { howContent, type HowContent } from "@/content/site/how";
 import { pickPeople, type PeoplePick } from "@/lib/site-pages";
 import { loadSitePage } from "@/lib/site-pages-server";
@@ -21,8 +22,11 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) return {};
-  const content = await loadSitePage("how", locale as Locale, howContent[locale as Locale]);
-  return { title: `${content.heroEyebrow} — Santamore`, description: content.heroLead };
+  const { sections, content } = await loadSitePage("how", locale as Locale, howContent[locale as Locale]);
+  const hero = sections?.find((s) => s.type === "hero")?.text;
+  const title = (hero && typeof hero.eyebrow === "string" && hero.eyebrow) || content.heroEyebrow;
+  const description = (hero && typeof hero.lead === "string" && hero.lead) || content.heroLead;
+  return { title: `${title} — Santamore`, description };
 }
 
 const eyebrowClass = "font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80";
@@ -35,7 +39,16 @@ export default async function HowPage({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const content: HowContent & { committeePeople?: PeoplePick } = await loadSitePage("how", locale as Locale, howContent[locale as Locale]);
+  const loaded = await loadSitePage("how", locale as Locale, howContent[locale as Locale]);
+  const content: HowContent & { committeePeople?: PeoplePick } = loaded.content;
+  if (loaded.sections) {
+    const [pools, tBeneficiaries] = await Promise.all([loadAssetPools(loaded.sections), getTranslations("beneficiaries")]);
+    return (
+      <div className="mx-auto max-w-3xl px-5 py-14">
+        <PageSections sections={loaded.sections} pools={pools} locale={locale as Locale} labels={{ more: tBeneficiaries("more"), cause: tBeneficiaries("cause") }} />
+      </div>
+    );
+  }
   // The committee, when attached to this page in the admin.
   let committee: PublicPerson[] = [];
   if (content.committeePeople && (content.committeePeople.kinds.length > 0 || content.committeePeople.ids.length > 0)) {
