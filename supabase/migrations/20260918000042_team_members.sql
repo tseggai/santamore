@@ -47,3 +47,8 @@ select t.id, t.kind, t.full_name, t.title, t.quote, t.photo_path, t.years, t.sor
 from public.team_members t
 where t.is_public;
 grant select on public.v_public_team to anon, authenticated;
+
+-- PostgREST learns about the new table at once; without this the API
+-- can answer PGRST205 ("could not find the table in the schema cache")
+-- until its cache refreshes on its own.
+notify pgrst, 'reload schema';
