@@ -125,5 +125,7 @@ select * from (values
              where table_schema = 'public' and table_name = 'events' and column_name = 'registration_mode'))
   ,('20260919000047_is_admin',
      to_regprocedure('public.is_admin()') is not null)
+  ,('20260919000048_delete_campaign',
+     to_regprocedure('public.delete_campaign(uuid)') is not null)
 ) as m (migration, applied)
 order by migration;

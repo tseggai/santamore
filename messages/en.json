@@ -818,7 +818,7 @@
     "evEdit": "Edit",
     "evCounts": "{registrations, plural, one {# registration} other {# registrations}} · {pages, plural, one {# fundraiser page} other {# fundraiser pages}} · {going} going",
     "campaignsTitle": "Causes",
-    "campaignsHint": "A cause is the money side: the SEPA reference donors pay to, the suggested amounts on the donate page, the goal and who benefits. Events hang off a cause.",
+    "campaignsHint": "A cause is the money side: the SEPA reference donors pay to, the suggested amounts on the donate page, the goal and who benefits. Events hang off a cause. A cause with donations, hand-overs, pages or teams cannot be deleted — unpublish it instead.",
     "campNew": "New cause",
     "campEmpty": "No causes yet.",
     "campDescription": "Description",
@@ -1389,7 +1389,14 @@
     "evRegModeOrganizerHint": "The Register button opens the organiser's link. Signing up here is free and only keeps our team list, the runner list and fundraising pages going.",
     "evRegModeHereHint": "People register and pay here. Add the organiser's price per place as a price tier above; bibs come from the pool below.",
     "dialogOk": "OK",
-    "dialogDelete": "Delete"
+    "dialogDelete": "Delete",
+    "caDeleteConfirm": "{count, plural, one {Delete this cause?} other {Delete # causes?}} Its events, sponsorships, photos, proposals, beneficiaries and year reports stay and lose the link. This cannot be undone. To hide it from the site instead, unpublish it.",
+    "caDeleteBlocked": "{name} was not deleted: {reason}. Unpublish it instead.",
+    "caDeleteReason_donations": "{count, plural, one {a donation was made to it} other {# donations were made to it}}",
+    "caDeleteReason_handovers": "{count, plural, one {a hand-over was booked to it} other {# hand-overs were booked to it}}",
+    "caDeleteReason_pages": "{count, plural, one {a fundraising page raises for it} other {# fundraising pages raise for it}}",
+    "caDeleteReason_teams": "{count, plural, one {a team raises for it} other {# teams raise for it}}",
+    "caDeleteReason_missing": "it no longer exists"
   },
   "forms": {
     "nameLabel": "Full name",
