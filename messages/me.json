@@ -1396,7 +1396,18 @@
     "caDeleteReason_handovers": "{count, plural, one {na njega je knjižena jedna predaja} few {na njega su knjižene # predaje} other {na njega je knjiženo # predaja}}",
     "caDeleteReason_pages": "{count, plural, one {za njega prikuplja jedna stranica} few {za njega prikupljaju # stranice} other {za njega prikuplja # stranica}}",
     "caDeleteReason_teams": "{count, plural, one {za njega prikuplja jedan tim} few {za njega prikupljaju # tima} other {za njega prikuplja # timova}}",
-    "caDeleteReason_missing": "više ne postoji"
+    "caDeleteReason_missing": "više ne postoji",
+    "peopleTabTeams": "Timovi",
+    "tmHint": "Timovi za prikupljanje: stranice koje zajedno prikupljaju za događaj, sa kapitenom. Brisanje tima odvaja njegove stranice i čuva svaki euro; tim čije su stranice primile donacije ne može se obrisati.",
+    "tmColEvent": "Događaj",
+    "tmColCause": "Cilj",
+    "tmColCaptain": "Kapiten",
+    "tmColPages": "Stranice",
+    "tmEmpty": "Još nema timova.",
+    "tmDeleteConfirm": "{count, plural, one {Obrisati ovaj tim?} few {Obrisati # tima?} other {Obrisati # timova?}} Stranice ostaju i napuštaju tim. Ovo se ne može poništiti.",
+    "tmDeleteBlocked": "{name} nije obrisan: na njegove stranice {count, plural, one {je stigla jedna donacija} few {su stigle # donacije} other {je stiglo # donacija}}.",
+    "pageDeleteConfirm": "Obrisati stranicu „{title}“? Njena lista za zamolbe, aktivnosti i fotografija brišu se s njom. Ovo se ne može poništiti. Ako je samo želiš skloniti sa sajta, sakrij je.",
+    "pageDeleteBlocked": "{title} nije obrisana: {count, plural, one {jedna donacija je navodi} few {# donacije je navode} other {# donacija je navodi}}. Umjesto toga je sakrij."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

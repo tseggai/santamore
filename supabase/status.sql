@@ -127,5 +127,8 @@ select * from (values
      to_regprocedure('public.is_admin()') is not null)
   ,('20260919000048_delete_campaign',
      to_regprocedure('public.delete_campaign(uuid)') is not null)
+  ,('20260919000049_delete_team_page',
+     to_regprocedure('public.delete_team(uuid)') is not null
+     and to_regprocedure('public.delete_fundraiser(uuid)') is not null)
 ) as m (migration, applied)
 order by migration;
