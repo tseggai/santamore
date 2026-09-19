@@ -1586,7 +1586,10 @@
     "close": "Close",
     "raiseCta": "Raise money for this cause",
     "beneficiariesHeading": "Who this cause reached",
-    "beneficiaryMore": "More about them"
+    "beneficiaryMore": "More about them",
+    "statusCompleted": "Completed",
+    "statusGoalReached": "Goal reached",
+    "statusHandedOver": "<amount></amount> handed over to the beneficiaries"
   },
   "perks": {
     "title": "Partner challenges",

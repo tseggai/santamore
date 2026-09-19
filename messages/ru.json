@@ -1587,7 +1587,10 @@
     "close": "Закрыть",
     "raiseCta": "Собирать на эту цель",
     "beneficiariesHeading": "До кого дошла эта цель",
-    "beneficiaryMore": "Подробнее о них"
+    "beneficiaryMore": "Подробнее о них",
+    "statusCompleted": "Завершено",
+    "statusGoalReached": "Цель достигнута",
+    "statusHandedOver": "<amount></amount> передано благополучателям"
   },
   "perks": {
     "title": "Челленджи партнёров",

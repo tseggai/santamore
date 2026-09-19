@@ -1586,7 +1586,10 @@
     "close": "Zatvori",
     "raiseCta": "Prikupljaj za ovaj cilj",
     "beneficiariesHeading": "Do koga je ovaj cilj stigao",
-    "beneficiaryMore": "Više o njima"
+    "beneficiaryMore": "Više o njima",
+    "statusCompleted": "Završeno",
+    "statusGoalReached": "Cilj dostignut",
+    "statusHandedOver": "<amount></amount> predato korisnicima"
   },
   "perks": {
     "title": "Izazovi partnera",

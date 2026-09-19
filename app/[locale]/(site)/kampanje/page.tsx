@@ -5,6 +5,8 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ProposalsList, type PublicProposal } from "@/components/proposals/ProposalsList";
 import { ProposePane } from "@/components/proposals/ProposePane";
 import type { PublicCriterion } from "@/components/proposals/ProposeForm";
+import { CauseStatus } from "@/components/campaigns/CauseStatus";
+import { openFirst } from "@/lib/cause-status";
 import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
@@ -23,6 +25,8 @@ interface CampaignRow {
   starts_at: string | null;
   ends_at: string | null;
   chapter_name: string | null;
+  /** Absent until migration 0044 is applied. */
+  disbursed_cents?: number | null;
 }
 
 export async function generateMetadata({
@@ -71,11 +75,10 @@ export default async function CampaignsIndexPage({
     signedIn = Boolean(auth.user);
     const { data } = await supabase
       .from("v_public_campaigns")
-      .select(
-        "slug, title, description, beneficiary_summary, goal_cents, raised_cents, donor_count, starts_at, ends_at, chapter_name",
-      )
+      .select("*")
       .order("starts_at", { ascending: false, nullsFirst: false });
-    campaigns = (data ?? []) as CampaignRow[];
+    // Open causes first; a completed one is read from its records, never set.
+    campaigns = openFirst((data ?? []) as CampaignRow[]);
   } catch {
     campaigns = [];
   }
@@ -121,6 +124,7 @@ export default async function CampaignsIndexPage({
                       {campaign.beneficiary_summary}
                     </span>
                   ) : null}
+                  <CauseStatus cause={campaign} className="mt-3" />
                   <span className="mt-3 flex items-baseline gap-3">
                     <span className="font-mono text-[16px] font-medium tabular-nums">
                       {money(campaign.raised_cents)}

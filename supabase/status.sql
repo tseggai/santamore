@@ -115,5 +115,8 @@ select * from (values
   ,('20260919000043_year_report_cause',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'year_reports' and column_name = 'campaign_id'))
+  ,('20260919000044_campaign_disbursed',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'v_public_campaigns' and column_name = 'disbursed_cents'))
 ) as m (migration, applied)
 order by migration;
