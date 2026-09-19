@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { saveCampaign, setCampaignsPublic } from "@/app/[locale]/admin/(protected)/kampanje/actions";
+import { deleteCampaigns, saveCampaign, setCampaignsPublic } from "@/app/[locale]/admin/(protected)/kampanje/actions";
 import { CoverField } from "@/components/admin/CoverField";
 import type { Option } from "@/components/admin/EventForm";
 import { GalleryManager, type GalleryAdminItem } from "@/components/admin/GalleryManager";
@@ -12,6 +12,7 @@ import { Chip, DataTable, Thumb, bulkButton, iconButton, rowButton, type Column 
 import { ExternalIcon, EyeIcon } from "@/components/Icons";
 import { formatShortDate } from "@/lib/dates";
 import { PageHeader } from "@/components/console/PageHeader";
+import { useDialog } from "@/components/console/useDialog";
 import { SidePanel } from "@/components/console/SidePanel";
 import { PreviewFrame } from "@/components/admin/PreviewFrame";
 import { CampaignPageView } from "@/components/campaigns/CampaignPageView";
@@ -443,6 +444,25 @@ export function CampaignsManager({
     clear?.();
     router.refresh();
   };
+  // Deleting is for a cause added by mistake; the database refuses one
+  // with donations, hand-overs, pages or teams and says why.
+  const [notice, setNotice] = useState<string[]>([]);
+  const dialog = useDialog();
+  const remove = async (ids: string[], clear: () => void) => {
+    if (!(await dialog.confirm(t("caDeleteConfirm", { count: ids.length })))) return;
+    setBusy(true);
+    setNotice([]);
+    const result = await deleteCampaigns({ ids }).catch(() => null);
+    setBusy(false);
+    if (!result?.ok) {
+      await dialog.alert(t("actionError"), result?.detail);
+      return;
+    }
+    setNotice(result.blocked.map((b) => t("caDeleteBlocked", { name: b.name, reason: t(`caDeleteReason_${b.reason}`, { count: b.count }) })));
+    clear();
+    if (ids.includes(open) && !result.blocked.length) setOpen("");
+    router.refresh();
+  };
 
   const columns: Column<CampaignRow>[] = [
     {
@@ -487,6 +507,7 @@ export function CampaignsManager({
 
   return (
     <div className="space-y-4">
+      {dialog.element}
       <PageHeader
         title={title}
         lead={lead}
@@ -505,6 +526,11 @@ export function CampaignsManager({
         <CampaignForm key={open} campaign={openCampaign} chapters={chapters} onDone={() => setOpen("")} />
       </SidePanel>
 
+      {notice.length > 0 ? (
+        <div role="alert" className="rounded-lg bg-mist px-4 py-3 text-[14px] font-semibold text-red-dark">
+          {notice.map((line) => <p key={line}>{line}</p>)}
+        </div>
+      ) : null}
       <DataTable
         rows={campaigns}
         getId={(c) => c.id}
@@ -533,6 +559,7 @@ export function CampaignsManager({
           <>
             <button type="button" disabled={busy} onClick={() => setPublic(ids, true, clear)} className={bulkButton}>{t("galleryPublish")}</button>
             <button type="button" disabled={busy} onClick={() => setPublic(ids, false, clear)} className={bulkButton}>{t("galleryUnpublish")}</button>
+            <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button>
           </>
         )}
       />

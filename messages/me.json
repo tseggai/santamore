@@ -818,7 +818,7 @@
     "evEdit": "Uredi",
     "evCounts": "{registrations, plural, one {# prijava} few {# prijave} other {# prijava}} · {pages, plural, one {# stranica} few {# stranice} other {# stranica}} · {going} dolazi",
     "campaignsTitle": "Ciljevi",
-    "campaignsHint": "Cilj je novčana strana: poziv na broj na koji donatori uplaćuju, predloženi iznosi na stranici za donacije, iznos i kome ide. Događaji se vežu za cilj.",
+    "campaignsHint": "Cilj je novčana strana: poziv na broj na koji donatori uplaćuju, predloženi iznosi na stranici za donacije, iznos i kome ide. Događaji se vežu za cilj. Cilj sa donacijama, predajama, stranicama ili timovima ne može se obrisati — umjesto toga povuci objavu.",
     "campNew": "Novi cilj",
     "campEmpty": "Još nema ciljeva.",
     "campDescription": "Opis",
@@ -1389,7 +1389,14 @@
     "evRegModeOrganizerHint": "Dugme Prijavi se otvara link organizatora. Prijava ovdje je besplatna i služi samo za spisak tima, listu trkača i stranice za prikupljanje.",
     "evRegModeHereHint": "Ljudi se prijavljuju i plaćaju ovdje. Cijenu organizatora po mjestu dodaj kao cjenovni razred iznad; startni brojevi dolaze iz fonda ispod.",
     "dialogOk": "U redu",
-    "dialogDelete": "Obriši"
+    "dialogDelete": "Obriši",
+    "caDeleteConfirm": "{count, plural, one {Obrisati ovaj cilj?} few {Obrisati # cilja?} other {Obrisati # ciljeva?}} Njegovi događaji, sponzorstva, fotografije, prijedlozi, korisnici i godišnji izvještaji ostaju i gube vezu. Ovo se ne može poništiti. Ako ga samo želiš sakriti sa sajta, povuci objavu.",
+    "caDeleteBlocked": "{name} nije obrisan: {reason}. Umjesto toga povuci objavu.",
+    "caDeleteReason_donations": "{count, plural, one {za njega je uplaćena jedna donacija} few {za njega su uplaćene # donacije} other {za njega je uplaćeno # donacija}}",
+    "caDeleteReason_handovers": "{count, plural, one {na njega je knjižena jedna predaja} few {na njega su knjižene # predaje} other {na njega je knjiženo # predaja}}",
+    "caDeleteReason_pages": "{count, plural, one {za njega prikuplja jedna stranica} few {za njega prikupljaju # stranice} other {za njega prikuplja # stranica}}",
+    "caDeleteReason_teams": "{count, plural, one {za njega prikuplja jedan tim} few {za njega prikupljaju # tima} other {za njega prikuplja # timova}}",
+    "caDeleteReason_missing": "više ne postoji"
   },
   "forms": {
     "nameLabel": "Ime i prezime",
