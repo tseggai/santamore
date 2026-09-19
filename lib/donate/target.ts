@@ -16,7 +16,7 @@ interface CampaignRow {
   slug: string;
   title: string;
   description: string | null;
-  goal_cents: number;
+  goal_cents: number | null;
   payment_reference: string;
   suggested_amounts: unknown;
   raised_cents: number;
@@ -30,7 +30,7 @@ interface FundraiserRow {
   slug: string;
   title: string;
   story: string | null;
-  goal_cents: number;
+  goal_cents: number | null;
   payment_reference: string;
   photo_path: string | null;
 }
