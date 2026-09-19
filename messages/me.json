@@ -1055,6 +1055,7 @@
     "teamAccount": "Nalog",
     "teamNoAccount": "Bez naloga",
     "teamAccountHint": "Nije obavezno. Povežite nalog osobe da vežete nivo pristupa za ovaj zapis.",
+    "teamAccountTaken": "Ovaj nalog je već povezan sa drugom osobom u timu. Otvorite taj zapis ili ga tamo prvo odvežite.",
     "teamAccountLevel": "Nivo pristupa: {level}.",
     "teamChangeAccess": "Promijeni u Nalozima",
     "teamPublic": "Prikaži na stranici O nama",

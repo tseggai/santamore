@@ -1055,6 +1055,7 @@
     "teamAccount": "Account",
     "teamNoAccount": "No account",
     "teamAccountHint": "Optional. Link the person's account to tie their access level to this record.",
+    "teamAccountTaken": "This account is already linked to another person on the team. Open that record instead, or unlink it there first.",
     "teamAccountLevel": "Access level: {level}.",
     "teamChangeAccess": "Change on Accounts",
     "teamPublic": "Show on the About us page",
