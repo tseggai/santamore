@@ -130,5 +130,9 @@ select * from (values
   ,('20260919000049_delete_team_page',
      to_regprocedure('public.delete_team(uuid)') is not null
      and to_regprocedure('public.delete_fundraiser(uuid)') is not null)
+  ,('20260919000050_captain_deletes_team',
+     exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+             where n.nspname = 'public' and p.proname = 'delete_team'
+               and pg_get_functiondef(p.oid) like '%v_captain%'))
 ) as m (migration, applied)
 order by migration;
