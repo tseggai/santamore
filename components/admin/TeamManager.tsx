@@ -42,10 +42,10 @@ const labelClass = "text-[13.5px] font-semibold";
 const inputClass = "mt-1 w-full rounded-lg bg-paper px-3.5 py-2.5 text-[15px] outline-none ring-sea/40 focus:ring-2";
 
 /** The team, one row each; the panel holds the person and their link to an account. */
-export function TeamManager({ rows, accounts }: { rows: TeamRow[]; accounts: AccountOption[] }) {
+export function TeamManager({ rows, accounts, initialOpenId = "" }: { rows: TeamRow[]; accounts: AccountOption[]; initialOpenId?: string }) {
   const t = useTranslations("admin");
   const router = useRouter();
-  const [open, setOpen] = useState<"" | "new" | string>("");
+  const [open, setOpen] = useState<"" | "new" | string>(rows.some((r) => r.id === initialOpenId) ? initialOpenId : "");
   const [busy, setBusy] = useState(false);
   const current = rows.find((r) => r.id === open) ?? null;
   const accountById = new Map(accounts.map((a) => [a.id, a]));

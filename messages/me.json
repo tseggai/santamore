@@ -1024,11 +1024,12 @@
     "spNew": "Novo sponzorstvo",
     "navMembers": "Ljudi",
     "membersTitle": "Članovi",
-    "membersHint": "Svaki nalog i šta ko radi: sportista kad je Strava povezana, prikupljač kad ima stranicu, učesnik kad je registrovan, kapiten, donator. Otvori red za stranice, registracije i Stravu.",
+    "membersHint": "Svaki nalog i šta osoba radi: sportista kad je Strava uključena, učesnik kad je prijavljen, kapiten, donator. Otvorite red za stranice, prijave, Stravu i nivo pristupa.",
     "peopleTitle": "Ljudi",
     "peopleHint": "Tim, sa nalogom ili bez njega, i svaki nalog sa onim što osoba radi i smije.",
     "peopleTabTeam": "Tim",
-    "peopleTabAccounts": "Nalozi",
+    "peopleTabFundraisers": "Prikupljači",
+    "peopleTabAccounts": "Članovi",
     "teamHint": "Rukovodstvo, tim, odbor, komisija i volonteri. Zapis stoji sam za sebe; nalog povežite samo da vežete nivo pristupa za osobu. Javni se prikazuju na stranici O nama; volonteri se računaju za godine u kojima su bili aktivni.",
     "teamNew": "Nova osoba",
     "teamCreate": "Dodaj osobu",
@@ -1068,7 +1069,7 @@
       "participants": "Učesnici",
       "captains": "Kapiteni",
       "donors": "Donatori",
-      "staff": "Tim"
+      "team": "Tim"
     },
     "memberRole": {
       "admin": "Admin",
@@ -1358,7 +1359,10 @@
     "yearBeneficiariesList": "Kuda je novac otišao",
     "yearBeneficiariesListHint": "Jedan po redu: opis · euri, npr. „Porodica u Tivtu, liječenje · 1200”",
     "yearDonorsList": "Donatori (zid donatora)",
-    "yearDonorsHint": "Jedan po redu: ime · euri. Napiši Anonimno za one koji nisu htjeli da budu imenovani."
+    "yearDonorsHint": "Jedan po redu: ime · euri. Napiši Anonimno za one koji nisu htjeli da budu imenovani.",
+    "peopleTabAll": "Svi",
+    "allPeopleHint": "Svi odjednom: svaki nalog i svaki zapis u timu, jedan filter za sve vrste. Osoba bez naloga se otvara na kartici Tim.",
+    "fundraisersPeopleHint": "Nalozi koji drže stranicu za prikupljanje: koliko je svako prikupio i njihove stranice za moderaciju."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

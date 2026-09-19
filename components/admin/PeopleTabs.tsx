@@ -10,7 +10,9 @@ export function PeopleTabs() {
     <SectionTabs
       ariaLabel={t("navMembers")}
       tabs={[
-        { href: "/admin/clanovi", label: t("peopleTabTeam"), exact: true },
+        { href: "/admin/clanovi", label: t("peopleTabAll"), exact: true },
+        { href: "/admin/clanovi/tim", label: t("peopleTabTeam") },
+        { href: "/admin/clanovi/prikupljaci", label: t("peopleTabFundraisers") },
         { href: "/admin/clanovi/nalozi", label: t("peopleTabAccounts") },
       ]}
     />

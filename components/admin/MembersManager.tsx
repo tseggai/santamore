@@ -35,11 +35,11 @@ export interface MemberRow {
   donations: number;
   given_cents: number;
   avatar_url?: string | null;
-  title?: string | null;
-  quote?: string | null;
-  photo_path?: string | null;
-  is_team?: boolean;
-  team_order?: number;
+  /** The role on the person's team record, when they have one. */
+  team_kind?: string;
+  team_id?: string;
+  /** A team record with no account: opens on the Team tab. */
+  team_only?: boolean;
 }
 
 export interface MemberPage {
@@ -76,11 +76,17 @@ export interface MemberTeam {
   event_name: string;
 }
 
-type Kind = "athletes" | "fundraisers" | "participants" | "captains" | "donors" | "staff";
-const KINDS: Kind[] = ["staff", "athletes", "fundraisers", "participants", "captains", "donors"];
+type Kind = "team" | "fundraisers" | "athletes" | "participants" | "captains" | "donors";
+const KINDS: Kind[] = ["team", "fundraisers", "athletes", "participants", "captains", "donors"];
+/** Which kinds each People tab filters by. */
+const KINDS_BY_MODE: Record<"all" | "fundraisers" | "members", Kind[]> = {
+  all: KINDS,
+  fundraisers: [],
+  members: ["athletes", "participants", "captains", "donors"],
+};
 /** One fixed dot per role, brand tones; a tooltip names it. */
 const KIND_DOT: Record<Kind, string> = {
-  staff: "bg-ink",
+  team: "bg-ink",
   athletes: "bg-sea",
   fundraisers: "bg-red",
   participants: "bg-sea/45",
@@ -95,7 +101,7 @@ function isKind(member: MemberRow, kind: Kind): boolean {
     case "participants": return member.registrations > 0 || member.rsvps > 0;
     case "captains": return member.teams > 0;
     case "donors": return member.donations > 0;
-    case "staff": return member.role !== "member";
+    case "team": return Boolean(member.team_kind);
   }
 }
 
@@ -116,8 +122,11 @@ export function MembersManager({
   registrations,
   teams,
   canManage = false,
+  mode = "members",
 }: {
   locale: Locale;
+  /** Which People tab this list is: sets the kinds the filter offers. */
+  mode?: "all" | "fundraisers" | "members";
   members: MemberRow[];
   pages: MemberPage[];
   registrations: MemberRegistration[];
@@ -126,6 +135,8 @@ export function MembersManager({
   canManage?: boolean;
 }) {
   const t = useTranslations("admin");
+  const router = useRouter();
+  const kinds = KINDS_BY_MODE[mode];
   const [open, setOpen] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
@@ -181,9 +192,9 @@ export function MembersManager({
       header: t("table.colRoles"),
       cell: (m) => (
         <span className="flex items-center gap-1.5">
-          {KINDS.map((kind) => {
+          {kinds.map((kind) => {
             const on = isKind(m, kind);
-            const label = kind === "staff" && m.role !== "member" ? t(`memberRole.${m.role}`) : t(`memberFilter.${kind}`);
+            const label = kind === "team" && m.team_kind ? t(`teamKindValue.${m.team_kind}`) : t(`memberFilter.${kind}`);
             return (
               <span
                 key={kind}
@@ -197,7 +208,7 @@ export function MembersManager({
         </span>
       ),
       filter: {
-        options: KINDS.map((kind) => ({ value: kind, label: t(`memberFilter.${kind}`) })),
+        options: kinds.map((kind) => ({ value: kind, label: t(`memberFilter.${kind}`) })),
         match: (m, value) => isKind(m, value as Kind),
       },
     },
@@ -250,7 +261,7 @@ export function MembersManager({
         getId={(m) => m.id}
         columns={columns}
         leading={(m) => <Thumb src={m.avatar_url ?? null} initial={displayName(m).charAt(0).toUpperCase()} rounded />}
-        onOpen={(m) => setOpen(m.id)}
+        onOpen={(m) => (m.team_only ? router.push(`/${locale}/admin/clanovi/tim?uredi=${m.team_id ?? m.id}`) : setOpen(m.id))}
         searchText={(m) => `${m.full_name ?? ""} ${m.email ?? ""}`}
         searchPlaceholder={t("memberSearch")}
         emptyLabel={t("membersEmpty")}
@@ -391,7 +402,7 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
       <p className="type-eyebrow text-black/60">{t("memberProfileHeading")}</p>
       <p className="mt-1 text-[13.5px] text-black/60">
         {canManage ? t("memberProfileHint") : t("memberProfileReadOnly")}{" "}
-        <Link href="/admin/clanovi" className="font-semibold text-sea underline underline-offset-2">{t("memberTeamLink")}</Link>
+        <Link href="/admin/clanovi/tim" className="font-semibold text-sea underline underline-offset-2">{t("memberTeamLink")}</Link>
       </p>
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
         <div>
