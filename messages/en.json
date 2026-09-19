@@ -619,7 +619,8 @@
       "emailsCopied": "Copied",
       "exportCsv": "Export CSV",
       "colLanguages": "Languages",
-      "colSigned": "Given"
+      "colSigned": "Given",
+      "colTeams": "Teams"
     },
     "confirmCash": "Confirm hand-in",
     "railCash": "cash",
@@ -1411,7 +1412,10 @@
     "tmDeleteConfirm": "{count, plural, one {Delete this team?} other {Delete # teams?}} Its pages stay and leave the team. This cannot be undone.",
     "tmDeleteBlocked": "{name} was not deleted: {count, plural, one {a donation} other {# donations}} went to its pages.",
     "pageDeleteConfirm": "Delete the page \"{title}\"? Its ask list, activities and photo go with it. This cannot be undone. To take it off the site instead, hide it.",
-    "pageDeleteBlocked": "{title} was not deleted: {count, plural, one {a donation names it} other {# donations name it}}. Hide it instead."
+    "pageDeleteBlocked": "{title} was not deleted: {count, plural, one {a donation names it} other {# donations name it}}. Hide it instead.",
+    "focusPagesFor": "Pages for {name}",
+    "focusTeamsFor": "Teams for {name}",
+    "focusClear": "Show all"
   },
   "forms": {
     "nameLabel": "Full name",

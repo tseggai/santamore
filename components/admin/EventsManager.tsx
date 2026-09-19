@@ -21,7 +21,9 @@ import { Link } from "@/i18n/navigation";
 export interface EventListRow extends EventFormValues {
   id: string;
   registrations: number;
+  /** Pages of the event's cause (pages belong to causes). */
   pages: number;
+  teams: number;
   going: number;
   offers: PerkChallengeAdminRow[];
   gallery: GalleryAdminItem[];
@@ -147,7 +149,25 @@ export function EventsManager({
       ),
       sort: (e) => e.registrations,
     },
-    { key: "pages", header: t("table.colPages"), align: "center", cell: (e) => e.pages, sort: (e) => e.pages },
+    {
+      key: "pages",
+      header: t("table.colPages"),
+      align: "center",
+      cell: (e) =>
+        e.pages > 0 && e.campaign_id ? (
+          <Link href={`/admin/clanovi/prikupljaci?cilj=${e.campaign_id}`} className="underline underline-offset-2 hover:text-sea">{e.pages}</Link>
+        ) : (
+          e.pages
+        ),
+      sort: (e) => e.pages,
+    },
+    {
+      key: "teams",
+      header: t("table.colTeams"),
+      align: "center",
+      cell: (e) => (e.teams > 0 ? <Link href={`/admin/clanovi/timovi?dogadjaj=${e.id}`} className="underline underline-offset-2 hover:text-sea">{e.teams}</Link> : e.teams),
+      sort: (e) => e.teams,
+    },
     { key: "going", header: t("table.colGoing"), align: "center", cell: (e) => e.going, sort: (e) => e.going },
   ];
 
