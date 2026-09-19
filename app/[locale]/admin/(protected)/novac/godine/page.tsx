@@ -26,6 +26,7 @@ interface ReportRow {
   beneficiaries_list: { label: string; amount_cents: number | null }[];
   donors_list: { name: string; amount_cents: number | null }[];
   volunteers_list: string[] | null;
+  campaign_id: string | null;
 }
 
 interface CampaignRow {
@@ -59,18 +60,27 @@ export default async function YearsPage({ params }: { params: Promise<{ locale: 
   setRequestLocale(locale);
   const t = await getTranslations("admin");
   const supabase = await createClient();
-  const [{ data: stats }, { data: reports }, { data: campaigns }, { data: donations }, { data: disbursements }, { data: sponsors }] = await Promise.all([
+  const [{ data: stats }, { data: reports }, { data: campaigns }, { data: donations }, { data: disbursements }, { data: sponsors }, { data: dealRows }] = await Promise.all([
     supabase.from("v_public_year_stats").select("*").order("year", { ascending: false }),
     supabase.from("year_reports").select("*"),
     supabase.from("campaigns").select("id, title, starts_at, created_at, is_public").order("starts_at", { ascending: false }).limit(500),
     supabase.from("donations").select("campaign_id, net_cents").in("status", ["approved", "refunded"]).limit(20_000),
     supabase.from("disbursements").select("campaign_id, amount_cents").not("published_at", "is", null).limit(5_000),
     supabase.from("v_public_sponsors").select("id, name, tier, amount_cents, is_in_kind, year, campaign_title, event_name").limit(2_000),
+    supabase.from("sponsors").select("campaign_id, amount_cents, fund, status, is_in_kind").limit(5_000),
   ]);
 
   const raisedBy = new Map<string, number>();
-  for (const d of (donations ?? []) as { campaign_id: string | null; net_cents: number }[]) {
-    if (d.campaign_id) raisedBy.set(d.campaign_id, (raisedBy.get(d.campaign_id) ?? 0) + d.net_cents);
+  const addRaised = (id: string | null, cents: number) => {
+    if (id) raisedBy.set(id, (raisedBy.get(id) ?? 0) + cents);
+  };
+  for (const d of (donations ?? []) as { campaign_id: string | null; net_cents: number }[]) addRaised(d.campaign_id, d.net_cents);
+  // Recorded gifts of a year report that names the cause, and sponsorship cash handed to beneficiaries.
+  for (const r of (reports ?? []) as ReportRow[]) {
+    if (r.campaign_id) addRaised(r.campaign_id, (r.donors_list ?? []).reduce((sum, g) => sum + (g.amount_cents ?? 0), 0));
+  }
+  for (const s of (dealRows ?? []) as { campaign_id: string | null; amount_cents: number | null; fund: string; status: string; is_in_kind: boolean }[]) {
+    if ((s.status === "signed" || s.status === "active") && !s.is_in_kind && s.fund === "impact") addRaised(s.campaign_id, s.amount_cents ?? 0);
   }
   const disbursedBy = new Map<string, { cents: number; count: number }>();
   for (const d of (disbursements ?? []) as { campaign_id: string | null; amount_cents: number }[]) {
@@ -125,6 +135,7 @@ export default async function YearsPage({ params }: { params: Promise<{ locale: 
             beneficiariesList: report.beneficiaries_list ?? [],
             donorsList: report.donors_list ?? [],
             volunteersList: report.volunteers_list ?? [],
+            campaignId: report.campaign_id,
           }
         : null,
     };

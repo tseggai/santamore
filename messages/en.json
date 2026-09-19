@@ -1368,6 +1368,8 @@
     "yearBeneficiariesListHint": "One per line: label · euros, e.g. “Family in Tivat, medical costs · 1200”",
     "yearDonorsList": "Donors (donor wall)",
     "yearDonorsHint": "One per line: name · euros. Write Anonymous for anyone who chose not to be named.",
+    "yearRecordedCause": "These recorded gifts and hand-overs belong to",
+    "yearRecordedCauseHint": "The cause of that year. Its raised figure then includes the donor list below and sponsorship cash handed to the beneficiaries.",
     "peopleTabAll": "All",
     "allPeopleHint": "Everyone at once: every account and every team record, one filter across all kinds. A person with no account opens on the Team tab.",
     "fundraisersPeopleHint": "The accounts that hold a fundraising page: how much each raised, and their pages to moderate."

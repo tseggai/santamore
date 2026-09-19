@@ -26,6 +26,8 @@ const schema = z.object({
   beneficiariesList: z.array(z.object({ label: z.string().trim().min(1).max(200), amount_cents: z.number().int().min(0).nullable() })).max(100).default([]),
   donorsList: z.array(z.object({ name: z.string().trim().min(1).max(120), amount_cents: z.number().int().min(0).nullable() })).max(2000).default([]),
   volunteersList: z.array(z.string().trim().min(1).max(120)).max(500).default([]),
+  /** The cause the recorded donor list and hand-overs belong to. */
+  campaignId: z.string().uuid().nullable().default(null),
 });
 
 export async function saveYearReport(input: unknown): Promise<YearReportResult> {
@@ -51,6 +53,7 @@ export async function saveYearReport(input: unknown): Promise<YearReportResult> 
       beneficiaries_list: data.beneficiariesList,
       donors_list: data.donorsList,
       volunteers_list: data.volunteersList,
+      campaign_id: data.campaignId,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "year" },
