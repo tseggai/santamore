@@ -1321,7 +1321,7 @@
     "evHosting": "Who organises it",
     "evHostingOwn": "We do — people register and pay here",
     "evHostingExternal": "Someone else — we run for Santamore",
-    "evExternalUrl": "Organiser's registration link",
+    "evExternalUrl": "Organiser's link (registration or event page)",
     "evBibs": "We buy bibs for the team",
     "evBibsHint": "Members can claim one until they run out.",
     "evBibCapacity": "Bibs we buy",
@@ -1381,7 +1381,13 @@
     "evDeleteReason_teams": "{count, plural, one {a team signed up for it} other {# teams signed up for it}}",
     "evDeleteReason_donations": "{count, plural, one {a donation was made for it} other {# donations were made for it}}",
     "evDeleteReason_paid": "{count, plural, one {a paid registration exists} other {# paid registrations exist}}",
-    "evDeleteReason_missing": "it no longer exists"
+    "evDeleteReason_missing": "it no longer exists",
+    "evOrganizerName": "Organiser",
+    "evRegMode": "Registration",
+    "evRegModeOrganizer": "With the organiser — here people only say they run for Santamore",
+    "evRegModeHere": "Here — we register the team and pay the organiser in one go",
+    "evRegModeOrganizerHint": "The Register button opens the organiser's link. Signing up here is free and only keeps our team list, the runner list and fundraising pages going.",
+    "evRegModeHereHint": "People register and pay here. Add the organiser's price per place as a price tier above; bibs come from the pool below."
   },
   "forms": {
     "nameLabel": "Full name",
@@ -1539,7 +1545,16 @@
     "guestOf": "guest of {name}",
     "partyTotal": "Total for {count} people",
     "externalNote": "Organised by others · you register with them",
-    "ticketsHeading": "Tickets"
+    "ticketsHeading": "Tickets",
+    "runForUsCta": "I'm running this for Santamore",
+    "registerWithCta": "Register with {name}",
+    "theOrganizer": "the organiser",
+    "factOrganizer": "Organised by",
+    "wayRunOrganizer": "Register with the organiser, run for Santamore",
+    "wayRunOrganizerSub": "{name} organises this race and takes the registrations. Sign up with them, then tell us you run in our colours — and raise money for the cause if you like.",
+    "wayRunTeam": "Run with the Santamore team",
+    "wayRunTeamSub": "{name} organises this race. We register the team and pay for the places in one go, so you register and pay here.",
+    "organizerSite": "Event details at {name}"
   },
   "gallery": {
     "eyebrow": "Gallery",

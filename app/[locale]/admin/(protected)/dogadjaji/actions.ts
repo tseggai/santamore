@@ -51,6 +51,8 @@ const eventSchema = z
     coverPath: z.string().trim().max(300).nullable().optional(),
     hosting: z.enum(["own", "external"]).default("own"),
     externalUrl: z.string().trim().url().max(300).nullable().default(null),
+    registrationMode: z.enum(["organizer", "here"]).default("organizer"),
+    organizerName: z.string().trim().max(120).nullable().default(null),
     bibPolicy: z.enum(["none", "we_buy"]).default("none"),
     bibCapacity: z.number().int().min(0).max(100_000).nullable().default(null),
     maxGuests: z.number().int().min(0).max(20).default(0),
@@ -90,8 +92,13 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
     // Only a race can be someone else's; only a gathering brings guests.
     hosting: data.kind === "race" ? data.hosting : "own",
     external_url: data.kind === "race" && data.hosting === "external" ? data.externalUrl : null,
-    bib_policy: data.kind === "race" && data.hosting === "external" ? data.bibPolicy : "none",
-    bib_capacity: data.kind === "race" && data.hosting === "external" && data.bibPolicy === "we_buy" ? data.bibCapacity : null,
+    organizer_name: data.kind === "race" && data.hosting === "external" ? data.organizerName : null,
+    // Our own events register here; an external race registers with the
+    // organiser unless we register the team ourselves.
+    registration_mode: data.kind === "race" && data.hosting === "external" ? data.registrationMode : "here",
+    // Bibs from our pool only make sense when we register the team.
+    bib_policy: data.kind === "race" && data.hosting === "external" && data.registrationMode === "here" ? data.bibPolicy : "none",
+    bib_capacity: data.kind === "race" && data.hosting === "external" && data.registrationMode === "here" && data.bibPolicy === "we_buy" ? data.bibCapacity : null,
     max_guests: data.kind === "social" ? data.maxGuests : 0,
     description: data.description,
     offers_shirts: data.kind === "social" ? false : data.offersShirts,
@@ -195,6 +202,8 @@ export type EventDeleteReason = "pages" | "teams" | "donations" | "paid" | "miss
 export interface EventDeleteResult {
   ok: boolean;
   error?: "invalid" | "server";
+  /** The database's own words when the call itself failed. */
+  detail?: string;
   /** Events that were refused, each with why (see delete_event, migration 0045). */
   blocked: { name: string; reason: EventDeleteReason; count: number }[];
   deleted: number;
@@ -219,7 +228,7 @@ export async function deleteEvents(input: unknown): Promise<EventDeleteResult> {
     const { data, error } = await supabase.rpc("delete_event", { p_id: id });
     if (error) {
       console.error("[admin] event delete failed:", error.code, error.message);
-      return { ok: false, error: "server", blocked, deleted };
+      return { ok: false, error: "server", detail: `${error.code}: ${error.message}`, blocked, deleted };
     }
     const result = data as { ok: boolean; reason?: EventDeleteReason; count?: number; name?: string };
     if (!result.ok) {

@@ -58,7 +58,7 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     const { data: event } = await service
       .from("events")
       .select(
-        "id, name, kind, is_published, distances, price_tiers, capacity, registration_opens_at, registration_closes_at, offers_shirts, hosting, bib_policy, bib_capacity, max_guests",
+        "id, name, kind, is_published, distances, price_tiers, capacity, registration_opens_at, registration_closes_at, offers_shirts, hosting, registration_mode, bib_policy, bib_capacity, max_guests",
       )
       .eq("slug", data.eventSlug)
       .maybeSingle();
@@ -69,7 +69,10 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     if (needsWaiver && !data.waiverAccepted) return { ok: false, error: "invalid" };
     const guests = event.kind === "social" ? data.guests.slice(0, event.max_guests ?? 0) : [];
     if (event.kind === "social" && data.guests.length > (event.max_guests ?? 0)) return { ok: false, error: "invalid" };
-    const wantsBib = data.needsBib && event.hosting === "external" && event.bib_policy === "we_buy";
+    // A race registered with its organiser: here people only say they run
+    // for Santamore, so nothing is owed and no bib of ours is claimed.
+    const withOrganizer = event.hosting === "external" && (event.registration_mode ?? "organizer") === "organizer";
+    const wantsBib = data.needsBib && event.hosting === "external" && !withOrganizer && event.bib_policy === "we_buy";
     const shirtSize = event.offers_shirts ? data.shirtSize : null;
 
     const now = Date.now();
@@ -90,7 +93,7 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     }
     // Free events (no tiers) register at zero; priced events need a tier
     // that is still on offer today (early-bird dates are enforced here).
-    const tiers = activeTiers(parseTiers(event.price_tiers));
+    const tiers = withOrganizer ? [] : activeTiers(parseTiers(event.price_tiers));
     const tier =
       tiers.length === 0
         ? null

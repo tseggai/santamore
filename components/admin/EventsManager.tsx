@@ -85,7 +85,7 @@ export function EventsManager({
     const result = await deleteEvents({ ids }).catch(() => null);
     setBusy(null);
     if (!result?.ok) {
-      window.alert(t("actionError"));
+      window.alert(result?.detail ? `${t("actionError")}\n\n${result.detail}` : t("actionError"));
       return;
     }
     setNotice(result.blocked.map((b) => t("evDeleteBlocked", { name: b.name, reason: t(`evDeleteReason_${b.reason}`, { count: b.count }) })));

@@ -120,5 +120,8 @@ select * from (values
              where table_schema = 'public' and table_name = 'v_public_campaigns' and column_name = 'disbursed_cents'))
   ,('20260919000045_delete_event',
      to_regprocedure('public.delete_event(uuid)') is not null)
+  ,('20260919000046_event_registration_mode',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'events' and column_name = 'registration_mode'))
 ) as m (migration, applied)
 order by migration;

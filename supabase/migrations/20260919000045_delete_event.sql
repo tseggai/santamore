@@ -60,3 +60,6 @@ $$;
 
 revoke all on function public.delete_event(uuid) from public;
 grant execute on function public.delete_event(uuid) to authenticated;
+
+-- PostgREST learns about the new function at once (see 0042).
+notify pgrst, 'reload schema';
