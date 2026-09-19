@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { setEventPublished, setEventsPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
+import { deleteEvents, setEventPublished, setEventsPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
 import { EventForm, type EventFormValues, type Option } from "@/components/admin/EventForm";
 import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
 import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
@@ -73,6 +73,24 @@ export function EventsManager({
     await setEventsPublished({ ids, published }).catch(() => null);
     setBusy(null);
     clear();
+    router.refresh();
+  };
+  // Deleting is for an event added by mistake; the database refuses one
+  // with pages, teams, donations or paid registrations and says why.
+  const [notice, setNotice] = useState<string[]>([]);
+  const remove = async (ids: string[], clear: () => void) => {
+    if (!window.confirm(t("evDeleteConfirm", { count: ids.length }))) return;
+    setBusy("bulk");
+    setNotice([]);
+    const result = await deleteEvents({ ids }).catch(() => null);
+    setBusy(null);
+    if (!result?.ok) {
+      window.alert(t("actionError"));
+      return;
+    }
+    setNotice(result.blocked.map((b) => t("evDeleteBlocked", { name: b.name, reason: t(`evDeleteReason_${b.reason}`, { count: b.count }) })));
+    clear();
+    if (ids.includes(open) && !result.blocked.length) setOpen("");
     router.refresh();
   };
 
@@ -164,6 +182,11 @@ export function EventsManager({
         />
       </SidePanel>
 
+      {notice.length > 0 ? (
+        <div role="alert" className="mb-4 rounded-lg bg-mist px-4 py-3 text-[14px] font-semibold text-red-dark">
+          {notice.map((line) => <p key={line}>{line}</p>)}
+        </div>
+      ) : null}
       <DataTable
         rows={events}
         getId={(e) => e.id}
@@ -192,6 +215,7 @@ export function EventsManager({
           <>
             <button type="button" disabled={busy === "bulk"} onClick={() => bulkPublish(ids, true, clear)} className={bulkButton}>{t("galleryPublish")}</button>
             <button type="button" disabled={busy === "bulk"} onClick={() => bulkPublish(ids, false, clear)} className={bulkButton}>{t("galleryUnpublish")}</button>
+            <button type="button" disabled={busy === "bulk"} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button>
           </>
         )}
       />

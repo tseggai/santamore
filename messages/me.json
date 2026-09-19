@@ -788,7 +788,7 @@
     "navEvents": "Događaji",
     "navCampaigns": "Ciljevi",
     "eventsTitle": "Događaji",
-    "eventsHint": "Trke i izazovi. Objavljeni događaji vide se na sajtu, primaju prijave i za njih se može prikupljati. Ništa se ne briše — umjesto toga povuci objavu.",
+    "eventsHint": "Trke, druženja i izazovi. Objavljeni događaji vide se na sajtu, primaju prijave i za njih se može prikupljati. Događaj sa stranicama, timovima, donacijama ili plaćenim prijavama ne može se obrisati — umjesto toga povuci objavu.",
     "evNew": "Novi događaj",
     "evName": "Naziv",
     "evSlug": "URL oznaka",
@@ -1373,7 +1373,15 @@
     "yearRecordedCauseHint": "Cilj te godine. Njegov prikupljeni iznos onda uključuje listu donatora ispod i sponzorski novac predat korisnicima.",
     "peopleTabAll": "Svi",
     "allPeopleHint": "Svi odjednom: svaki nalog i svaki zapis u timu, jedan filter za sve vrste. Osoba bez naloga se otvara na kartici Tim.",
-    "fundraisersPeopleHint": "Nalozi koji drže stranicu za prikupljanje: koliko je svako prikupio i njihove stranice za moderaciju."
+    "fundraisersPeopleHint": "Nalozi koji drže stranicu za prikupljanje: koliko je svako prikupio i njihove stranice za moderaciju.",
+    "evDelete": "Obriši",
+    "evDeleteConfirm": "{count, plural, one {Obrisati ovaj događaj?} few {Obrisati # događaja?} other {Obrisati # događaja?}} Neplaćene prijave i potvrde dolaska brišu se s njim; fotografije, sponzorstva i ponude ostaju. Ovo se ne može poništiti. Ako ga samo želiš sakriti sa sajta, povuci objavu.",
+    "evDeleteBlocked": "{name} nije obrisan: {reason}. Umjesto toga povuci objavu.",
+    "evDeleteReason_pages": "{count, plural, one {za njega prikuplja jedna stranica} few {za njega prikupljaju # stranice} other {za njega prikuplja # stranica}}",
+    "evDeleteReason_teams": "{count, plural, one {prijavio se jedan tim} few {prijavila su se # tima} other {prijavilo se # timova}}",
+    "evDeleteReason_donations": "{count, plural, one {za njega je uplaćena jedna donacija} few {za njega su uplaćene # donacije} other {za njega je uplaćeno # donacija}}",
+    "evDeleteReason_paid": "{count, plural, one {postoji jedna plaćena prijava} few {postoje # plaćene prijave} other {postoji # plaćenih prijava}}",
+    "evDeleteReason_missing": "više ne postoji"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

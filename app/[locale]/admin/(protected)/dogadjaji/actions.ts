@@ -189,3 +189,56 @@ export async function setEventsPublished(input: unknown): Promise<EventActionRes
   revalidatePath("/[locale]", "page");
   return { ok: true };
 }
+
+export type EventDeleteReason = "pages" | "teams" | "donations" | "paid" | "missing";
+
+export interface EventDeleteResult {
+  ok: boolean;
+  error?: "invalid" | "server";
+  /** Events that were refused, each with why (see delete_event, migration 0045). */
+  blocked: { name: string; reason: EventDeleteReason; count: number }[];
+  deleted: number;
+}
+
+/**
+ * Delete events added by mistake. The database refuses any event that
+ * carries pages, teams, donations or paid registrations; the rest go with
+ * their unpaid registrations and RSVPs. Admin only (enforced in SQL).
+ */
+export async function deleteEvents(input: unknown): Promise<EventDeleteResult> {
+  const parsed = z.object({ ids: z.array(z.string().uuid()).min(1).max(200) }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid", blocked: [], deleted: 0 };
+
+  const supabase = await createClient();
+  const { data: rows } = await supabase.from("events").select("id, cover_path").in("id", parsed.data.ids);
+  const covers = new Map((rows ?? []).map((r) => [r.id as string, r.cover_path as string | null]));
+
+  const blocked: EventDeleteResult["blocked"] = [];
+  let deleted = 0;
+  for (const id of parsed.data.ids) {
+    const { data, error } = await supabase.rpc("delete_event", { p_id: id });
+    if (error) {
+      console.error("[admin] event delete failed:", error.code, error.message);
+      return { ok: false, error: "server", blocked, deleted };
+    }
+    const result = data as { ok: boolean; reason?: EventDeleteReason; count?: number; name?: string };
+    if (!result.ok) {
+      blocked.push({ name: result.name ?? "", reason: result.reason ?? "missing", count: Number(result.count ?? 0) });
+      continue;
+    }
+    deleted += 1;
+    // The cover lives under covers/events/<id>/ (or a new-<uuid> folder).
+    const path = covers.get(id);
+    const folder = path && path.includes("/") ? path.slice(0, path.lastIndexOf("/")) : `covers/events/${id}`;
+    const bucket = supabase.storage.from("gallery");
+    const { data: files } = await bucket.list(folder);
+    if (files && files.length > 0) await bucket.remove(files.map((file) => `${folder}/${file.name}`));
+  }
+
+  if (deleted > 0) {
+    revalidatePath("/[locale]/admin/dogadjaji", "layout");
+    revalidatePath("/[locale]/dogadjaji", "layout");
+    revalidatePath("/[locale]", "page");
+  }
+  return { ok: true, blocked, deleted };
+}

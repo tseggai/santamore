@@ -788,7 +788,7 @@
     "navEvents": "Events",
     "navCampaigns": "Causes",
     "eventsTitle": "Events",
-    "eventsHint": "Races and challenges. Published events appear on the site, take registrations and can be fundraised for. Nothing is deleted — unpublish instead.",
+    "eventsHint": "Races, gatherings and challenges. Published events appear on the site, take registrations and can be fundraised for. An event with pages, teams, donations or paid registrations cannot be deleted — unpublish it instead.",
     "evNew": "New event",
     "evName": "Name",
     "evSlug": "URL slug",
@@ -1373,7 +1373,15 @@
     "yearRecordedCauseHint": "The cause of that year. Its raised figure then includes the donor list below and sponsorship cash handed to the beneficiaries.",
     "peopleTabAll": "All",
     "allPeopleHint": "Everyone at once: every account and every team record, one filter across all kinds. A person with no account opens on the Team tab.",
-    "fundraisersPeopleHint": "The accounts that hold a fundraising page: how much each raised, and their pages to moderate."
+    "fundraisersPeopleHint": "The accounts that hold a fundraising page: how much each raised, and their pages to moderate.",
+    "evDelete": "Delete",
+    "evDeleteConfirm": "{count, plural, one {Delete this event?} other {Delete # events?}} Unpaid registrations and RSVPs go with it; photos, sponsorships and offers stay. This cannot be undone. To hide it from the site instead, unpublish it.",
+    "evDeleteBlocked": "{name} was not deleted: {reason}. Unpublish it instead.",
+    "evDeleteReason_pages": "{count, plural, one {a fundraising page raises for it} other {# fundraising pages raise for it}}",
+    "evDeleteReason_teams": "{count, plural, one {a team signed up for it} other {# teams signed up for it}}",
+    "evDeleteReason_donations": "{count, plural, one {a donation was made for it} other {# donations were made for it}}",
+    "evDeleteReason_paid": "{count, plural, one {a paid registration exists} other {# paid registrations exist}}",
+    "evDeleteReason_missing": "it no longer exists"
   },
   "forms": {
     "nameLabel": "Full name",
