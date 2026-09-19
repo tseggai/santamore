@@ -7,7 +7,7 @@ import { useState, type FormEvent } from "react";
 import { saveSitePage } from "@/app/[locale]/admin/(protected)/sadrzaj/pages-actions";
 import { TranslateBar } from "@/components/admin/TranslateBar";
 import { SidePanel } from "@/components/console/SidePanel";
-import { PAGE_FIELDS, parseField, serializeField, type PageContent, type SitePage } from "@/lib/site-pages";
+import { EMPTY_IDS, EMPTY_PEOPLE, PAGE_FIELDS, TEAM_KINDS, isAttachment, parseField, serializeField, type IdPick, type PageContent, type PeoplePick, type SitePage, type TeamKind } from "@/lib/site-pages";
 import { routing, type Locale } from "@/i18n/routing";
 
 export interface SitePageRow {
@@ -15,6 +15,13 @@ export interface SitePageRow {
   locale: Locale;
   content: PageContent;
   updated_at: string;
+}
+
+/** What the attachment pickers offer: the records that exist. */
+export interface PickOptions {
+  team: { id: string; full_name: string; kind: TeamKind; is_public: boolean }[];
+  supporters: { id: string; name: string }[];
+  beneficiaries: { id: string; name: string; is_published: boolean }[];
 }
 
 const PAGES: { page: SitePage; href: string }[] = [
@@ -29,7 +36,7 @@ const inputClass = "mt-1 w-full rounded-lg bg-paper px-3.5 py-2.5 text-[15px] ou
  * per language. Every field starts from the shipped copy, so staff edit
  * what is there rather than start from blank.
  */
-export function SitePagesManager({ rows, shipped, locale }: { rows: SitePageRow[]; shipped: Record<SitePage, Record<Locale, PageContent>>; locale: Locale }) {
+export function SitePagesManager({ rows, shipped, locale, options }: { rows: SitePageRow[]; shipped: Record<SitePage, Record<Locale, PageContent>>; locale: Locale; options: PickOptions }) {
   const t = useTranslations("admin");
   const [open, setOpen] = useState<SitePage | null>(null);
   const saved = (page: SitePage, loc: Locale) => rows.find((r) => r.page === page && r.locale === loc) ?? null;
@@ -53,23 +60,39 @@ export function SitePagesManager({ rows, shipped, locale }: { rows: SitePageRow[
       </ul>
 
       <SidePanel open={open !== null} title={open ? t(`sitePage.${open}`) : ""} onClose={() => setOpen(null)} wide>
-        {open ? <PageEditor key={open} page={open} rows={rows} shipped={shipped[open]} locale={locale} onDone={() => setOpen(null)} /> : null}
+        {open ? <PageEditor key={open} page={open} rows={rows} shipped={shipped[open]} locale={locale} options={options} onDone={() => setOpen(null)} /> : null}
       </SidePanel>
     </>
   );
 }
 
-function PageEditor({ page, rows, shipped, locale, onDone }: { page: SitePage; rows: SitePageRow[]; shipped: Record<Locale, PageContent>; locale: Locale; onDone: () => void }) {
+function PageEditor({ page, rows, shipped, locale, options, onDone }: { page: SitePage; rows: SitePageRow[]; shipped: Record<Locale, PageContent>; locale: Locale; options: PickOptions; onDone: () => void }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [tab, setTab] = useState<Locale>(locale);
   const fields = PAGE_FIELDS[page];
+  const textFields = fields.filter((spec) => !isAttachment(spec));
+  const attachmentFields = fields.filter(isAttachment);
+  // Attachments are the same in every language: read from whichever row has them.
+  const savedAttachment = (key: string) => rows.find((r) => r.page === page && r.content[key] !== undefined)?.content[key];
+  const [attachments, setAttachments] = useState<Record<string, PeoplePick | IdPick>>(() =>
+    Object.fromEntries(
+      attachmentFields.map((spec) => [spec.key, (savedAttachment(spec.key) as PeoplePick | IdPick | undefined) ?? (spec.kind === "people" ? EMPTY_PEOPLE : EMPTY_IDS)]),
+    ),
+  );
+  const setPeople = (key: string, patch: Partial<PeoplePick>) => setAttachments((a) => ({ ...a, [key]: { ...(a[key] as PeoplePick), ...patch } }));
+  const toggleId = (key: string, id: string) =>
+    setAttachments((a) => {
+      const current = a[key] as IdPick;
+      const ids = current.ids.includes(id) ? current.ids.filter((v) => v !== id) : [...current.ids, id];
+      return { ...a, [key]: { ...current, ids } };
+    });
   // One draft per language, each field as text; the saved value wins, else the shipped copy.
   const initial = (): Record<Locale, Record<string, string>> =>
     Object.fromEntries(
       routing.locales.map((loc) => {
         const saved = rows.find((r) => r.page === page && r.locale === loc)?.content ?? {};
-        return [loc, Object.fromEntries(fields.map((spec) => [spec.key, serializeField(spec, saved[spec.key] ?? shipped[loc]?.[spec.key])]))];
+        return [loc, Object.fromEntries(textFields.map((spec) => [spec.key, serializeField(spec, saved[spec.key] ?? shipped[loc]?.[spec.key])]))];
       }),
     ) as Record<Locale, Record<string, string>>;
   const [drafts, setDrafts] = useState(initial);
@@ -86,7 +109,10 @@ function PageEditor({ page, rows, shipped, locale, onDone }: { page: SitePage; r
         saveSitePage({
           page,
           locale: loc,
-          content: Object.fromEntries(fields.map((spec) => [spec.key, parseField(spec, drafts[loc][spec.key] ?? "")]).filter(([, v]) => v !== undefined)),
+          content: {
+            ...Object.fromEntries(textFields.map((spec) => [spec.key, parseField(spec, drafts[loc][spec.key] ?? "")]).filter(([, v]) => v !== undefined)),
+            ...attachments,
+          },
         }).catch(() => ({ ok: false as const, error: "server" as const })),
       ),
     );
@@ -118,11 +144,11 @@ function PageEditor({ page, rows, shipped, locale, onDone }: { page: SitePage; r
       <TranslateBar
         className="mt-3"
         source={tab}
-        getFields={() => Object.fromEntries(fields.map((spec) => [spec.key, drafts[tab][spec.key] ?? ""]))}
+        getFields={() => Object.fromEntries(textFields.map((spec) => [spec.key, drafts[tab][spec.key] ?? ""]))}
         apply={(loc, translated) => setDrafts((d) => ({ ...d, [loc]: { ...d[loc], ...translated } }))}
       />
       <div className="mt-4 space-y-4">
-        {fields.map((spec) => {
+        {textFields.map((spec) => {
           const id = `sp-${page}-${spec.key}`;
           const value = drafts[tab][spec.key] ?? "";
           const hint =
@@ -146,6 +172,78 @@ function PageEditor({ page, rows, shipped, locale, onDone }: { page: SitePage; r
           );
         })}
       </div>
+      {attachmentFields.length > 0 ? (
+        <div className="mt-6 border-t-[0.5px] border-line pt-5">
+          <p className="text-[14.5px] font-bold">{t("pageAttachHeading")}</p>
+          <p className="mt-1 text-[13.5px] text-black/60">{t("pageAttachHint")}</p>
+          <div className="mt-4 space-y-5">
+            {attachmentFields.map((spec) => {
+              const value = attachments[spec.key];
+              const checkbox = "h-4 w-4 accent-red";
+              if (spec.kind === "people") {
+                const pick = value as PeoplePick;
+                return (
+                  <fieldset key={spec.key} className="rounded-lg bg-paper px-3.5 py-3">
+                    <legend className="px-1 text-[13.5px] font-semibold">{t(`pageField.${page}.${spec.key}`)}</legend>
+                    <p className="text-[13px] text-black/50">{t("pickByRole")}</p>
+                    <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1.5">
+                      {TEAM_KINDS.map((kind) => (
+                        <label key={kind} className="inline-flex items-center gap-1.5 text-[14px]">
+                          <input
+                            type="checkbox"
+                            className={checkbox}
+                            checked={pick.kinds.includes(kind)}
+                            onChange={(e) => setPeople(spec.key, { kinds: e.target.checked ? [...pick.kinds, kind] : pick.kinds.filter((k) => k !== kind) })}
+                          />
+                          {t(`teamKindValue.${kind}`)}
+                        </label>
+                      ))}
+                    </div>
+                    <p className="mt-3 text-[13px] text-black/50">{t("pickByName")}</p>
+                    {options.team.length === 0 ? (
+                      <p className="mt-1 text-[13.5px] text-black/45">{t("pickNoPeople")}</p>
+                    ) : (
+                      <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1.5">
+                        {options.team.map((person) => (
+                          <label key={person.id} className="inline-flex items-center gap-1.5 text-[14px]">
+                            <input
+                              type="checkbox"
+                              className={checkbox}
+                              checked={pick.ids.includes(person.id)}
+                              onChange={(e) => setPeople(spec.key, { ids: e.target.checked ? [...pick.ids, person.id] : pick.ids.filter((v) => v !== person.id) })}
+                            />
+                            {person.full_name}
+                            <span className="text-black/45">· {t(`teamKindValue.${person.kind}`)}{person.is_public ? "" : ` · ${t("teamPrivate").toLowerCase()}`}</span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </fieldset>
+                );
+              }
+              const pick = value as IdPick;
+              const list = spec.kind === "supporters" ? options.supporters : options.beneficiaries.map((b) => ({ id: b.id, name: b.is_published ? b.name : `${b.name} · ${t("bnDraft").toLowerCase()}` }));
+              return (
+                <fieldset key={spec.key} className="rounded-lg bg-paper px-3.5 py-3">
+                  <legend className="px-1 text-[13.5px] font-semibold">{t(`pageField.${page}.${spec.key}`)}</legend>
+                  {list.length === 0 ? (
+                    <p className="text-[13.5px] text-black/45">{t("pickNone")}</p>
+                  ) : (
+                    <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+                      {list.map((row) => (
+                        <label key={row.id} className="inline-flex items-center gap-1.5 text-[14px]">
+                          <input type="checkbox" className={checkbox} checked={pick.ids.includes(row.id)} onChange={() => toggleId(spec.key, row.id)} />
+                          {row.name}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </fieldset>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
       <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-line bg-mist px-5 py-3 sm:-mx-6 sm:px-6">

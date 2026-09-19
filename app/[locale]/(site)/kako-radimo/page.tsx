@@ -2,8 +2,11 @@ import { notFound } from "next/navigation";
 import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
+import { PeopleStrip, type PublicPerson } from "@/components/people/PeopleStrip";
 import { howContent, type HowContent } from "@/content/site/how";
+import { pickPeople, type PeoplePick } from "@/lib/site-pages";
 import { loadSitePage } from "@/lib/site-pages-server";
+import { createClient } from "@/lib/supabase/server";
 
 // Staff edit this page from the admin.
 export const dynamic = "force-dynamic";
@@ -32,7 +35,18 @@ export default async function HowPage({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const content: HowContent = await loadSitePage("how", locale as Locale, howContent[locale as Locale]);
+  const content: HowContent & { committeePeople?: PeoplePick } = await loadSitePage("how", locale as Locale, howContent[locale as Locale]);
+  // The committee, when attached to this page in the admin.
+  let committee: PublicPerson[] = [];
+  if (content.committeePeople && (content.committeePeople.kinds.length > 0 || content.committeePeople.ids.length > 0)) {
+    try {
+      const supabase = await createClient();
+      const { data } = await supabase.from("v_public_team").select("id, kind, full_name, title, quote, photo_path, years, sort_order").order("sort_order").order("full_name");
+      committee = pickPeople(content.committeePeople, (data ?? []) as PublicPerson[]);
+    } catch {
+      committee = [];
+    }
+  }
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
@@ -135,6 +149,11 @@ export default async function HowPage({
             </p>
           ))}
         </div>
+        {committee.length > 0 ? (
+          <div className="mt-5">
+            <PeopleStrip people={committee} />
+          </div>
+        ) : null}
         <Link
           href="/o-nama"
           className="mt-5 inline-block text-[14.5px] font-semibold text-sea underline decoration-black/30 underline-offset-2 hover:text-sea-2"

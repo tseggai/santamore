@@ -1166,6 +1166,12 @@
     "sitePageLanguage": "Language",
     "sitePageLinesHint": "One entry per line.",
     "sitePageRecordsHint": "One per line, parts separated by “ · ”: {parts}",
+    "pageAttachHeading": "Attached to this page",
+    "pageAttachHint": "The same in every language. People come from People → Team, supporters from Supporters, beneficiaries from Beneficiaries; only public ones show on the site.",
+    "pickByRole": "Everyone with a role:",
+    "pickByName": "And by name:",
+    "pickNoPeople": "No one on the team yet. Add people under People → Team.",
+    "pickNone": "Nothing to pick yet.",
     "pagePart": {
       "name": "name",
       "who": "who",
@@ -1195,7 +1201,13 @@
         "plan": "Plan paragraphs",
         "teamHeading": "Team heading",
         "teamLead": "Team lead",
-        "peopleNote": "Note under the team"
+        "peopleNote": "Note under the team",
+        "boardPeople": "The board (shown under the structure)",
+        "committeePeople": "The grants committee (shown in the committee block)",
+        "teamPeople": "The team section (empty = officers, staff, board and committee)",
+        "volunteerPeople": "Volunteers (empty = everyone with the Volunteer role)",
+        "featuredBeneficiaries": "Beneficiary stories on this page",
+        "featuredSupporters": "Partners on this page"
       },
       "how": {
         "heroEyebrow": "Eyebrow",
@@ -1214,7 +1226,8 @@
         "ledgerCta": "Ledger button",
         "decideHeading": "Deciding heading",
         "decide": "How we decide",
-        "decideCta": "Deciding button"
+        "decideCta": "Deciding button",
+        "committeePeople": "The committee (shown under “how we decide”)"
       }
     },
     "postViewLive": "View",

@@ -1166,6 +1166,12 @@
     "sitePageLanguage": "Jezik",
     "sitePageLinesHint": "Jedna stavka po redu.",
     "sitePageRecordsHint": "Jedan po redu, djelovi odvojeni sa „ · “: {parts}",
+    "pageAttachHeading": "Vezano za ovu stranicu",
+    "pageAttachHint": "Isto na svakom jeziku. Ljudi dolaze iz Ljudi → Tim, podržavaoci iz Podržavaoci, korisnici iz Korisnici; na sajtu se vide samo javni.",
+    "pickByRole": "Svi sa ulogom:",
+    "pickByName": "I po imenu:",
+    "pickNoPeople": "Još niko nije u timu. Dodajte ljude pod Ljudi → Tim.",
+    "pickNone": "Još nema šta da se izabere.",
     "pagePart": {
       "name": "naziv",
       "who": "ko",
@@ -1195,7 +1201,13 @@
         "plan": "Pasusi plana",
         "teamHeading": "Naslov tima",
         "teamLead": "Uvod tima",
-        "peopleNote": "Napomena ispod tima"
+        "peopleNote": "Napomena ispod tima",
+        "boardPeople": "Odbor (ispod strukture)",
+        "committeePeople": "Komisija za dodjelu (u bloku o komisiji)",
+        "teamPeople": "Odjeljak Tim (prazno = rukovodstvo, tim, odbor i komisija)",
+        "volunteerPeople": "Volonteri (prazno = svi sa ulogom Volonter)",
+        "featuredBeneficiaries": "Priče korisnika na ovoj stranici",
+        "featuredSupporters": "Partneri na ovoj stranici"
       },
       "how": {
         "heroEyebrow": "Nadnaslov",
@@ -1214,7 +1226,8 @@
         "ledgerCta": "Dugme knjige",
         "decideHeading": "Naslov odlučivanja",
         "decide": "Kako odlučujemo",
-        "decideCta": "Dugme odlučivanja"
+        "decideCta": "Dugme odlučivanja",
+        "committeePeople": "Komisija (ispod „kako odlučujemo“)"
       }
     },
     "postViewLive": "Pogledaj",
