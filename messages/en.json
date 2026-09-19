@@ -1387,7 +1387,9 @@
     "evRegModeOrganizer": "With the organiser — here people only say they run for Santamore",
     "evRegModeHere": "Here — we register the team and pay the organiser in one go",
     "evRegModeOrganizerHint": "The Register button opens the organiser's link. Signing up here is free and only keeps our team list, the runner list and fundraising pages going.",
-    "evRegModeHereHint": "People register and pay here. Add the organiser's price per place as a price tier above; bibs come from the pool below."
+    "evRegModeHereHint": "People register and pay here. Add the organiser's price per place as a price tier above; bibs come from the pool below.",
+    "dialogOk": "OK",
+    "dialogDelete": "Delete"
   },
   "forms": {
     "nameLabel": "Full name",

@@ -222,6 +222,18 @@
   }
 }
 
+/* Console alert and confirm (components/console/useDialog.tsx). */
+@keyframes dialog-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 /* Console slide-over (components/console/SidePanel.tsx). */
 @keyframes panel-in {
   from {

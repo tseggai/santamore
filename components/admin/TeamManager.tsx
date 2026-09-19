@@ -7,6 +7,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { deleteTeamMember, saveTeamMember } from "@/app/[locale]/admin/(protected)/clanovi/team-actions";
 import { Chip, DataTable, Thumb, rowButton, type Column } from "@/components/console/DataTable";
 import { SidePanel } from "@/components/console/SidePanel";
+import { useDialog } from "@/components/console/useDialog";
 import { downscaleToJpeg } from "@/lib/images";
 import { teamPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -50,13 +51,14 @@ export function TeamManager({ rows, accounts, initialOpenId = "" }: { rows: Team
   const current = rows.find((r) => r.id === open) ?? null;
   const accountById = new Map(accounts.map((a) => [a.id, a]));
 
+  const dialog = useDialog();
   const remove = async (row: TeamRow) => {
-    if (!window.confirm(t("teamDeleteConfirm", { name: row.full_name }))) return;
+    if (!(await dialog.confirm(t("teamDeleteConfirm", { name: row.full_name })))) return;
     setBusy(true);
     const result = await deleteTeamMember({ id: row.id }).catch(() => null);
     setBusy(false);
     if (!result?.ok) {
-      window.alert(t("actionError"));
+      await dialog.alert(t("actionError"), result?.detail ?? null);
       return;
     }
     if (open === row.id) setOpen("");
@@ -109,6 +111,7 @@ export function TeamManager({ rows, accounts, initialOpenId = "" }: { rows: Team
 
   return (
     <>
+      {dialog.element}
       <div className="flex justify-end">
         <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
           + {t("teamNew")}

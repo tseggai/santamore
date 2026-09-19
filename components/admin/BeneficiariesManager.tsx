@@ -7,6 +7,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { deleteBeneficiary, saveBeneficiary } from "@/app/[locale]/admin/(protected)/sadrzaj/beneficiaries-actions";
 import { Chip, DataTable, Thumb, rowButton, type Column } from "@/components/console/DataTable";
 import { SidePanel } from "@/components/console/SidePanel";
+import { useDialog } from "@/components/console/useDialog";
 import { TranslateBar } from "@/components/admin/TranslateBar";
 import { downscaleToJpeg } from "@/lib/images";
 import { beneficiaryPhotoUrl } from "@/lib/storage";
@@ -42,13 +43,14 @@ export function BeneficiariesManager({ rows, causes }: { rows: BeneficiaryRow[];
   const current = rows.find((r) => r.id === open) ?? null;
   const causeTitle = new Map(causes.map((c) => [c.id, c.title]));
 
+  const dialog = useDialog();
   const remove = async (row: BeneficiaryRow) => {
-    if (!window.confirm(t("bnDeleteConfirm", { name: row.name }))) return;
+    if (!(await dialog.confirm(t("bnDeleteConfirm", { name: row.name })))) return;
     setBusy(true);
     const result = await deleteBeneficiary({ id: row.id }).catch(() => null);
     setBusy(false);
     if (!result?.ok) {
-      window.alert(t("actionError"));
+      await dialog.alert(t("actionError"));
       return;
     }
     if (open === row.id) setOpen("");
@@ -81,6 +83,7 @@ export function BeneficiariesManager({ rows, causes }: { rows: BeneficiaryRow[];
 
   return (
     <>
+      {dialog.element}
       <div className="flex justify-end">
         <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
           + {t("bnNew")}

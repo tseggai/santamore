@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 
 import { saveSitePage } from "@/app/[locale]/admin/(protected)/sadrzaj/pages-actions";
 import { TranslateBar } from "@/components/admin/TranslateBar";
+import { useDialog } from "@/components/console/useDialog";
 import { EMPTY_IDS, EMPTY_PEOPLE, TEAM_KINDS, type IdPick, type PeoplePick } from "@/lib/site-pages";
 import { SECTION_FIELDS, SECTION_TYPES, blankSection, projectDrafts, type SectionAssets, type SectionDraft, type SectionType } from "@/lib/site-sections";
 import { routing, type Locale } from "@/i18n/routing";
@@ -46,8 +47,9 @@ export function SectionsEditor({ page, initial, options, locale, onDone }: { pag
       [next[index], next[target]] = [next[target], next[index]];
       return next;
     });
-  const remove = (id: string) => {
-    if (!window.confirm(t("sectionRemoveConfirm"))) return;
+  const dialog = useDialog();
+  const remove = async (id: string) => {
+    if (!(await dialog.confirm(t("sectionRemoveConfirm")))) return;
     setSections((all) => all.filter((s) => s.id !== id));
   };
   const add = (type: SectionType) => {
@@ -101,6 +103,7 @@ export function SectionsEditor({ page, initial, options, locale, onDone }: { pag
 
   return (
     <form onSubmit={submit}>
+      {dialog.element}
       <p className="text-[14px] leading-relaxed text-black/60">{t("sectionsHint")}</p>
       <div role="tablist" aria-label={t("sitePageLanguage")} className="mt-3 flex gap-1 border-b-[0.5px] border-line pb-3">
         {routing.locales.map((loc) => (
@@ -133,7 +136,7 @@ export function SectionsEditor({ page, initial, options, locale, onDone }: { pag
                 <span className="flex gap-1">
                   <button type="button" onClick={() => move(index, -1)} disabled={index === 0} aria-label={t("sectionUp")} className={ghost}>↑</button>
                   <button type="button" onClick={() => move(index, 1)} disabled={index === sections.length - 1} aria-label={t("sectionDown")} className={ghost}>↓</button>
-                  <button type="button" onClick={() => remove(s.id)} className={`${ghost} text-red-dark`}>{t("sectionRemove")}</button>
+                  <button type="button" onClick={() => void remove(s.id)} className={`${ghost} text-red-dark`}>{t("sectionRemove")}</button>
                 </span>
               </div>
               {open ? (
