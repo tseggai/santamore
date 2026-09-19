@@ -17,7 +17,8 @@ export interface DonateTarget {
   slug: string;
   title: string;
   description: string | null;
-  goalCents: Cents;
+  /** Null when the cause raises without a goal. */
+  goalCents: Cents | null;
   paymentReference: string;
 }
 

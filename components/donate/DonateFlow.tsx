@@ -311,7 +311,8 @@ export function DonateFlow({
       </div>
       {step === 1 && campaign.description ? (
         <p className="mt-3 text-[15.5px] leading-relaxed text-black/70">
-          {campaign.description} {t("goal", { amount: money(campaign.goalCents) })}
+          {campaign.description}
+          {campaign.goalCents && campaign.goalCents > 0 ? <> {t("goal", { amount: money(campaign.goalCents) })}</> : null}
         </p>
       ) : null}
 
