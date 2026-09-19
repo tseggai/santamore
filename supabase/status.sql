@@ -134,5 +134,9 @@ select * from (values
      exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
              where n.nspname = 'public' and p.proname = 'delete_team'
                and pg_get_functiondef(p.oid) like '%v_captain%'))
+  ,('20260919000051_delete_team_counts_money',
+     exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+             where n.nspname = 'public' and p.proname = 'delete_team'
+               and pg_get_functiondef(p.oid) like '%''approved'', ''refunded''%'))
 ) as m (migration, applied)
 order by migration;
