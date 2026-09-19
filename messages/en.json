@@ -31,8 +31,8 @@
   },
   "home": {
     "eyebrow": "Montenegrin non-profit · Tivat",
-    "title": "We run, we swim, we help — and we publish every euro.",
-    "sub": "We organise the Santa Run, winter sea swims and regattas in the Bay of Kotor. The money goes to local families, children and small businesses — and every payment in and out sits in a public ledger.",
+    "title": "We stay active and social — for a cause.",
+    "sub": "Runs, rides, swims and sea races, plus music nights and brunches, in Tivat and the Bay of Kotor. Every euro we raise goes to a cause our community chose.",
     "ctaDonate": "Donate",
     "ctaLedger": "See the ledger",
     "buildNote": "This site is under construction. First event: December.",
@@ -66,9 +66,9 @@
     "slideCauseCta": "Give to this cause",
     "slideCauseText": "{raised} raised of {goal}",
     "slideCauseTextNoGoal": "{raised} raised so far",
-    "slideVoteEyebrow": "Your say",
-    "slideVoteText": "{count} proposals in the running. The five with most votes are the shortlist we choose from.",
-    "slideVoteTextEmpty": "Know a need we should take on? Propose it — the community votes, we choose from the top five.",
+    "slideVoteEyebrow": "You propose, we raise",
+    "slideVoteText": "{count} proposals in the running. Members vote, the top five make the shortlist, and we raise for the one we take on.",
+    "slideVoteTextEmpty": "You propose the cause, we raise the money. Members vote, the top five make the shortlist, and we take one on.",
     "proposalsPane": "Propose a cause",
     "chipIntro": "Who we are",
     "chipEvent": "Event",
@@ -82,7 +82,7 @@
     "goalReached": "of the goal",
     "proofTitle": "Every euro, in public",
     "proofLead": "What came in, what went out, and the two funds that never mix. Updated the moment a gift is matched or a hand-over is published.",
-    "whatTitle": "You propose the cause. We raise the money and publish every euro.",
+    "whatTitle": "You propose the cause. We raise the money.",
     "whatLead": "Santamore is a Montenegrin non-profit in Tivat. A need is proposed by the community, members vote it onto the shortlist, we take it on, and we raise for it with runs, swims, gatherings and the fundraising pages of our members. Every euro in and out sits in a public ledger.",
     "eventsByCauseTitle": "What we are raising for, and where",
     "eventsByCauseLead": "Each cause with the events that raise for it: register, join or come along. Every ticket and every kilometre counts for the cause beside it.",
@@ -96,7 +96,7 @@
     "partnersLead": "The companies that pay for our team so donations never have to — with what each one gave.",
     "partnersOfYear": "Partners of {year}",
     "causesHeading": "What we are raising for right now",
-    "proposalsHeading": "Which cause should we take on next?"
+    "proposalsHeading": "Your community, your cause."
   },
   "footer": {
     "orgHeading": "Organisation",

@@ -31,8 +31,8 @@
   },
   "home": {
     "eyebrow": "Crnogorska neprofitna organizacija · Tivat",
-    "title": "Trčimo, plivamo i pomažemo — a svaki euro javno objavimo.",
-    "sub": "Organizujemo Santa Run, zimska kupanja i regate u Boki. Novac ide lokalnim porodicama, djeci i malim biznisima — i svaka uplata i isplata stoji u javnom registru.",
+    "title": "Aktivni smo i družimo se — za dobar cilj.",
+    "sub": "Trke, biciklijade, plivanja i regate, uz muzičke večeri i brančeve, u Tivtu i Boki. Svaki prikupljeni euro ide cilju koji je izabrala naša zajednica.",
     "ctaDonate": "Podrži",
     "ctaLedger": "Pogledaj registar",
     "buildNote": "Stranica je u izradi. Prvi događaj: decembar.",
@@ -66,9 +66,9 @@
     "slideCauseCta": "Doniraj ovom cilju",
     "slideCauseText": "{raised} prikupljeno od {goal}",
     "slideCauseTextNoGoal": "{raised} prikupljeno do sada",
-    "slideVoteEyebrow": "Tvoja riječ",
-    "slideVoteText": "{count} prijedloga u igri. Pet s najviše glasova čini uži izbor iz kojeg biramo.",
-    "slideVoteTextEmpty": "Znaš potrebu koju bi trebalo da preuzmemo? Predloži je — zajednica glasa, mi biramo iz prvih pet.",
+    "slideVoteEyebrow": "Ti predlažeš, mi prikupljamo",
+    "slideVoteText": "{count} prijedloga u igri. Članovi glasaju, prvih pet ulazi u uži izbor, a mi prikupljamo za onaj koji preuzmemo.",
+    "slideVoteTextEmpty": "Ti predlažeš cilj, mi prikupljamo novac. Članovi glasaju, prvih pet ulazi u uži izbor, a mi preuzimamo jedan.",
     "proposalsPane": "Predloži cilj",
     "chipIntro": "Ko smo",
     "chipEvent": "Događaj",
@@ -82,7 +82,7 @@
     "goalReached": "cilja",
     "proofTitle": "Svaki euro, javno",
     "proofLead": "Šta je ušlo, šta je izašlo, i dva fonda koja se nikad ne miješaju. Ažurira se čim uparimo uplatu ili objavimo predaju.",
-    "whatTitle": "Ti predlažeš cilj. Mi prikupljamo novac i objavljujemo svaki euro.",
+    "whatTitle": "Ti predlažeš cilj. Mi prikupljamo novac.",
     "whatLead": "Santamore je crnogorska neprofitna organizacija iz Tivta. Potrebu predlaže zajednica, članovi je glasanjem uvode u uži izbor, mi je preuzimamo i prikupljamo za nju trkama, plivanjem, druženjima i stranicama naših članova. Svaki euro koji uđe i izađe stoji u javnoj knjizi.",
     "eventsByCauseTitle": "Za šta prikupljamo, i gdje",
     "eventsByCauseLead": "Svaki cilj sa događajima koji prikupljaju za njega: prijavi se, pridruži se ili svrati. Svaka karta i svaki kilometar računaju se za cilj pored.",
@@ -96,7 +96,7 @@
     "partnersLead": "Firme koje plaćaju naš tim da donacije ne moraju — i koliko je svaka dala.",
     "partnersOfYear": "Partneri {year}.",
     "causesHeading": "Za šta trenutno prikupljamo",
-    "proposalsHeading": "Koji cilj da preuzmemo sljedeći?"
+    "proposalsHeading": "Tvoja zajednica, tvoj cilj."
   },
   "footer": {
     "orgHeading": "Organizacija",
