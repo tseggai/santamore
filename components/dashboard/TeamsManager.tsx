@@ -43,12 +43,9 @@ export function TeamsManager({
   // The captain made the team, so the captain may delete it; the pages
   // stay. The database refuses a team whose pages took donations.
   const dialog = useDialog();
-  const [busy, setBusy] = useState<string | null>(null);
   const remove = async (team: MyTeam) => {
     if (!(await dialog.confirm(t("teamDeleteAsk", { name: team.name })))) return;
-    setBusy(team.id);
     const result = await deleteMyTeam({ teamId: team.id }).catch(() => null);
-    setBusy(null);
     if (!result?.ok) {
       await dialog.alert(result?.blocked ? t("teamDeleteRefused", { count: result.blocked }) : t("teamDeleteFailed"));
       return;
@@ -89,17 +86,9 @@ export function TeamsManager({
                 >
                   {t("teamEdit")}
                 </button>
-                <button
-                  type="button"
-                  disabled={busy === team.id}
-                  onClick={() => void remove(team)}
-                  className="rounded-lg px-2.5 py-1 text-[13px] font-semibold text-red-dark transition-colors hover:bg-mist-2 disabled:opacity-60"
-                >
-                  {t("teamDeleteButton")}
-                </button>
               </div>
               {open === team.id ? (
-                <TeamPanel mode="edit" team={team} onDone={done} onCancel={() => setOpen("")} />
+                <TeamPanel mode="edit" team={team} onDone={done} onCancel={() => setOpen("")} onDelete={() => void remove(team)} />
               ) : null}
             </li>
           ))}

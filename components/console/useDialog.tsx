@@ -76,7 +76,7 @@ export function useDialog() {
               type="button"
               autoFocus
               onClick={() => settle(true)}
-              className={`rounded-lg px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 ${request.kind === "confirm" && request.danger ? "bg-red" : "bg-ink"}`}
+              className={`rounded-lg px-5 py-2.5 text-[14.5px] font-bold text-paper outline-none transition-opacity hover:opacity-90 focus-visible:ring-2 focus-visible:ring-sea focus-visible:ring-offset-2 ${request.kind === "confirm" && request.danger ? "bg-red" : "bg-ink"}`}
             >
               {request.kind === "alert" ? t("dialogOk") : (request.confirmLabel ?? t("dialogDelete"))}
             </button>

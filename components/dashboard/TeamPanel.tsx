@@ -32,6 +32,7 @@ export function TeamPanel({
   joinFundraiserId = null,
   onDone,
   onCancel,
+  onDelete,
 }: {
   mode: "create" | "edit";
   team?: TeamOption;
@@ -41,6 +42,8 @@ export function TeamPanel({
   joinFundraiserId?: string | null;
   onDone: (team: TeamOption) => void;
   onCancel: () => void;
+  /** Edit mode: the captain deletes the team; the pages stay. */
+  onDelete?: () => void;
 }) {
   const t = useTranslations("dashboard");
   const [name, setName] = useState(team?.name ?? "");
@@ -191,6 +194,16 @@ export function TeamPanel({
         >
           {t("cancel")}
         </button>
+        {mode === "edit" && onDelete ? (
+          <button
+            type="button"
+            disabled={busy !== ""}
+            onClick={onDelete}
+            className="ml-auto rounded-lg px-3 py-2.5 text-[14.5px] font-semibold text-red-dark transition-colors hover:bg-mist-2 disabled:opacity-60"
+          >
+            {t("teamDeleteButton")}
+          </button>
+        ) : null}
       </div>
     </form>
   );
