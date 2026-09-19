@@ -4,11 +4,12 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { saveMemberProfile } from "@/app/[locale]/admin/(protected)/clanovi/actions";
+import { deleteFundraiser, saveMemberProfile } from "@/app/[locale]/admin/(protected)/clanovi/actions";
 
 import { DataTable, Thumb, bulkButton, type Column } from "@/components/console/DataTable";
 import { formatShortDate } from "@/lib/dates";
 import { SidePanel } from "@/components/console/SidePanel";
+import { useDialog } from "@/components/console/useDialog";
 
 import { FundraiserStatusButtons } from "@/components/admin/FundraiserModeration";
 import { RegistrationRowActions } from "@/components/admin/RegistrationRowActions";
@@ -50,6 +51,7 @@ export interface MemberPage {
   status: "draft" | "active" | "hidden";
   goal_cents: number | null;
   event_name: string;
+  team_id: string | null;
 }
 
 export interface MemberRegistration {
@@ -73,7 +75,13 @@ export interface MemberTeam {
   captain_id: string | null;
   name: string;
   slug: string;
+  event_id: string;
+  campaign_id: string | null;
   event_name: string;
+  cause_title: string | null;
+  captain_name: string;
+  /** Pages in the team. */
+  pages: number;
 }
 
 type Kind = "team" | "fundraisers" | "athletes" | "participants" | "captains" | "donors";
@@ -144,6 +152,23 @@ export function MembersManager({
   const myPages = member ? pages.filter((p) => p.user_id === member.id) : [];
   const myRegs = member ? registrations.filter((r) => r.user_id === member.id) : [];
   const myTeams = member ? teams.filter((tm) => tm.captain_id === member.id) : [];
+  // Deleting a page is for one added by mistake; the database refuses a
+  // page that took donations and says so.
+  const dialog = useDialog();
+  const removePage = async (page: MemberPage) => {
+    if (!(await dialog.confirm(t("pageDeleteConfirm", { title: page.title })))) return;
+    const result = await deleteFundraiser({ id: page.id }).catch(() => null);
+    if (!result?.ok) {
+      await dialog.alert(t("actionError"), result?.detail);
+      return;
+    }
+    const refused = result.blocked[0];
+    if (refused) {
+      await dialog.alert(t("pageDeleteBlocked", { title: refused.name, count: refused.count }));
+      return;
+    }
+    router.refresh();
+  };
 
   const copyEmails = async (ids: string[]) => {
     const emails = members.filter((m) => ids.includes(m.id) && m.email).map((m) => m.email as string);
@@ -275,6 +300,7 @@ export function MembersManager({
         )}
       />
 
+      {dialog.element}
       <SidePanel open={member !== null} title={member ? displayName(member) : ""} onClose={() => setOpen(null)}>
         {member ? (
       <div className="space-y-5">
@@ -296,7 +322,14 @@ export function MembersManager({
                   <span className={page.status === "active" ? "font-semibold text-sea" : page.status === "hidden" ? "font-semibold text-red-dark" : "text-black/60"}>
                     {t(`pageStatusValue.${page.status}`)}
                   </span>
-                  <span className="ml-auto"><FundraiserStatusButtons fundraiserId={page.id} status={page.status} /></span>
+                  <span className="ml-auto flex items-center gap-1.5">
+                    <FundraiserStatusButtons fundraiserId={page.id} status={page.status} />
+                    {canManage ? (
+                      <button type="button" onClick={() => void removePage(page)} className="rounded-lg px-2.5 py-1 text-[13px] font-semibold text-red-dark transition-colors hover:bg-mist-2">
+                        {t("evDelete")}
+                      </button>
+                    ) : null}
+                  </span>
                 </li>
               ))}
             </ul>

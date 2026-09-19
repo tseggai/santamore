@@ -1026,8 +1026,8 @@
     "membersTitle": "Members",
     "membersHint": "Every account and what each person does: athlete when Strava is on, participant when registered, captain, donor. Open a row for their pages, registrations, Strava and access level.",
     "peopleTitle": "People",
-    "peopleHint": "The team, with or without an account, and every account with what each person does and may do.",
-    "peopleTabTeam": "Team",
+    "peopleHint": "The staff, with or without an account, every account with what each person does and may do, and the fundraising teams.",
+    "peopleTabTeam": "Staff",
     "peopleTabFundraisers": "Fundraisers",
     "peopleTabAccounts": "Members",
     "teamHint": "Officers, staff, board, committee and volunteers. A record stands on its own; link an account only to tie the access level to the person. Public ones appear on About us; volunteers count for the years they were active.",
@@ -1060,7 +1060,7 @@
     "teamChangeAccess": "Change on Accounts",
     "teamPublic": "Show on the About us page",
     "teamDeleteConfirm": "Remove “{name}” from the team? Their account, if any, stays.",
-    "memberTeamLink": "Their public profile lives on the Team tab.",
+    "memberTeamLink": "Their public profile lives on the Staff tab.",
     "membersEmpty": "Nobody matches.",
     "memberSearch": "Search by name or email",
     "memberFilter": {
@@ -1070,7 +1070,7 @@
       "participants": "Participants",
       "captains": "Captains",
       "donors": "Donors",
-      "team": "Team"
+      "team": "Staff"
     },
     "memberRole": {
       "admin": "Admin",
@@ -1372,7 +1372,7 @@
     "yearRecordedCause": "These recorded gifts and hand-overs belong to",
     "yearRecordedCauseHint": "The cause of that year. Its raised figure then includes the donor list below and sponsorship cash handed to the beneficiaries.",
     "peopleTabAll": "All",
-    "allPeopleHint": "Everyone at once: every account and every team record, one filter across all kinds. A person with no account opens on the Team tab.",
+    "allPeopleHint": "Everyone at once: every account and every staff record, one filter across all kinds. A person with no account opens on the Staff tab.",
     "fundraisersPeopleHint": "The accounts that hold a fundraising page: how much each raised, and their pages to moderate.",
     "evDelete": "Delete",
     "evDeleteConfirm": "{count, plural, one {Delete this event?} other {Delete # events?}} Unpaid registrations and RSVPs go with it; photos, sponsorships and offers stay. This cannot be undone. To hide it from the site instead, unpublish it.",
@@ -1396,7 +1396,18 @@
     "caDeleteReason_handovers": "{count, plural, one {a hand-over was booked to it} other {# hand-overs were booked to it}}",
     "caDeleteReason_pages": "{count, plural, one {a fundraising page raises for it} other {# fundraising pages raise for it}}",
     "caDeleteReason_teams": "{count, plural, one {a team raises for it} other {# teams raise for it}}",
-    "caDeleteReason_missing": "it no longer exists"
+    "caDeleteReason_missing": "it no longer exists",
+    "peopleTabTeams": "Teams",
+    "tmHint": "Fundraising teams: pages raising together for an event, with a captain. Deleting a team unlinks its pages and keeps every euro; a team whose pages took donations cannot be deleted.",
+    "tmColEvent": "Event",
+    "tmColCause": "Cause",
+    "tmColCaptain": "Captain",
+    "tmColPages": "Pages",
+    "tmEmpty": "No teams yet.",
+    "tmDeleteConfirm": "{count, plural, one {Delete this team?} other {Delete # teams?}} Its pages stay and leave the team. This cannot be undone.",
+    "tmDeleteBlocked": "{name} was not deleted: {count, plural, one {a donation} other {# donations}} went to its pages.",
+    "pageDeleteConfirm": "Delete the page \"{title}\"? Its ask list, activities and photo go with it. This cannot be undone. To take it off the site instead, hide it.",
+    "pageDeleteBlocked": "{title} was not deleted: {count, plural, one {a donation names it} other {# donations name it}}. Hide it instead."
   },
   "forms": {
     "nameLabel": "Full name",
