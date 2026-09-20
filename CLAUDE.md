@@ -17,6 +17,7 @@ Vitest + Playwright
 - Every mutation re-validates on the server. Never trust client input.
 - Approved donations are immutable. Corrections go in `ledger_adjustments` as new rows.
 - Public data is exposed only through the `v_public_*` views, enforced by RLS.
+- Every money figure is a sum over `v_money_in_all` / `v_money_out_all` rows (see `docs/MONEY-MODEL.md`). Never add a list on top of a view in page code.
 - Webhook handlers must verify signatures before doing anything, and must be idempotent.
 - Mobile-first. Keyboard navigable, visible focus, real labels, `prefers-reduced-motion` respected.
 
