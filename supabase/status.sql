@@ -153,5 +153,7 @@ select * from (values
      to_regprocedure('public.purge_test_data()') is not null
      and exists (select 1 from information_schema.columns
                  where table_schema = 'public' and table_name = 'donations' and column_name = 'is_test'))
+  ,('20260920000056_mark_as_test',
+     to_regprocedure('public.mark_campaign_test(uuid)') is not null)
 ) as m (migration, applied)
 order by migration;

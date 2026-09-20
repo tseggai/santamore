@@ -251,3 +251,23 @@ export async function deleteEvents(input: unknown): Promise<EventDeleteResult> {
   }
   return { ok: true, blocked, deleted };
 }
+
+/**
+ * Mark events made before test mode as test data (migration 0056): the
+ * event, its gifts, registrations and RSVPs flip to is_test. Admin only.
+ */
+export async function markEventsTest(input: unknown): Promise<EventActionResult & { detail?: string }> {
+  const parsed = z.object({ ids: z.array(z.string().uuid()).min(1).max(200) }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const supabase = await createClient();
+  for (const id of parsed.data.ids) {
+    const { error } = await supabase.rpc("mark_event_test", { p_id: id });
+    if (error) {
+      console.error("[admin] mark_event_test failed:", error.code, error.message);
+      return { ok: false, error: "server", detail: `${error.code}: ${error.message}` };
+    }
+  }
+  revalidatePath("/[locale]/admin", "layout");
+  revalidatePath("/[locale]", "layout");
+  return { ok: true };
+}

@@ -195,3 +195,24 @@ export async function deleteCampaigns(input: unknown): Promise<CampaignDeleteRes
   }
   return { ok: true, blocked, deleted };
 }
+
+/**
+ * Mark causes made before test mode as test data (migration 0056): the
+ * cause and everything attached flip to is_test, so it can be deleted or
+ * purged like anything made in test mode. Admin only (enforced in SQL).
+ */
+export async function markCampaignsTest(input: unknown): Promise<CampaignActionResult & { detail?: string }> {
+  const parsed = z.object({ ids: z.array(z.string().uuid()).min(1).max(200) }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const supabase = await createClient();
+  for (const id of parsed.data.ids) {
+    const { error } = await supabase.rpc("mark_campaign_test", { p_id: id });
+    if (error) {
+      console.error("[admin] mark_campaign_test failed:", error.code, error.message);
+      return { ok: false, error: "server", detail: `${error.code}: ${error.message}` };
+    }
+  }
+  revalidatePath("/[locale]/admin", "layout");
+  revalidatePath("/[locale]", "layout");
+  return { ok: true };
+}

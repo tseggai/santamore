@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { deleteCampaigns, saveCampaign, setCampaignsPublic } from "@/app/[locale]/admin/(protected)/kampanje/actions";
+import { deleteCampaigns, markCampaignsTest, saveCampaign, setCampaignsPublic } from "@/app/[locale]/admin/(protected)/kampanje/actions";
 import { CoverField } from "@/components/admin/CoverField";
 import type { Option } from "@/components/admin/EventForm";
 import { GalleryManager, type GalleryAdminItem } from "@/components/admin/GalleryManager";
@@ -24,6 +24,8 @@ import type { Locale } from "@/i18n/routing";
 
 export interface CampaignRow {
   id: string;
+  /** Made in test mode, or marked as test afterwards (migration 0055/0056). */
+  is_test?: boolean;
   title: string;
   slug: string;
   chapter_id: string;
@@ -448,6 +450,18 @@ export function CampaignsManager({
   // with donations, hand-overs, pages or teams and says why.
   const [notice, setNotice] = useState<string[]>([]);
   const dialog = useDialog();
+  const markTest = async (ids: string[], clear: () => void) => {
+    if (!(await dialog.confirm(t("markTestConfirm", { count: ids.length }), { danger: false, confirmLabel: t("markTest") }))) return;
+    setBusy(true);
+    const result = await markCampaignsTest({ ids }).catch(() => null);
+    setBusy(false);
+    if (!result?.ok) {
+      await dialog.alert(t("actionError"), result?.detail);
+      return;
+    }
+    clear();
+    router.refresh();
+  };
   const remove = async (ids: string[], clear: () => void) => {
     if (!(await dialog.confirm(t("caDeleteConfirm", { count: ids.length })))) return;
     setBusy(true);
@@ -474,7 +488,12 @@ export function CampaignsManager({
     {
       key: "status",
       header: t("table.colStatus"),
-      cell: (c) => (c.is_public ? <Chip tone="sea">{t("campPublicBadge")}</Chip> : <Chip>{t("postDraft")}</Chip>),
+      cell: (c) => (
+        <span className="inline-flex items-center gap-1.5">
+          {c.is_public ? <Chip tone="sea">{t("campPublicBadge")}</Chip> : <Chip>{t("postDraft")}</Chip>}
+          {c.is_test ? <Chip tone="red">{t("testChip")}</Chip> : null}
+        </span>
+      ),
       sort: (c) => (c.is_public ? 1 : 0),
       filter: {
         options: [
@@ -559,6 +578,7 @@ export function CampaignsManager({
           <>
             <button type="button" disabled={busy} onClick={() => setPublic(ids, true, clear)} className={bulkButton}>{t("galleryPublish")}</button>
             <button type="button" disabled={busy} onClick={() => setPublic(ids, false, clear)} className={bulkButton}>{t("galleryUnpublish")}</button>
+            <button type="button" disabled={busy} onClick={() => markTest(ids, clear)} className={bulkButton}>{t("markTest")}</button>
             <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button>
           </>
         )}
