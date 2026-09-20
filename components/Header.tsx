@@ -90,9 +90,8 @@ export default function Header() {
           <Link href="/dashboard" className={`hidden text-[15px] font-semibold md:inline ${link}`}>
             {t("nav.myPage")}
           </Link>
-          <div className="hidden md:block">
-            <LocaleSwitcher variant={glass ? "dark" : "light"} />
-          </div>
+          {/* the language is one tap away on every size; on a phone it sits before Donate */}
+          <LocaleSwitcher variant={glass ? "dark" : "light"} />
           <DonateButton
             request={{ kind: "campaign" }}
             href="/podrzi"
