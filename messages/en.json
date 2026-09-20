@@ -1583,7 +1583,11 @@
     "wayRunOrganizerSub": "{name} organises this race and takes the registrations. Sign up with them, then tell us you run in our colours — and raise money for the cause if you like.",
     "wayRunTeam": "Run with the Santamore team",
     "wayRunTeamSub": "{name} organises this race. We register the team and pay for the places in one go, so you register and pay here.",
-    "organizerSite": "Event details at {name}"
+    "organizerSite": "Event details at {name}",
+    "wayMoneyWent": "Where the money went",
+    "wayMoneyWentFor": "Where the money for {cause} went",
+    "wayMoneyWentSub": "This event is over. Every euro it raised, and where it was handed over, is on the money page for that year.",
+    "moneyWentCta": "See where the money went"
   },
   "gallery": {
     "eyebrow": "Gallery",
