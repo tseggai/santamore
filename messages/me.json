@@ -96,7 +96,8 @@
     "partnersLead": "Firme koje plaćaju naš tim da donacije ne moraju — i koliko je svaka dala.",
     "partnersOfYear": "Partneri {year}.",
     "causesHeading": "Za šta trenutno prikupljamo",
-    "proposalsHeading": "Tvoja zajednica, tvoj cilj."
+    "proposalsHeading": "Tvoja zajednica, tvoj cilj.",
+    "testModeBanner": "Test režim — brojke na ovom sajtu su vježba, ne pravi pokloni."
   },
   "footer": {
     "orgHeading": "Organizacija",
@@ -481,7 +482,8 @@
     "teamDeleteAsk": "Obrisati „{name}“? Stranice članova ostaju i napuštaju tim. Ovo se ne može poništiti.",
     "teamDeleteRefused": "Ovaj tim se ne može obrisati: na njegove stranice {count, plural, one {je stigla jedna donacija} few {su stigle # donacije} other {je stiglo # donacija}}.",
     "teamDeleteFailed": "Nešto nije u redu — tim nije obrisan. Pokušaj ponovo.",
-    "causeDraft": "još nije objavljen"
+    "causeDraft": "još nije objavljen",
+    "consoleBadgeTest": "Test režim"
   },
   "email": {
     "instructions": {
@@ -755,7 +757,7 @@
     "settingsTabPages": "Stranice",
     "settingsTabNews": "Vijesti",
     "settingsTabPhotos": "Fotografije",
-    "settingsTabDemo": "Demo podaci",
+    "settingsTabDemo": "Test i demo",
     "eventsTabEvents": "Događaji",
     "eventsTabRegistrations": "Prijave",
     "photosHint": "Fotografije pripadaju događaju ili cilju; otvorite ga da dodate, objavite ili obrišete fotografije.",
@@ -1418,7 +1420,18 @@
     "pageDeleteBlocked": "{title} nije obrisana: {count, plural, one {jedna donacija je navodi} few {# donacije je navode} other {# donacija je navodi}}. Umjesto toga je sakrij.",
     "focusPagesFor": "Stranice za: {name}",
     "focusTeamsFor": "Timovi za: {name}",
-    "focusClear": "Prikaži sve"
+    "focusClear": "Prikaži sve",
+    "consoleBadgeTest": "Test režim",
+    "testModeTitle": "Test režim",
+    "testModeOn": "Uključen",
+    "testModeOff": "Uživo",
+    "testModeHint": "Dok je test režim uključen, svaki cilj, događaj, stranica, tim, prijava, poklon, predaja, sponzorstvo i izvještaj koji napraviš označen je kao test. Test pokloni nisu nepromjenjivi, pa se test ciljevi i događaji mogu obrisati. Čim pređeš uživo, test redovi nestaju iz javnih brojki; čišćenje ih trajno uklanja. Pravi redovi se nikad ne diraju.",
+    "testModeTurnOn": "Uključi test režim",
+    "testModeGoLive": "Pređi uživo",
+    "testModeGoLiveConfirm": "Preći uživo? Sve što se od sada napravi je stvarno i nepromjenjivo, a test redovi nestaju sa javnog sajta dok ih ne očistiš.",
+    "testModePurge": "Očisti test podatke",
+    "testModePurgeConfirm": "Obrisati svaki red napravljen u test režimu: ciljeve, događaje, stranice, timove, prijave, poklone, predaje, sponzorstva, podržavaoce, prijedloge, korisnike i izvještaje? Pravi redovi ostaju. Ovo se ne može poništiti.",
+    "testModePurged": "{count, plural, one {Uklonjen # test red.} few {Uklonjena # test reda.} other {Uklonjeno # test redova.}}"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

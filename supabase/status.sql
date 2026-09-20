@@ -149,5 +149,9 @@ select * from (values
      to_regclass('public.v_money_in_all') is not null
      and exists (select 1 from information_schema.columns
                  where table_schema = 'public' and table_name = 'v_public_ledger_in' and column_name = 'source'))
+  ,('20260920000055_test_mode',
+     to_regprocedure('public.purge_test_data()') is not null
+     and exists (select 1 from information_schema.columns
+                 where table_schema = 'public' and table_name = 'donations' and column_name = 'is_test'))
 ) as m (migration, applied)
 order by migration;

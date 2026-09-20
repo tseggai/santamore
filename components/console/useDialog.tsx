@@ -69,8 +69,10 @@ export function useDialog() {
       aria-label={request?.message ?? ""}
       onCancel={(event) => {
         event.preventDefault();
+        event.stopPropagation();
         settle(false);
       }}
+      onClose={(event) => event.stopPropagation()}
       onClick={(event) => {
         if (event.target === event.currentTarget) settle(false);
       }}

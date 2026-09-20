@@ -41,8 +41,14 @@ export function SidePanel({
     <dialog
       ref={dialogRef}
       aria-label={title}
-      onClose={onClose}
+      // React re-dispatches a nested dialog's close and cancel up the
+      // component tree even though they never bubble in the DOM, so only
+      // this dialog's own events may close the panel.
+      onClose={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
       onCancel={(event) => {
+        if (event.target !== event.currentTarget) return;
         event.preventDefault();
         onClose();
       }}

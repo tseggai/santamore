@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { DemoTool } from "@/components/admin/DemoTool";
+import { TestModeCard } from "@/components/admin/TestModeCard";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -23,6 +24,7 @@ export default async function AdminDemoPage() {
     ? await supabase.from("profiles").select("role").eq("id", user.id).single()
     : { data: null };
   const isStaff = profile?.role === "admin" || profile?.role === "chapter_lead";
+  const { data: testMode } = await supabase.rpc("test_mode");
 
   const counts = { users: 0, teams: 0, fundraisers: 0, donations: 0 };
   if (isStaff) {
@@ -39,7 +41,9 @@ export default async function AdminDemoPage() {
 
   return (
     <div className="pb-8">
-      <p className="max-w-2xl text-[14px] leading-relaxed text-black/60">{t("demoHint")}</p>
+      <TestModeCard on={Boolean(testMode)} canManage={profile?.role === "admin"} />
+      <h2 className="mt-8 text-[16px] font-bold">{t("demoTitle")}</h2>
+      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("demoHint")}</p>
       <DemoTool counts={counts} />
     </div>
   );
