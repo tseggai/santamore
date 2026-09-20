@@ -507,6 +507,8 @@ export interface PageEditorData {
     teamId: string | null;
     causeId: string;
     causeTitle: string;
+    /** Staff have published the cause; until then the page cannot go live for donors. */
+    causePublic: boolean;
   };
   teams: { id: string; name: string; description: string | null; photoPath: string | null }[];
   captainOf: string[];
@@ -532,7 +534,9 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
   if (!mine || !mine.campaign_id) return null;
 
   const service = createServiceClient();
-  const { data: cause } = await supabase.from("v_public_campaigns").select("slug, title").eq("id", mine.campaign_id).maybeSingle();
+  // The cause by id, public or not: a runner may build a page on a cause
+  // staff have not published yet, and the editor should still name it.
+  const { data: cause } = await service.from("campaigns").select("slug, title, is_public").eq("id", mine.campaign_id).maybeSingle();
   const [{ data: teams }, { data: captained }, { data: totals }, { data: challenge }, { data: activityRows }, { data: cashRows }] =
     await Promise.all([
       supabase.from("v_team_totals").select("id, name, description, photo_path").eq("campaign_id", mine.campaign_id).order("name"),
@@ -571,7 +575,8 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
       status: mine.status,
       teamId: mine.team_id,
       causeId: mine.campaign_id,
-      causeTitle: cause?.title ?? "Santamore",
+      causeTitle: cause?.title ?? "",
+      causePublic: Boolean(cause?.is_public),
     },
     teams: ((teams ?? []) as { id: string; name: string; description: string | null; photo_path: string | null }[]).map((team) => ({
       id: team.id,

@@ -478,7 +478,8 @@
     "teamDeleteButton": "Delete team",
     "teamDeleteAsk": "Delete “{name}”? Members' pages stay and leave the team. This cannot be undone.",
     "teamDeleteRefused": "This team cannot be deleted: {count, plural, one {a donation} other {# donations}} went to its pages.",
-    "teamDeleteFailed": "Something went wrong — the team was not deleted. Please try again."
+    "teamDeleteFailed": "Something went wrong — the team was not deleted. Please try again.",
+    "causeDraft": "not published yet"
   },
   "email": {
     "instructions": {
