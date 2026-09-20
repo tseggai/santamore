@@ -478,7 +478,8 @@
     "teamDeleteButton": "Delete team",
     "teamDeleteAsk": "Delete “{name}”? Members' pages stay and leave the team. This cannot be undone.",
     "teamDeleteRefused": "This team cannot be deleted: {count, plural, one {a donation} other {# donations}} went to its pages.",
-    "teamDeleteFailed": "Something went wrong — the team was not deleted. Please try again."
+    "teamDeleteFailed": "Something went wrong — the team was not deleted. Please try again.",
+    "causeDraft": "not published yet"
   },
   "email": {
     "instructions": {
@@ -793,7 +794,7 @@
     "navEvents": "Events",
     "navCampaigns": "Causes",
     "eventsTitle": "Events",
-    "eventsHint": "Races, gatherings and challenges. Published events appear on the site, take registrations and can be fundraised for. An event with pages, teams, donations or paid registrations cannot be deleted — unpublish it instead.",
+    "eventsHint": "Races, gatherings and challenges. Published events appear on the site, take registrations and can be fundraised for. An event with donations or paid registrations cannot be deleted — unpublish it instead; its pages and teams stay on their cause.",
     "evNew": "New event",
     "evName": "Name",
     "evSlug": "URL slug",
@@ -1380,7 +1381,7 @@
     "allPeopleHint": "Everyone at once: every account and every staff record, one filter across all kinds. A person with no account opens on the Staff tab.",
     "fundraisersPeopleHint": "The accounts that hold a fundraising page: how much each raised, and their pages to moderate.",
     "evDelete": "Delete",
-    "evDeleteConfirm": "{count, plural, one {Delete this event?} other {Delete # events?}} Unpaid registrations and RSVPs go with it; photos, sponsorships and offers stay. This cannot be undone. To hide it from the site instead, unpublish it.",
+    "evDeleteConfirm": "{count, plural, one {Delete this event?} other {Delete # events?}} Unpaid registrations and RSVPs go with it; pages, teams, photos, sponsorships and offers stay. This cannot be undone. To hide it from the site instead, unpublish it.",
     "evDeleteBlocked": "{name} was not deleted: {reason}. Unpublish it instead.",
     "evDeleteReason_pages": "{count, plural, one {a fundraising page raises for it} other {# fundraising pages raise for it}}",
     "evDeleteReason_teams": "{count, plural, one {a team signed up for it} other {# teams signed up for it}}",
@@ -1582,7 +1583,11 @@
     "wayRunOrganizerSub": "{name} organises this race and takes the registrations. Sign up with them, then tell us you run in our colours — and raise money for the cause if you like.",
     "wayRunTeam": "Run with the Santamore team",
     "wayRunTeamSub": "{name} organises this race. We register the team and pay for the places in one go, so you register and pay here.",
-    "organizerSite": "Event details at {name}"
+    "organizerSite": "Event details at {name}",
+    "wayMoneyWent": "Where the money went",
+    "wayMoneyWentFor": "Where the money for {cause} went",
+    "wayMoneyWentSub": "This event is over. Every euro it raised, and where it was handed over, is on the money page for that year.",
+    "moneyWentCta": "See where the money went"
   },
   "gallery": {
     "eyebrow": "Gallery",
@@ -1842,8 +1847,8 @@
     "disbursed": "Handed over",
     "operations": "Operations fund",
     "donors": "Donors",
-    "runners": "Runners",
-    "pages": "Fundraising pages",
+    "runners": "Participants",
+    "pages": "Fundraisers",
     "teams": "Teams",
     "events": "Events",
     "supporters": "Sponsors",
@@ -1924,7 +1929,15 @@
     "byName": "proposed by {name}",
     "rankLabel": "#{rank}",
     "continue": "Continue",
-    "back": "Back to the questions"
+    "back": "Back to the questions",
+    "openPage": "Open as a page",
+    "sharePage": "Share",
+    "shareText": "Know a need Santamore should take on? Propose it here — members vote, and we choose from the top five.",
+    "pageStep1": "You propose a need in Montenegro: who has it, where, and roughly what it would take.",
+    "pageStep2": "Members vote proposals up. The five with most votes are the shortlist.",
+    "pageStep3": "We take one on, raise for it with events and pages, and publish every euro.",
+    "pageCriteriaHeading": "What we can take on",
+    "pageCriteriaSub": "A proposal first answers these questions. A “no” on any of them means it is not one for us — the form says so right away."
   },
   "beneficiaries": {
     "eyebrow": "Beneficiaries",

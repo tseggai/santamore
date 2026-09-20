@@ -395,12 +395,7 @@ export default async function LedgerPage({
           key: "runners",
           label: tYears("runners"),
           value: count(stats.runner_count),
-          content: (
-            <>
-              <p className="text-[14.5px] text-black/70">{tYears("runnersNote", { count: stats.runner_count })}</p>
-              <div className="mt-3">{eventList}</div>
-            </>
-          ),
+          content: <p className="text-[14.5px] text-black/70">{tYears("runnersNote", { count: stats.runner_count })}</p>,
         },
         {
           key: "pages",
@@ -442,7 +437,6 @@ export default async function LedgerPage({
               </ul>
             ),
         },
-        { key: "events", label: tYears("events"), value: count(stats.event_count), content: eventList },
         {
           key: "sponsors",
           label: tYears("supporters"),
@@ -568,14 +562,20 @@ export default async function LedgerPage({
 
       {stats ? (
         <>
-          {/* where the money went, in the public form */}
+          {/* the events that raised it, then where the money went */}
           <section className="mt-5">
+            <h3 className="type-eyebrow text-sea/80">
+              {tYears("eventsHeading")} <span className="font-mono normal-case tracking-normal text-black/45">· {count(stats.event_count)}</span>
+            </h3>
+            <div className="mt-2">{eventList}</div>
+          </section>
+          <section className="mt-6">
             <h3 className="type-eyebrow text-sea/80">{tYears("beneficiariesHeading")}</h3>
             {handOverList}
           </section>
 
-          {/* the year in figures: each tile opens what stands behind it */}
-          <div className="mt-5">
+          {/* the rest of the year, every section open */}
+          <div className="mt-8">
             <YearSections
               story={{
                 key: "story",

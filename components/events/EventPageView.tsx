@@ -287,15 +287,31 @@ export function EventPageView({
           {event.campaign_slug ? (
             <div>
               <p className={`type-eyebrow ${dark ? "text-paper/70" : "text-sea/80"}`}>{t("causeEyebrow")}</p>
-              <p className="mt-3 text-[16px] font-bold">{event.campaign_title ? t("wayRaiseFor", { cause: event.campaign_title }) : t("wayRaise")}</p>
-              <p className={`mt-1 text-[14.5px] leading-relaxed ${dark ? "text-paper/75" : "text-black/65"}`}>{t("wayRaiseSub")}</p>
-              <div className="mt-3">
-                {preview ? (
-                  <span className={secondary}>{t("fundraiseCta")}</span>
-                ) : (
-                  <Link href={`/dashboard/prikupljaj?cause=${event.campaign_slug}`} className={secondary}>{t("fundraiseCta")}</Link>
-                )}
-              </div>
+              {finished ? (
+                <>
+                  <p className="mt-3 text-[16px] font-bold">{event.campaign_title ? t("wayMoneyWentFor", { cause: event.campaign_title }) : t("wayMoneyWent")}</p>
+                  <p className={`mt-1 text-[14.5px] leading-relaxed ${dark ? "text-paper/75" : "text-black/65"}`}>{t("wayMoneyWentSub")}</p>
+                  <div className="mt-3">
+                    {preview || !starts ? (
+                      <span className={secondary}>{t("moneyWentCta")}</span>
+                    ) : (
+                      <Link href={`/transparentnost?godina=${starts.getFullYear()}`} className={secondary}>{t("moneyWentCta")}</Link>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="mt-3 text-[16px] font-bold">{event.campaign_title ? t("wayRaiseFor", { cause: event.campaign_title }) : t("wayRaise")}</p>
+                  <p className={`mt-1 text-[14.5px] leading-relaxed ${dark ? "text-paper/75" : "text-black/65"}`}>{t("wayRaiseSub")}</p>
+                  <div className="mt-3">
+                    {preview ? (
+                      <span className={secondary}>{t("fundraiseCta")}</span>
+                    ) : (
+                      <Link href={`/dashboard/prikupljaj?cause=${event.campaign_slug}`} className={secondary}>{t("fundraiseCta")}</Link>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
           ) : null}
         </div>

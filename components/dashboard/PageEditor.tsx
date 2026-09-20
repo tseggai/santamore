@@ -30,6 +30,8 @@ interface EditorFundraiser {
   teamId: string | null;
   causeId: string;
   causeTitle: string;
+  /** Staff have published the cause; until then it is named but not linked. */
+  causePublic: boolean;
 }
 
 const NEW_TEAM = "__new__";
@@ -166,9 +168,21 @@ export function PageEditor({
       }
       setIsActive(false);
       const saved = await persist();
+      if (!saved.ok) {
+        setBusy("");
+        setNotice("error");
+        router.refresh();
+        return;
+      }
+      setDirty(false);
+      // Back to live: the page was published before the edit, so it stays
+      // published unless the edit left it incomplete.
+      const restored = await setFundraiserStatus({ fundraiserId: fundraiser.id, publish: true }).catch(
+        () => ({ ok: false as const, error: "server" as const }),
+      );
       setBusy("");
-      setNotice(saved.ok ? "saved" : "error");
-      if (saved.ok) setDirty(false);
+      setIsActive(restored.ok);
+      setNotice(restored.ok ? "saved" : "error" in restored && restored.error === "incomplete" ? "incomplete" : "error");
       router.refresh();
       return;
     }
@@ -413,7 +427,12 @@ export function PageEditor({
                 </button>
               ) : null}
               <span>·</span>
-              <span className={linkClass}>{fundraiser.causeTitle}</span>
+              {fundraiser.causeTitle ? (
+                <span className={fundraiser.causePublic ? linkClass : "text-black/60"}>
+                  {fundraiser.causeTitle}
+                  {!fundraiser.causePublic ? <span className="ml-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-black/45">{t("causeDraft")}</span> : null}
+                </span>
+              ) : null}
             </div>
 
             {teamPanel === "create" ? (

@@ -478,7 +478,8 @@
     "teamDeleteButton": "Obriši tim",
     "teamDeleteAsk": "Obrisati „{name}“? Stranice članova ostaju i napuštaju tim. Ovo se ne može poništiti.",
     "teamDeleteRefused": "Ovaj tim se ne može obrisati: na njegove stranice {count, plural, one {je stigla jedna donacija} few {su stigle # donacije} other {je stiglo # donacija}}.",
-    "teamDeleteFailed": "Nešto nije u redu — tim nije obrisan. Pokušaj ponovo."
+    "teamDeleteFailed": "Nešto nije u redu — tim nije obrisan. Pokušaj ponovo.",
+    "causeDraft": "još nije objavljen"
   },
   "email": {
     "instructions": {
@@ -793,7 +794,7 @@
     "navEvents": "Događaji",
     "navCampaigns": "Ciljevi",
     "eventsTitle": "Događaji",
-    "eventsHint": "Trke, druženja i izazovi. Objavljeni događaji vide se na sajtu, primaju prijave i za njih se može prikupljati. Događaj sa stranicama, timovima, donacijama ili plaćenim prijavama ne može se obrisati — umjesto toga povuci objavu.",
+    "eventsHint": "Trke, druženja i izazovi. Objavljeni događaji vide se na sajtu, primaju prijave i za njih se može prikupljati. Događaj sa donacijama ili plaćenim prijavama ne može se obrisati — umjesto toga povuci objavu; njegove stranice i timovi ostaju na svom cilju.",
     "evNew": "Novi događaj",
     "evName": "Naziv",
     "evSlug": "URL oznaka",
@@ -1380,7 +1381,7 @@
     "allPeopleHint": "Svi odjednom: svaki nalog i svaki zapis osoblja, jedan filter za sve vrste. Osoba bez naloga otvara se na kartici Osoblje.",
     "fundraisersPeopleHint": "Nalozi koji drže stranicu za prikupljanje: koliko je svako prikupio i njihove stranice za moderaciju.",
     "evDelete": "Obriši",
-    "evDeleteConfirm": "{count, plural, one {Obrisati ovaj događaj?} few {Obrisati # događaja?} other {Obrisati # događaja?}} Neplaćene prijave i potvrde dolaska brišu se s njim; fotografije, sponzorstva i ponude ostaju. Ovo se ne može poništiti. Ako ga samo želiš sakriti sa sajta, povuci objavu.",
+    "evDeleteConfirm": "{count, plural, one {Obrisati ovaj događaj?} few {Obrisati # događaja?} other {Obrisati # događaja?}} Neplaćene prijave i potvrde dolaska brišu se s njim; stranice, timovi, fotografije, sponzorstva i ponude ostaju. Ovo se ne može poništiti. Ako ga samo želiš sakriti sa sajta, povuci objavu.",
     "evDeleteBlocked": "{name} nije obrisan: {reason}. Umjesto toga povuci objavu.",
     "evDeleteReason_pages": "{count, plural, one {za njega prikuplja jedna stranica} few {za njega prikupljaju # stranice} other {za njega prikuplja # stranica}}",
     "evDeleteReason_teams": "{count, plural, one {prijavio se jedan tim} few {prijavila su se # tima} other {prijavilo se # timova}}",
@@ -1582,7 +1583,11 @@
     "wayRunOrganizerSub": "{name} organizuje ovu trku i prima prijave. Prijavi se kod njih, pa nam javi da trčiš u našim bojama — i prikupi novac za cilj ako želiš.",
     "wayRunTeam": "Trči sa Santamore timom",
     "wayRunTeamSub": "{name} organizuje ovu trku. Mi prijavljujemo tim i plaćamo mjesta odjednom, pa se prijavljuješ i plaćaš ovdje.",
-    "organizerSite": "Detalji događaja: {name}"
+    "organizerSite": "Detalji događaja: {name}",
+    "wayMoneyWent": "Gdje je novac otišao",
+    "wayMoneyWentFor": "Gdje je otišao novac za: {cause}",
+    "wayMoneyWentSub": "Ovaj događaj je završen. Svaki euro koji je prikupio, i kome je predat, stoji na stranici novca za tu godinu.",
+    "moneyWentCta": "Pogledaj gdje je novac otišao"
   },
   "gallery": {
     "eyebrow": "Galerija",
@@ -1842,8 +1847,8 @@
     "disbursed": "Predato",
     "operations": "Operativni fond",
     "donors": "Donatori",
-    "runners": "Trkači",
-    "pages": "Stranice za prikupljanje",
+    "runners": "Učesnici",
+    "pages": "Prikupljači",
     "teams": "Timovi",
     "events": "Događaji",
     "supporters": "Sponzori",
@@ -1924,7 +1929,15 @@
     "byName": "predložio/la {name}",
     "rankLabel": "#{rank}",
     "continue": "Nastavi",
-    "back": "Nazad na pitanja"
+    "back": "Nazad na pitanja",
+    "openPage": "Otvori kao stranicu",
+    "sharePage": "Podijeli",
+    "shareText": "Znaš potrebu koju bi Santamore trebalo da preuzme? Predloži je ovdje — članovi glasaju, mi biramo iz prvih pet.",
+    "pageStep1": "Ti predlažeš potrebu u Crnoj Gori: ko je ima, gdje, i otprilike koliko bi trebalo.",
+    "pageStep2": "Članovi glasaju za prijedloge. Pet sa najviše glasova su uži izbor.",
+    "pageStep3": "Mi preuzimamo jedan, prikupljamo za njega događajima i stranicama, i objavljujemo svaki euro.",
+    "pageCriteriaHeading": "Šta možemo preuzeti",
+    "pageCriteriaSub": "Prijedlog prvo odgovara na ova pitanja. „Ne“ na bilo koje znači da nije za nas — formular to odmah kaže."
   },
   "beneficiaries": {
     "eyebrow": "Korisnici",

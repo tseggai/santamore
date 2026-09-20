@@ -77,9 +77,11 @@ export default async function EditPagePage({
     .maybeSingle();
   if (!mine || !mine.campaign_id) redirect(`/${locale}/dashboard/stranice`);
 
-  const { data: cause } = await supabase
-    .from("v_public_campaigns")
-    .select("slug, title")
+  // The cause by id, public or not: a page can be built on a cause staff
+  // have not published yet, and the editor should still name it.
+  const { data: cause } = await createServiceClient()
+    .from("campaigns")
+    .select("slug, title, is_public")
     .eq("id", mine.campaign_id)
     .maybeSingle();
 
@@ -165,7 +167,8 @@ export default async function EditPagePage({
             status: mine.status,
             teamId: mine.team_id,
             causeId: mine.campaign_id,
-            causeTitle: cause?.title ?? "Santamore",
+            causeTitle: cause?.title ?? "",
+            causePublic: Boolean(cause?.is_public),
           }}
           teams={((teams ?? []) as {
             id: string;
