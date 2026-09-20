@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 interface DialogRequest {
   kind: "alert" | "confirm";
@@ -23,7 +24,15 @@ interface DialogRequest {
 export function useDialog() {
   const t = useTranslations("admin");
   const [request, setRequest] = useState<DialogRequest | null>(null);
+  // The open request also lives in a ref, so settling never runs a side
+  // effect inside a state updater.
+  const pending = useRef<DialogRequest | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  // The box renders through a portal on <body>: a console screen usually
+  // sits inside a slide-over <dialog>, and a dialog nested in a dialog
+  // confused iOS Safari into closing the slide-over instead.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -33,23 +42,28 @@ export function useDialog() {
   }, [request]);
 
   const settle = useCallback((ok: boolean) => {
-    setRequest((current) => {
-      current?.resolve(ok);
-      return null;
-    });
+    const current = pending.current;
+    pending.current = null;
+    setRequest(null);
+    current?.resolve(ok);
+  }, []);
+  const ask = useCallback((next: DialogRequest) => {
+    pending.current?.resolve(false);
+    pending.current = next;
+    setRequest(next);
   }, []);
 
   const confirm = useCallback(
     (message: string, options: { confirmLabel?: string; danger?: boolean } = {}) =>
-      new Promise<boolean>((resolve) => setRequest({ kind: "confirm", message, danger: options.danger ?? true, confirmLabel: options.confirmLabel, resolve })),
-    [],
+      new Promise<boolean>((resolve) => ask({ kind: "confirm", message, danger: options.danger ?? true, confirmLabel: options.confirmLabel, resolve })),
+    [ask],
   );
   const alert = useCallback(
-    (message: string, detail?: string | null) => new Promise<void>((resolve) => setRequest({ kind: "alert", message, detail, resolve: () => resolve() })),
-    [],
+    (message: string, detail?: string | null) => new Promise<void>((resolve) => ask({ kind: "alert", message, detail, resolve: () => resolve() })),
+    [ask],
   );
 
-  const element: ReactNode = (
+  const box: ReactNode = (
     <dialog
       ref={dialogRef}
       aria-label={request?.message ?? ""}
@@ -85,6 +99,7 @@ export function useDialog() {
       ) : null}
     </dialog>
   );
+  const element: ReactNode = mounted ? createPortal(box, document.body) : null;
 
   return { confirm, alert, element };
 }

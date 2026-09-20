@@ -47,7 +47,11 @@ export function SidePanel({
         onClose();
       }}
       onClick={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        // A click on the backdrop closes the panel, unless another modal
+        // (the console confirm) is open on top: that click is theirs.
+        if (event.target !== event.currentTarget) return;
+        if (document.querySelectorAll("dialog[open]").length > 1) return;
+        onClose();
       }}
       className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none justify-end bg-transparent p-0 backdrop:bg-ink/55 open:flex"
     >
