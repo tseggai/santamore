@@ -155,5 +155,9 @@ select * from (values
                  where table_schema = 'public' and table_name = 'donations' and column_name = 'is_test'))
   ,('20260920000056_mark_as_test',
      to_regprocedure('public.mark_campaign_test(uuid)') is not null)
+  ,('20260920000057_mark_test_allowed',
+     exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+             where n.nspname = 'public' and p.proname = 'enforce_donation_immutability'
+               and pg_get_functiondef(p.oid) like '%Marking a live gift as test data%'))
 ) as m (migration, applied)
 order by migration;
