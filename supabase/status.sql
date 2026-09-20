@@ -138,5 +138,9 @@ select * from (values
      exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
              where n.nspname = 'public' and p.proname = 'delete_team'
                and pg_get_functiondef(p.oid) like '%''approved'', ''refunded''%'))
+  ,('20260920000052_pages_by_cause_only',
+     exists (select 1 from information_schema.columns
+             where table_schema = 'public' and table_name = 'fundraisers'
+               and column_name = 'event_id' and is_nullable = 'YES'))
 ) as m (migration, applied)
 order by migration;
