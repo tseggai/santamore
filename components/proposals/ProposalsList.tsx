@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { toggleVote } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
+import { ProposeForm } from "@/components/proposals/ProposeForm";
 import { formatCents } from "@/lib/money";
 import { SHORTLIST_SIZE } from "@/lib/proposals";
 import { Link } from "@/i18n/navigation";
@@ -22,6 +23,8 @@ export interface PublicProposal {
   vote_rank: number;
   proposer_first_name: string;
   campaign_slug: string | null;
+  /** The reader proposed it (migration 0058). */
+  is_mine?: boolean;
 }
 
 /**
@@ -35,6 +38,8 @@ export function ProposalsList({ proposals, myVotes, signedIn }: { proposals: Pub
   const router = useRouter();
   const [voted, setVoted] = useState<Set<string>>(new Set(myVotes));
   const [busy, setBusy] = useState<string | null>(null);
+  // The proposer may rewrite their proposal until the first vote lands.
+  const [editing, setEditing] = useState<string | null>(null);
 
   const vote = async (proposal: PublicProposal) => {
     const on = !voted.has(proposal.id);
@@ -60,6 +65,7 @@ export function ProposalsList({ proposals, myVotes, signedIn }: { proposals: Pub
         const inRunning = proposal.status !== "chosen";
         const shortlisted = inRunning && proposal.vote_rank <= SHORTLIST_SIZE;
         const mine = voted.has(proposal.id);
+        const editable = Boolean(proposal.is_mine) && proposal.status === "open" && proposal.vote_count === 0;
         // The count shown follows the tap without waiting for the refresh.
         const count = proposal.vote_count + (mine && !myVotes.includes(proposal.id) ? 1 : !mine && myVotes.includes(proposal.id) ? -1 : 0);
         return (
@@ -105,7 +111,26 @@ export function ProposalsList({ proposals, myVotes, signedIn }: { proposals: Pub
                 {proposal.campaign_slug ? (
                   <Link href={`/kampanje/${proposal.campaign_slug}`} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">→ {t("chosen")}</Link>
                 ) : null}
+                {editable && editing !== proposal.id ? (
+                  <button type="button" onClick={() => setEditing(proposal.id)} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">
+                    {t("edit")}
+                  </button>
+                ) : null}
+                {proposal.is_mine && !editable && proposal.status === "open" ? <span>· {t("editLockedShort")}</span> : null}
               </p>
+              {editing === proposal.id ? (
+                <div className="mt-4 rounded-lg bg-paper px-4 py-4">
+                  <ProposeForm
+                    criteria={[]}
+                    edit={{ id: proposal.id, title: proposal.title, summary: proposal.summary, location: proposal.location, beneficiary: proposal.beneficiary, amountCents: proposal.amount_cents }}
+                    onSaved={() => {
+                      setEditing(null);
+                      router.refresh();
+                    }}
+                    onCancel={() => setEditing(null)}
+                  />
+                </div>
+              ) : null}
             </div>
           </li>
         );

@@ -1956,7 +1956,14 @@
     "pageStep2": "Members vote proposals up. The five with most votes are the shortlist.",
     "pageStep3": "We take one on, raise for it with events and pages, and publish every euro.",
     "pageCriteriaHeading": "What we can take on",
-    "pageCriteriaSub": "A proposal first answers these questions. A “no” on any of them means it is not one for us — the form says so right away."
+    "pageCriteriaSub": "A proposal first answers these questions. A “no” on any of them means it is not one for us — the form says so right away.",
+    "edit": "Edit",
+    "editUntilVote": "This is your proposal. You can change the wording until the first vote lands; after that the text stays as people voted for it.",
+    "editSave": "Save changes",
+    "editSaved": "Saved.",
+    "editCancel": "Cancel",
+    "editLocked": "Someone has voted since you opened this, so the wording is now fixed.",
+    "editLockedShort": "yours — fixed after the first vote"
   },
   "beneficiaries": {
     "eyebrow": "Beneficiaries",

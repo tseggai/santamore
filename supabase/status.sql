@@ -159,5 +159,7 @@ select * from (values
      exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
              where n.nspname = 'public' and p.proname = 'enforce_donation_immutability'
                and pg_get_functiondef(p.oid) like '%Marking a live gift as test data%'))
+  ,('20260920000058_proposal_edit',
+     to_regprocedure('public.update_my_proposal(uuid, text, text, text, text, bigint)') is not null)
 ) as m (migration, applied)
 order by migration;
