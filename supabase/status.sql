@@ -142,5 +142,8 @@ select * from (values
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'fundraisers'
                and column_name = 'event_id' and is_nullable = 'YES'))
+  ,('20260920000053_santamore25_all_to_beneficiaries',
+     exists (select 1 from public.year_reports yr, jsonb_array_elements(yr.beneficiaries_list) h
+             where yr.year = 2025 and coalesce((h->>'amount_cents')::bigint, 0) > 0))
 ) as m (migration, applied)
 order by migration;

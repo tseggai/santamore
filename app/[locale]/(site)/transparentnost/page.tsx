@@ -263,7 +263,8 @@ export default async function LedgerPage({
   const stats: YearStats | null = derived
     ? {
         ...derived,
-        received_cents: derived.received_cents + listSum(recordedDonorRows),
+        // Sponsorship cash handed to the beneficiaries is money raised, as the cause page counts it.
+        received_cents: derived.received_cents + listSum(recordedDonorRows) + sponsorImpact,
         disbursed_cents: derived.disbursed_cents + listSum(recordedHandOvers),
         donor_count: derived.donor_count + groupDonors(recordedDonorRows).length,
         event_count: derived.event_count + recordedEvents.length,
