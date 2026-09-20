@@ -6,11 +6,12 @@ import { useState, type FormEvent } from "react";
 
 import { deleteFundraiser, saveMemberProfile } from "@/app/[locale]/admin/(protected)/clanovi/actions";
 
-import { DataTable, Thumb, bulkButton, type Column } from "@/components/console/DataTable";
+import { Chip, DataTable, Thumb, bulkButton, type Column } from "@/components/console/DataTable";
 import { formatShortDate } from "@/lib/dates";
 import { FocusChip } from "@/components/console/FocusChip";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
+import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 
 import { FundraiserStatusButtons } from "@/components/admin/FundraiserModeration";
 import { RegistrationRowActions } from "@/components/admin/RegistrationRowActions";
@@ -54,6 +55,7 @@ export interface MemberPage {
   event_name: string;
   team_id: string | null;
   campaign_id: string | null;
+  is_test?: boolean;
 }
 
 export interface MemberRegistration {
@@ -84,6 +86,7 @@ export interface MemberTeam {
   captain_name: string;
   /** Pages in the team. */
   pages: number;
+  is_test?: boolean;
 }
 
 type Kind = "team" | "fundraisers" | "athletes" | "participants" | "captains" | "donors";
@@ -328,8 +331,12 @@ export function MembersManager({
                   <span className={page.status === "active" ? "font-semibold text-sea" : page.status === "hidden" ? "font-semibold text-red-dark" : "text-black/60"}>
                     {t(`pageStatusValue.${page.status}`)}
                   </span>
+                  {page.is_test ? <Chip tone="red">{t("testChip")}</Chip> : null}
                   <span className="ml-auto flex items-center gap-1.5">
                     <FundraiserStatusButtons fundraiserId={page.id} status={page.status} />
+                    {canManage ? (
+                      <TestFlagButtons kind="fundraiser" ids={[page.id]} isTest={() => Boolean(page.is_test)} className="rounded-lg px-2.5 py-1 text-[13px] font-semibold transition-colors hover:bg-mist-2" />
+                    ) : null}
                     {canManage ? (
                       <button type="button" onClick={() => void removePage(page)} className="rounded-lg px-2.5 py-1 text-[13px] font-semibold text-red-dark transition-colors hover:bg-mist-2">
                         {t("evDelete")}

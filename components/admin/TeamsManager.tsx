@@ -6,9 +6,10 @@ import { useState } from "react";
 
 import { deleteTeams } from "@/app/[locale]/admin/(protected)/clanovi/actions";
 import type { MemberTeam } from "@/components/admin/MembersManager";
-import { DataTable, bulkButton, type Column } from "@/components/console/DataTable";
+import { Chip, DataTable, bulkButton, type Column } from "@/components/console/DataTable";
 import { FocusChip } from "@/components/console/FocusChip";
 import { useDialog } from "@/components/console/useDialog";
+import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 import { Link } from "@/i18n/navigation";
 
 /**
@@ -42,7 +43,12 @@ export function TeamsManager({ teams, canManage, focus = null }: { teams: Member
     {
       key: "name",
       header: t("table.colName"),
-      cell: (tm) => <Link href={`/t/${tm.slug}`} className="block max-w-[260px] truncate font-semibold hover:text-sea">{tm.name}</Link>,
+      cell: (tm) => (
+        <span className="inline-flex max-w-[300px] items-center gap-1.5">
+          <Link href={`/t/${tm.slug}`} className="truncate font-semibold hover:text-sea">{tm.name}</Link>
+          {tm.is_test ? <Chip tone="red">{t("testChip")}</Chip> : null}
+        </span>
+      ),
       sort: (tm) => tm.name,
     },
     { key: "event", header: t("tmColEvent"), cell: (tm) => <span className="text-black/70">{tm.event_name}</span>, sort: (tm) => tm.event_name },
@@ -68,7 +74,10 @@ export function TeamsManager({ teams, canManage, focus = null }: { teams: Member
         emptyLabel={t("tmEmpty")}
         filterSlot={focus ? <FocusChip label={focus.label} clearHref={focus.clearHref} /> : undefined}
         bulkActions={canManage ? (ids, clear) => (
-          <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button>
+          <>
+            <TestFlagButtons kind="team" ids={ids} isTest={(id) => Boolean(teams.find((tm) => tm.id === id)?.is_test)} clear={clear} disabled={busy} />
+            <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button>
+          </>
         ) : undefined}
       />
     </div>

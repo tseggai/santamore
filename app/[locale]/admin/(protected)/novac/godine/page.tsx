@@ -22,6 +22,7 @@ interface ReportRow {
   plan_md: string | null;
   venues: string[];
   is_public: boolean;
+  is_test: boolean;
   events: { name: string; date: string | null; venue: string | null }[];
   beneficiaries_list: { label: string; amount_cents: number | null }[];
   donors_list: { name: string; amount_cents: number | null }[];
@@ -114,6 +115,7 @@ export default async function YearsPage({ params }: { params: Promise<{ locale: 
             planMd: report.plan_md,
             venues: report.venues ?? [],
             isPublic: report.is_public,
+            isTest: Boolean(report.is_test),
             events: report.events ?? [],
             beneficiariesList: report.beneficiaries_list ?? [],
             donorsList: report.donors_list ?? [],

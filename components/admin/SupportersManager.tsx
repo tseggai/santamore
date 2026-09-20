@@ -12,6 +12,7 @@ import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/co
 import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
+import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 import { supporterLogoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 import { Link } from "@/i18n/navigation";
@@ -29,6 +30,7 @@ export interface SupporterRow {
   is_active: boolean;
   logo_path: string | null;
   kind: "sponsor" | "donor";
+  is_test?: boolean;
 }
 
 export interface SponsorshipRow {
@@ -518,7 +520,12 @@ export function SupportersManager({
     {
       key: "status",
       header: t("table.colStatus"),
-      cell: (s) => (s.is_active ? <Chip tone="sea">{t("table.statusActive")}</Chip> : <Chip>{t("suInactive")}</Chip>),
+      cell: (s) => (
+        <span className="inline-flex items-center gap-1.5">
+          {s.is_active ? <Chip tone="sea">{t("table.statusActive")}</Chip> : <Chip>{t("suInactive")}</Chip>}
+          {s.is_test ? <Chip tone="red">{t("testChip")}</Chip> : null}
+        </span>
+      ),
       sort: (s) => (s.is_active ? 1 : 0),
       filter: {
         options: [
@@ -722,6 +729,7 @@ export function SupportersManager({
           <>
             <button type="button" disabled={busy} onClick={() => setActive(ids, true, clear)} className={bulkButton}>{t("table.activate")}</button>
             <button type="button" disabled={busy} onClick={() => setActive(ids, false, clear)} className={bulkButton}>{t("table.deactivate")}</button>
+            <TestFlagButtons kind="supporter" ids={ids} isTest={(id) => Boolean(supporters.find((s) => s.id === id)?.is_test)} clear={clear} disabled={busy} />
             <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={`${bulkButton} text-red-dark`}>{t("suDelete")}</button>
           </>
         )}
