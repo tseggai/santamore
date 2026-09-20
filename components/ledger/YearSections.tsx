@@ -1,90 +1,45 @@
-"use client";
-
-import { useId, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export interface YearSection {
   key: string;
   label: string;
-  /** The figure on the tile; the tile is the tab. */
+  /** The figure on the tile; the tile jumps to the section. */
   value: string;
   content: ReactNode;
 }
 
 /**
- * The year in figures, as tabs: each tile is a tab whose panel shows what
- * stands behind the number; the first tab is the year's story. No motion,
- * so nothing to switch off for reduced-motion users. Arrow keys move
- * between tabs, per the WAI tabs pattern.
+ * The year in full: the story first, then a strip of figures, then every
+ * section open on the page. A figure is a link to its section, so the
+ * strip reads as a table of contents rather than a set of tabs.
  */
 export function YearSections({ story, sections }: { story: { key: string; label: string; content: ReactNode }; sections: YearSection[] }) {
-  const baseId = useId();
-  const all = [story.key, ...sections.map((s) => s.key)];
-  const [active, setActive] = useState(story.key);
-  const panelId = (key: string) => `${baseId}-${key}-panel`;
-  const tabId = (key: string) => `${baseId}-${key}-tab`;
-  const tile = (selected: boolean) =>
-    `rounded-lg px-3.5 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea ${
-      selected ? "bg-sea text-paper" : "bg-mist hover:bg-mist-2"
-    }`;
-
-  const onKey = (event: React.KeyboardEvent<HTMLButtonElement>, key: string) => {
-    const index = all.indexOf(key);
-    let next: number | null = null;
-    if (event.key === "ArrowRight" || event.key === "ArrowDown") next = (index + 1) % all.length;
-    if (event.key === "ArrowLeft" || event.key === "ArrowUp") next = (index - 1 + all.length) % all.length;
-    if (event.key === "Home") next = 0;
-    if (event.key === "End") next = all.length - 1;
-    if (next === null) return;
-    event.preventDefault();
-    setActive(all[next]);
-    document.getElementById(tabId(all[next]))?.focus();
-  };
-
+  const id = (key: string) => `godina-${key}`;
   return (
     <div>
-      <div role="tablist" aria-label={story.label} className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <button
-          type="button"
-          role="tab"
-          id={tabId(story.key)}
-          aria-selected={active === story.key}
-          aria-controls={panelId(story.key)}
-          tabIndex={active === story.key ? 0 : -1}
-          onClick={() => setActive(story.key)}
-          onKeyDown={(e) => onKey(e, story.key)}
-          className={`${tile(active === story.key)} col-span-2 sm:col-span-4`}
-        >
-          <span className={`type-eyebrow ${active === story.key ? "text-paper/80" : "text-sea/80"}`}>{story.label}</span>
-        </button>
+      <section id={id(story.key)}>
+        <h3 className="type-eyebrow text-sea/80">{story.label}</h3>
+        <div className="mt-2">{story.content}</div>
+      </section>
+      <nav aria-label={story.label} className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {sections.map((section) => (
-          <button
+          <a
             key={section.key}
-            type="button"
-            role="tab"
-            id={tabId(section.key)}
-            aria-selected={active === section.key}
-            aria-controls={panelId(section.key)}
-            tabIndex={active === section.key ? 0 : -1}
-            onClick={() => setActive(section.key)}
-            onKeyDown={(e) => onKey(e, section.key)}
-            className={tile(active === section.key)}
+            href={`#${id(section.key)}`}
+            className="rounded-lg bg-mist px-3.5 py-3 text-left transition-colors hover:bg-mist-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea"
           >
-            <span className={`block text-[12.5px] font-semibold ${active === section.key ? "text-paper/80" : "text-black/55"}`}>{section.label}</span>
+            <span className="block text-[12.5px] font-semibold text-black/55">{section.label}</span>
             <span className="mt-0.5 block font-mono text-[22px] tabular-nums">{section.value}</span>
-          </button>
+          </a>
         ))}
-      </div>
-      {[story, ...sections].map((section) => (
-        <div
-          key={section.key}
-          role="tabpanel"
-          id={panelId(section.key)}
-          aria-labelledby={tabId(section.key)}
-          hidden={active !== section.key}
-          className="mt-5"
-        >
-          {section.content}
-        </div>
+      </nav>
+      {sections.map((section) => (
+        <section key={section.key} id={id(section.key)} className="mt-8 scroll-mt-24">
+          <h3 className="type-eyebrow text-sea/80">
+            {section.label} <span className="font-mono normal-case tracking-normal text-black/45">· {section.value}</span>
+          </h3>
+          <div className="mt-2">{section.content}</div>
+        </section>
       ))}
     </div>
   );
