@@ -12,6 +12,7 @@ import { PublicGallery } from "@/components/gallery/PublicGallery";
 import { galleryImageUrl } from "@/lib/storage";
 import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
+import { causeState } from "@/lib/cause-status";
 import { formatCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, type Locale } from "@/i18n/routing";
@@ -64,6 +65,11 @@ export function CampaignPageView({
   });
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
   const cover = galleryImageUrl(campaign.cover_path ?? null);
+  // A completed cause takes no more money: its buttons lead to where the
+  // money went, on the money page for its year.
+  const state = causeState(campaign);
+  const yearOf = campaign.ends_at ?? campaign.starts_at;
+  const moneyYear = yearOf ? new Date(yearOf).getFullYear() : null;
   const secondaryButton =
     "inline-flex h-12 items-center rounded-lg bg-mist px-5 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea";
   const linkClass =
@@ -110,17 +116,29 @@ export function CampaignPageView({
       </div>
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
-        <DonateButton
-          request={{ kind: "campaign", slug: campaign.slug }}
-          href={`/podrzi?kampanja=${campaign.slug}`}
-          className="inline-flex h-12 items-center rounded-lg bg-red px-8 text-[16.5px] font-bold text-paper transition-colors hover:bg-red-dark"
-        >
-          {tDonate("payVerb")}
-        </DonateButton>
-        {preview ? (
-          <span className={secondaryButton}>{t("raiseCta")}</span>
+        {state.completed ? (
+          preview || moneyYear === null ? (
+            <span className={secondaryButton}>{t("moneyWentCta")}</span>
+          ) : (
+            <Link href={`/transparentnost?godina=${moneyYear}`} className="inline-flex h-12 items-center rounded-lg bg-sea px-6 text-[15.5px] font-bold text-paper transition-colors hover:bg-sea-2">
+              {t("moneyWentCta")}
+            </Link>
+          )
         ) : (
-          <Link href={`/dashboard/prikupljaj?cause=${campaign.slug}`} className={secondaryButton}>{t("raiseCta")}</Link>
+          <>
+            <DonateButton
+              request={{ kind: "campaign", slug: campaign.slug }}
+              href={`/podrzi?kampanja=${campaign.slug}`}
+              className="inline-flex h-12 items-center rounded-lg bg-red px-8 text-[16.5px] font-bold text-paper transition-colors hover:bg-red-dark"
+            >
+              {tDonate("payVerb")}
+            </DonateButton>
+            {preview ? (
+              <span className={secondaryButton}>{t("raiseCta")}</span>
+            ) : (
+              <Link href={`/dashboard/prikupljaj?cause=${campaign.slug}`} className={secondaryButton}>{t("raiseCta")}</Link>
+            )}
+          </>
         )}
         {preview ? (
           <span className={secondaryButton}>{t("shareCta")}</span>

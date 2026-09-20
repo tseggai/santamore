@@ -27,6 +27,8 @@ const RAIL_KEYS: Record<string, string> = {
   sepa: "railSepa",
   cash: "railCash",
   other: "railMixed",
+  recorded: "railRecorded",
+  sponsorship: "railSponsorship",
 };
 
 interface InRow {
@@ -38,6 +40,8 @@ interface InRow {
   campaign_title: string | null;
   chapter_slug: string | null;
   rail: string;
+  /** Which record the row comes from: the ledger, a year report, or a sponsorship. */
+  source: "ledger" | "recorded" | "sponsorship";
 }
 interface OutRow {
   id: string;
@@ -47,6 +51,8 @@ interface OutRow {
   category: string | null;
   chapter_slug: string | null;
   documentation_paths: string[];
+  source: "ledger" | "recorded";
+  is_paid: boolean;
 }
 interface AdjRow {
   id: string;
@@ -230,46 +236,37 @@ export default async function LedgerPage({
   if (year !== null && !years.includes(year) && yearStats.length > 0) notFound();
   const derived = year !== null ? (yearStats.find((row) => row.year === year) ?? null) : null;
   const report = year !== null ? (yearReports.find((row) => row.year === year) ?? null) : null;
-  // What the report records that the ledger cannot: lists from a year
-  // before the ledger existed, and the volunteers by name.
+  // Every figure comes from the money views: the ledger, the gifts and
+  // hand-overs recorded on a year report, and sponsorship cash that went
+  // to the beneficiaries are rows of the same ledger (migration 0054).
+  // The report adds only what has no row: events before the site, and
+  // the volunteers by name.
   const recordedEvents = report?.events ?? [];
-  const recordedHandOvers = report?.beneficiaries_list ?? [];
-  const recordedDonorRows = report?.donors_list ?? [];
-  // Volunteers: team records active that year, plus names recorded on the report.
   const volunteers = [...new Set([...teamVolunteers, ...(report?.volunteers_list ?? [])])];
-  const recordedOutsideLedger = recordedDonorRows.length > 0 || recordedHandOvers.length > 0;
-  // The donor wall: individuals recorded as supporters plus the recorded
-  // list, one chip per name with every gift behind it.
+  const recordedOutsideLedger = inRows.some((row) => row.source !== "ledger") || outRows.some((row) => row.source !== "ledger");
+  // The donor wall: every named gift of the year, one chip per name, plus
+  // an individual supporter's gifts that fed operations (those are not
+  // ledger rows, since they never went to a beneficiary).
   const donors = groupDonors([
-    ...individualDonors.flatMap((su) =>
-      (su.gifts ?? []).length > 0
-        ? (su.gifts ?? []).map((g) => ({ name: su.name, amount_cents: g.amount_cents, target: g.target, date: g.date }))
-        : [{ name: su.name, amount_cents: su.cash_cents > 0 ? su.cash_cents : null }],
+    ...inRows.flatMap((row) =>
+      row.display_name ? [{ name: row.display_name, amount_cents: row.amount_cents, target: row.campaign_title ?? row.fundraiser_title ?? null, date: row.entry_date }] : [],
     ),
-    ...recordedDonorRows,
+    ...individualDonors.flatMap((su) =>
+      (su.gifts ?? []).filter((g) => g.fund !== "impact" && !g.in_kind).map((g) => ({ name: su.name, amount_cents: g.amount_cents, target: g.target, date: g.date })),
+    ),
   ]);
   const sponsorCash = supporters.reduce((sum, su) => sum + su.cash_cents, 0);
   // Sponsorship cash that went to beneficiaries counts as raised, not as operations.
   const sponsorImpact = supporters.reduce((sum, su) => sum + (su.impact_cents ?? 0), 0);
-  const listSum = (rows: { amount_cents: number | null }[]) => rows.reduce((sum, row) => sum + (row.amount_cents ?? 0), 0);
-  // Hand-overs of the year grouped by their public label: the ledger's
-  // published rows plus what was recorded before the ledger.
+  // Hand-overs of the year grouped by their public label, whatever record they come from.
   const byLabel = new Map<string, number>();
-  for (const row of outRows) byLabel.set(row.beneficiary_label, (byLabel.get(row.beneficiary_label) ?? 0) + row.amount_cents);
-  for (const row of recordedHandOvers) byLabel.set(row.label, (byLabel.get(row.label) ?? 0) + (row.amount_cents ?? 0));
+  for (const row of outRows) if (row.is_paid) byLabel.set(row.beneficiary_label, (byLabel.get(row.beneficiary_label) ?? 0) + row.amount_cents);
   const beneficiaries = [...byLabel].map(([label, cents]) => ({ label, cents })).sort((a, b) => b.cents - a.cents);
-  // Every figure derives from a record: the ledger, the events, the
-  // supporter records, and the report's lists. Nothing overrides them.
   const stats: YearStats | null = derived
     ? {
         ...derived,
-        // Sponsorship cash handed to the beneficiaries is money raised, as the cause page counts it.
-        received_cents: derived.received_cents + listSum(recordedDonorRows) + sponsorImpact,
-        disbursed_cents: derived.disbursed_cents + listSum(recordedHandOvers),
-        donor_count: derived.donor_count + groupDonors(recordedDonorRows).length,
         event_count: derived.event_count + recordedEvents.length,
         supporter_count: supporters.length,
-        beneficiary_count: beneficiaries.length,
       }
     : null;
   const tense = year === null ? "all" : year < thisYear ? "past" : year === thisYear ? "current" : "future";

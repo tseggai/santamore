@@ -278,7 +278,9 @@
     "emptyIn": "Još nema zabilježenih uplata.",
     "emptyOut": "Još nema objavljenih isplata.",
     "downloadIn": "Preuzmi CSV — uplate",
-    "downloadOut": "Preuzmi CSV — isplate"
+    "downloadOut": "Preuzmi CSV — isplate",
+    "railRecorded": "EVIDENTIRANO",
+    "railSponsorship": "SPONZOR"
   },
   "dashboard": {
     "title": "Moja stranica za prikupljanje",
@@ -1645,7 +1647,8 @@
     "beneficiaryMore": "Više o njima",
     "statusCompleted": "Završeno",
     "statusGoalReached": "Cilj dostignut",
-    "statusHandedOver": "<amount></amount> predato korisnicima"
+    "statusHandedOver": "<amount></amount> predato korisnicima",
+    "moneyWentCta": "Pogledaj gdje je novac otišao"
   },
   "perks": {
     "title": "Izazovi partnera",

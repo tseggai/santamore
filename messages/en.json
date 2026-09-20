@@ -278,7 +278,9 @@
     "emptyIn": "No donations recorded yet.",
     "emptyOut": "No disbursements published yet.",
     "downloadIn": "Download CSV — money in",
-    "downloadOut": "Download CSV — money out"
+    "downloadOut": "Download CSV — money out",
+    "railRecorded": "RECORDED",
+    "railSponsorship": "SPONSOR"
   },
   "dashboard": {
     "title": "My fundraising page",
@@ -1645,7 +1647,8 @@
     "beneficiaryMore": "More about them",
     "statusCompleted": "Completed",
     "statusGoalReached": "Goal reached",
-    "statusHandedOver": "<amount></amount> handed over to the beneficiaries"
+    "statusHandedOver": "<amount></amount> handed over to the beneficiaries",
+    "moneyWentCta": "See where the money went"
   },
   "perks": {
     "title": "Partner challenges",
