@@ -294,7 +294,8 @@ export default async function LedgerPage({
     id: row.id,
     date: row.entry_date,
     name: row.beneficiary_label,
-    attribution: row.chapter_slug ? row.chapter_slug.toUpperCase() : t("national"),
+    // A recorded hand-over has no chapter: say where the row comes from instead.
+    attribution: row.source !== "ledger" ? t("railRecorded") : row.chapter_slug ? row.chapter_slug.toUpperCase() : t("national"),
     railKey: null,
     amountCents: row.amount_cents,
     docs: row.documentation_paths.flatMap((path, index) => {
@@ -471,7 +472,6 @@ export default async function LedgerPage({
               </ul>
             ),
         },
-        { key: "beneficiaries", label: tYears("beneficiaries"), value: count(stats.beneficiary_count), content: handOverList },
       ]
     : [];
 
@@ -568,7 +568,9 @@ export default async function LedgerPage({
             <div className="mt-2">{eventList}</div>
           </section>
           <section className="mt-6">
-            <h3 className="type-eyebrow text-sea/80">{tYears("beneficiariesHeading")}</h3>
+            <h3 className="type-eyebrow text-sea/80">
+              {tYears("beneficiariesHeading")} <span className="font-mono normal-case tracking-normal text-black/45">· {count(stats.beneficiary_count)}</span>
+            </h3>
             {handOverList}
           </section>
 
