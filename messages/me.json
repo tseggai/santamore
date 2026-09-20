@@ -278,7 +278,9 @@
     "emptyIn": "Još nema zabilježenih uplata.",
     "emptyOut": "Još nema objavljenih isplata.",
     "downloadIn": "Preuzmi CSV — uplate",
-    "downloadOut": "Preuzmi CSV — isplate"
+    "downloadOut": "Preuzmi CSV — isplate",
+    "railRecorded": "EVIDENTIRANO",
+    "railSponsorship": "SPONZOR"
   },
   "dashboard": {
     "title": "Moja stranica za prikupljanje",

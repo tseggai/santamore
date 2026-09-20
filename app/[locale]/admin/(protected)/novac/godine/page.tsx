@@ -60,34 +60,17 @@ export default async function YearsPage({ params }: { params: Promise<{ locale: 
   setRequestLocale(locale);
   const t = await getTranslations("admin");
   const supabase = await createClient();
-  const [{ data: stats }, { data: reports }, { data: campaigns }, { data: donations }, { data: disbursements }, { data: sponsors }, { data: dealRows }] = await Promise.all([
+  const [{ data: stats }, { data: reports }, { data: campaigns }, { data: totals }, { data: sponsors }] = await Promise.all([
     supabase.from("v_public_year_stats").select("*").order("year", { ascending: false }),
     supabase.from("year_reports").select("*"),
     supabase.from("campaigns").select("id, title, starts_at, created_at, is_public").order("starts_at", { ascending: false }).limit(500),
-    supabase.from("donations").select("campaign_id, net_cents").in("status", ["approved", "refunded"]).limit(20_000),
-    supabase.from("disbursements").select("campaign_id, amount_cents").not("published_at", "is", null).limit(5_000),
+    // One money view (migration 0054): raised, handed over and hand-over
+    // count per cause, the same figures the public pages show.
+    supabase.from("v_campaign_totals").select("id, raised_cents, disbursed_cents, hand_overs").limit(2000),
     supabase.from("v_public_sponsors").select("id, name, tier, amount_cents, is_in_kind, year, campaign_title, event_name").limit(2_000),
-    supabase.from("sponsors").select("campaign_id, amount_cents, fund, status, is_in_kind").limit(5_000),
   ]);
 
-  const raisedBy = new Map<string, number>();
-  const addRaised = (id: string | null, cents: number) => {
-    if (id) raisedBy.set(id, (raisedBy.get(id) ?? 0) + cents);
-  };
-  for (const d of (donations ?? []) as { campaign_id: string | null; net_cents: number }[]) addRaised(d.campaign_id, d.net_cents);
-  // Recorded gifts of a year report that names the cause, and sponsorship cash handed to beneficiaries.
-  for (const r of (reports ?? []) as ReportRow[]) {
-    if (r.campaign_id) addRaised(r.campaign_id, (r.donors_list ?? []).reduce((sum, g) => sum + (g.amount_cents ?? 0), 0));
-  }
-  for (const s of (dealRows ?? []) as { campaign_id: string | null; amount_cents: number | null; fund: string; status: string; is_in_kind: boolean }[]) {
-    if ((s.status === "signed" || s.status === "active") && !s.is_in_kind && s.fund === "impact") addRaised(s.campaign_id, s.amount_cents ?? 0);
-  }
-  const disbursedBy = new Map<string, { cents: number; count: number }>();
-  for (const d of (disbursements ?? []) as { campaign_id: string | null; amount_cents: number }[]) {
-    if (!d.campaign_id) continue;
-    const prev = disbursedBy.get(d.campaign_id) ?? { cents: 0, count: 0 };
-    disbursedBy.set(d.campaign_id, { cents: prev.cents + d.amount_cents, count: prev.count + 1 });
-  }
+  const totalsById = new Map(((totals ?? []) as { id: string; raised_cents: number; disbursed_cents: number; hand_overs: number }[]).map((row) => [row.id, row]));
   const causesByYear = new Map<number, YearCause[]>();
   for (const c of (campaigns ?? []) as CampaignRow[]) {
     const year = yearOf(c.starts_at) ?? yearOf(c.created_at);
@@ -97,9 +80,9 @@ export default async function YearsPage({ params }: { params: Promise<{ locale: 
       id: c.id,
       title: c.title,
       isPublic: c.is_public,
-      raisedCents: raisedBy.get(c.id) ?? 0,
-      disbursedCents: disbursedBy.get(c.id)?.cents ?? 0,
-      handOvers: disbursedBy.get(c.id)?.count ?? 0,
+      raisedCents: totalsById.get(c.id)?.raised_cents ?? 0,
+      disbursedCents: totalsById.get(c.id)?.disbursed_cents ?? 0,
+      handOvers: totalsById.get(c.id)?.hand_overs ?? 0,
     });
     causesByYear.set(year, list);
   }

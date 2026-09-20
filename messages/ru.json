@@ -279,7 +279,9 @@
     "emptyIn": "Поступлений пока нет.",
     "emptyOut": "Опубликованных выплат пока нет.",
     "downloadIn": "Скачать CSV — поступления",
-    "downloadOut": "Скачать CSV — выплаты"
+    "downloadOut": "Скачать CSV — выплаты",
+    "railRecorded": "ЗАПИСАНО",
+    "railSponsorship": "СПОНСОР"
   },
   "dashboard": {
     "title": "Моя страница сбора",

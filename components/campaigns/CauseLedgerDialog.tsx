@@ -8,7 +8,7 @@ import { formatCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
-const RAIL_KEYS: Record<string, string> = { card: "railCard", sepa: "railSepa", cash: "railCash", other: "railMixed" };
+const RAIL_KEYS: Record<string, string> = { card: "railCard", sepa: "railSepa", cash: "railCash", other: "railMixed", recorded: "railRecorded", sponsorship: "railSponsorship" };
 
 function displayDate(iso: string): string {
   const [y, m, d] = iso.slice(0, 10).split("-");

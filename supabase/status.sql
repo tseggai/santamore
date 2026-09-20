@@ -145,5 +145,9 @@ select * from (values
   ,('20260920000053_santamore25_all_to_beneficiaries',
      exists (select 1 from public.year_reports yr, jsonb_array_elements(yr.beneficiaries_list) h
              where yr.year = 2025 and coalesce((h->>'amount_cents')::bigint, 0) > 0))
+  ,('20260920000054_one_ledger',
+     to_regclass('public.v_money_in_all') is not null
+     and exists (select 1 from information_schema.columns
+                 where table_schema = 'public' and table_name = 'v_public_ledger_in' and column_name = 'source'))
 ) as m (migration, applied)
 order by migration;

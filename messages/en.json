@@ -278,7 +278,9 @@
     "emptyIn": "No donations recorded yet.",
     "emptyOut": "No disbursements published yet.",
     "downloadIn": "Download CSV — money in",
-    "downloadOut": "Download CSV — money out"
+    "downloadOut": "Download CSV — money out",
+    "railRecorded": "RECORDED",
+    "railSponsorship": "SPONSOR"
   },
   "dashboard": {
     "title": "My fundraising page",
