@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
-import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { Link } from "@/i18n/navigation";
 
 export interface MenuItem {
@@ -89,8 +88,7 @@ export function MobileMenu({
       >
         {open ? (
           <div className="flex h-full w-[min(100%,320px)] flex-col bg-paper px-4 py-4 shadow-[-16px_0_48px_rgba(14,58,70,0.18)] motion-safe:animate-[panel-in_220ms_ease-out]">
-            <div className="flex items-center justify-between">
-              <LocaleSwitcher />
+            <div className="flex items-center justify-end">
               <button
                 type="button"
                 onClick={() => setOpen(false)}
