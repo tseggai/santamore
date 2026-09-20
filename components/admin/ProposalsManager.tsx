@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
 import { chooseProposal, saveCriterion, setProposalStatus } from "@/app/[locale]/admin/(protected)/kampanje/prijedlozi/actions";
+import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 import { SidePanel } from "@/components/console/SidePanel";
 import { formatShortDate } from "@/lib/dates";
 import { formatCents } from "@/lib/money";
@@ -27,6 +28,7 @@ export interface ProposalRow {
   campaign_id: string | null;
   created_at: string;
   votes: number;
+  is_test?: boolean;
 }
 
 export interface CriterionRow {
@@ -116,6 +118,7 @@ export function ProposalsManager({
                       {p.amount_cents ? ` · ~${formatCents(p.amount_cents, locale, { trimWholeCents: true })}` : ""}
                     </span>
                   </span>
+                  {p.is_test ? <span className="rounded-full bg-red px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("testChip")}</span> : null}
                   {shortlisted ? <span className="rounded-full bg-sea px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("prStatusShortlisted")}</span> : null}
                   <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${p.status === "chosen" ? "bg-red text-paper" : p.status === "rejected" || p.status === "declined" ? "bg-paper text-black/50" : "bg-paper text-black/70"}`}>
                     {t(statusKey(p.status))}
@@ -205,6 +208,9 @@ function ProposalPanel({ proposal, chapters, locale, onDone }: { proposal: Propo
       {proposal.campaign_id ? (
         <Link href="/admin/kampanje" className="inline-block text-[14.5px] font-semibold text-sea underline underline-offset-2">{t("prChosenCause")} →</Link>
       ) : null}
+      <div className="flex flex-wrap gap-2">
+        <TestFlagButtons kind="proposal" ids={[proposal.id]} isTest={() => Boolean(proposal.is_test)} clear={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold hover:bg-mist-2 disabled:opacity-60" />
+      </div>
 
       {!decided ? (
         <>

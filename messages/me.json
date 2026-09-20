@@ -1167,6 +1167,7 @@
     "bnStoryHint": "Običan tekst ili Markdown. Prazan jezik prikazuje prvi napisani.",
     "bnPublish": "Objavljeno na sajtu",
     "bnDeleteConfirm": "Obrisati „{name}“ i fotografiju? Ovo se ne može poništiti.",
+    "bnDeleteManyConfirm": "{count, plural, one {Obrisati ovog korisnika?} few {Obrisati # korisnika?} other {Obrisati # korisnika?}}",
     "sitePage": {
       "about": "O nama",
       "how": "Kako radimo"
@@ -1434,7 +1435,10 @@
     "testModePurged": "{count, plural, one {Uklonjen # test red.} few {Uklonjena # test reda.} other {Uklonjeno # test redova.}}",
     "testChip": "Test",
     "markTest": "Označi kao test podatke",
-    "markTestConfirm": "{count, plural, one {Označiti ovaj zapis i sve vezano za njega kao test podatke?} few {Označiti # zapisa i sve vezano za njih kao test podatke?} other {Označiti # zapisa i sve vezano za njih kao test podatke?}} Pokloni, predaje, stranice i timovi koji se za njih vežu prestaju da se računaju čim je test režim isključen, gube nepromjenjivost i odlaze sa sljedećim čišćenjem. Pravi novac koji nije vezan ostaje netaknut."
+    "markTestConfirm": "{count, plural, one {Označiti ovaj zapis i sve vezano za njega kao test podatke?} few {Označiti # zapisa i sve vezano za njih kao test podatke?} other {Označiti # zapisa i sve vezano za njih kao test podatke?}} Pokloni, predaje, stranice i timovi koji se za njih vežu prestaju da se računaju čim je test režim isključen, gube nepromjenjivost i odlaze sa sljedećim čišćenjem. Pravi novac koji nije vezan ostaje netaknut.",
+    "markLive": "Označi kao pravi zapis",
+    "markLiveConfirm": "{count, plural, one {Prebaciti ovaj zapis i sve vezano za njega u pravi režim?} few {Prebaciti # zapisa i sve vezano za njih u pravi režim?} other {Prebaciti # zapisa i sve vezano za njih u pravi režim?}} Od sada se računaju, njihovi pokloni i predaje postaju nepromjenjivi, a čišćenje ih ne dira. Zapis pod nadređenim koji ostaje test i dalje odlazi sa čišćenjem.",
+    "yearTestData": "Test podaci (odlaze sa čišćenjem)"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

@@ -22,6 +22,8 @@ const schema = z.object({
   planMd: z.string().trim().max(8000).nullable(),
   venues: z.array(z.string().trim().min(1).max(120)).max(50),
   isPublic: z.boolean(),
+  /** Left out for a new report: the database follows the test-mode switch. */
+  isTest: z.boolean().optional(),
   events: z.array(z.object({ name: z.string().trim().min(1).max(160), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(), venue: z.string().trim().max(160).nullable() })).max(50).default([]),
   beneficiariesList: z.array(z.object({ label: z.string().trim().min(1).max(200), amount_cents: z.number().int().min(0).nullable() })).max(100).default([]),
   donorsList: z.array(z.object({ name: z.string().trim().min(1).max(120), amount_cents: z.number().int().min(0).nullable() })).max(2000).default([]),
@@ -43,6 +45,7 @@ export async function saveYearReport(input: unknown): Promise<YearReportResult> 
       plan_md: data.planMd,
       venues: data.venues,
       is_public: data.isPublic,
+      ...(data.isTest === undefined ? {} : { is_test: data.isTest }),
       // Retired: nothing overrides a derived figure any more.
       volunteers: null,
       beneficiaries: null,

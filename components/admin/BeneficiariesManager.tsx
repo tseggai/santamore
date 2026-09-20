@@ -5,9 +5,10 @@ import { useTranslations } from "next-intl";
 import { useRef, useState, type FormEvent } from "react";
 
 import { deleteBeneficiary, saveBeneficiary } from "@/app/[locale]/admin/(protected)/sadrzaj/beneficiaries-actions";
-import { Chip, DataTable, Thumb, rowButton, type Column } from "@/components/console/DataTable";
+import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
+import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 import { TranslateBar } from "@/components/admin/TranslateBar";
 import { downscaleToJpeg } from "@/lib/images";
 import { beneficiaryPhotoUrl } from "@/lib/storage";
@@ -24,6 +25,7 @@ export interface BeneficiaryRow {
   campaign_id: string | null;
   is_published: boolean;
   sort_order: number;
+  is_test?: boolean;
 }
 
 export interface CauseOption {
@@ -56,13 +58,32 @@ export function BeneficiariesManager({ rows, causes }: { rows: BeneficiaryRow[];
     if (open === row.id) setOpen("");
     router.refresh();
   };
+  const removeMany = async (ids: string[], clear: () => void) => {
+    if (!(await dialog.confirm(t("bnDeleteManyConfirm", { count: ids.length })))) return;
+    setBusy(true);
+    let failed = false;
+    for (const id of ids) {
+      const result = await deleteBeneficiary({ id }).catch(() => null);
+      if (!result?.ok) failed = true;
+    }
+    setBusy(false);
+    if (failed) await dialog.alert(t("actionError"));
+    clear();
+    if (ids.includes(open)) setOpen("");
+    router.refresh();
+  };
 
   const columns: Column<BeneficiaryRow>[] = [
     { key: "name", header: t("table.colName"), cell: (r) => <span className="block max-w-[260px] truncate font-semibold">{r.name}</span>, sort: (r) => r.name },
     {
       key: "status",
       header: t("table.colStatus"),
-      cell: (r) => (r.is_published ? <Chip tone="sea">{t("bnPublished")}</Chip> : <Chip>{t("bnDraft")}</Chip>),
+      cell: (r) => (
+        <span className="inline-flex items-center gap-1.5">
+          {r.is_published ? <Chip tone="sea">{t("bnPublished")}</Chip> : <Chip>{t("bnDraft")}</Chip>}
+          {r.is_test ? <Chip tone="red">{t("testChip")}</Chip> : null}
+        </span>
+      ),
       sort: (r) => (r.is_published ? 1 : 0),
       filter: {
         options: [
@@ -100,6 +121,12 @@ export function BeneficiariesManager({ rows, causes }: { rows: BeneficiaryRow[];
           emptyLabel={t("bnEmpty")}
           rowActions={(r) => (
             <button type="button" disabled={busy} onClick={() => remove(r)} className={`${rowButton} text-red-dark`}>{t("suDelete")}</button>
+          )}
+          bulkActions={(ids, clear) => (
+            <>
+              <TestFlagButtons kind="beneficiary" ids={ids} isTest={(id) => Boolean(rows.find((r) => r.id === id)?.is_test)} clear={clear} disabled={busy} />
+              <button type="button" disabled={busy} onClick={() => removeMany(ids, clear)} className={`${bulkButton} text-red-dark`}>{t("suDelete")}</button>
+            </>
           )}
         />
       </div>

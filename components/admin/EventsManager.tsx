@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { deleteEvents, markEventsTest, setEventPublished, setEventsPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
+import { deleteEvents, setEventPublished, setEventsPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
 import { EventForm, type EventFormValues, type Option } from "@/components/admin/EventForm";
 import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
 import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
@@ -14,6 +14,7 @@ import { StravaWebhookButton } from "@/components/admin/StravaWebhookPanel";
 import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
+import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 import type { WebhookStatus } from "@/app/[locale]/admin/(protected)/izazovi/actions";
 import { galleryImageUrl } from "@/lib/storage";
 import { Link } from "@/i18n/navigation";
@@ -84,18 +85,7 @@ export function EventsManager({
   // with pages, teams, donations or paid registrations and says why.
   const [notice, setNotice] = useState<string[]>([]);
   const dialog = useDialog();
-  const markTest = async (ids: string[], clear: () => void) => {
-    if (!(await dialog.confirm(t("markTestConfirm", { count: ids.length }), { danger: false, confirmLabel: t("markTest") }))) return;
-    setBusy("bulk");
-    const result = await markEventsTest({ ids }).catch(() => null);
-    setBusy(null);
-    if (!result?.ok) {
-      await dialog.alert(t("actionError"), result?.detail);
-      return;
-    }
-    clear();
-    router.refresh();
-  };
+  const isTest = (id: string) => Boolean(events.find((e) => e.id === id)?.is_test);
   const remove = async (ids: string[], clear: () => void) => {
     if (!(await dialog.confirm(t("evDeleteConfirm", { count: ids.length })))) return;
     setBusy("bulk");
@@ -257,7 +247,7 @@ export function EventsManager({
           <>
             <button type="button" disabled={busy === "bulk"} onClick={() => bulkPublish(ids, true, clear)} className={bulkButton}>{t("galleryPublish")}</button>
             <button type="button" disabled={busy === "bulk"} onClick={() => bulkPublish(ids, false, clear)} className={bulkButton}>{t("galleryUnpublish")}</button>
-            <button type="button" disabled={busy === "bulk"} onClick={() => markTest(ids, clear)} className={bulkButton}>{t("markTest")}</button>
+            <TestFlagButtons kind="event" ids={ids} isTest={isTest} clear={clear} disabled={busy === "bulk"} />
             <button type="button" disabled={busy === "bulk"} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button>
           </>
         )}

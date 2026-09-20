@@ -16,6 +16,7 @@ export interface YearReport {
   planMd: string | null;
   venues: string[];
   isPublic: boolean;
+  isTest: boolean;
   events: { name: string; date: string | null; venue: string | null }[];
   beneficiariesList: { label: string; amount_cents: number | null }[];
   donorsList: { name: string; amount_cents: number | null }[];
@@ -98,6 +99,7 @@ export function YearsManager({ rows }: { rows: YearRow[] }) {
                 >
                   {r.report?.isPublic ? t("yearPublished") : r.report ? t("yearDraft") : t("yearMissing")}
                 </span>
+                {r.report?.isTest ? <span className="rounded-full bg-red px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("testChip")}</span> : null}
               </button>
             </li>
           );
@@ -132,6 +134,8 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
   const [plan, setPlan] = useState(r?.planMd ?? "");
   const [venues, setVenues] = useState((r?.venues ?? []).join(", "));
   const [isPublic, setIsPublic] = useState(r?.isPublic ?? false);
+  // A new report follows the test-mode switch like every other record; an existing one shows its flag.
+  const [isTest, setIsTest] = useState<boolean | undefined>(r?.isTest);
   const [eventsText, setEventsText] = useState((r?.events ?? []).map((e) => [e.name, e.date ?? "", e.venue ?? ""].filter(Boolean).join(" · ")).join("\n"));
   const [beneficiariesText, setBeneficiariesText] = useState((r?.beneficiariesList ?? []).map((b) => (b.amount_cents != null ? `${b.label} · ${euros(b.amount_cents)}` : b.label)).join("\n"));
   const [donorsText, setDonorsText] = useState((r?.donorsList ?? []).map((d) => (d.amount_cents != null ? `${d.name} · ${euros(d.amount_cents)}` : d.name)).join("\n"));
@@ -153,6 +157,7 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
       planMd: plan.trim() || null,
       venues: venues.split(",").map((v) => v.trim()).filter(Boolean),
       isPublic,
+      isTest,
       events: lines(eventsText).map((line) => {
         const [name, date, venue] = line.split("·").map((part) => part.trim());
         return { name: name ?? "", date: date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null, venue: venue || null };
@@ -332,6 +337,12 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
           <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} className="h-4 w-4 accent-red" />
           {t("yearPublic")}
         </label>
+        {isTest !== undefined ? (
+          <label className="flex items-center gap-2 text-[14.5px]">
+            <input type="checkbox" checked={isTest} onChange={(e) => setIsTest(e.target.checked)} className="h-4 w-4 accent-red" />
+            {t("yearTestData")}
+          </label>
+        ) : null}
         <div className="ml-auto flex gap-2">
           <button type="submit" disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
             {t("evSave")}

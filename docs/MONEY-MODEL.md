@@ -75,6 +75,7 @@ Migration 0055 adds a site-wide switch (`site_settings.test_mode`, read through 
 
 - test gifts and hand-overs are not immutable, and the delete functions treat test money as removable;
 - `v_money_in_all`, `v_money_out_all`, `v_public_campaigns` and `v_public_events` include test rows only while test mode is on, so going live hides them at once;
-- `purge_test_data()` (admin) removes every test row and everything that hangs off a test cause or event, and nothing else.
+- `purge_test_data()` (admin) removes every test row and everything that hangs off a test cause or event, and nothing else;
+- `set_record_test(kind, id, test)` (admin, migration 0059) flips one cause, event, page, team, supporter, beneficiary or proposal and everything attached to it either way, and `set_year_report_test(year, test)` does the same for a year report. Marking as test is the one edit the immutability triggers allow on live money; marking as live makes the money immutable again. A child of a parent that stays test still goes with the purge.
 
-The switch and the purge live under Settings → Test & demo. The console badge reads "Test mode" and the public site shows a red bar while it is on.
+The switch and the purge live under Settings → Test & demo. Every admin list shows a red "Test" chip on test rows and offers "Mark as test data" / "Mark as live" on a selection (a year report has a checkbox in its form), so after a practice run the records worth keeping are qualified and the rest deleted one by one or purged together. The console badge reads "Test mode" and the public site shows a red bar while it is on.
