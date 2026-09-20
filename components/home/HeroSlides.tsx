@@ -201,23 +201,28 @@ export function HeroSlides({ slides }: { slides: HeroSlide[] }) {
             aria-roledescription="slide"
             aria-label={`${i + 1} / ${count}`}
             aria-hidden={!active}
-            className={`absolute inset-0 flex flex-col justify-end transition-opacity duration-700 motion-reduce:transition-none sm:justify-center ${active ? "z-[1] opacity-100" : "pointer-events-none opacity-0"}`}
+            // The active slide sits in the flow, so a tall slide on a phone grows
+            // the section instead of sliding up under the header.
+            className={`flex min-h-[100dvh] flex-col justify-end transition-opacity duration-700 motion-reduce:transition-none sm:justify-center ${active ? "relative z-[1] opacity-100" : "pointer-events-none absolute inset-0 opacity-0"}`}
           >
             {slide.image ? <Image src={slide.image} alt="" fill priority={i === 0} sizes="100vw" className="object-cover" /> : null}
             {/* one flat tint over the whole photo: the picture stays visible, the text stays legible */}
             <div className={`absolute inset-0 ${slide.image ? "bg-black/50" : "bg-sea"}`} />
             {/* the same column as every content page; only the picture runs edge to edge */}
-            <div className="relative mx-auto w-full max-w-3xl px-5 pb-24 pt-[calc(56px+64px)] sm:pb-28 sm:pt-[calc(64px+76px)]">
+            <div className="relative mx-auto w-full max-w-3xl px-5 pb-24 pt-[92px] sm:pb-28 sm:pt-[calc(64px+76px)]">
               <div>
-                <span className="inline-flex items-center gap-2 rounded-full bg-paper/15 px-3 py-1 font-mono text-[11.5px] uppercase tracking-[0.16em] text-paper">
-                  <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-red" />
-                  {slide.chip}
-                </span>
-                <p className="mt-4 font-mono text-[12px] uppercase tracking-[0.16em] text-paper/70">{slide.eyebrow}</p>
-                <h2 className="type-display mt-2 text-4xl leading-[1.08] sm:text-5xl">{slide.title}</h2>
-                <p className="mt-4 max-w-2xl text-[16.5px] leading-relaxed text-paper/80">{slide.text}</p>
+                {/* what it is and the one-line context, on a single row */}
+                <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-[12px] uppercase tracking-[0.16em] text-paper/70">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-paper/15 px-3 py-1 text-[11.5px] text-paper">
+                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-red" />
+                    {slide.chip}
+                  </span>
+                  <span>{slide.eyebrow}</span>
+                </p>
+                <h2 className="type-display mt-3 text-[32px] leading-[1.1] sm:mt-2 sm:text-5xl sm:leading-[1.08]">{slide.title}</h2>
+                <p className="mt-3 max-w-2xl text-[15.5px] leading-relaxed text-paper/80 sm:mt-4 sm:text-[16.5px]">{slide.text}</p>
                 <Card card={slide.card} />
-                <div className="mt-7 flex flex-wrap gap-3">
+                <div className="mt-6 flex flex-wrap gap-3 sm:mt-7">
                   {button(slide.primary, "red")}
                   {slide.secondary ? button(slide.secondary, "ghost") : null}
                 </div>
