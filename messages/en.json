@@ -1431,7 +1431,10 @@
     "testModeGoLiveConfirm": "Go live? Everything created from now on is real and immutable, and test rows disappear from the public site until you purge them.",
     "testModePurge": "Purge test data",
     "testModePurgeConfirm": "Delete every row made in test mode: causes, events, pages, teams, registrations, gifts, hand-overs, sponsorships, supporters, proposals, beneficiaries and reports? Real rows stay. This cannot be undone.",
-    "testModePurged": "{count, plural, one {# test row removed.} other {# test rows removed.}}"
+    "testModePurged": "{count, plural, one {# test row removed.} other {# test rows removed.}}",
+    "testChip": "Test",
+    "markTest": "Mark as test data",
+    "markTestConfirm": "{count, plural, one {Mark this record and everything attached to it as test data?} other {Mark # records and everything attached to them as test data?}} Gifts, hand-overs, pages and teams that hang off them stop counting the moment test mode is off, lose their immutability, and go with the next purge. Real money that is not attached is untouched."
   },
   "forms": {
     "nameLabel": "Full name",

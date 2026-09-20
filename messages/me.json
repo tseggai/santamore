@@ -1431,7 +1431,10 @@
     "testModeGoLiveConfirm": "Preći uživo? Sve što se od sada napravi je stvarno i nepromjenjivo, a test redovi nestaju sa javnog sajta dok ih ne očistiš.",
     "testModePurge": "Očisti test podatke",
     "testModePurgeConfirm": "Obrisati svaki red napravljen u test režimu: ciljeve, događaje, stranice, timove, prijave, poklone, predaje, sponzorstva, podržavaoce, prijedloge, korisnike i izvještaje? Pravi redovi ostaju. Ovo se ne može poništiti.",
-    "testModePurged": "{count, plural, one {Uklonjen # test red.} few {Uklonjena # test reda.} other {Uklonjeno # test redova.}}"
+    "testModePurged": "{count, plural, one {Uklonjen # test red.} few {Uklonjena # test reda.} other {Uklonjeno # test redova.}}",
+    "testChip": "Test",
+    "markTest": "Označi kao test podatke",
+    "markTestConfirm": "{count, plural, one {Označiti ovaj zapis i sve vezano za njega kao test podatke?} few {Označiti # zapisa i sve vezano za njih kao test podatke?} other {Označiti # zapisa i sve vezano za njih kao test podatke?}} Pokloni, predaje, stranice i timovi koji se za njih vežu prestaju da se računaju čim je test režim isključen, gube nepromjenjivost i odlaze sa sljedećim čišćenjem. Pravi novac koji nije vezan ostaje netaknut."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

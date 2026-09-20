@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { deleteEvents, setEventPublished, setEventsPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
+import { deleteEvents, markEventsTest, setEventPublished, setEventsPublished } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
 import { EventForm, type EventFormValues, type Option } from "@/components/admin/EventForm";
 import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
 import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
@@ -20,6 +20,8 @@ import { Link } from "@/i18n/navigation";
 
 export interface EventListRow extends EventFormValues {
   id: string;
+  /** Made in test mode, or marked as test afterwards (migration 0055/0056). */
+  is_test?: boolean;
   registrations: number;
   /** Pages of the event's cause (pages belong to causes). */
   pages: number;
@@ -82,6 +84,18 @@ export function EventsManager({
   // with pages, teams, donations or paid registrations and says why.
   const [notice, setNotice] = useState<string[]>([]);
   const dialog = useDialog();
+  const markTest = async (ids: string[], clear: () => void) => {
+    if (!(await dialog.confirm(t("markTestConfirm", { count: ids.length }), { danger: false, confirmLabel: t("markTest") }))) return;
+    setBusy("bulk");
+    const result = await markEventsTest({ ids }).catch(() => null);
+    setBusy(null);
+    if (!result?.ok) {
+      await dialog.alert(t("actionError"), result?.detail);
+      return;
+    }
+    clear();
+    router.refresh();
+  };
   const remove = async (ids: string[], clear: () => void) => {
     if (!(await dialog.confirm(t("evDeleteConfirm", { count: ids.length })))) return;
     setBusy("bulk");
@@ -118,7 +132,12 @@ export function EventsManager({
     {
       key: "status",
       header: t("table.colStatus"),
-      cell: (e) => (e.is_published ? <Chip tone="sea">{t("postLive")}</Chip> : <Chip>{t("postDraft")}</Chip>),
+      cell: (e) => (
+        <span className="inline-flex items-center gap-1.5">
+          {e.is_published ? <Chip tone="sea">{t("postLive")}</Chip> : <Chip>{t("postDraft")}</Chip>}
+          {e.is_test ? <Chip tone="red">{t("testChip")}</Chip> : null}
+        </span>
+      ),
       sort: (e) => (e.is_published ? 1 : 0),
       filter: {
         options: [
@@ -238,6 +257,7 @@ export function EventsManager({
           <>
             <button type="button" disabled={busy === "bulk"} onClick={() => bulkPublish(ids, true, clear)} className={bulkButton}>{t("galleryPublish")}</button>
             <button type="button" disabled={busy === "bulk"} onClick={() => bulkPublish(ids, false, clear)} className={bulkButton}>{t("galleryUnpublish")}</button>
+            <button type="button" disabled={busy === "bulk"} onClick={() => markTest(ids, clear)} className={bulkButton}>{t("markTest")}</button>
             <button type="button" disabled={busy === "bulk"} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button>
           </>
         )}
