@@ -38,12 +38,14 @@ export default async function DashboardLayout({
     redirect(`/${locale}/dashboard/prijava`);
   }
 
+  const { data: testMode } = await supabase.rpc("test_mode");
+
   return (
     <ConsoleShell
       tone="ink"
       icon={iconWhite}
       homeHref="/dashboard"
-      badge={t("consoleBadge")}
+      badge={testMode ? t("consoleBadgeTest") : t("consoleBadge")}
       menuLabel={t("menuOpen")}
       closeLabel={t("menuClose")}
       nav={<DashboardNav />}

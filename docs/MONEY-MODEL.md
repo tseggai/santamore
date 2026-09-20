@@ -68,3 +68,13 @@ Enter the recorded gifts and hand-overs on the year report (Money → Years) and
 ## When adding a figure
 
 Ask which rows it sums. If the answer is not "rows of `v_money_in_all` or `v_money_out_all`", the figure will drift from the others. Add a column to a view rather than a computation to a page.
+
+## Test mode
+
+Migration 0055 adds a site-wide switch (`site_settings.test_mode`, read through `test_mode()`). While it is on, every cause, event, page, team, registration, gift, adjustment, hand-over, sponsorship, supporter, proposal, beneficiary and year report is created with `is_test = true`. Consequences:
+
+- test gifts and hand-overs are not immutable, and the delete functions treat test money as removable;
+- `v_money_in_all`, `v_money_out_all`, `v_public_campaigns` and `v_public_events` include test rows only while test mode is on, so going live hides them at once;
+- `purge_test_data()` (admin) removes every test row and everything that hangs off a test cause or event, and nothing else.
+
+The switch and the purge live under Settings → Test & demo. The console badge reads "Test mode" and the public site shows a red bar while it is on.

@@ -96,7 +96,8 @@
     "partnersLead": "The companies that pay for our team so donations never have to — with what each one gave.",
     "partnersOfYear": "Partners of {year}",
     "causesHeading": "What we are raising for right now",
-    "proposalsHeading": "Your community, your cause."
+    "proposalsHeading": "Your community, your cause.",
+    "testModeBanner": "Test mode — the figures on this site are practice data, not real gifts."
   },
   "footer": {
     "orgHeading": "Organisation",
@@ -481,7 +482,8 @@
     "teamDeleteAsk": "Delete “{name}”? Members' pages stay and leave the team. This cannot be undone.",
     "teamDeleteRefused": "This team cannot be deleted: {count, plural, one {a donation} other {# donations}} went to its pages.",
     "teamDeleteFailed": "Something went wrong — the team was not deleted. Please try again.",
-    "causeDraft": "not published yet"
+    "causeDraft": "not published yet",
+    "consoleBadgeTest": "Test mode"
   },
   "email": {
     "instructions": {
@@ -755,7 +757,7 @@
     "settingsTabPages": "Pages",
     "settingsTabNews": "News",
     "settingsTabPhotos": "Photos",
-    "settingsTabDemo": "Demo data",
+    "settingsTabDemo": "Test & demo",
     "eventsTabEvents": "Events",
     "eventsTabRegistrations": "Registrations",
     "photosHint": "Photos belong to an event or a cause; open one to add, publish or delete its photos.",
@@ -1418,7 +1420,18 @@
     "pageDeleteBlocked": "{title} was not deleted: {count, plural, one {a donation names it} other {# donations name it}}. Hide it instead.",
     "focusPagesFor": "Pages for {name}",
     "focusTeamsFor": "Teams for {name}",
-    "focusClear": "Show all"
+    "focusClear": "Show all",
+    "consoleBadgeTest": "Test mode",
+    "testModeTitle": "Test mode",
+    "testModeOn": "On",
+    "testModeOff": "Live",
+    "testModeHint": "While test mode is on, every cause, event, page, team, registration, gift, hand-over, sponsorship and report you create is marked as test. Test gifts are not immutable, so test causes and events can be deleted. The moment you go live, test rows leave the public figures; purge removes them for good. Real rows are never touched.",
+    "testModeTurnOn": "Turn test mode on",
+    "testModeGoLive": "Go live",
+    "testModeGoLiveConfirm": "Go live? Everything created from now on is real and immutable, and test rows disappear from the public site until you purge them.",
+    "testModePurge": "Purge test data",
+    "testModePurgeConfirm": "Delete every row made in test mode: causes, events, pages, teams, registrations, gifts, hand-overs, sponsorships, supporters, proposals, beneficiaries and reports? Real rows stay. This cannot be undone.",
+    "testModePurged": "{count, plural, one {# test row removed.} other {# test rows removed.}}"
   },
   "forms": {
     "nameLabel": "Full name",
