@@ -1648,7 +1648,8 @@
     "beneficiaryMore": "Подробнее о них",
     "statusCompleted": "Завершено",
     "statusGoalReached": "Цель достигнута",
-    "statusHandedOver": "<amount></amount> передано благополучателям"
+    "statusHandedOver": "<amount></amount> передано благополучателям",
+    "moneyWentCta": "Посмотреть, куда ушли деньги"
   },
   "perks": {
     "title": "Челленджи партнёров",

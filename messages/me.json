@@ -1647,7 +1647,8 @@
     "beneficiaryMore": "Više o njima",
     "statusCompleted": "Završeno",
     "statusGoalReached": "Cilj dostignut",
-    "statusHandedOver": "<amount></amount> predato korisnicima"
+    "statusHandedOver": "<amount></amount> predato korisnicima",
+    "moneyWentCta": "Pogledaj gdje je novac otišao"
   },
   "perks": {
     "title": "Izazovi partnera",
