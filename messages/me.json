@@ -1929,7 +1929,15 @@
     "byName": "predložio/la {name}",
     "rankLabel": "#{rank}",
     "continue": "Nastavi",
-    "back": "Nazad na pitanja"
+    "back": "Nazad na pitanja",
+    "openPage": "Otvori kao stranicu",
+    "sharePage": "Podijeli",
+    "shareText": "Znaš potrebu koju bi Santamore trebalo da preuzme? Predloži je ovdje — članovi glasaju, mi biramo iz prvih pet.",
+    "pageStep1": "Ti predlažeš potrebu u Crnoj Gori: ko je ima, gdje, i otprilike koliko bi trebalo.",
+    "pageStep2": "Članovi glasaju za prijedloge. Pet sa najviše glasova su uži izbor.",
+    "pageStep3": "Mi preuzimamo jedan, prikupljamo za njega događajima i stranicama, i objavljujemo svaki euro.",
+    "pageCriteriaHeading": "Šta možemo preuzeti",
+    "pageCriteriaSub": "Prijedlog prvo odgovara na ova pitanja. „Ne“ na bilo koje znači da nije za nas — formular to odmah kaže."
   },
   "beneficiaries": {
     "eyebrow": "Korisnici",

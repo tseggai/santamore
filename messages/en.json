@@ -1929,7 +1929,15 @@
     "byName": "proposed by {name}",
     "rankLabel": "#{rank}",
     "continue": "Continue",
-    "back": "Back to the questions"
+    "back": "Back to the questions",
+    "openPage": "Open as a page",
+    "sharePage": "Share",
+    "shareText": "Know a need Santamore should take on? Propose it here — members vote, and we choose from the top five.",
+    "pageStep1": "You propose a need in Montenegro: who has it, where, and roughly what it would take.",
+    "pageStep2": "Members vote proposals up. The five with most votes are the shortlist.",
+    "pageStep3": "We take one on, raise for it with events and pages, and publish every euro.",
+    "pageCriteriaHeading": "What we can take on",
+    "pageCriteriaSub": "A proposal first answers these questions. A “no” on any of them means it is not one for us — the form says so right away."
   },
   "beneficiaries": {
     "eyebrow": "Beneficiaries",
