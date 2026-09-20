@@ -98,3 +98,39 @@ export async function toggleVote(input: unknown): Promise<VoteResult> {
   revalidatePath("/[locale]/kampanje", "layout");
   return { ok: true };
 }
+
+export interface EditProposalResult {
+  ok: boolean;
+  error?: "invalid" | "server" | "closed" | "voted";
+}
+
+/**
+ * The proposer rewrites their own proposal while it is open and no one has
+ * voted yet (update_my_proposal, migration 0058, enforces all three).
+ */
+export async function updateProposal(input: unknown): Promise<EditProposalResult> {
+  const parsed = proposeSchema
+    .omit({ answers: true, locale: true })
+    .extend({ proposalId: z.string().uuid() })
+    .safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const data = parsed.data;
+  const supabase = await createClient();
+  const { data: result, error } = await supabase.rpc("update_my_proposal", {
+    p_id: data.proposalId,
+    p_title: data.title,
+    p_summary: data.summary,
+    p_location: data.location,
+    p_beneficiary: data.beneficiary,
+    p_amount_cents: data.amountCents,
+  });
+  if (error) {
+    console.error("[proposals] update failed:", error.code, error.message);
+    return { ok: false, error: "server" };
+  }
+  const row = result as { ok: boolean; reason?: string };
+  if (!row.ok) return { ok: false, error: row.reason === "voted" ? "voted" : "closed" };
+  revalidatePath("/[locale]/kampanje", "layout");
+  revalidatePath("/[locale]/predlozi", "page");
+  return { ok: true };
+}

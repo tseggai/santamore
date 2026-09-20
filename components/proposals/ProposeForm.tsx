@@ -3,7 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { proposeCause } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
+import { proposeCause, updateProposal } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
 import { parseEurosToCents } from "@/lib/money";
 import { allAnswered, failedCriteria } from "@/lib/proposals";
 import { Link } from "@/i18n/navigation";
@@ -21,23 +21,44 @@ export interface PublicCriterion {
  * on is turned down kindly before anyone writes three paragraphs — then
  * the proposal itself. The server judges again against the live criteria.
  */
-export function ProposeForm({ criteria }: { criteria: PublicCriterion[] }) {
+export interface ProposalDraft {
+  id: string;
+  title: string;
+  summary: string;
+  location: string | null;
+  beneficiary: string | null;
+  amountCents: number | null;
+}
+
+export function ProposeForm({
+  criteria,
+  edit = null,
+  onSaved,
+  onCancel,
+}: {
+  criteria: PublicCriterion[];
+  /** Editing an existing proposal: the screening is behind it, only the wording changes. */
+  edit?: ProposalDraft | null;
+  onSaved?: () => void;
+  onCancel?: () => void;
+}) {
   const t = useTranslations("proposals");
   const tDonate = useTranslations("donate");
   const locale = useLocale() as Locale;
   const [answers, setAnswers] = useState<Record<string, boolean | undefined>>({});
-  const [title, setTitle] = useState("");
-  const [summary, setSummary] = useState("");
-  const [location, setLocation] = useState("");
-  const [beneficiary, setBeneficiary] = useState("");
-  const [amount, setAmount] = useState("");
-  const [state, setState] = useState<"idle" | "busy" | "error" | "done" | "rejected">("idle");
+  const [title, setTitle] = useState(edit?.title ?? "");
+  const [summary, setSummary] = useState(edit?.summary ?? "");
+  const [location, setLocation] = useState(edit?.location ?? "");
+  const [beneficiary, setBeneficiary] = useState(edit?.beneficiary ?? "");
+  const [amount, setAmount] = useState(edit?.amountCents != null ? String(edit.amountCents / 100) : "");
+  const [state, setState] = useState<"idle" | "busy" | "error" | "done" | "rejected" | "locked">("idle");
   const [reasons, setReasons] = useState<string[]>([]);
   // Two screens: the questions, then — only once they pass — the proposal.
-  const [step, setStep] = useState<1 | 2>(1);
+  // An edit starts on the second: the questions were answered already.
+  const [step, setStep] = useState<1 | 2>(edit ? 2 : 1);
 
-  const answered = allAnswered(criteria, answers);
-  const failed = failedCriteria(criteria, answers);
+  const answered = edit ? true : allAnswered(criteria, answers);
+  const failed = edit ? [] : failedCriteria(criteria, answers);
   const screenedOut = answered && failed.length > 0;
 
   const submit = async (event: FormEvent) => {
@@ -49,6 +70,23 @@ export function ProposeForm({ criteria }: { criteria: PublicCriterion[] }) {
       return;
     }
     setState("busy");
+    if (edit) {
+      const saved = await updateProposal({
+        proposalId: edit.id,
+        title,
+        summary,
+        location: location.trim() || null,
+        beneficiary: beneficiary.trim() || null,
+        amountCents,
+      }).catch(() => ({ ok: false as const, error: "server" as const }));
+      if (saved.ok) {
+        setState("done");
+        onSaved?.();
+      } else {
+        setState(saved.error === "voted" || saved.error === "closed" ? "locked" : "error");
+      }
+      return;
+    }
     const result = await proposeCause({
       title,
       summary,
@@ -79,6 +117,14 @@ export function ProposeForm({ criteria }: { criteria: PublicCriterion[] }) {
   const labelClass = "text-[14px] font-semibold";
   const choice = (active: boolean) =>
     `rounded-lg px-4 py-2 text-[14.5px] font-semibold transition-colors ${active ? "bg-ink text-paper" : "bg-mist hover:bg-mist-2"}`;
+
+  if (state === "locked") {
+    return <p role="alert" className="rounded-lg bg-mist px-4 py-3 text-[14.5px] font-semibold text-red-dark">{t("editLocked")}</p>;
+  }
+
+  if (state === "done" && edit) {
+    return <p role="status" className="rounded-lg bg-mist px-4 py-3 text-[14.5px] font-semibold text-sea">{t("editSaved")}</p>;
+  }
 
   if (state === "done") {
     return (
@@ -161,9 +207,9 @@ export function ProposeForm({ criteria }: { criteria: PublicCriterion[] }) {
 
   return (
     <form onSubmit={submit} className="space-y-6">
-      {stepLine}
+      {edit ? null : stepLine}
       <section>
-        <h2 className="text-[16px] font-bold">{t("detailsHeading")}</h2>
+        {edit ? <p className="text-[14px] leading-relaxed text-black/60">{t("editUntilVote")}</p> : <h2 className="text-[16px] font-bold">{t("detailsHeading")}</h2>}
         <div className="mt-3 space-y-4">
           <div>
             <label htmlFor="prTitle" className={labelClass}>{t("titleLabel")}</label>
@@ -195,11 +241,17 @@ export function ProposeForm({ criteria }: { criteria: PublicCriterion[] }) {
       {state === "error" ? <p role="alert" className="text-[14px] font-semibold text-red-dark">{tDonate("errServer")}</p> : null}
       <div className="flex flex-wrap gap-2">
         <button type="submit" disabled={state === "busy"} className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60">
-          {t("submit")}
+          {edit ? t("editSave") : t("submit")}
         </button>
-        <button type="button" onClick={() => setStep(1)} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
-          ← {t("back")}
-        </button>
+        {edit ? (
+          <button type="button" onClick={onCancel} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
+            {t("editCancel")}
+          </button>
+        ) : (
+          <button type="button" onClick={() => setStep(1)} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
+            ← {t("back")}
+          </button>
+        )}
       </div>
     </form>
   );
