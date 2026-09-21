@@ -6,6 +6,7 @@ import { useRef, useState, type FormEvent } from "react";
 
 import { deleteTeamMember, saveTeamMember } from "@/app/[locale]/admin/(protected)/osoblje/team-actions";
 import { Chip, DataTable, Thumb, rowButton, type Column } from "@/components/console/DataTable";
+import { HeaderAction } from "@/components/console/HeaderAction";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
 import { downscaleToJpeg } from "@/lib/images";
@@ -112,11 +113,11 @@ export function TeamManager({ rows, accounts, initialOpenId = "" }: { rows: Team
   return (
     <>
       {dialog.element}
-      <div className="flex justify-end">
+      <HeaderAction>
         <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
           + {t("teamNew")}
         </button>
-      </div>
+      </HeaderAction>
       <div className="mt-4">
         <DataTable
           rows={rows}

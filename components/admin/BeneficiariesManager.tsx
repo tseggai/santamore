@@ -6,6 +6,7 @@ import { useRef, useState, type FormEvent } from "react";
 
 import { deleteBeneficiary, saveBeneficiary } from "@/app/[locale]/admin/(protected)/sadrzaj/beneficiaries-actions";
 import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
+import { HeaderAction } from "@/components/console/HeaderAction";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
 import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
@@ -105,12 +106,12 @@ export function BeneficiariesManager({ rows, causes, canManage = false }: { rows
   return (
     <>
       {dialog.element}
-      <div className="flex justify-end">
+      <HeaderAction>
         <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
           + {t("bnNew")}
         </button>
-      </div>
-      <div className="mt-4">
+      </HeaderAction>
+      <div>
         <DataTable
           rows={rows}
           getId={(r) => r.id}

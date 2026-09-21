@@ -1,4 +1,3 @@
-import { getTranslations } from "next-intl/server";
 
 import { CampaignsManager, type CampaignRow } from "@/components/admin/CampaignsManager";
 import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
@@ -21,7 +20,6 @@ export default async function AdminCampaignsPage({
   searchParams: Promise<{ uredi?: string }>;
 }) {
   const [{ locale }, { uredi }] = await Promise.all([params, searchParams]);
-  const t = await getTranslations("admin");
   const supabase = await createClient();
 
   const [{ data: campaigns }, { data: chapters }, { data: events }, { data: totals }, { data: galleryRows }] =
@@ -57,8 +55,6 @@ export default async function AdminCampaignsPage({
   return (
     <div className="py-8">
       <CampaignsManager
-        title={t("campaignsTitle")}
-        lead={t("campaignsHint")}
         locale={locale as Locale}
         campaigns={rows}
         chapters={(chapters ?? []) as { id: string; name: string }[]}

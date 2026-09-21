@@ -1,4 +1,3 @@
-import { getTranslations } from "next-intl/server";
 
 import {
   SupportersManager,
@@ -18,7 +17,6 @@ export default async function AdminSupportersPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const t = await getTranslations("admin");
   const supabase = await createClient();
 
   const [{ data: supporters }, { data: sponsorships }, { data: offers }, { data: chapters }, { data: campaigns }, { data: events }] =
@@ -34,8 +32,6 @@ export default async function AdminSupportersPage({
   return (
     <div className="pb-8">
       <SupportersManager
-        title={t("supportersTabSponsors")}
-        lead={t("supportersHint")}
         locale={locale as Locale}
         supporters={(supporters ?? []) as SupporterRow[]}
         sponsorships={(sponsorships ?? []) as SponsorshipRow[]}

@@ -440,8 +440,9 @@ export function SupportersManager({
   lead,
   canManage = false,
 }: {
-  title: string;
-  lead: string;
+  /** Left out inside a section: the layout draws the title, the action goes up to it. */
+  title?: string;
+  lead?: string;
   locale: Locale;
   /** Admin: the test flag is theirs (set_record_test). */
   canManage?: boolean;

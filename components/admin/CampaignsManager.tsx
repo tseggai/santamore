@@ -431,8 +431,9 @@ export function CampaignsManager({
   initialOpenId = "",
   canManage = false,
 }: {
-  title: string;
-  lead: string;
+  /** Left out inside the section: the layout draws the title, the action goes up to it. */
+  title?: string;
+  lead?: string;
   locale: Locale;
   campaigns: CampaignRow[];
   /** Admin: deleting and the test flag are theirs (delete_campaign, set_record_test). */

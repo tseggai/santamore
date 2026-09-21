@@ -1,4 +1,3 @@
-import { getTranslations } from "next-intl/server";
 
 import { goingFor, pagesFor, type EventLinked, type LinkedRegistration } from "@/lib/event-linked";
 import { EventsManager, type EventListRow } from "@/components/admin/EventsManager";
@@ -42,7 +41,6 @@ export default async function AdminEventsPage({
   searchParams: Promise<{ uredi?: string }>;
 }) {
   const [{ locale }, { uredi }] = await Promise.all([params, searchParams]);
-  const t = await getTranslations("admin");
   const supabase = await createClient();
 
   const [
@@ -141,8 +139,6 @@ export default async function AdminEventsPage({
     <div className="py-8">
       <EventsManager
         linked={linked}
-        title={t("eventsTitle")}
-        lead={t("eventsHint")}
         events={rows}
         chapters={(chapters ?? []) as { id: string; name: string }[]}
         campaigns={((campaigns ?? []) as { id: string; title: string }[]).map((campaign) => ({
