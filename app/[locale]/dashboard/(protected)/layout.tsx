@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 
 import { SignOutButton } from "@/components/admin/SignOutButton";
+import { ConsoleIdentity } from "@/components/console/ConsoleIdentity";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { DonateProvider } from "@/components/donate/DonateDialog";
 import { DashboardNav } from "@/components/dashboard/DashboardNav";
@@ -38,7 +39,10 @@ export default async function DashboardLayout({
     redirect(`/${locale}/dashboard/prijava`);
   }
 
-  const { data: testMode } = await supabase.rpc("test_mode");
+  const [{ data: testMode }, { data: profile }] = await Promise.all([
+    supabase.rpc("test_mode"),
+    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+  ]);
 
   return (
     <ConsoleShell
@@ -51,6 +55,7 @@ export default async function DashboardLayout({
       nav={<DashboardNav />}
       footer={
         <>
+          <ConsoleIdentity name={profile?.full_name?.trim() || user.email || "—"} email={user.email ?? null} href="/dashboard/profil" label={t("navProfile")} />
           <Link
             href="/"
             className="whitespace-nowrap rounded-lg px-3.5 py-2 text-[13.5px] font-medium text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper"

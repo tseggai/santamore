@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ProposalsList, type PublicProposal } from "@/components/proposals/ProposalsList";
 import { ProposePane } from "@/components/proposals/ProposePane";
 import type { PublicCriterion } from "@/components/proposals/ProposeForm";
+import { SHORTLIST_SIZE } from "@/lib/proposals";
 import { CauseStatus } from "@/components/campaigns/CauseStatus";
 import { openFirst } from "@/lib/cause-status";
 import { formatCents } from "@/lib/money";
@@ -166,9 +167,15 @@ export default async function CampaignsIndexPage({
             <ProposePane signedIn={signedIn} criteria={criteria} />
           </div>
         </div>
-        <div className="mt-2 max-h-[60vh] overflow-y-auto pr-1 lg:max-h-[calc(100vh-22rem)]">
-          <ProposalsList proposals={proposals} myVotes={myVotes} signedIn={signedIn} />
-        </div>
+        {/* the five in the running; the full list, with the text, is a page of its own */}
+        <ProposalsList proposals={proposals.filter((proposal) => proposal.status !== "chosen").slice(0, SHORTLIST_SIZE)} myVotes={myVotes} signedIn={signedIn} compact />
+        {proposals.length > 0 ? (
+          <p className="mt-3 text-[14px]">
+            <Link href="/kampanje/predlozi" className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">
+              {tProposals("allProposals", { count: proposals.length })} →
+            </Link>
+          </p>
+        ) : null}
       </aside>
       </div>
     </div>

@@ -21,7 +21,7 @@ export default async function FundraisersPage({
   const causePages = cilj ? people.pages.filter((page) => page.campaign_id === cilj) : null;
   const holders = causePages ? new Set(causePages.map((page) => page.user_id)) : null;
   const members = people.accounts.filter((m) => (holders ? holders.has(m.id) : m.pages > 0));
-  const focus = causePages && causePages.length > 0 ? { label: t("focusPagesFor", { name: causePages[0].event_name }), clearHref: "/admin/clanovi/prikupljaci" } : null;
+  const focus = causePages && causePages.length > 0 ? { label: t("focusPagesFor", { name: causePages[0].event_name }), clearHref: "/admin/podrska/prikupljaci" } : null;
   return (
     <div className="pb-8">
       <p className="max-w-2xl text-[14px] leading-relaxed text-black/60">{t("fundraisersPeopleHint")}</p>

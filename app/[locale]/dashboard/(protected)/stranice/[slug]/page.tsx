@@ -9,6 +9,7 @@ import { ShareButton } from "@/components/ShareButton";
 import type { ChallengeMetric } from "@/lib/metrics";
 import { formatCents } from "@/lib/money";
 import { createServiceClient } from "@/lib/supabase/admin";
+import { causeState } from "@/lib/cause-status";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -85,6 +86,13 @@ export default async function EditPagePage({
     .eq("id", mine.campaign_id)
     .maybeSingle();
 
+  // The causes the page may move to: published and still open, plus its own.
+  const { data: openCauses } = await supabase.from("v_public_campaigns").select("id, title, goal_cents, raised_cents, disbursed_cents, ends_at").order("starts_at", { ascending: false, nullsFirst: false });
+  const causeChoices = ((openCauses ?? []) as { id: string; title: string; goal_cents: number | null; raised_cents: number; disbursed_cents: number | null; ends_at: string | null }[])
+    .filter((row) => row.id === mine.campaign_id || !causeState(row).completed)
+    .map((row) => ({ id: row.id, title: row.title }));
+  if (!causeChoices.some((row) => row.id === mine.campaign_id)) causeChoices.unshift({ id: mine.campaign_id, title: cause?.title ?? "" });
+
   const [
     { data: teams },
     { data: captained },
@@ -95,8 +103,8 @@ export default async function EditPagePage({
   ] = await Promise.all([
     supabase
       .from("v_team_totals")
-      .select("id, name, description, photo_path")
-      .eq("campaign_id", mine.campaign_id)
+      .select("id, name, description, photo_path, campaign_id")
+      .in("campaign_id", causeChoices.map((row) => row.id))
       .order("name"),
     // teams_select_own: the rows this runner captains.
     supabase.from("teams").select("id").eq("captain_id", user.id),
@@ -170,17 +178,20 @@ export default async function EditPagePage({
             causeTitle: cause?.title ?? "",
             causePublic: Boolean(cause?.is_public),
           }}
+          causes={causeChoices}
           teams={((teams ?? []) as {
             id: string;
             name: string;
             description: string | null;
             photo_path: string | null;
+            campaign_id: string | null;
           }[]).map(
             (team): TeamOption => ({
               id: team.id,
               name: team.name,
               description: team.description,
               photoPath: team.photo_path,
+              causeId: team.campaign_id ?? undefined,
             }),
           )}
           captainOf={(captained ?? []).map((row) => row.id)}

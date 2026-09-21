@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { toggleVote } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
+import { SidePanel } from "@/components/console/SidePanel";
 import { ProposeForm } from "@/components/proposals/ProposeForm";
 import { formatCents } from "@/lib/money";
 import { SHORTLIST_SIZE } from "@/lib/proposals";
@@ -32,7 +33,18 @@ export interface PublicProposal {
  * the shortlist mark; a chosen one links to the cause it became. Voting
  * is one tap for a signed-in member and a sign-in link for everyone else.
  */
-export function ProposalsList({ proposals, myVotes, signedIn }: { proposals: PublicProposal[]; myVotes: string[]; signedIn: boolean }) {
+export function ProposalsList({
+  proposals,
+  myVotes,
+  signedIn,
+  compact = false,
+}: {
+  proposals: PublicProposal[];
+  myVotes: string[];
+  signedIn: boolean;
+  /** The sidebar form: name and the facts, no text. The full list keeps the proposer's own line breaks. */
+  compact?: boolean;
+}) {
   const t = useTranslations("proposals");
   const locale = useLocale() as Locale;
   const router = useRouter();
@@ -58,9 +70,12 @@ export function ProposalsList({ proposals, myVotes, signedIn }: { proposals: Pub
   };
 
   if (proposals.length === 0) return <p className="mt-4 text-[15px] text-black/60">{t("empty")}</p>;
+  const editingProposal = proposals.find((proposal) => proposal.id === editing) ?? null;
+  const voteBox = compact ? "h-12 w-12" : "h-14 w-14";
 
   return (
-    <ul className="mt-4 space-y-2">
+    <>
+    <ul className={compact ? "mt-4 space-y-1.5" : "mt-4 space-y-2"}>
       {proposals.map((proposal) => {
         const inRunning = proposal.status !== "chosen";
         const shortlisted = inRunning && proposal.vote_rank <= SHORTLIST_SIZE;
@@ -69,7 +84,7 @@ export function ProposalsList({ proposals, myVotes, signedIn }: { proposals: Pub
         // The count shown follows the tap without waiting for the refresh.
         const count = proposal.vote_count + (mine && !myVotes.includes(proposal.id) ? 1 : !mine && myVotes.includes(proposal.id) ? -1 : 0);
         return (
-          <li key={proposal.id} className="flex gap-4 rounded-lg bg-mist px-5 py-4">
+          <li key={proposal.id} className={compact ? "flex gap-3 rounded-lg bg-mist px-4 py-3" : "flex gap-4 rounded-lg bg-mist px-5 py-4"}>
             <div className="shrink-0 text-center">
               {inRunning ? (
                 signedIn ? (
@@ -78,36 +93,36 @@ export function ProposalsList({ proposals, myVotes, signedIn }: { proposals: Pub
                     aria-pressed={mine}
                     disabled={busy === proposal.id}
                     onClick={() => vote(proposal)}
-                    className={`flex h-14 w-14 flex-col items-center justify-center rounded-lg text-[12px] font-bold transition-colors disabled:opacity-60 ${mine ? "bg-sea text-paper" : "bg-paper hover:bg-mist-2"}`}
+                    className={`flex ${voteBox} flex-col items-center justify-center rounded-lg text-[12px] font-bold transition-colors disabled:opacity-60 ${mine ? "bg-sea text-paper" : "bg-paper hover:bg-mist-2"}`}
                   >
                     <span aria-hidden className="text-[16px] leading-none">▲</span>
                     <span className="mt-0.5 font-mono text-[14px] tabular-nums">{count}</span>
                   </button>
                 ) : (
-                  <Link href={`/dashboard/prijava`} title={t("signInToVote")} className="flex h-14 w-14 flex-col items-center justify-center rounded-lg bg-paper text-[12px] font-bold hover:bg-mist-2">
+                  <Link href={`/dashboard/prijava`} title={t("signInToVote")} className={`flex ${voteBox} flex-col items-center justify-center rounded-lg bg-paper text-[12px] font-bold hover:bg-mist-2`}>
                     <span aria-hidden className="text-[16px] leading-none">▲</span>
                     <span className="mt-0.5 font-mono text-[14px] tabular-nums">{count}</span>
                   </Link>
                 )
               ) : (
-                <span className="flex h-14 w-14 flex-col items-center justify-center rounded-lg bg-paper font-mono text-[14px] tabular-nums text-black/60">{count}</span>
+                <span className={`flex ${voteBox} flex-col items-center justify-center rounded-lg bg-paper font-mono text-[14px] tabular-nums text-black/60`}>{count}</span>
               )}
             </div>
             <div className="min-w-0 flex-1">
               <p className="flex flex-wrap items-center gap-2">
-                <span className="text-[16px] font-bold">{proposal.title}</span>
+                <span className={compact ? "text-[15px] font-bold leading-snug" : "text-[16px] font-bold"}>{proposal.title}</span>
                 {proposal.status === "chosen" ? (
                   <span className="rounded-full bg-red px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("chosen")}</span>
                 ) : shortlisted ? (
                   <span className="rounded-full bg-sea px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("shortlist")}</span>
                 ) : null}
               </p>
-              <p className="mt-1 text-[14.5px] leading-relaxed text-black/75">{proposal.summary}</p>
-              <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[13.5px] text-black/55">
+              {compact ? null : <p className="mt-1 whitespace-pre-line text-[14.5px] leading-relaxed text-black/75">{proposal.summary}</p>}
+              <p className={`flex flex-wrap gap-x-3 gap-y-1 text-[13.5px] text-black/55 ${compact ? "mt-1" : "mt-2"}`}>
                 {proposal.location ? <span>{proposal.location}</span> : null}
                 {proposal.beneficiary ? <span>· {proposal.beneficiary}</span> : null}
                 {proposal.amount_cents ? <span className="font-mono tabular-nums">· ~{formatCents(proposal.amount_cents, locale, { trimWholeCents: true })}</span> : null}
-                {proposal.proposer_first_name ? <span>· {t("byName", { name: proposal.proposer_first_name })}</span> : null}
+                {proposal.proposer_first_name && !compact ? <span>· {t("byName", { name: proposal.proposer_first_name })}</span> : null}
                 {proposal.campaign_slug ? (
                   <Link href={`/kampanje/${proposal.campaign_slug}`} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">→ {t("chosen")}</Link>
                 ) : null}
@@ -116,25 +131,32 @@ export function ProposalsList({ proposals, myVotes, signedIn }: { proposals: Pub
                     {t("edit")}
                   </button>
                 ) : null}
-                {proposal.is_mine && !editable && proposal.status === "open" ? <span>· {t("editLockedShort")}</span> : null}
+                {proposal.is_mine && !editable && proposal.status === "open" && !compact ? <span>· {t("editLockedShort")}</span> : null}
               </p>
-              {editing === proposal.id ? (
-                <div className="mt-4 rounded-lg bg-paper px-4 py-4">
-                  <ProposeForm
-                    criteria={[]}
-                    edit={{ id: proposal.id, title: proposal.title, summary: proposal.summary, location: proposal.location, beneficiary: proposal.beneficiary, amountCents: proposal.amount_cents }}
-                    onSaved={() => {
-                      setEditing(null);
-                      router.refresh();
-                    }}
-                    onCancel={() => setEditing(null)}
-                  />
-                </div>
-              ) : null}
             </div>
           </li>
         );
       })}
     </ul>
+    {/* the proposer's edit, in the same slide-over every form on the site uses */}
+    <SidePanel open={editingProposal !== null} title={editingProposal?.title ?? ""} onClose={() => setEditing(null)}>
+      {editingProposal ? (
+        <ProposeForm
+          key={editingProposal.id}
+          criteria={[]}
+          edit={{ id: editingProposal.id, title: editingProposal.title, summary: editingProposal.summary, location: editingProposal.location, beneficiary: editingProposal.beneficiary, amountCents: editingProposal.amount_cents }}
+          onSaved={() => {
+            setEditing(null);
+            router.refresh();
+          }}
+          onCancel={() => setEditing(null)}
+          onDeleted={() => {
+            setEditing(null);
+            router.refresh();
+          }}
+        />
+      ) : null}
+    </SidePanel>
+    </>
   );
 }

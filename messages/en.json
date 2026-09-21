@@ -483,7 +483,22 @@
     "teamDeleteRefused": "This team cannot be deleted: {count, plural, one {a donation} other {# donations}} went to its pages.",
     "teamDeleteFailed": "Something went wrong — the team was not deleted. Please try again.",
     "causeDraft": "not published yet",
-    "consoleBadgeTest": "Test mode"
+    "consoleBadgeTest": "Test mode",
+    "causeLocked": "Gifts came in for this cause, so the page stays with it.",
+    "causeTakenNotice": "You already have a page for that cause.",
+    "navProfile": "My profile",
+    "profileTitle": "My profile",
+    "profileHint": "The record behind your account: your name as we address you, a phone for event day, and the language we write to you in. Your page's name is edited on the page itself.",
+    "profileEmail": "Email",
+    "profilePhone": "Phone (optional)",
+    "profileLocale": "Language",
+    "profileLocaleName": {
+      "me": "Crnogorski",
+      "en": "English",
+      "ru": "Русский"
+    },
+    "profileSave": "Save",
+    "profileAdminLink": "Open the admin console"
   },
   "email": {
     "instructions": {
@@ -625,7 +640,8 @@
       "exportCsv": "Export CSV",
       "colLanguages": "Languages",
       "colSigned": "Given",
-      "colTeams": "Teams"
+      "colTeams": "Teams",
+      "colCauses": "Causes"
     },
     "confirmCash": "Confirm hand-in",
     "railCash": "cash",
@@ -1032,14 +1048,8 @@
     "webhookStateMissing": "Not subscribed",
     "webhookStateUnconfigured": "Not configured",
     "spNew": "New sponsorship",
-    "navMembers": "People",
     "membersTitle": "Members",
     "membersHint": "Every account and what each person does: athlete when Strava is on, participant when registered, captain, donor. Open a row for their pages, registrations, Strava and access level.",
-    "peopleTitle": "People",
-    "peopleHint": "The staff, with or without an account, every account with what each person does and may do, and the fundraising teams.",
-    "peopleTabTeam": "Staff",
-    "peopleTabFundraisers": "Fundraisers",
-    "peopleTabAccounts": "Members",
     "teamHint": "Officers, staff, board, committee and volunteers. A record stands on its own; link an account only to tie the access level to the person. Public ones appear on About us; volunteers count for the years they were active.",
     "teamNew": "New person",
     "teamCreate": "Add person",
@@ -1085,7 +1095,8 @@
     "memberRole": {
       "admin": "Admin",
       "chapter_lead": "Chapter lead",
-      "member": "Member"
+      "member": "Member",
+      "accounting": "Accounting"
     },
     "memberProfileHeading": "Profile and access",
     "memberProfileHint": "The name and what this account may do in the admin.",
@@ -1095,7 +1106,8 @@
     "memberAccessHint": {
       "member": "Runs pages, joins teams and events. No admin access.",
       "chapter_lead": "Everything in the admin except members' access levels.",
-      "admin": "Everything, including who is admin."
+      "admin": "Everything, including who is admin.",
+      "accounting": "The Money section and the supporters behind it. Nothing else in the console."
     },
     "memberTitle": "Role in the team",
     "memberTitleHint": "e.g. co-founder, treasurer, event director",
@@ -1382,8 +1394,6 @@
     "yearDonorsHint": "One per line: name · euros. Write Anonymous for anyone who chose not to be named.",
     "yearRecordedCause": "These recorded gifts and hand-overs belong to",
     "yearRecordedCauseHint": "The cause of that year. Its raised figure then includes the donor list below and sponsorship cash handed to the beneficiaries.",
-    "peopleTabAll": "All",
-    "allPeopleHint": "Everyone at once: every account and every staff record, one filter across all kinds. A person with no account opens on the Staff tab.",
     "fundraisersPeopleHint": "The accounts that hold a fundraising page: how much each raised, and their pages to moderate.",
     "evDelete": "Delete",
     "evDeleteConfirm": "{count, plural, one {Delete this event?} other {Delete # events?}} Unpaid registrations and RSVPs go with it; pages, teams, photos, sponsorships and offers stay. This cannot be undone. To hide it from the site instead, unpublish it.",
@@ -1408,7 +1418,6 @@
     "caDeleteReason_pages": "{count, plural, one {a fundraising page raises for it} other {# fundraising pages raise for it}}",
     "caDeleteReason_teams": "{count, plural, one {a team raises for it} other {# teams raise for it}}",
     "caDeleteReason_missing": "it no longer exists",
-    "peopleTabTeams": "Teams",
     "tmHint": "Fundraising teams: pages raising together for an event, with a captain. Deleting a team unlinks its pages and keeps every euro; a team whose pages took donations cannot be deleted.",
     "tmColEvent": "Event",
     "tmColCause": "Cause",
@@ -1438,7 +1447,29 @@
     "markTestConfirm": "{count, plural, one {Mark this record and everything attached to it as test data?} other {Mark # records and everything attached to them as test data?}} Gifts, hand-overs, pages and teams that hang off them stop counting the moment test mode is off, lose their immutability, and go with the next purge. Real money that is not attached is untouched.",
     "markLive": "Mark as live",
     "markLiveConfirm": "{count, plural, one {Qualify this record and everything attached to it for live mode?} other {Qualify # records and everything attached to them for live mode?}} They count from now on, their gifts and hand-overs become immutable, and the purge leaves them alone. A record under a parent that stays test still goes with the purge.",
-    "yearTestData": "Test data (goes with the purge)"
+    "yearTestData": "Test data (goes with the purge)",
+    "peekEmpty": "Nothing here yet.",
+    "peekOpenFull": "Open the full list",
+    "peekRsvpOnly": "Said they are coming, no registration",
+    "peekGuestOf": "guest of {name}",
+    "pagesDraftSuffix": "{count, plural, one {+# draft} other {+# drafts}}",
+    "navPages": "Pages",
+    "navStaff": "Staff",
+    "supportersSectionHint": "Everyone the money comes through: the organisations that sponsor us, the people who raise on a page, the donors, the participants, and the teams.",
+    "supportersTabSponsors": "Sponsors",
+    "supportersTabFundraisers": "Fundraisers",
+    "supportersTabDonors": "Donors",
+    "supportersTabParticipants": "Participants",
+    "supportersTabTeams": "Teams",
+    "donorsHint": "The accounts behind approved gifts, with what each gave. Gifts without an account are in the ledger only.",
+    "participantsHint": "Everyone registered for an event or who said they are coming, and the athletes with Strava on. Open a row for their registrations and activity.",
+    "staffSectionHint": "The staff records that make up the team, and every account with its access level: member, accounting, staff or admin.",
+    "staffTabTeam": "Staff",
+    "staffTabAccounts": "Accounts",
+    "pagesHint": "Every fundraising page: who runs it, which cause and team it raises for, and its state. A fundraiser is a person and may hold several pages.",
+    "pagesDeleteConfirm": "{count, plural, one {Delete this page?} other {Delete # pages?}} A page that took gifts is refused.",
+    "pgColFundraiser": "Fundraiser",
+    "pgColTeam": "Team"
   },
   "forms": {
     "nameLabel": "Full name",
@@ -1967,7 +1998,11 @@
     "editSaved": "Saved.",
     "editCancel": "Cancel",
     "editLocked": "Someone has voted since you opened this, so the wording is now fixed.",
-    "editLockedShort": "yours — fixed after the first vote"
+    "editLockedShort": "yours — fixed after the first vote",
+    "allProposals": "{count, plural, one {All proposals (#)} other {All proposals (#)}}",
+    "backToCauses": "Causes",
+    "delete": "Withdraw the proposal",
+    "deleteConfirm": "Withdraw this proposal? It is removed from the list. You can propose again any time."
   },
   "beneficiaries": {
     "eyebrow": "Beneficiaries",

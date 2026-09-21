@@ -15,6 +15,7 @@ import { PageHeader } from "@/components/console/PageHeader";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
 import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
+import { EventPeekPanel, type EventLinked, type PeekKind } from "@/components/admin/EventPeekPanel";
 import type { WebhookStatus } from "@/app/[locale]/admin/(protected)/izazovi/actions";
 import { galleryImageUrl } from "@/lib/storage";
 import { Link } from "@/i18n/navigation";
@@ -23,16 +24,18 @@ export interface EventListRow extends EventFormValues {
   id: string;
   /** Made in test mode, or marked as test afterwards (migration 0055/0056). */
   is_test?: boolean;
-  registrations: number;
-  /** Pages of the event's cause (pages belong to causes). */
-  pages: number;
-  teams: number;
+  /** Heads coming: uncancelled registrations, guests included, plus RSVPs without one. */
   going: number;
+  /** Published pages of the event's cause (pages belong to causes), and the drafts beside them. */
+  pages: number;
+  pagesDraft: number;
+  teams: number;
   offers: PerkChallengeAdminRow[];
   gallery: GalleryAdminItem[];
 }
 
 const KINDS = ["race", "challenge", "social"] as const;
+const countButton = "rounded px-1.5 py-0.5 font-mono tabular-nums underline underline-offset-2 hover:bg-mist-2 hover:text-sea";
 
 /**
  * Event list: one row per event, filter by kind and status, the row opens
@@ -41,6 +44,7 @@ const KINDS = ["race", "challenge", "social"] as const;
  */
 export function EventsManager({
   events,
+  linked,
   chapters,
   campaigns,
   supporters,
@@ -55,6 +59,8 @@ export function EventsManager({
   /** An event to open straight away, e.g. from the Photos overview. */
   initialOpenId?: string;
   events: EventListRow[];
+  /** The rows behind the counts, for the quick look. */
+  linked: EventLinked;
   chapters: Option[];
   campaigns: Option[];
   supporters: Option[];
@@ -85,6 +91,8 @@ export function EventsManager({
   // with pages, teams, donations or paid registrations and says why.
   const [notice, setNotice] = useState<string[]>([]);
   const dialog = useDialog();
+  // A count opens what it stands for in the slide-over; the list stays put.
+  const [peek, setPeek] = useState<{ kind: PeekKind; eventId: string; eventName: string; campaignId: string | null } | null>(null);
   const isTest = (id: string) => Boolean(events.find((e) => e.id === id)?.is_test);
   const remove = async (ids: string[], clear: () => void) => {
     if (!(await dialog.confirm(t("evDeleteConfirm", { count: ids.length })))) return;
@@ -150,39 +158,37 @@ export function EventsManager({
       sort: (e) => e.venue,
     },
     {
-      key: "registrations",
-      header: t("table.colRegistrations"),
+      key: "going",
+      header: t("table.colGoing"),
       align: "center",
-      cell: (e) => (
-        <Link href={`/admin/dogadjaji/prijave?event=${e.id}`} className="underline underline-offset-2 hover:text-sea">{e.registrations}</Link>
-      ),
-      sort: (e) => e.registrations,
+      cell: (e) => <button type="button" onClick={() => setPeek({ kind: "going", eventId: e.id, eventName: e.name, campaignId: e.campaign_id ?? null })} className={countButton}>{e.going}</button>,
+      sort: (e) => e.going,
     },
     {
       key: "pages",
       header: t("table.colPages"),
       align: "center",
-      cell: (e) =>
-        e.pages > 0 && e.campaign_id ? (
-          <Link href={`/admin/clanovi/prikupljaci?cilj=${e.campaign_id}`} className="underline underline-offset-2 hover:text-sea">{e.pages}</Link>
-        ) : (
-          e.pages
-        ),
+      cell: (e) => (
+        <button type="button" onClick={() => setPeek({ kind: "pages", eventId: e.id, eventName: e.name, campaignId: e.campaign_id ?? null })} className={countButton}>
+          {e.pages}
+          {e.pagesDraft > 0 ? <span className="ml-1 font-sans text-[12px] font-medium normal-case text-black/50">{t("pagesDraftSuffix", { count: e.pagesDraft })}</span> : null}
+        </button>
+      ),
       sort: (e) => e.pages,
     },
     {
       key: "teams",
       header: t("table.colTeams"),
       align: "center",
-      cell: (e) => (e.teams > 0 ? <Link href={`/admin/clanovi/timovi?dogadjaj=${e.id}`} className="underline underline-offset-2 hover:text-sea">{e.teams}</Link> : e.teams),
+      cell: (e) => <button type="button" onClick={() => setPeek({ kind: "teams", eventId: e.id, eventName: e.name, campaignId: e.campaign_id ?? null })} className={countButton}>{e.teams}</button>,
       sort: (e) => e.teams,
     },
-    { key: "going", header: t("table.colGoing"), align: "center", cell: (e) => e.going, sort: (e) => e.going },
   ];
 
   return (
     <div className="space-y-4">
       {dialog.element}
+      <EventPeekPanel peek={peek} linked={linked} onClose={() => setPeek(null)} />
       <PageHeader
         title={title}
         lead={lead}

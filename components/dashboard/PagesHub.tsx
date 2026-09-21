@@ -193,6 +193,7 @@ export function PagesHub({
               key={editor.fundraiser.id}
               locale={locale}
               fundraiser={editor.fundraiser}
+              causes={editor.causes}
               teams={editor.teams}
               captainOf={editor.captainOf}
               presetTeamId={joinTeamId}

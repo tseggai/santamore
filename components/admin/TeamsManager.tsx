@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { deleteTeams } from "@/app/[locale]/admin/(protected)/clanovi/actions";
+import { deleteTeams } from "@/app/[locale]/admin/(protected)/osoblje/actions";
 import type { MemberTeam } from "@/components/admin/MembersManager";
 import { Chip, DataTable, bulkButton, type Column } from "@/components/console/DataTable";
 import { FocusChip } from "@/components/console/FocusChip";

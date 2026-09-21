@@ -34,6 +34,11 @@ interface EditorFundraiser {
   causePublic: boolean;
 }
 
+export interface CauseChoice {
+  id: string;
+  title: string;
+}
+
 const NEW_TEAM = "__new__";
 
 /**
@@ -45,6 +50,7 @@ const NEW_TEAM = "__new__";
 export function PageEditor({
   locale,
   fundraiser,
+  causes,
   teams: initialTeams,
   captainOf,
   presetTeamId,
@@ -53,6 +59,8 @@ export function PageEditor({
 }: {
   locale: Locale;
   fundraiser: EditorFundraiser;
+  /** The published causes still open, plus the page's own; the page may move between them until a gift comes in. */
+  causes: CauseChoice[];
   teams: TeamOption[];
   /** Team ids this runner captains — those they may edit. */
   captainOf: string[];
@@ -86,7 +94,10 @@ export function PageEditor({
   const [editing, setEditing] = useState<"" | "name" | "story" | "goal">("");
   const [teamPanel, setTeamPanel] = useState<"" | "create" | "edit">("");
   const [busy, setBusy] = useState<"" | "save" | "publish" | "photo">("");
-  const [notice, setNotice] = useState<"" | "saved" | "error" | "incomplete" | "goal">("");
+  const [notice, setNotice] = useState<"" | "saved" | "error" | "incomplete" | "goal" | "causeLocked" | "causeTaken">("");
+  const [causeId, setCauseId] = useState(fundraiser.causeId);
+  // Gifts came in: the money stays where it was given, so the page stays with its cause.
+  const causeLocked = donorCount > 0;
   const [dirty, setDirty] = useState(Boolean(presetTeamId && presetTeamId !== fundraiser.teamId));
   const fileRef = useRef<HTMLInputElement>(null);
   const storyRef = useRef<HTMLTextAreaElement>(null);
@@ -107,7 +118,8 @@ export function PageEditor({
     ...(goalCents && goalCents > 0 ? [] : [t("needGoal")]),
     ...(story.trim().length >= 80 ? [] : [t("needStory")]),
   ];
-  const selectedTeam = teams.find((team) => team.id === teamId) ?? null;
+  const teamsForCause = teams.filter((team) => !team.causeId || team.causeId === causeId);
+  const selectedTeam = teamsForCause.find((team) => team.id === teamId) ?? null;
   const canEditTeam = selectedTeam !== null && captains.includes(selectedTeam.id);
   const money = (cents: Cents) => formatCents(cents, locale, { trimWholeCents: true });
 
@@ -124,6 +136,7 @@ export function PageEditor({
       goalCents,
       teamId: teamId === "" ? null : teamId,
       photoPath,
+      causeId,
     }).catch(() => ({ ok: false as const, error: "server" as const }));
 
   const save = async () => {
@@ -140,8 +153,17 @@ export function PageEditor({
       setDirty(false);
       router.refresh();
     } else {
-      setNotice("error" in result && result.error === "incomplete" ? "incomplete" : "error");
+      const reason = "error" in result ? result.error : "server";
+      setNotice(reason === "incomplete" || reason === "causeLocked" || reason === "causeTaken" ? reason : "error");
     }
+  };
+
+  const onCauseChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setCauseId(event.target.value);
+    // Teams belong to a cause; the old one's team cannot follow.
+    setTeamId("");
+    setTeamPanel("");
+    touch();
   };
 
   const togglePublish = async () => {
@@ -247,7 +269,8 @@ export function PageEditor({
     touch();
   };
 
-  const onTeamDone = (team: TeamOption) => {
+  const onTeamDone = (option: TeamOption) => {
+    const team = { ...option, causeId };
     setTeams((existing) => {
       const others = existing.filter((candidate) => candidate.id !== team.id);
       return [...others, team].sort((a, b) => a.name.localeCompare(b.name));
@@ -318,6 +341,12 @@ export function PageEditor({
         <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">
           {t("goalInvalid")}
         </p>
+      ) : null}
+      {notice === "causeLocked" ? (
+        <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">{t("causeLocked")}</p>
+      ) : null}
+      {notice === "causeTaken" ? (
+        <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">{t("causeTakenNotice")}</p>
       ) : null}
 
       {/* the page itself — what a donor sees on /f/[slug], editable in place */}
@@ -406,14 +435,14 @@ export function PageEditor({
                 className="rounded-lg border-[1.5px] border-line bg-paper px-2 py-1 text-[14px] font-semibold text-black outline-none focus:border-sea"
               >
                 <option value="">{t("noTeam")}</option>
-                {teams.map((team) => (
+                {teamsForCause.map((team) => (
                   <option key={team.id} value={team.id}>
                     {team.name}
                   </option>
                 ))}
                 <option value={NEW_TEAM}>{t("newTeamOption")}</option>
               </select>
-              {teams.length === 0 && teamPanel === "" ? (
+              {teamsForCause.length === 0 && teamPanel === "" ? (
                 <span className="basis-full text-[13px] text-black/50">{t("noTeamsForCause")}</span>
               ) : null}
               {canEditTeam && teamPanel === "" ? (
@@ -427,12 +456,29 @@ export function PageEditor({
                 </button>
               ) : null}
               <span>·</span>
-              {fundraiser.causeTitle ? (
-                <span className={fundraiser.causePublic ? linkClass : "text-black/60"}>
+              <label htmlFor="fCause" className="sr-only">
+                {t("causeLabel")}
+              </label>
+              {causeLocked || causes.length <= 1 ? (
+                <span className={fundraiser.causePublic ? linkClass : "text-black/60"} title={causeLocked ? t("causeLocked") : undefined}>
                   {fundraiser.causeTitle}
                   {!fundraiser.causePublic ? <span className="ml-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-black/45">{t("causeDraft")}</span> : null}
                 </span>
-              ) : null}
+              ) : (
+                <select
+                  id="fCause"
+                  value={causeId}
+                  onChange={onCauseChange}
+                  className="rounded-lg border-[1.5px] border-line bg-paper px-2 py-1 text-[14px] font-semibold text-black outline-none focus:border-sea"
+                >
+                  {causes.map((cause) => (
+                    <option key={cause.id} value={cause.id}>
+                      {cause.title}
+                      {cause.id === fundraiser.causeId && !fundraiser.causePublic ? ` — ${t("causeDraft")}` : ""}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             {teamPanel === "create" ? (

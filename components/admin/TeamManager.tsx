@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState, type FormEvent } from "react";
 
-import { deleteTeamMember, saveTeamMember } from "@/app/[locale]/admin/(protected)/clanovi/team-actions";
+import { deleteTeamMember, saveTeamMember } from "@/app/[locale]/admin/(protected)/osoblje/team-actions";
 import { Chip, DataTable, Thumb, rowButton, type Column } from "@/components/console/DataTable";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
@@ -36,7 +36,7 @@ export interface AccountOption {
   id: string;
   full_name: string | null;
   email: string | null;
-  role: "member" | "chapter_lead" | "admin";
+  role: "member" | "accounting" | "chapter_lead" | "admin";
 }
 
 const labelClass = "text-[13.5px] font-semibold";
@@ -283,7 +283,7 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
             {linked ? (
               <>
                 {t("teamAccountLevel", { level: t(`memberRole.${linked.role}`) })}{" "}
-                <Link href="/admin/clanovi/nalozi" className="font-semibold text-sea underline underline-offset-2">{t("teamChangeAccess")}</Link>
+                <Link href="/admin/osoblje/nalozi" className="font-semibold text-sea underline underline-offset-2">{t("teamChangeAccess")}</Link>
               </>
             ) : (
               t("teamAccountHint")

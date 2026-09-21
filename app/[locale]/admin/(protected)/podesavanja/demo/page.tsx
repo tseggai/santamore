@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { DemoTool } from "@/components/admin/DemoTool";
 import { TestModeCard } from "@/components/admin/TestModeCard";
 import { createServiceClient } from "@/lib/supabase/admin";
+import { isStaffRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +24,7 @@ export default async function AdminDemoPage() {
   const { data: profile } = user
     ? await supabase.from("profiles").select("role").eq("id", user.id).single()
     : { data: null };
-  const isStaff = profile?.role === "admin" || profile?.role === "chapter_lead";
+  const isStaff = isStaffRole(profile?.role);
   const { data: testMode } = await supabase.rpc("test_mode");
 
   const counts = { users: 0, teams: 0, fundraisers: 0, donations: 0 };

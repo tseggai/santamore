@@ -5,7 +5,9 @@ import type { ReactNode } from "react";
 
 import { AdminNav } from "@/components/admin/AdminNav";
 import { SignOutButton } from "@/components/admin/SignOutButton";
+import { ConsoleIdentity } from "@/components/console/ConsoleIdentity";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { isStaffRole, type Role } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
@@ -29,7 +31,7 @@ export default async function AdminLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const t = await getTranslations("admin");
+  const [t, tDashboard] = await Promise.all([getTranslations("admin"), getTranslations("dashboard")]);
 
   const supabase = await createClient();
   const {
@@ -41,10 +43,11 @@ export default async function AdminLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, full_name")
     .eq("id", user.id)
     .single();
-  const isStaff = profile?.role === "admin" || profile?.role === "chapter_lead";
+  const role = (profile?.role ?? "member") as Role;
+  const isStaff = isStaffRole(role);
 
   if (!isStaff) {
     return (
@@ -71,9 +74,16 @@ export default async function AdminLayout({
       menuLabel={t("menuOpen")}
       closeLabel={t("menuClose")}
       width="max-w-5xl"
-      nav={<AdminNav />}
+      nav={<AdminNav role={role} />}
       footer={
         <>
+          <ConsoleIdentity
+            name={profile?.full_name?.trim() || user.email || "—"}
+            email={user.email ?? null}
+            role={t(`memberRole.${role}`)}
+            href="/dashboard/profil"
+            label={tDashboard("navProfile")}
+          />
           <Link
             href="/"
             className="whitespace-nowrap rounded-lg px-3.5 py-2 text-[13.5px] font-medium text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper"

@@ -3,7 +3,8 @@
 import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { proposeCause, updateProposal } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
+import { deleteProposal, proposeCause, updateProposal } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
+import { useDialog } from "@/components/console/useDialog";
 import { parseEurosToCents } from "@/lib/money";
 import { allAnswered, failedCriteria } from "@/lib/proposals";
 import { Link } from "@/i18n/navigation";
@@ -35,12 +36,15 @@ export function ProposeForm({
   edit = null,
   onSaved,
   onCancel,
+  onDeleted,
 }: {
   criteria: PublicCriterion[];
   /** Editing an existing proposal: the screening is behind it, only the wording changes. */
   edit?: ProposalDraft | null;
   onSaved?: () => void;
   onCancel?: () => void;
+  /** The proposer withdrew it (same rule as an edit: open, no votes yet). */
+  onDeleted?: () => void;
 }) {
   const t = useTranslations("proposals");
   const tDonate = useTranslations("donate");
@@ -56,6 +60,19 @@ export function ProposeForm({
   // Two screens: the questions, then — only once they pass — the proposal.
   // An edit starts on the second: the questions were answered already.
   const [step, setStep] = useState<1 | 2>(edit ? 2 : 1);
+  const dialog = useDialog();
+
+  const withdraw = async () => {
+    if (!edit) return;
+    if (!(await dialog.confirm(t("deleteConfirm"), { confirmLabel: t("delete") }))) return;
+    setState("busy");
+    const result = await deleteProposal({ proposalId: edit.id }).catch(() => ({ ok: false as const, error: "server" as const }));
+    if (result.ok) {
+      onDeleted?.();
+      return;
+    }
+    setState(result.error === "voted" || result.error === "closed" ? "locked" : "error");
+  };
 
   const answered = edit ? true : allAnswered(criteria, answers);
   const failed = edit ? [] : failedCriteria(criteria, answers);
@@ -207,6 +224,7 @@ export function ProposeForm({
 
   return (
     <form onSubmit={submit} className="space-y-6">
+      {dialog.element}
       {edit ? null : stepLine}
       <section>
         {edit ? <p className="text-[14px] leading-relaxed text-black/60">{t("editUntilVote")}</p> : <h2 className="text-[16px] font-bold">{t("detailsHeading")}</h2>}
@@ -244,9 +262,14 @@ export function ProposeForm({
           {edit ? t("editSave") : t("submit")}
         </button>
         {edit ? (
-          <button type="button" onClick={onCancel} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
-            {t("editCancel")}
-          </button>
+          <>
+            <button type="button" onClick={onCancel} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
+              {t("editCancel")}
+            </button>
+            <button type="button" disabled={state === "busy"} onClick={() => void withdraw()} className="ml-auto rounded-lg px-4 py-3.5 text-[15px] font-semibold text-red-dark transition-colors hover:bg-mist-2 disabled:opacity-60">
+              {t("delete")}
+            </button>
+          </>
         ) : (
           <button type="button" onClick={() => setStep(1)} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
             ← {t("back")}

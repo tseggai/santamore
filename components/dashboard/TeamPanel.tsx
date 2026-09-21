@@ -17,6 +17,8 @@ export interface TeamOption {
   name: string;
   description: string | null;
   photoPath: string | null;
+  /** The cause the team raises for; the editor shows only the current cause's teams. */
+  causeId?: string;
 }
 
 /**

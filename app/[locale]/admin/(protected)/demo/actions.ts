@@ -19,6 +19,7 @@ import { demoPersonAvatar, demoTeamAvatar } from "@/lib/demo/avatar";
 import { generatePaymentReference } from "@/lib/references";
 import { slugify } from "@/lib/slug";
 import { createServiceClient } from "@/lib/supabase/admin";
+import { isStaffRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 
 // Demo data is service-role work (auth users, active pages, approved
@@ -65,7 +66,7 @@ async function requireStaff(): Promise<boolean> {
     .select("role")
     .eq("id", user.id)
     .single();
-  return profile?.role === "admin" || profile?.role === "chapter_lead";
+  return isStaffRole(profile?.role);
 }
 
 /**
