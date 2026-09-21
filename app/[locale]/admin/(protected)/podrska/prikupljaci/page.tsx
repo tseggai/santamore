@@ -1,7 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { MembersManager } from "@/components/admin/MembersManager";
-import { YearSelect, parseYear } from "@/components/console/YearSelect";
+import { YearSelect } from "@/components/console/YearSelect";
+import { parseYear } from "@/lib/years";
 import { loadPeople } from "@/lib/server/people";
 import type { Locale } from "@/i18n/routing";
 

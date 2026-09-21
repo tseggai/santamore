@@ -1,7 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { TeamsManager } from "@/components/admin/TeamsManager";
-import { YearSelect, parseYear } from "@/components/console/YearSelect";
+import { YearSelect } from "@/components/console/YearSelect";
+import { parseYear } from "@/lib/years";
 import { loadPeople } from "@/lib/server/people";
 
 export const dynamic = "force-dynamic";

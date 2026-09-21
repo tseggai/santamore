@@ -1,7 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { DonorsManager, type DonorGift, type DonorRow } from "@/components/admin/DonorsManager";
-import { YearSelect, parseYear } from "@/components/console/YearSelect";
+import { YearSelect } from "@/components/console/YearSelect";
+import { parseYear } from "@/lib/years";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
