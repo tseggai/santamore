@@ -2,7 +2,7 @@
 
 Draft articles to insert into the statute template (`04-statute.en.md`, Montenegrin original *Obrazac statuta udruženja*). Montenegrin is the operative text; the English under each article is a translation for founders who do not read it. Drafted 2026-09-21 from the governance the team guide commits to (`docs/reference/team-guide.html`) and the drafting rules in the Ministry's guidance note (`07-guidance-statute.en.md`): every body gets its powers, composition, election and dismissal, term, quorum and majority. **The lawyer reviews the Montenegrin before signing.** Nothing here is legal advice.
 
-**Where the articles go.** The three new chapters are inserted after Article 31 (end of the Executive Director chapters) and before the chapter "SLUŽBENICI (OSOBLJE)". They are numbered 32 to 44 below. The template's existing Articles 32 to 42 then become 45 to 55. The optional proxy article at the end goes after Article 17, as the guidance note recommends, and shifts everything after it by one; renumber once, at the end.
+**Where the articles go.** The three new chapters are inserted after Article 31 (end of the Executive Director chapters) and before the chapter "SLUŽBENICI (OSOBLJE)". They are numbered 32 to 44 below. The template's existing Articles 32 to 42 then become 45 to 55. The proxy chapter (Articles 17a to 17f) goes after Article 17, as the guidance note recommends, and shifts everything after it by six; renumber once, at the end.
 
 **Decisions embedded in the draft, all from the team guide.** Change them if the founders decide otherwise; each is a single number or sentence.
 
@@ -179,19 +179,81 @@ Sredstva evidentirana za ukinuti ogranak ostaju namijenjena korisnicima sa njego
 
 *Article 44. Dissolving a chapter.* The Board may dissolve a chapter on the proposal of a majority of its members, if it has held no event in twelve months, or if it breaches the Statute or the Chapter Rules. Funds recorded for a dissolved chapter stay earmarked for beneficiaries from its area.
 
-## 5. Optional: proxy representation in the Assembly / Opciono: predstavljanje članova preko punomoćnika
+## 5. New chapter: NAČIN PREDSTAVLJANJA ČLANOVA U SKUPŠTINI PREKO OPUNOMOĆENIH PREDSTAVNIKA / REPRESENTING MEMBERS IN THE ASSEMBLY THROUGH AUTHORISED PROXIES
 
-The guidance note recommends this chapter for territorially dispersed memberships. With chapters in several towns and an Assembly that must meet at least once a year, it keeps the Assembly quorate without everyone travelling. Insert after Article 17 under the heading "NAČIN PREDSTAVLJANJA ČLANOVA U SKUPŠTINI PREKO OPUNOMOĆENIH PREDSTAVNIKA".
+The Ministry's guidance note recommends this chapter for associations with many or territorially dispersed members, and says it should define what a proxy contains, how it is obtained and whether proxies are organised by territory or by number. With chapters in several towns and an Assembly that must meet at least once a year, it keeps the Assembly quorate without everyone travelling, and it gives the Article 14 sentence about "authorised representatives of more than 50 percent of members" a procedure. Insert after Article 17, before the chapter "NAČIN ODLUČIVANJA"; numbered 17a to 17f here so nothing else moves until the final renumbering.
 
-### Član 17a — Punomoćje
+### Član 17a — Pravo na predstavljanje
 
-Član udruženja može pisanim punomoćjem ovlastiti drugog člana udruženja da ga zastupa i glasa u njegovo ime na jednoj sjednici Skupštine. Punomoćje sadrži ime i prezime i JMB davaoca i primaoca punomoćja, oznaku sjednice na koju se odnosi, datum i potpis davaoca punomoćja, a može se dati i elektronskim putem sa adrese e-pošte upisane u registar članova.
+Član udruženja koji ne može prisustvovati sjednici Skupštine može pisanim punomoćjem ovlastiti drugog člana udruženja (opunomoćeni predstavnik) da ga predstavlja i glasa u njegovo ime na toj sjednici.
 
-Punomoćje se dostavlja Predsjedniku Skupštine prije početka sjednice i prilaže se zapisniku. Jedan član može zastupati najviše pet drugih članova. Članovi ogranka mogu punomoćje dati rukovodiocu ogranka.
+Opunomoćeni predstavnik može biti samo član udruženja koji ima pravo glasa i na kojeg se ne odnosi isključenje prava glasa iz člana 22 ovog statuta po pitanju o kome se glasa.
 
-Član kojeg zastupa punomoćnik smatra se prisutnim za utvrđivanje kvoruma iz člana 14 ovog statuta.
+Punomoćje se može dati za jednu sjednicu Skupštine, uključujući i njen nastavak ili ponovno sazivanje iz člana 15 ovog statuta. Punomoćje dato za više sjednica ili na neodređeno vrijeme ne važi.
 
-*Article 17a. Proxies.* A member may authorise another member in writing to represent and vote for them at one Assembly session. The proxy states both members' names and JMBs, the session, the date and the giver's signature, and may be sent by email from the address in the register of members. It goes to the President of the Assembly before the session starts and is attached to the minutes. One member may hold at most five proxies; chapter members may give theirs to the chapter lead. A member represented by proxy counts as present for the quorum in Article 14.
+*Article 17a. Right to be represented.* A member who cannot attend may authorise another member in writing to represent them and vote for them at that session. Only a voting member not excluded under Article 22 on the matter in question may act as proxy. A proxy is valid for one session, including its continuation or reconvening under Article 15; a proxy for several sessions or for an indefinite period is void.
+
+### Član 17b — Sadržina punomoćja
+
+Punomoćje sadrži:
+
+1. ime i prezime i JMB, odnosno broj putne isprave, člana koji daje punomoćje;
+2. ime i prezime i JMB, odnosno broj putne isprave, opunomoćenog predstavnika;
+3. oznaku sjednice Skupštine na koju se odnosi (datum sazivanja ili datum održavanja);
+4. po izboru davaoca punomoćja, uputstvo kako da se glasa o pojedinim tačkama dnevnog reda; ako uputstva nema, opunomoćeni predstavnik glasa po sopstvenoj ocjeni;
+5. datum i potpis davaoca punomoćja.
+
+Punomoćje se daje na obrascu koji utvrđuje Predsjednik Skupštine i objavljuje uz poziv za sjednicu, a važi i punomoćje dato u slobodnoj formi ako sadrži sve podatke iz stava 1 ovog člana.
+
+Punomoćje se može dati i elektronskim putem, porukom poslatom sa adrese elektronske pošte davaoca punomoćja upisane u registar članova, na adresu udruženja navedenu u pozivu za sjednicu. Elektronsko punomoćje ne mora biti potpisano.
+
+*Article 17b. Content of a proxy.* Names and JMB or passport numbers of both members; the session it covers; optional voting instructions per agenda item, failing which the proxy votes at their own discretion; date and signature. The President of the Assembly publishes a form with the notice of the session, but a free-form proxy with the same content is valid. A proxy may be given by email from the address in the register of members to the address in the notice, and then needs no signature.
+
+### Član 17c — Dostavljanje i provjera punomoćja
+
+Punomoćje se dostavlja Predsjedniku Skupštine najkasnije do početka sjednice. Punomoćje dostavljeno nakon početka sjednice ne uzima se u obzir.
+
+Predsjednik Skupštine, prije utvrđivanja kvoruma, provjerava da li su punomoćja uredna, da li su davalac i primalac punomoćja članovi udruženja i da li je poštovano ograničenje iz člana 17d ovog statuta, i o tome obavještava Skupštinu. Neuredno punomoćje ne proizvodi dejstvo, a Predsjednik Skupštine unosi razlog u zapisnik.
+
+Punomoćja se prilažu zapisniku i čuvaju uz njega.
+
+*Article 17c. Delivery and verification.* Proxies reach the President of the Assembly no later than the start of the session; later ones are disregarded. Before establishing the quorum the President checks each proxy is in order, that both parties are members and that the cap in Article 17d is respected, and reports to the Assembly. A defective proxy has no effect and the reason goes in the minutes. Proxies are attached to the minutes and kept with them.
+
+### Član 17d — Ograničenje broja punomoćja
+
+Jedan opunomoćeni predstavnik može predstavljati najviše pet članova udruženja, pored sopstvenog glasa.
+
+Izuzetno, rukovodilac ogranka može predstavljati sve članove udruženja sa područja svog ogranka koji su mu dali punomoćje, ako je ogranak najmanje deset dana prije sjednice održao sastanak članova ogranka o tačkama dnevnog reda i ako je zapisnik sa tog sastanka dostavljen Predsjedniku Skupštine uz punomoćja.
+
+Izvršni direktor, članovi Upravnog odbora i članovi Komisije za dodjelu sredstava ne mogu biti opunomoćeni predstavnici kada se odlučuje o njihovom izboru, razrješenju, izvještaju o radu ili naknadi.
+
+*Article 17d. Cap on proxies.* One proxy holder may represent at most five members in addition to their own vote. By exception, a chapter lead may represent all members from the chapter's area who gave them a proxy, provided the chapter held a members' meeting on the agenda at least ten days before the session and its minutes accompany the proxies. The Executive Director, Board members and Grants Committee members cannot act as proxies on decisions about their own election, dismissal, reports or remuneration.
+
+### Član 17e — Opoziv punomoćja i lično prisustvo
+
+Davalac punomoćja može opozvati punomoćje pisanom ili elektronskom izjavom dostavljenom Predsjedniku Skupštine do početka sjednice.
+
+Ako davalac punomoćja lično pristupi sjednici, punomoćje prestaje da važi od trenutka kada Predsjednik Skupštine utvrdi njegovo prisustvo, o čemu se stavlja zabilješka u zapisnik.
+
+Opunomoćeni predstavnik ne može prenijeti punomoćje na drugo lice.
+
+*Article 17e. Revocation and personal attendance.* A proxy may be revoked by a written or electronic statement delivered to the President before the session starts. If the giver attends in person, the proxy lapses the moment the President records their presence. A proxy cannot be passed on to a third person.
+
+### Član 17f — Dejstvo punomoćja
+
+Član kojeg predstavlja opunomoćeni predstavnik smatra se prisutnim za utvrđivanje kvoruma iz člana 14 i za utvrđivanje većine iz članova 16, 17 i 39 ovog statuta.
+
+Opunomoćeni predstavnik glasa javno u ime svakog člana kojeg predstavlja, a u zapisnik se za svaku tačku unosi koliko je glasova dato lično, a koliko preko punomoćja. Kod tajnog glasanja iz člana 20 opunomoćeni predstavnik dobija po jedan glasački listić za svakog člana kojeg predstavlja.
+
+Opunomoćeni predstavnik koji glasa suprotno pisanom uputstvu davaoca punomoćja odgovara davaocu punomoćja, ali to ne utiče na punovažnost odluke Skupštine.
+
+Predstavljanje preko opunomoćenog predstavnika nije dozvoljeno pri glasanju o prestanku rada udruženja iz člana 39 ovog statuta i o raspodjeli imovine iz člana 40 ovog statuta. [Alternativa: obrisati ovaj stav ako osnivači žele da punomoćja važe i za ta pitanja.]
+
+*Article 17f. Effect of a proxy.* A represented member counts as present for the quorum in Article 14 and the majorities in Articles 16, 17 and 39. The proxy votes openly for each member represented, and the minutes record per item how many votes were cast in person and how many by proxy; in a secret ballot under Article 20 the proxy receives one ballot per member represented. A proxy who votes against written instructions is answerable to the giver, but the Assembly's decision stands. Proxies are not allowed on the decision to dissolve the association (Article 39) or to distribute its assets (Article 40). [Alternative: delete this paragraph if the founders want proxies to count on those decisions too.]
+
+**Consequential edit to Article 14.** Replace its second paragraph with: "Članovi koje predstavljaju opunomoćeni predstavnici u skladu sa članovima 17a do 17f ovog statuta računaju se kao prisutni." / "Members represented by proxies under Articles 17a to 17f count as present." The template's current wording ("proxies of more than 50 percent of members") becomes redundant once the chapter defines the mechanism.
+
+**Decisions embedded here.** Five proxies per holder; the chapter-lead exception conditional on a chapter meeting ten days before; email proxies accepted without signature; no proxies on dissolution. Each is one number or one sentence to change.
 
 ## 6. Points for the lawyer / Pitanja za advokata
 
@@ -199,4 +261,5 @@ Punomoćje se dostavlja Predsjedniku Skupštine prije početka sjednice i prila�
 2. Confirm the staffing act may move from the Assembly to the Board (edit to old Art. 32). / Potvrditi da Akt o sistematizaciji može preći sa Skupštine na Upravni odbor.
 3. Check whether the earmarking of donations in the new paragraph of old Art. 34 needs wording aligned with Article 30 of the Law on the use of assets. / Provjeriti da li namjensko vezivanje priloga u novom stavu čl. 34 treba uskladiti sa čl. 30 Zakona.
 4. Decide whether Board members should have a term limit (the draft allows re-election without limit). / Odlučiti da li članovi Upravnog odbora treba da imaju ograničenje broja mandata (nacrt dozvoljava ponovni izbor bez ograničenja).
-5. Renumber all articles and cross-references once the insertions are final. / Prenumerisati sve članove i upućivanja kada dopune budu konačne.
+5. Confirm that Article 14 of the template, once amended as in section 5, satisfies Article 23 of the Law on proxy representation, and whether the no-proxy rule for dissolution (Art. 17f, last paragraph) is permissible. / Potvrditi da izmijenjeni čl. 14 ispunjava čl. 23 Zakona o predstavljanju preko punomoćnika, i da li je dozvoljena zabrana punomoćja pri odlučivanju o prestanku rada (čl. 17f, posljednji stav).
+6. Renumber all articles and cross-references once the insertions are final. / Prenumerisati sve članove i upućivanja kada dopune budu konačne.

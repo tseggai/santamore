@@ -16,7 +16,7 @@ September 2026 and are not stored here; the team holds them. This folder has:
 | `05-founding-assembly-minutes.en.md` | English translation of *Obrazac zapisnika sa osnivačke skupštine* |
 | `06-guidance-founding-act.en.md` | English translation of *Uputstvo za popunjavanje osnivačkog akta*, the official note on what the founding decision must contain (Law Art. 11) |
 | `07-guidance-statute.en.md` | English translation of *Uputstvo za izradu statuta udruženja*, the official note on what the statute must regulate |
-| `statute-additions.md` | Draft articles (ME operative text, EN translation) for the Board, the Grants Committee and chapters, plus the consequential edits to existing articles and an optional proxy-voting article |
+| `statute-additions.md` | Draft articles (ME operative text, EN translation) for the Board, the Grants Committee and chapters, the proxy-voting chapter (Articles 17a to 17f), plus the consequential edits to existing articles |
 | `completion-guide.md` | Bilingual (EN / ME) field-by-field guide: what to write in every blank, template defects to fix, suggested goals and activities, consistency checklist, path to Monri, open questions |
 
 Rules from `CLAUDE.md` apply: no fabricated names, numbers, addresses or legal
