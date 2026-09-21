@@ -1,4 +1,4 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 
 import { YearsManager, type YearCause, type YearRow, type YearSponsorship } from "@/components/admin/YearsManager";
 import { createClient } from "@/lib/supabase/server";
@@ -59,7 +59,6 @@ const yearOf = (iso: string | null | undefined) => (iso ? Number(iso.slice(0, 4)
 export default async function YearsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("admin");
   const supabase = await createClient();
   const [{ data: stats }, { data: reports }, { data: campaigns }, { data: totals }, { data: sponsors }] = await Promise.all([
     supabase.from("v_public_year_stats").select("*").order("year", { ascending: false }),

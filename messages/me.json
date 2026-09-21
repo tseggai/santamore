@@ -295,7 +295,6 @@
     "actionError": "Nije uspjelo — pokušaj ponovo.",
     "statusDraft": "Nacrt — još nije objavljena",
     "statusActive": "Objavljena",
-    "daysLeft": "{count, plural, one {# dan} other {# dana}} do događaja",
     "nextHeading": "Tvoj sljedeći korak",
     "nextActionPublish": "Dovrši stranicu za prikupljanje i objavi je — fotografija, cilj i tri rečenice priče.",
     "nextActionSelf": "Započni stranicu svojih 20 €. Stranice koje krenu od nule ostanu na nuli.",

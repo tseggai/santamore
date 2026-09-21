@@ -1,4 +1,4 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 
 import { ProposalsManager, type CriterionRow, type ProposalRow } from "@/components/admin/ProposalsManager";
 import { isAdmin } from "@/lib/server/access";
@@ -11,7 +11,6 @@ export const dynamic = "force-dynamic";
 export default async function ProposalsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("admin");
   const supabase = await createClient();
   const [{ data: proposals }, { data: votes }, { data: criteria }, { data: chapters }, { data: profiles }] = await Promise.all([
     supabase.from("cause_proposals").select("*").order("created_at", { ascending: false }).limit(500),

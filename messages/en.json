@@ -295,7 +295,6 @@
     "actionError": "Something failed — try again.",
     "statusDraft": "Draft — not published yet",
     "statusActive": "Published",
-    "daysLeft": "{count, plural, one {# day} other {# days}} to the event",
     "nextHeading": "Your next move",
     "nextActionPublish": "Finish your fundraising page and publish it — a photo, a goal and three sentences of story.",
     "nextActionSelf": "Start your page with your own €20. Pages that open at €0 stay at €0.",
