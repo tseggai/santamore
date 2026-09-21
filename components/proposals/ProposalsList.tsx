@@ -52,12 +52,20 @@ export function ProposalsList({
   const [busy, setBusy] = useState<string | null>(null);
   // The proposer may rewrite their proposal until the first vote lands.
   const [editing, setEditing] = useState<string | null>(null);
+  // The full list shows one line of each proposal until it is opened.
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [voteError, setVoteError] = useState<{ id: string; kind: "closed" | "server" } | null>(null);
 
   const vote = async (proposal: PublicProposal) => {
     const on = !voted.has(proposal.id);
     setBusy(proposal.id);
-    const result = await toggleVote({ proposalId: proposal.id, on }).catch(() => ({ ok: false as const }));
+    setVoteError(null);
+    const result = await toggleVote({ proposalId: proposal.id, on }).catch(() => ({ ok: false as const, error: "server" as const }));
     setBusy(null);
+    if (!result.ok) {
+      setVoteError({ id: proposal.id, kind: "error" in result && result.error === "closed" ? "closed" : "server" });
+      return;
+    }
     if (result.ok) {
       setVoted((set) => {
         const next = new Set(set);
@@ -117,12 +125,30 @@ export function ProposalsList({
                   <span className="rounded-full bg-sea px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("shortlist")}</span>
                 ) : null}
               </p>
-              {compact ? null : <p className="mt-1 whitespace-pre-line text-[14.5px] leading-relaxed text-black/75">{proposal.summary}</p>}
-              <p className={`flex flex-wrap gap-x-3 gap-y-1 text-[13.5px] text-black/55 ${compact ? "mt-1" : "mt-2"}`}>
+              {/* the facts first: where, who benefits, roughly how much */}
+              <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[13.5px] text-black/55">
                 {proposal.location ? <span>{proposal.location}</span> : null}
                 {proposal.beneficiary ? <span>· {proposal.beneficiary}</span> : null}
                 {proposal.amount_cents ? <span className="font-mono tabular-nums">· ~{formatCents(proposal.amount_cents, locale, { trimWholeCents: true })}</span> : null}
-                {proposal.proposer_first_name && !compact ? <span>· {t("byName", { name: proposal.proposer_first_name })}</span> : null}
+              </p>
+              {compact ? null : (
+                <>
+                  <p className={`mt-2 text-[14.5px] leading-relaxed text-black/75 ${expanded.has(proposal.id) ? "whitespace-pre-line" : "truncate"}`}>{proposal.summary}</p>
+                  <button
+                    type="button"
+                    aria-expanded={expanded.has(proposal.id)}
+                    onClick={() => setExpanded((set) => { const next = new Set(set); if (next.has(proposal.id)) next.delete(proposal.id); else next.add(proposal.id); return next; })}
+                    className="mt-1 text-[13.5px] font-semibold text-sea underline underline-offset-2 hover:text-sea-2"
+                  >
+                    {expanded.has(proposal.id) ? t("readLess") : t("readMore")}
+                  </button>
+                </>
+              )}
+              {voteError?.id === proposal.id ? (
+                <p role="alert" className="mt-2 text-[13.5px] font-semibold text-red-dark">{voteError.kind === "closed" ? t("voteClosed") : t("voteFailed")}</p>
+              ) : null}
+              <p className={`flex flex-wrap gap-x-3 gap-y-1 text-[13.5px] text-black/55 ${compact ? "mt-1" : "mt-2"}`}>
+                {proposal.proposer_first_name && !compact ? <span>{t("byName", { name: proposal.proposer_first_name })}</span> : null}
                 {proposal.campaign_slug ? (
                   <Link href={`/kampanje/${proposal.campaign_slug}`} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">→ {t("chosen")}</Link>
                 ) : null}
@@ -131,7 +157,7 @@ export function ProposalsList({
                     {t("edit")}
                   </button>
                 ) : null}
-                {proposal.is_mine && !editable && proposal.status === "open" && !compact ? <span>· {t("editLockedShort")}</span> : null}
+                {proposal.is_mine && !editable && proposal.status === "open" && !compact ? <span>{t("editLockedShort")}</span> : null}
               </p>
             </div>
           </li>

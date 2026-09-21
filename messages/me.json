@@ -2004,7 +2004,11 @@
     "allProposals": "{count, plural, one {Svi prijedlozi (#)} few {Svi prijedlozi (#)} other {Svi prijedlozi (#)}}",
     "backToCauses": "Ciljevi",
     "delete": "Povuci prijedlog",
-    "deleteConfirm": "Povući ovaj prijedlog? Uklanja se sa liste. Možeš predložiti ponovo kad god želiš."
+    "deleteConfirm": "Povući ovaj prijedlog? Uklanja se sa liste. Možeš predložiti ponovo kad god želiš.",
+    "readMore": "Pročitaj više",
+    "readLess": "Prikaži manje",
+    "voteFailed": "Glas nije zabilježen. Pokušaj ponovo.",
+    "voteClosed": "Ovaj prijedlog više ne prima glasove."
   },
   "beneficiaries": {
     "eyebrow": "Korisnici",

@@ -94,10 +94,15 @@ export async function toggleVote(input: unknown): Promise<VoteResult> {
   // The insert trigger guards the way in; the way out is guarded here.
   const { data: proposal } = await supabase.from("v_public_cause_proposals").select("status").eq("id", parsed.data.proposalId).maybeSingle();
   if (!proposal || (proposal.status !== "open" && proposal.status !== "shortlisted")) return { ok: false, error: "closed" };
+  // A plain insert: members hold insert and delete on cause_votes, not
+  // update, so an upsert (insert … on conflict do update) is refused.
   const { error } = parsed.data.on
-    ? await supabase.from("cause_votes").upsert({ proposal_id: parsed.data.proposalId, user_id: user.id }, { onConflict: "proposal_id,user_id" })
+    ? await supabase.from("cause_votes").insert({ proposal_id: parsed.data.proposalId, user_id: user.id })
     : await supabase.from("cause_votes").delete().eq("proposal_id", parsed.data.proposalId).eq("user_id", user.id);
-  if (error) return { ok: false, error: error.code === "P0001" ? "closed" : "server" };
+  if (error && error.code !== "23505") {
+    console.error("[proposals] vote failed:", error.code, error.message);
+    return { ok: false, error: error.code === "P0001" ? "closed" : "server" };
+  }
   revalidatePath("/[locale]/kampanje", "layout");
   return { ok: true };
 }

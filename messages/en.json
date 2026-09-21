@@ -2004,7 +2004,11 @@
     "allProposals": "{count, plural, one {All proposals (#)} other {All proposals (#)}}",
     "backToCauses": "Causes",
     "delete": "Withdraw the proposal",
-    "deleteConfirm": "Withdraw this proposal? It is removed from the list. You can propose again any time."
+    "deleteConfirm": "Withdraw this proposal? It is removed from the list. You can propose again any time.",
+    "readMore": "Read more",
+    "readLess": "Show less",
+    "voteFailed": "Your vote did not register. Try again.",
+    "voteClosed": "This proposal is no longer open for votes."
   },
   "beneficiaries": {
     "eyebrow": "Beneficiaries",
