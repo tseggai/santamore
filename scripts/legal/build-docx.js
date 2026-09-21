@@ -210,6 +210,8 @@ function pairedRows(orig, blocks, anchor) {
   const isClan = b => b.type === 'p' && /^Član\s+\d+$/.test(b.text || '');
   // A Montenegrin chapter heading at the end of a segment belongs to the next segment, where its English twin sits.
   for (let s = 0; s < meSegs.length - 1; s++) { while (meSegs[s].length > 1 && isCaps(meSegs[s][meSegs[s].length - 1])) meSegs[s + 1].unshift(meSegs[s].pop()); }
+  // The English chapter headings precede "### Article N" in the source, so they end a segment too; carry them forward likewise.
+  for (let s = 0; s < enSegs.length - 1; s++) { while (enSegs[s].length > 1 && enSegs[s][enSegs[s].length - 1].type === 'h2') enSegs[s + 1].unshift(enSegs[s].pop()); }
   const rows = [];
   for (let s = 0; s < meSegs.length; s++) {
     const en = enSegs[s], me = [...meSegs[s]];
