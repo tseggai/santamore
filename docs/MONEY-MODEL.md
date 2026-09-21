@@ -40,6 +40,7 @@ v_money_out_all     every euro out, every cause    (internal, no grants)
       ├── v_fundraiser_totals / v_team_totals        the same rows by page and by team
       │     └── v_leaderboard / v_leaderboard_teams
       ├── v_staff_members                            raised and given per account, from the same rows
+      ├── v_donors / v_donor_gifts                   the same rows by donor, staff only (Donors tab)
       ├── v_money_in_daily                           the same rows by day, staff only (overview chart)
       └── v_public_ops_total                         operations-fund cash + entry fees only
 ```
@@ -62,7 +63,8 @@ Each row carries a `source`, so the public ledger can say where a row comes from
 | Admin causes list, admin years page | `v_campaign_totals` | published and draft causes alike |
 | Admin overview chart | `v_money_in_daily` | last 30 days |
 | Leaderboards, pages, teams, fundraisers board | `v_fundraiser_totals`, `v_team_totals`, `v_public_campaigns.pages_raised_cents` | the same rows by page |
-| Supporters tabs (raised, given) | `v_staff_members` | the same rows by account |
+| Supporters → Fundraisers, Participants (raised, given) | `v_staff_members` | the same rows by account |
+| Supporters → Donors | `v_donors`, `v_donor_gifts` | the same rows by donor, account or not |
 | Chapter totals | `v_chapter_totals` | ledger only; recorded rows have no chapter |
 
 ## Cause state

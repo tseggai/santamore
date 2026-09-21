@@ -1,29 +1,26 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { MembersManager } from "@/components/admin/MembersManager";
-import { loadPeople } from "@/lib/server/people";
-import type { Locale } from "@/i18n/routing";
+import { DonorsManager, type DonorGift, type DonorRow } from "@/components/admin/DonorsManager";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-/** Donors: the accounts behind approved gifts, with what each gave. */
+/** Donors: everyone a money-in row belongs to, from the ledger (v_donors, migration 0067), with their gifts. */
 export default async function DonorsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("admin");
-  const people = await loadPeople();
+  const supabase = await createClient();
+  const [{ data: donors }, { data: gifts }] = await Promise.all([
+    supabase.from("v_donors").select("*").order("given_cents", { ascending: false }).limit(5000),
+    supabase.from("v_donor_gifts").select("*").order("entry_date", { ascending: false }).limit(20_000),
+  ]);
   return (
     <div className="pb-8">
       <p className="max-w-2xl text-[14px] leading-relaxed text-black/60">{t("donorsHint")}</p>
-      <MembersManager
-        locale={locale as Locale}
-        mode="donors"
-        members={people.accounts.filter((m) => m.donations > 0)}
-        pages={people.pages}
-        registrations={people.registrations}
-        teams={people.teams}
-        canManage={people.canManage}
-      />
+      <div className="mt-4">
+        <DonorsManager donors={(donors ?? []) as DonorRow[]} gifts={(gifts ?? []) as DonorGift[]} />
+      </div>
     </div>
   );
 }

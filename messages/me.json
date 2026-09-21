@@ -1470,7 +1470,7 @@
     "supportersTabDonors": "Donatori",
     "supportersTabParticipants": "Učesnici",
     "supportersTabTeams": "Timovi",
-    "donorsHint": "Nalozi iza odobrenih poklona, sa iznosom svakog. Pokloni bez naloga su samo u knjizi.",
+    "donorsHint": "Svi kojima pripada poklon, iz knjige: pokloni upareni ovdje, imena zapisana na godišnjem izvještaju, novac podržavaoca. Jedan red po donatoru, sa nalogom ili bez; red otvara njegove poklone.",
     "participantsHint": "Svi prijavljeni na događaj ili koji su javili da dolaze, i sportisti sa uključenom Stravom. Otvori red za prijave i aktivnost.",
     "staffSectionHint": "Zapisi osoblja koji čine tim, i svaki nalog sa nivoom pristupa: član, računovodstvo, osoblje ili admin.",
     "staffTabTeam": "Osoblje",
@@ -1489,7 +1489,22 @@
     "homePhotoHint": "Slika iza uvodnog slajda početne strane. Pejzažna, široka; ide ispod tamnog tona sa naslovom preko. Bez nje ostaje čista boja mora.",
     "homePhotoAdd": "Dodaj fotografiju",
     "homePhotoReplace": "Zamijeni fotografiju",
-    "homePhotoRemove": "Ukloni"
+    "homePhotoRemove": "Ukloni",
+    "dnColSource": "Izvor",
+    "dnColGifts": "Pokloni",
+    "dnColLast": "Zadnji poklon",
+    "dnAccount": "Nalog",
+    "dnAnonymous": "Anonimno",
+    "dnSearch": "Pretraži po imenu ili cilju",
+    "dnEmpty": "Još nema poklona u knjizi.",
+    "dnGiftsSince": "{count, plural, one {# poklon} few {# poklona} other {# poklona}} od {date}",
+    "dnOpenAccount": "Otvori nalog pod Osoblje → Nalozi",
+    "dnSource": {
+      "ledger": "Knjiga",
+      "recorded": "Zapisano",
+      "sponsorship": "Podržavalac",
+      "adjustment": "Ispravka"
+    }
   },
   "forms": {
     "nameLabel": "Ime i prezime",

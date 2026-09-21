@@ -1470,7 +1470,7 @@
     "supportersTabDonors": "Donors",
     "supportersTabParticipants": "Participants",
     "supportersTabTeams": "Teams",
-    "donorsHint": "The accounts behind approved gifts, with what each gave. Gifts without an account are in the ledger only.",
+    "donorsHint": "Everyone a gift belongs to, from the ledger: gifts matched here, names recorded on a year report, a supporter's cash. One row per donor, whether or not they have an account; the row opens their gifts.",
     "participantsHint": "Everyone registered for an event or who said they are coming, and the athletes with Strava on. Open a row for their registrations and activity.",
     "staffSectionHint": "The staff records that make up the team, and every account with its access level: member, accounting, staff or admin.",
     "staffTabTeam": "Staff",
@@ -1489,7 +1489,22 @@
     "homePhotoHint": "The picture behind the opening slide of the landing page. Landscape, wide; it sits under a dark tint with the headline on top. None means the plain sea colour.",
     "homePhotoAdd": "Add a photo",
     "homePhotoReplace": "Replace the photo",
-    "homePhotoRemove": "Remove"
+    "homePhotoRemove": "Remove",
+    "dnColSource": "From",
+    "dnColGifts": "Gifts",
+    "dnColLast": "Last gift",
+    "dnAccount": "Account",
+    "dnAnonymous": "Anonymous",
+    "dnSearch": "Search by name or cause",
+    "dnEmpty": "No gifts in the ledger yet.",
+    "dnGiftsSince": "{count, plural, one {# gift} other {# gifts}} since {date}",
+    "dnOpenAccount": "Open their account under Staff → Accounts",
+    "dnSource": {
+      "ledger": "Ledger",
+      "recorded": "Recorded",
+      "sponsorship": "Supporter",
+      "adjustment": "Correction"
+    }
   },
   "forms": {
     "nameLabel": "Full name",
