@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import packJson from "@/content/legal-pack/pack.json";
-import { initialFields, packProblems, placeholderIds, sanitizeDraftHtml, segments, type LegalPack } from "./legal-pack";
+import { initialFields, packProblems, placeholderIds, sanitizeDraftHtml, savePackSchema, segments, type LegalPack } from "./legal-pack";
 
 const pack = packJson as unknown as LegalPack;
 
@@ -63,5 +63,23 @@ describe("sanitizeDraftHtml", () => {
       expect(clean, draft.id).not.toBeNull();
       expect(clean!.replace(/<br \/>/g, "<br>").replace(/\s+/g, " ")).toBe(draft.html.replace(/\s+/g, " "));
     }
+  });
+});
+
+describe("savePackSchema", () => {
+  const schema = savePackSchema(pack);
+
+  it("accepts each part of the pack and rejects unknown ids", () => {
+    expect(schema.safeParse({ key: "fields", value: { org: { me: "a", en: "b", stale: null } } }).success).toBe(true);
+    expect(schema.safeParse({ key: "fields", value: { nope: { me: "a", en: "b", stale: null } } }).success).toBe(false);
+    expect(schema.safeParse({ key: "checks", value: { s1_1: true } }).success).toBe(true);
+    expect(schema.safeParse({ key: "checks", value: { s9_999: true } }).success).toBe(false);
+    expect(schema.safeParse({ key: "draft:impressum", value: { html: "<p>x</p>" } }).success).toBe(true);
+    expect(schema.safeParse({ key: "draft:unknown", value: { html: "<p>x</p>" } }).success).toBe(false);
+    expect(schema.safeParse({ key: "other", value: {} }).success).toBe(false);
+  });
+
+  it("accepts the whole initial field state", () => {
+    expect(schema.safeParse({ key: "fields", value: initialFields(pack) }).success).toBe(true);
   });
 });

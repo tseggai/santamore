@@ -1,9 +1,7 @@
 "use server";
 
-import { z } from "zod";
-
 import packJson from "@/content/legal-pack/pack.json";
-import { DRAFT_KEY, sanitizeDraftHtml, type LegalPack } from "@/lib/legal-pack";
+import { sanitizeDraftHtml, savePackSchema, type LegalPack } from "@/lib/legal-pack";
 import { isStaffRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 
@@ -12,19 +10,9 @@ import { createClient } from "@/lib/supabase/server";
 // languages goes through translateFields in ../translate-actions.ts.
 
 const pack = packJson as unknown as LegalPack;
-const FIELD_IDS = new Set(Object.keys(pack.fields));
-const CHECK_IDS = new Set(pack.forms.flatMap((f) => f.blocks.flatMap((b) => (b.type === "check" ? [b.id] : []))));
-const DRAFT_IDS = new Set(pack.drafts.map((d) => d.id));
+const inputSchema = savePackSchema(pack);
 
 export type SaveLegalPackResult = { ok: true; updatedAt: string } | { ok: false; error: "invalid" | "forbidden" | "missing_table" | "server" };
-
-const fieldState = z.object({ me: z.string().max(20_000), en: z.string().max(20_000), stale: z.enum(["me", "en"]).nullable() });
-
-const inputSchema = z.discriminatedUnion("key", [
-  z.object({ key: z.literal("fields"), value: z.record(z.string().regex(/^[a-z0-9_]{1,40}$/), fieldState).refine((v) => Object.keys(v).every((id) => FIELD_IDS.has(id))) }),
-  z.object({ key: z.literal("checks"), value: z.record(z.string().regex(/^s\d_\d{1,3}$/), z.boolean()).refine((v) => Object.keys(v).every((id) => CHECK_IDS.has(id))) }),
-  z.object({ key: z.string().regex(DRAFT_KEY).refine((k) => DRAFT_IDS.has(k.slice("draft:".length))), value: z.object({ html: z.string().max(400_000) }) }),
-]);
 
 export async function saveLegalPack(input: unknown): Promise<SaveLegalPackResult> {
   const parsed = inputSchema.safeParse(input);

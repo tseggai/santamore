@@ -10,6 +10,8 @@
  * other stale until it is translated again.
  */
 
+import { z } from "zod";
+
 export type PackLang = "me" | "en";
 export type Bilingual = Record<PackLang, string>;
 
@@ -167,4 +169,21 @@ export function sanitizeDraftHtml(html: string): string | null {
     });
   if (/<\s*(script|style|iframe|object|embed|form|input|link|meta)\b/i.test(out) || /\son[a-z]+\s*=/i.test(out) || /javascript:/i.test(out)) return null;
   return out;
+}
+
+/**
+ * What the save action accepts: one part of the pack, its value shaped for
+ * that part, every id checked against the pack. Plain union: a regex key
+ * cannot be a zod discriminator (zod 4 throws at module load).
+ */
+export function savePackSchema(pack: LegalPack) {
+  const fieldIds = new Set(Object.keys(pack.fields));
+  const checkIds = new Set(pack.forms.flatMap((f) => f.blocks.flatMap((b) => (b.type === "check" ? [b.id] : []))));
+  const draftIds = new Set(pack.drafts.map((d) => d.id));
+  const fieldState = z.object({ me: z.string().max(20_000), en: z.string().max(20_000), stale: z.enum(["me", "en"]).nullable() });
+  return z.union([
+    z.object({ key: z.literal("fields"), value: z.record(z.string().regex(/^[a-z0-9_]{1,40}$/), fieldState).refine((v) => Object.keys(v).every((id) => fieldIds.has(id))) }),
+    z.object({ key: z.literal("checks"), value: z.record(z.string().regex(/^s\d_\d{1,3}$/), z.boolean()).refine((v) => Object.keys(v).every((id) => checkIds.has(id))) }),
+    z.object({ key: z.string().regex(DRAFT_KEY).refine((k) => draftIds.has(k.slice("draft:".length))), value: z.object({ html: z.string().max(400_000) }) }),
+  ]);
 }
