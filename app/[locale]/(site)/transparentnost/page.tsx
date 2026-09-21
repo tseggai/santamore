@@ -40,8 +40,8 @@ interface InRow {
   campaign_title: string | null;
   chapter_slug: string | null;
   rail: string;
-  /** Which record the row comes from: the ledger, a year report, or a sponsorship. */
-  source: "ledger" | "recorded" | "sponsorship";
+  /** Which record the row comes from: the ledger, a correction to it, a year report, or a sponsorship. */
+  source: "ledger" | "adjustment" | "recorded" | "sponsorship";
 }
 interface OutRow {
   id: string;
@@ -51,7 +51,7 @@ interface OutRow {
   category: string | null;
   chapter_slug: string | null;
   documentation_paths: string[];
-  source: "ledger" | "recorded";
+  source: "ledger" | "adjustment" | "recorded";
   is_paid: boolean;
 }
 interface AdjRow {
@@ -75,6 +75,8 @@ interface YearStats {
   event_count: number;
   supporter_count: number;
   beneficiary_count: number;
+  sponsor_cash_cents: number;
+  sponsor_impact_cents: number;
 }
 interface YearReport {
   year: number;
@@ -243,7 +245,8 @@ export default async function LedgerPage({
   // the volunteers by name.
   const recordedEvents = report?.events ?? [];
   const volunteers = [...new Set([...teamVolunteers, ...(report?.volunteers_list ?? [])])];
-  const recordedOutsideLedger = inRows.some((row) => row.source !== "ledger") || outRows.some((row) => row.source !== "ledger");
+  const fromLedger = (source: string) => source === "ledger" || source === "adjustment";
+  const recordedOutsideLedger = inRows.some((row) => !fromLedger(row.source)) || outRows.some((row) => !fromLedger(row.source));
   // The donor wall: every named gift of the year, one chip per name, plus
   // an individual supporter's gifts that fed operations (those are not
   // ledger rows, since they never went to a beneficiary).
@@ -255,9 +258,10 @@ export default async function LedgerPage({
       (su.gifts ?? []).filter((g) => g.fund !== "impact" && !g.in_kind).map((g) => ({ name: su.name, amount_cents: g.amount_cents, target: g.target, date: g.date })),
     ),
   ]);
-  const sponsorCash = supporters.reduce((sum, su) => sum + su.cash_cents, 0);
-  // Sponsorship cash that went to beneficiaries counts as raised, not as operations.
-  const sponsorImpact = supporters.reduce((sum, su) => sum + (su.impact_cents ?? 0), 0);
+  // Sponsorship cash of the year, and the part that went to beneficiaries
+  // (raised, not operations): columns of the year view, not a page-side sum.
+  const sponsorCash = derived?.sponsor_cash_cents ?? 0;
+  const sponsorImpact = derived?.sponsor_impact_cents ?? 0;
   // Hand-overs of the year grouped by their public label, whatever record they come from.
   const byLabel = new Map<string, number>();
   for (const row of outRows) if (row.is_paid) byLabel.set(row.beneficiary_label, (byLabel.get(row.beneficiary_label) ?? 0) + row.amount_cents);
@@ -278,7 +282,10 @@ export default async function LedgerPage({
       ? formatSignedCents(cents, locale as Locale, { trimWholeCents: true })
       : formatCents(cents, locale as Locale, { trimWholeCents: true });
 
-  const moneyIn: LedgerRow[] = inRows.map((row) => ({
+  // Corrections are ledger rows too (migration 0062), but they read best as
+  // their own dated lines with the reason, so the lists show the entries and
+  // the corrections block below shows the corrections.
+  const moneyIn: LedgerRow[] = inRows.filter((row) => row.source !== "adjustment").map((row) => ({
     id: row.id,
     date: row.entry_date,
     name: row.display_name,
@@ -290,12 +297,12 @@ export default async function LedgerPage({
     amountCents: row.amount_cents,
   }));
 
-  const moneyOut: LedgerRow[] = outRows.map((row) => ({
+  const moneyOut: LedgerRow[] = outRows.filter((row) => row.source !== "adjustment").map((row) => ({
     id: row.id,
     date: row.entry_date,
     name: row.beneficiary_label,
     // A recorded hand-over has no chapter: say where the row comes from instead.
-    attribution: row.source !== "ledger" ? t("railRecorded") : row.chapter_slug ? row.chapter_slug.toUpperCase() : t("national"),
+    attribution: !fromLedger(row.source) ? t("railRecorded") : row.chapter_slug ? row.chapter_slug.toUpperCase() : t("national"),
     railKey: null,
     amountCents: row.amount_cents,
     docs: row.documentation_paths.flatMap((path, index) => {

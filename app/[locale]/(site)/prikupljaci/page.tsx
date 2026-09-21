@@ -48,9 +48,10 @@ async function fetchBoard(causeSlug: string | undefined) {
     const supabase = await createClient();
     const { data: causeRows } = await supabase
       .from("v_public_campaigns")
-      .select("id, slug, title, ends_at")
+      .select("id, slug, title, ends_at, pages_raised_cents")
       .order("starts_at", { ascending: false });
-    const options: CauseOption[] = ((causeRows ?? []) as { id: string; slug: string; title: string; ends_at: string | null }[]).map((c) => ({
+    const causeList = (causeRows ?? []) as { id: string; slug: string; title: string; ends_at: string | null; pages_raised_cents: number }[];
+    const options: CauseOption[] = causeList.map((c) => ({
       id: c.id,
       name: c.title,
       slug: c.slug,
@@ -60,7 +61,7 @@ async function fetchBoard(causeSlug: string | undefined) {
     const chosen = causeSlug ? (options.find((c) => c.slug === causeSlug) ?? null) : null;
     let individualsQuery = supabase.from("v_leaderboard").select("slug, title, photo_path, raised_cents, campaign_id");
     let teamsQuery = supabase.from("v_leaderboard_teams").select("slug, name, photo_path, raised_cents, member_count, campaign_id");
-    let totalsQuery = supabase.from("v_fundraiser_totals").select("raised_cents, campaign_id");
+    let totalsQuery = supabase.from("v_fundraiser_totals").select("campaign_id");
     if (chosen) {
       individualsQuery = individualsQuery.eq("campaign_id", chosen.id);
       teamsQuery = teamsQuery.eq("campaign_id", chosen.id);
@@ -72,7 +73,7 @@ async function fetchBoard(causeSlug: string | undefined) {
       // Header aggregates over EVERY active page, not just the displayed 100.
       totalsQuery,
     ]);
-    const totalsRows = (allTotals ?? []) as { raised_cents: number; campaign_id: string | null }[];
+    const totalsRows = (allTotals ?? []) as { campaign_id: string | null }[];
     for (const row of totalsRows) {
       const option = options.find((c) => c.id === row.campaign_id);
       if (option) option.pages += 1;
@@ -84,7 +85,8 @@ async function fetchBoard(causeSlug: string | undefined) {
       individuals: (individuals ?? []) as IndividualRow[],
       teams: (teams ?? []) as TeamRow[],
       activeCount: totalsRows.length,
-      totalRaised: totalsRows.reduce((sum, row) => sum + row.raised_cents, 0),
+      // What the pages raised: the cause view's column (migration 0062), not a sum over the board.
+      totalRaised: (chosen ? causeList.filter((c) => c.id === chosen.id) : causeList).reduce((sum, c) => sum + c.pages_raised_cents, 0),
     };
   } catch {
     return null;

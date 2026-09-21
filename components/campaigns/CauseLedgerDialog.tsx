@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 
 import { fetchCauseLedger, type CauseLedger } from "@/app/[locale]/(site)/kampanje/actions";
-import { formatCents } from "@/lib/money";
+import { formatSignedCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
@@ -43,7 +43,8 @@ export function CauseLedgerDialog({ slug, className }: { slug: string; className
     setOpen(true);
     if (!ledger) setLedger(await fetchCauseLedger(slug).catch(() => ({ rows: [], totalCents: 0, donorCount: 0 })));
   };
-  const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
+  // A correction is a signed line in the same list.
+  const money = (cents: number) => formatSignedCents(cents, locale, { trimWholeCents: true });
 
   return (
     <>

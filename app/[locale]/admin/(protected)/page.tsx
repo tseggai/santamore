@@ -38,11 +38,9 @@ async function fetchOverview() {
       .select("id", { count: "exact", head: true })
       .eq("status", "pending"),
     supabase
-      .from("donations")
-      .select("approved_at, amount_cents")
-      .eq("status", "approved")
-      .gte("approved_at", sinceIso)
-      .limit(2000),
+      .from("v_money_in_daily")
+      .select("entry_date, amount_cents")
+      .gte("entry_date", sinceIso.slice(0, 10)),
     supabase.from("registrations").select("id", { count: "exact", head: true }),
     supabase
       .from("registrations")
@@ -61,7 +59,8 @@ async function fetchOverview() {
       .gte("created_at", weekAgoIso),
   ]);
 
-  // Bucket approved money-in per UTC day for the 30-day chart.
+  // The 30-day chart: one row per day from the ledger (v_money_in_daily),
+  // so refunds, corrections and recorded gifts count like everywhere else.
   const start = new Date(sinceIso).getTime();
   const days: DayPoint[] = Array.from({ length: 30 }, (_, index) => ({
     date: new Date(start + index * DAY_MS).toISOString().slice(0, 10),
@@ -69,9 +68,8 @@ async function fetchOverview() {
   }));
   const byDate = new Map(days.map((day) => [day.date, day]));
   let chartTotal = 0;
-  for (const row of recentDonations.data ?? []) {
-    if (!row.approved_at) continue;
-    const bucket = byDate.get(row.approved_at.slice(0, 10));
+  for (const row of (recentDonations.data ?? []) as { entry_date: string; amount_cents: number }[]) {
+    const bucket = byDate.get(row.entry_date);
     if (bucket) {
       bucket.cents += row.amount_cents;
       chartTotal += row.amount_cents;

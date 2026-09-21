@@ -74,6 +74,16 @@ export function formatCents(
 }
 
 /**
+ * Plain "12.34" for exports and machine fields, signed, no float division.
+ */
+export function centsToEuros(cents: number): string {
+  if (!Number.isSafeInteger(cents)) throw new TypeError(`Expected integer cents, got: ${String(cents)}`);
+  const sign = cents < 0 ? "-" : "";
+  const abs = Math.abs(cents);
+  return `${sign}${Math.floor(abs / 100)}.${String(abs % 100).padStart(2, "0")}`;
+}
+
+/**
  * Format a signed cent amount for display, e.g. ledger_adjustments rows.
  * Design decision: money AMOUNTS (donations, disbursements) are always
  * non-negative Cents; only ledger_adjustments.amount_cents is a signed

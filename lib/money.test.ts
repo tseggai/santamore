@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  centsToEuros,
   MAX_CENTS,
   addCents,
   assertCents,
@@ -126,5 +127,17 @@ describe("parseEurosToCents", () => {
 
   it("returns null above the sanity cap", () => {
     expect(parseEurosToCents("999999999999")).toBeNull();
+  });
+});
+
+describe("centsToEuros", () => {
+  it("writes plain euros with two decimals and no float division", () => {
+    expect(centsToEuros(0)).toBe("0.00");
+    expect(centsToEuros(5)).toBe("0.05");
+    expect(centsToEuros(123456)).toBe("1234.56");
+    expect(centsToEuros(-250)).toBe("-2.50");
+  });
+  it("refuses a non-integer", () => {
+    expect(() => centsToEuros(1.5)).toThrow();
   });
 });

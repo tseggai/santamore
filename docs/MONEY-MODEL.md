@@ -1,6 +1,6 @@
 # Money model — one ledger, every figure derived from it
 
-_Audit of 2026-09-20 and the rule that came out of it._
+_Audit of 2026-09-20 and the rule that came out of it; corrections folded in on 2026-09-21 (docs/AUDIT.md)._
 
 ## The problem the audit found
 
@@ -26,20 +26,25 @@ Until migration 0054, every surface summed its own mix of these:
 
 **There is one money-in ledger and one money-out ledger. Every figure on every page is a sum over their rows.** Nothing is typed in, and no page adds a list on top of a view.
 
-Migration `20260920000054_one_ledger.sql` implements it:
+Migrations `20260920000054_one_ledger.sql` and `20260920000062_ledger_integrity.sql` implement it:
 
 ```
 v_money_in_all      every euro in, every cause     (internal, no grants)
 v_money_out_all     every euro out, every cause    (internal, no grants)
-      │
-      ├── v_public_ledger_in / v_public_ledger_out   the same rows, public causes only,
-      │                                              with `source` = ledger | recorded | sponsorship
+      │             rows: ledger | adjustment | recorded | sponsorship
+      ├── v_public_ledger_in / v_public_ledger_out   the same rows, public causes only
       ├── v_public_ledger_summary                    sums of those rows (home, admin overview, OG image)
-      ├── v_public_year_stats                        the same rows by year (money page)
-      ├── v_public_campaigns                         the same rows by cause (cause page, causes list, donate)
-      ├── v_public_ops_total                         operations-fund cash + entry fees only
-      └── v_campaign_totals                          the same rows by cause, all causes, staff only
+      ├── v_public_year_stats                        the same rows by year, plus sponsor cash of the year
+      ├── v_public_campaigns                         the same rows by cause, plus what its pages raised
+      ├── v_campaign_totals                          the same rows by cause, all causes, staff only
+      ├── v_fundraiser_totals / v_team_totals        the same rows by page and by team
+      │     └── v_leaderboard / v_leaderboard_teams
+      ├── v_staff_members                            raised and given per account, from the same rows
+      ├── v_money_in_daily                           the same rows by day, staff only (overview chart)
+      └── v_public_ops_total                         operations-fund cash + entry fees only
 ```
+
+A correction (`ledger_adjustments`) is a row of the ledger like any other, with `source = 'adjustment'`, the donor or beneficiary of the row it corrects, and a signed amount. Nothing sums adjustments separately any more; the public ledger lists them under the entries with their reason (`v_public_ledger_adjustments`), and the CSV exports do the same.
 
 Each row carries a `source`, so the public ledger can say where a row comes from (the `RECORDED` and `SPONSOR` pills), and a `donor_key` (a hashed email, a name, or a supporter id) so donor counts are distinct across sources without exposing anything.
 
@@ -52,9 +57,12 @@ Each row carries a `source`, so the public ledger can say where a row comes from
 | Money page, all years | `v_public_ledger_summary`, `v_public_ledger_in/out` | |
 | Money page, one year | `v_public_year_stats` for the figures, `v_public_ledger_in/out` windowed by `entry_date` for the lists | the donor wall and the hand-over list are grouped from the rows; the report contributes only events before the site and volunteers by name |
 | Cause page, causes list, hero slides, donate sheet | `v_public_campaigns` | raised, donor count, handed over |
-| Cause ledger dialog, CSV exports | `v_public_ledger_in/out` | filtered by `cause_slug` |
+| Cause ledger dialog | `v_public_campaigns` for the figure, `v_public_ledger_in` for the list | filtered by `cause_slug` |
+| CSV exports | `v_public_ledger_in/out` | entries, then corrections with their reason |
 | Admin causes list, admin years page | `v_campaign_totals` | published and draft causes alike |
-| Leaderboards, pages, teams | `v_fundraiser_totals`, `v_team_totals` | ledger donations by page; pages are ledger-era by nature |
+| Admin overview chart | `v_money_in_daily` | last 30 days |
+| Leaderboards, pages, teams, fundraisers board | `v_fundraiser_totals`, `v_team_totals`, `v_public_campaigns.pages_raised_cents` | the same rows by page |
+| Supporters tabs (raised, given) | `v_staff_members` | the same rows by account |
 | Chapter totals | `v_chapter_totals` | ledger only; recorded rows have no chapter |
 
 ## Cause state
@@ -73,9 +81,11 @@ Ask which rows it sums. If the answer is not "rows of `v_money_in_all` or `v_mon
 
 Migration 0055 adds a site-wide switch (`site_settings.test_mode`, read through `test_mode()`). While it is on, every cause, event, page, team, registration, gift, adjustment, hand-over, sponsorship, supporter, proposal, beneficiary and year report is created with `is_test = true`. Consequences:
 
-- test gifts and hand-overs are not immutable, and the delete functions treat test money as removable;
-- `v_money_in_all`, `v_money_out_all`, `v_public_campaigns` and `v_public_events` include test rows only while test mode is on, so going live hides them at once;
+- test gifts, corrections and hand-overs are not immutable, and the delete functions treat test money as removable;
+- every `v_public_*` view and every total includes test rows only while test mode is on, so going live hides them at once;
 - `purge_test_data()` (admin) removes every test row and everything that hangs off a test cause or event, and nothing else;
-- `set_record_test(kind, id, test)` (admin, migration 0059) flips one cause, event, page, team, supporter, beneficiary or proposal and everything attached to it either way, and `set_year_report_test(year, test)` does the same for a year report. Marking as test is the one edit the immutability triggers allow on live money; marking as live makes the money immutable again. A child of a parent that stays test still goes with the purge.
+- `set_record_test(kind, id, test)` (admin, migration 0059) flips one cause, event, page, team, supporter, beneficiary or proposal and everything attached to it either way, and `set_year_report_test(year, test)` does the same for a year report. Marking as test is the one edit the immutability triggers allow on live money (gifts, corrections and hand-overs alike); marking as live makes the money immutable again. A child of a parent that stays test still goes with the purge: the purge marks it test first, then removes it.
+
+Immutability, precisely: an approved or refunded gift allows approved → refunded, message moderation and the test flag; a published hand-over allows `paid_at` once and the test flag; a correction allows the test flag. Everything else is refused, and a correction is the way to change a figure.
 
 The switch and the purge live under Settings → Test & demo. Every admin list shows a red "Test" chip on test rows and offers "Mark as test data" / "Mark as live" on a selection (a year report has a checkbox in its form), so after a practice run the records worth keeping are qualified and the rest deleted one by one or purged together. The console badge reads "Test mode" and the public site shows a red bar while it is on.

@@ -25,17 +25,22 @@ export async function fetchCauseLedger(slug: string): Promise<CauseLedger> {
   if (!parsed.success) return { rows: [], totalCents: 0, donorCount: 0 };
   try {
     const supabase = await createClient();
-    const { data } = await supabase
-      .from("v_public_ledger_in")
-      .select("id, entry_date, amount_cents, display_name, fundraiser_title, rail")
-      .eq("cause_slug", parsed.data)
-      .order("entry_date", { ascending: false })
-      .limit(300);
+    // The figure is the cause's own (one sum over the ledger, migration 0062);
+    // the list is the latest rows, corrections included as signed lines.
+    const [{ data }, { data: cause }] = await Promise.all([
+      supabase
+        .from("v_public_ledger_in")
+        .select("id, entry_date, amount_cents, display_name, fundraiser_title, rail")
+        .eq("cause_slug", parsed.data)
+        .order("entry_date", { ascending: false })
+        .limit(300),
+      supabase.from("v_public_campaigns").select("raised_cents, donor_count").eq("slug", parsed.data).maybeSingle(),
+    ]);
     const rows = (data ?? []) as CauseLedgerRow[];
     return {
       rows,
-      totalCents: rows.reduce((sum, row) => sum + row.amount_cents, 0),
-      donorCount: rows.length,
+      totalCents: cause?.raised_cents ?? 0,
+      donorCount: cause?.donor_count ?? 0,
     };
   } catch {
     return { rows: [], totalCents: 0, donorCount: 0 };
