@@ -33,3 +33,7 @@ export function teamPhotoUrl(path: string | null): string | null {
 export function beneficiaryPhotoUrl(path: string | null): string | null {
   return publicStorageUrl("beneficiary-photos", path);
 }
+
+export function proposalPhotoUrl(path: string | null): string | null {
+  return publicStorageUrl("proposal-photos", path);
+}

@@ -2023,7 +2023,15 @@
     "readMore": "Read more",
     "readLess": "Show less",
     "voteFailed": "Your vote did not register. Try again.",
-    "voteClosed": "This proposal is no longer open for votes."
+    "voteClosed": "This proposal is no longer open for votes.",
+    "linkLabel": "Link (optional)",
+    "linkHint": "A website, an article, a social post: where people can read more.",
+    "photoLabel": "Photo (optional)",
+    "photoAdd": "Add a photo",
+    "photoReplace": "Replace the photo",
+    "photoRemove": "Remove",
+    "photoHint": "One picture of the need or the people behind it. Never someone's photo without their say.",
+    "openLink": "Read more at the link"
   },
   "beneficiaries": {
     "eyebrow": "Beneficiaries",

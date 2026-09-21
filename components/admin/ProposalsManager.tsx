@@ -8,7 +8,10 @@ import { chooseProposal, saveCriterion, setProposalStatus } from "@/app/[locale]
 import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 import { SidePanel } from "@/components/console/SidePanel";
 import { formatShortDate } from "@/lib/dates";
+import Image from "next/image";
+
 import { formatCents } from "@/lib/money";
+import { proposalPhotoUrl } from "@/lib/storage";
 import { SHORTLIST_SIZE } from "@/lib/proposals";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -29,6 +32,8 @@ export interface ProposalRow {
   created_at: string;
   votes: number;
   is_test?: boolean;
+  link_url?: string | null;
+  photo_path?: string | null;
 }
 
 export interface CriterionRow {
@@ -195,6 +200,14 @@ function ProposalPanel({ proposal, chapters, locale, canManage, onDone }: { prop
         {formatShortDate(proposal.created_at, locale)} · {t("prBy")} {proposal.proposer_name || "—"} · ▲ {proposal.votes} {t("prVotes")}
       </p>
       <p className="whitespace-pre-line text-[15px] leading-relaxed">{proposal.summary}</p>
+      {proposal.photo_path ? (
+        <Image src={proposalPhotoUrl(proposal.photo_path) ?? ""} alt="" width={800} height={450} className="aspect-[16/9] w-full max-w-md rounded-lg bg-paper object-cover" />
+      ) : null}
+      {proposal.link_url ? (
+        <p className="text-[14px]">
+          <a href={proposal.link_url} target="_blank" rel="noopener noreferrer" className="break-all font-semibold text-sea underline underline-offset-2">{proposal.link_url} ↗</a>
+        </p>
+      ) : null}
       <dl className="grid gap-x-4 gap-y-2 text-[14px] sm:grid-cols-2">
         {proposal.location ? (<><dt className="font-semibold">{t("cpLocation")}</dt><dd>{proposal.location}</dd></>) : null}
         {proposal.beneficiary ? (<><dt className="font-semibold">{t("campBeneficiary")}</dt><dd>{proposal.beneficiary}</dd></>) : null}

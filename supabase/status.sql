@@ -161,6 +161,8 @@ select * from (values
                and pg_get_functiondef(p.oid) like '%Marking a live gift as test data%'))
   ,('20260920000058_proposal_edit',
      to_regprocedure('public.update_my_proposal(uuid, text, text, text, text, bigint)') is not null)
+  ,('20260920000064_proposal_media',
+     to_regprocedure('public.update_my_proposal(uuid, text, text, text, text, bigint, text, text)') is not null)
   ,('20260920000063_cause_completed',
      exists (select 1 from information_schema.columns
              where table_schema = 'public' and table_name = 'v_public_campaigns' and column_name = 'completed_at'))

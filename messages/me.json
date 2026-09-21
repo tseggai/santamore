@@ -2023,7 +2023,15 @@
     "readMore": "Pročitaj više",
     "readLess": "Prikaži manje",
     "voteFailed": "Glas nije zabilježen. Pokušaj ponovo.",
-    "voteClosed": "Ovaj prijedlog više ne prima glasove."
+    "voteClosed": "Ovaj prijedlog više ne prima glasove.",
+    "linkLabel": "Link (opciono)",
+    "linkHint": "Sajt, članak, objava: gdje ljudi mogu pročitati više.",
+    "photoLabel": "Fotografija (opciono)",
+    "photoAdd": "Dodaj fotografiju",
+    "photoReplace": "Zamijeni fotografiju",
+    "photoRemove": "Ukloni",
+    "photoHint": "Jedna slika potrebe ili ljudi iza nje. Nikad nečija fotografija bez pristanka.",
+    "openLink": "Pročitaj više na linku"
   },
   "beneficiaries": {
     "eyebrow": "Korisnici",

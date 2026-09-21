@@ -7,7 +7,10 @@ import { useState } from "react";
 import { toggleVote } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
 import { SidePanel } from "@/components/console/SidePanel";
 import { ProposeForm } from "@/components/proposals/ProposeForm";
+import Image from "next/image";
+
 import { formatCents } from "@/lib/money";
+import { proposalPhotoUrl } from "@/lib/storage";
 import { SHORTLIST_SIZE } from "@/lib/proposals";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -26,6 +29,9 @@ export interface PublicProposal {
   campaign_slug: string | null;
   /** The reader proposed it (migration 0058). */
   is_mine?: boolean;
+  /** Where to read more, and one picture (migration 0064); shown once the proposal is opened. */
+  link_url?: string | null;
+  photo_path?: string | null;
 }
 
 /**
@@ -134,6 +140,14 @@ export function ProposalsList({
               {compact ? null : (
                 <>
                   <p className={`mt-2 text-[14.5px] leading-relaxed text-black/75 ${expanded.has(proposal.id) ? "whitespace-pre-line" : "truncate"}`}>{proposal.summary}</p>
+                  {expanded.has(proposal.id) && proposal.photo_path ? (
+                    <Image src={proposalPhotoUrl(proposal.photo_path) ?? ""} alt="" width={800} height={450} className="mt-3 aspect-[16/9] w-full max-w-lg rounded-lg bg-paper object-cover" />
+                  ) : null}
+                  {expanded.has(proposal.id) && proposal.link_url ? (
+                    <p className="mt-2 text-[14px]">
+                      <a href={proposal.link_url} target="_blank" rel="noopener noreferrer" className="break-all font-semibold text-sea underline underline-offset-2 hover:text-sea-2">{t("openLink")} ↗</a>
+                    </p>
+                  ) : null}
                   <button
                     type="button"
                     aria-expanded={expanded.has(proposal.id)}
@@ -170,7 +184,7 @@ export function ProposalsList({
         <ProposeForm
           key={editingProposal.id}
           criteria={[]}
-          edit={{ id: editingProposal.id, title: editingProposal.title, summary: editingProposal.summary, location: editingProposal.location, beneficiary: editingProposal.beneficiary, amountCents: editingProposal.amount_cents }}
+          edit={{ id: editingProposal.id, title: editingProposal.title, summary: editingProposal.summary, location: editingProposal.location, beneficiary: editingProposal.beneficiary, amountCents: editingProposal.amount_cents, linkUrl: editingProposal.link_url ?? null, photoPath: editingProposal.photo_path ?? null }}
           onSaved={() => {
             setEditing(null);
             router.refresh();

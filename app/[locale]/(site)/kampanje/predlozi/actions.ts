@@ -17,6 +17,9 @@ const proposeSchema = z.object({
   location: z.string().trim().max(120).nullable(),
   beneficiary: z.string().trim().max(200).nullable(),
   amountCents: z.number().int().min(0).max(MAX_CENTS).nullable(),
+  /** Where people can read more, and one picture (a path in proposal-photos under the proposer's folder). */
+  linkUrl: z.string().trim().url().max(300).nullable(),
+  photoPath: z.string().trim().max(200).regex(/^[0-9a-f-]{36}\/[\w.-]+$/).nullable(),
   answers: z.record(z.string().uuid(), z.boolean()),
   locale: z.enum(["me", "en", "ru"]),
 });
@@ -53,6 +56,7 @@ export async function proposeCause(input: unknown): Promise<ProposeResult> {
   const failed = failedCriteria(criteria, data.answers);
   const reasons = failed.map((criterion) => criterion[`reason_${data.locale}` as const]);
 
+  if (data.photoPath && !data.photoPath.startsWith(`${user.id}/`)) return { ok: false, error: "invalid" };
   const { data: row, error } = await supabase
     .from("cause_proposals")
     .insert({
@@ -62,6 +66,8 @@ export async function proposeCause(input: unknown): Promise<ProposeResult> {
       location: data.location,
       beneficiary: data.beneficiary,
       amount_cents: data.amountCents,
+      link_url: data.linkUrl,
+      photo_path: data.photoPath,
       status: failed.length > 0 ? "rejected" : "open",
       // Stored in English so staff read one language in the console.
       rejection_reasons: failed.map((criterion) => criterion.reason_en),
@@ -131,6 +137,8 @@ export async function updateProposal(input: unknown): Promise<EditProposalResult
     p_location: data.location,
     p_beneficiary: data.beneficiary,
     p_amount_cents: data.amountCents,
+    p_link_url: data.linkUrl,
+    p_photo_path: data.photoPath,
   });
   if (error) {
     console.error("[proposals] update failed:", error.code, error.message);
