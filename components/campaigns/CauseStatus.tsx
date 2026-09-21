@@ -20,6 +20,14 @@ export function CauseStatus({ cause, className = "" }: { cause: CauseFigures; cl
     <span className={`flex flex-wrap items-center gap-2 ${className}`}>
       {state.completed ? <span className={`${chip} bg-sea text-paper`}>{t("statusCompleted")}</span> : null}
       {state.goalReached ? <span className={`${chip} bg-mist-2 text-sea`}>{t("statusGoalReached")}</span> : null}
+      {state.goalMet === false ? (
+        <span className={`${chip} bg-mist-2 text-red-dark`}>{t("statusGoalMissed")}</span>
+      ) : null}
+      {state.goalMet === false && cause.goal_cents ? (
+        <span className="text-[13.5px] text-black/70">
+          {t("statusRaisedOf", { raised: formatCents(cause.raised_cents, locale, { trimWholeCents: true }), goal: formatCents(cause.goal_cents, locale, { trimWholeCents: true }) })}
+        </span>
+      ) : null}
       {state.handedOver > 0 ? (
         <span className="text-[13.5px] text-black/70">
           {t.rich("statusHandedOver", {

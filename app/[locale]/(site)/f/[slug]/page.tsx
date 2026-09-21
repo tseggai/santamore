@@ -120,13 +120,19 @@ export default async function FundraiserPage({
               </>
             ) : null}
             {fundraiser.campaign_slug ? (
-              <Link href={`/kampanje/${fundraiser.campaign_slug}`} className={linkClass}>
-                {fundraiser.campaign_title}
-              </Link>
+              <>
+                {t("raisingFor")}{" "}
+                <Link href={`/kampanje/${fundraiser.campaign_slug}`} className={linkClass}>
+                  {fundraiser.campaign_title}
+                </Link>
+              </>
             ) : fundraiser.event_slug ? (
-              <Link href={`/dogadjaji/${fundraiser.event_slug}`} className={linkClass}>
-                {fundraiser.event_name}
-              </Link>
+              <>
+                {t("raisingFor")}{" "}
+                <Link href={`/dogadjaji/${fundraiser.event_slug}`} className={linkClass}>
+                  {fundraiser.event_name}
+                </Link>
+              </>
             ) : null}
           </p>
           <div className="mt-4 flex items-center gap-2">

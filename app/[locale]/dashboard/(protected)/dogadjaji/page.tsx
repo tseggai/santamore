@@ -5,6 +5,7 @@ import { GivingSection } from "@/components/dashboard/GivingSection";
 import { RsvpSelect } from "@/components/dashboard/RsvpSelect";
 import { DonateButton } from "@/components/donate/DonateButton";
 import { ExternalIcon } from "@/components/Icons";
+import { causeState } from "@/lib/cause-status";
 import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
@@ -35,6 +36,8 @@ interface CampaignRow {
   donor_count: number;
   starts_at: string | null;
   ends_at: string | null;
+  disbursed_cents: number;
+  completed_at: string | null;
 }
 
 /**
@@ -73,7 +76,7 @@ export default async function ConsoleEventsPage({
       .order("starts_at", { ascending: true }),
     supabase
       .from("v_public_campaigns")
-      .select("id, slug, title, goal_cents, raised_cents, donor_count, starts_at, ends_at")
+      .select("id, slug, title, goal_cents, raised_cents, donor_count, starts_at, ends_at, disbursed_cents, completed_at")
       .order("starts_at", { ascending: false }),
     supabase.from("registrations").select("event_id, status").eq("user_id", user.id),
     supabase.from("event_rsvps").select("event_id, status").eq("user_id", user.id),
@@ -103,6 +106,9 @@ export default async function ConsoleEventsPage({
   };
   const upcoming = events.filter((e) => !isPast(e));
   const past = events.filter(isPast).reverse();
+  // A cause is current until its records or staff say it is done (lib/cause-status.ts).
+  const currentCauses = campaigns.filter((c) => !causeState(c).completed);
+  const pastCauses = campaigns.filter((c) => causeState(c).completed);
 
   const dateFormat = new Intl.DateTimeFormat(htmlLang(loc), { day: "numeric", month: "long", year: "numeric" });
   const fmt = (iso: string | null) => (iso ? dateFormat.format(new Date(iso)) : "");
@@ -187,7 +193,8 @@ export default async function ConsoleEventsPage({
       <p className="mt-2 text-[15px] leading-relaxed text-black/65">{t("evSub")}</p>
 
       <section className="mt-6">
-        <h2 className="type-eyebrow text-black/60">{t("evUpcoming")}</h2>
+        <h2 className="type-display text-xl">{t("evEventsHeading")}</h2>
+        <h3 className="type-eyebrow mt-4 text-black/60">{t("evUpcoming")}</h3>
         {upcoming.length === 0 ? (
           <p className="mt-2 text-[14.5px] text-black/60">{t("evNoUpcoming")}</p>
         ) : (
@@ -205,12 +212,13 @@ export default async function ConsoleEventsPage({
       ) : null}
 
       <section className="mt-8 border-t-[0.5px] border-line pt-6">
-        <h2 className="type-eyebrow text-black/60">{t("evCampaigns")}</h2>
-        {campaigns.length === 0 ? (
-          <p className="mt-2 text-[14.5px] text-black/60">{t("evNoCampaigns")}</p>
+        <h2 className="type-display text-xl">{t("evCampaigns")}</h2>
+        <h3 className="type-eyebrow mt-4 text-black/60">{t("evCurrentCauses")}</h3>
+        {currentCauses.length === 0 ? (
+          <p className="mt-2 text-[14.5px] text-black/60">{t("evNoCurrentCauses")}</p>
         ) : (
           <ul className="mt-3 space-y-3">
-            {campaigns.map((campaign) => {
+            {currentCauses.map((campaign) => {
               const pct =
                 campaign.goal_cents && campaign.goal_cents > 0
                   ? Math.min(100, Math.round((campaign.raised_cents / campaign.goal_cents) * 100))
@@ -279,6 +287,45 @@ export default async function ConsoleEventsPage({
             })}
           </ul>
         )}
+        {pastCauses.length > 0 ? (
+          <details className="mt-6">
+            <summary className="cursor-pointer text-[14.5px] font-semibold text-black/70">{t("evPastCauses", { count: pastCauses.length })}</summary>
+            {/* a completed cause takes no more gifts and no new pages: figures and a link, no buttons */}
+            <ul className="mt-3 space-y-3">
+              {pastCauses.map((campaign) => {
+                const state = causeState(campaign);
+                return (
+                  <li key={campaign.slug} className="rounded-lg bg-mist p-4 sm:p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[16px] font-bold">{campaign.title}</p>
+                        <p className="mt-0.5 text-[14px] text-black/60">
+                          {campaign.starts_at ? fmt(campaign.starts_at) : ""}
+                          {campaign.ends_at ? ` — ${fmt(campaign.ends_at)}` : ""}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {chip(t("evCompleted"), "sea")}
+                          {state.goalMet === true ? chip(t("evGoalMet")) : null}
+                          {state.goalMet === false ? chip(t("evGoalMissed"), "red") : null}
+                          {campaignsRaising.has(campaign.slug) ? chip(t("evRaised")) : null}
+                          {supportedCampaigns.has(campaign.slug) ? chip(t("evSupported")) : null}
+                        </div>
+                        <p className="mt-3 font-mono text-[15px] tabular-nums">
+                          {money(campaign.raised_cents)}
+                          {campaign.goal_cents ? <span className="text-[13px] font-medium text-black/50"> / {money(campaign.goal_cents)}</span> : null}
+                          <span className="ml-3 font-sans text-[13px] font-medium text-black/55">{campaign.donor_count} {t("evDonors")}</span>
+                        </p>
+                      </div>
+                      <Link href={`/kampanje/${campaign.slug}`} aria-label={t("evView")} title={t("evView")} className={iconBtn}>
+                        <ExternalIcon />
+                      </Link>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </details>
+        ) : null}
       </section>
       <GivingSection locale={locale} />
     </div>

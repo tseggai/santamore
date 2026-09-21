@@ -456,9 +456,7 @@ export function PageEditor({
                 </button>
               ) : null}
               <span>·</span>
-              <label htmlFor="fCause" className="sr-only">
-                {t("causeLabel")}
-              </label>
+              <label htmlFor="fCause">{tRunner("raisingFor")}</label>
               {causeLocked || causes.length <= 1 ? (
                 <span className={fundraiser.causePublic ? linkClass : "text-black/60"} title={causeLocked ? t("causeLocked") : undefined}>
                   {fundraiser.causeTitle}

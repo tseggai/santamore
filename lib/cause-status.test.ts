@@ -7,7 +7,7 @@ const NOW = Date.parse("2026-09-19T12:00:00Z");
 describe("causeState", () => {
   it("is open while the end date is ahead and the goal is not met", () => {
     const state = causeState({ goal_cents: 500000, raised_cents: 120000, disbursed_cents: 0, ends_at: "2026-12-31T00:00:00Z" }, NOW);
-    expect(state).toEqual({ ended: false, goalReached: false, handedOver: 0, completed: false });
+    expect(state).toEqual({ ended: false, goalReached: false, handedOver: 0, completed: false, goalMet: null });
   });
 
   it("reads goal reached from the figures, not from a flag", () => {
@@ -60,5 +60,19 @@ describe("flagshipCause", () => {
 
   it("is null without causes", () => {
     expect(flagshipCause([], NOW)).toBeNull();
+  });
+});
+
+describe("completed by decision", () => {
+  it("is completed once staff close it, whatever the figures say", () => {
+    const state = causeState({ goal_cents: 100_000, raised_cents: 10_000, disbursed_cents: 0, ends_at: null, completed_at: "2026-09-21T00:00:00Z" }, Date.parse("2026-09-21T12:00:00Z"));
+    expect(state.completed).toBe(true);
+    expect(state.goalMet).toBe(false);
+  });
+  it("reports the goal met on a completed cause that reached it, and nothing on an open one", () => {
+    const done = causeState({ goal_cents: 100_000, raised_cents: 120_000, disbursed_cents: 0, ends_at: null, completed_at: "2026-09-21T00:00:00Z" });
+    expect(done.goalMet).toBe(true);
+    const open = causeState({ goal_cents: 100_000, raised_cents: 120_000, disbursed_cents: 0, ends_at: null, completed_at: null }, Date.parse("2026-09-21T12:00:00Z"));
+    expect(open.goalMet).toBe(null);
   });
 });

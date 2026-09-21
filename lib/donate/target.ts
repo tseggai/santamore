@@ -24,7 +24,7 @@ interface CampaignRow {
   ends_at: string | null;
 }
 
-const CAMPAIGN_COLUMNS = "slug, title, description, goal_cents, payment_reference, suggested_amounts, raised_cents, starts_at, ends_at";
+const CAMPAIGN_COLUMNS = "slug, title, description, goal_cents, payment_reference, suggested_amounts, raised_cents, disbursed_cents, starts_at, ends_at, completed_at";
 
 interface FundraiserRow {
   slug: string;

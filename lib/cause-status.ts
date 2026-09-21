@@ -7,6 +7,8 @@ export interface CauseFigures {
   /** Published hand-overs plus those recorded on a year report; absent before migration 0044. */
   disbursed_cents?: Cents | null;
   ends_at: string | null;
+  /** Staff closed the cause (migration 0063). */
+  completed_at?: string | null;
 }
 
 export interface CauseState {
@@ -16,8 +18,10 @@ export interface CauseState {
   goalReached: boolean;
   /** Money was handed over to the beneficiaries. */
   handedOver: Cents;
-  /** Ended, or everything raised has been handed over: nothing left to do. */
+  /** Closed by staff, ended, or everything raised has been handed over: nothing left to do. */
   completed: boolean;
+  /** For a completed cause with a goal: whether it was met. Null when there is no goal or it is still open. */
+  goalMet: boolean | null;
 }
 
 /**
@@ -26,10 +30,13 @@ export interface CauseState {
  */
 export function causeState(cause: CauseFigures, now: number = Date.now()): CauseState {
   const ended = cause.ends_at !== null && new Date(cause.ends_at).getTime() < now;
-  const goalReached = cause.goal_cents !== null && cause.goal_cents > 0 && cause.raised_cents >= cause.goal_cents;
+  const hasGoal = cause.goal_cents !== null && cause.goal_cents > 0;
+  const goalReached = hasGoal && cause.raised_cents >= (cause.goal_cents as Cents);
   const handedOver = cause.disbursed_cents ?? 0;
-  const completed = ended || (handedOver > 0 && cause.raised_cents > 0 && handedOver >= cause.raised_cents);
-  return { ended, goalReached, handedOver, completed };
+  const closed = Boolean(cause.completed_at);
+  const completed = closed || ended || (handedOver > 0 && cause.raised_cents > 0 && handedOver >= cause.raised_cents);
+  const goalMet = completed && hasGoal ? goalReached : null;
+  return { ended, goalReached, handedOver, completed, goalMet };
 }
 
 /** Open causes first, then the completed ones; each group keeps its order. */

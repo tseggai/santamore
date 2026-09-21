@@ -195,3 +195,24 @@ export async function deleteCampaigns(input: unknown): Promise<CampaignDeleteRes
   }
   return { ok: true, blocked, deleted };
 }
+
+/** Close a cause by decision (migration 0063): no more gifts, no new pages, every surface says so. Or reopen it. */
+export async function setCampaignsCompleted(input: unknown): Promise<CampaignActionResult> {
+  const parsed = z
+    .object({ ids: z.array(z.string().uuid()).min(1).max(200), completed: z.boolean() })
+    .safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("campaigns")
+    .update({ completed_at: parsed.data.completed ? new Date().toISOString() : null })
+    .in("id", parsed.data.ids);
+  if (error) return { ok: false, error: "server" };
+
+  revalidatePath("/[locale]/admin/kampanje", "page");
+  revalidatePath("/[locale]/kampanje", "layout");
+  revalidatePath("/[locale]/dashboard", "layout");
+  revalidatePath("/[locale]", "page");
+  return { ok: true };
+}

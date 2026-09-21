@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { deleteCampaigns, saveCampaign, setCampaignsPublic } from "@/app/[locale]/admin/(protected)/kampanje/actions";
+import { deleteCampaigns, saveCampaign, setCampaignsCompleted, setCampaignsPublic } from "@/app/[locale]/admin/(protected)/kampanje/actions";
 import { CoverField } from "@/components/admin/CoverField";
 import type { Option } from "@/components/admin/EventForm";
 import { GalleryManager, type GalleryAdminItem } from "@/components/admin/GalleryManager";
@@ -41,6 +41,8 @@ export interface CampaignRow {
   raised_cents: number;
   events: number;
   cover_path?: string | null;
+  /** Closed by staff (migration 0063). */
+  completed_at?: string | null;
   gallery: GalleryAdminItem[];
 }
 
@@ -443,6 +445,19 @@ export function CampaignsManager({
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
   const chapterName = new Map(chapters.map((c) => [c.id, c.name]));
 
+  const dialog = useDialog();
+  const setCompleted = async (ids: string[], completed: boolean, clear?: () => void) => {
+    if (completed && !(await dialog.confirm(t("caCompleteConfirm", { count: ids.length }), { danger: false, confirmLabel: t("caMarkCompleted") }))) return;
+    setBusy(true);
+    const result = await setCampaignsCompleted({ ids, completed }).catch(() => null);
+    setBusy(false);
+    if (!result?.ok) {
+      await dialog.alert(t("actionError"));
+      return;
+    }
+    clear?.();
+    router.refresh();
+  };
   const setPublic = async (ids: string[], isPublic: boolean, clear?: () => void) => {
     setBusy(true);
     await setCampaignsPublic({ ids, isPublic }).catch(() => null);
@@ -453,7 +468,6 @@ export function CampaignsManager({
   // Deleting is for a cause added by mistake; the database refuses one
   // with donations, hand-overs, pages or teams and says why.
   const [notice, setNotice] = useState<string[]>([]);
-  const dialog = useDialog();
   const isTest = (id: string) => Boolean(campaigns.find((c) => c.id === id)?.is_test);
   const remove = async (ids: string[], clear: () => void) => {
     if (!(await dialog.confirm(t("caDeleteConfirm", { count: ids.length })))) return;
@@ -484,6 +498,7 @@ export function CampaignsManager({
       cell: (c) => (
         <span className="inline-flex items-center gap-1.5">
           {c.is_public ? <Chip tone="sea">{t("campPublicBadge")}</Chip> : <Chip>{t("postDraft")}</Chip>}
+          {c.completed_at ? <Chip tone="ink">{t("caCompletedChip")}</Chip> : null}
           {c.is_test ? <Chip tone="red">{t("testChip")}</Chip> : null}
         </span>
       ),
@@ -492,8 +507,9 @@ export function CampaignsManager({
         options: [
           { value: "public", label: t("campPublicBadge") },
           { value: "draft", label: t("postDraft") },
+          { value: "completed", label: t("caCompletedChip") },
         ],
-        match: (c, value) => (value === "public" ? c.is_public : !c.is_public),
+        match: (c, value) => (value === "completed" ? Boolean(c.completed_at) : value === "public" ? c.is_public : !c.is_public),
       },
     },
     {
@@ -571,6 +587,8 @@ export function CampaignsManager({
           <>
             <button type="button" disabled={busy} onClick={() => setPublic(ids, true, clear)} className={bulkButton}>{t("galleryPublish")}</button>
             <button type="button" disabled={busy} onClick={() => setPublic(ids, false, clear)} className={bulkButton}>{t("galleryUnpublish")}</button>
+            <button type="button" disabled={busy} onClick={() => setCompleted(ids, true, clear)} className={bulkButton}>{t("caMarkCompleted")}</button>
+            <button type="button" disabled={busy} onClick={() => setCompleted(ids, false, clear)} className={bulkButton}>{t("caReopen")}</button>
             {canManage ? <TestFlagButtons kind="campaign" ids={ids} isTest={isTest} clear={clear} disabled={busy} /> : null}
             {canManage ? <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button> : null}
           </>
