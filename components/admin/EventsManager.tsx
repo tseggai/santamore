@@ -56,8 +56,9 @@ export function EventsManager({
   initialOpenId = "",
   canManage = false,
 }: {
-  title: string;
-  lead: string;
+  /** Left out inside the section: the layout draws the title, the actions go up to it. */
+  title?: string;
+  lead?: string;
   /** An event to open straight away, e.g. from the Photos overview. */
   initialOpenId?: string;
   /** Admin: deleting and the test flag are theirs (delete_event, set_record_test). */
