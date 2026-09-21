@@ -29,8 +29,7 @@ export default async function DonorsPage({ params, searchParams }: { params: Pro
   const giftRows = ((gifts ?? []) as DonorGift[]).filter((g) => year === null || g.year === year);
   return (
     <div className="pb-8">
-      <p className="max-w-2xl text-[14px] leading-relaxed text-black/60">{t("donorsHint")}</p>
-      <div className="mt-4"><YearSelect years={years} value={year} /></div>
+      <div><YearSelect years={years} value={year} /></div>
       <div className="mt-4">
         <DonorsManager donors={(donors ?? []) as DonorRow[]} gifts={giftRows} />
       </div>
