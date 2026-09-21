@@ -1438,7 +1438,12 @@
     "markTestConfirm": "{count, plural, one {Označiti ovaj zapis i sve vezano za njega kao test podatke?} few {Označiti # zapisa i sve vezano za njih kao test podatke?} other {Označiti # zapisa i sve vezano za njih kao test podatke?}} Pokloni, predaje, stranice i timovi koji se za njih vežu prestaju da se računaju čim je test režim isključen, gube nepromjenjivost i odlaze sa sljedećim čišćenjem. Pravi novac koji nije vezan ostaje netaknut.",
     "markLive": "Označi kao pravi zapis",
     "markLiveConfirm": "{count, plural, one {Prebaciti ovaj zapis i sve vezano za njega u pravi režim?} few {Prebaciti # zapisa i sve vezano za njih u pravi režim?} other {Prebaciti # zapisa i sve vezano za njih u pravi režim?}} Od sada se računaju, njihovi pokloni i predaje postaju nepromjenjivi, a čišćenje ih ne dira. Zapis pod nadređenim koji ostaje test i dalje odlazi sa čišćenjem.",
-    "yearTestData": "Test podaci (odlaze sa čišćenjem)"
+    "yearTestData": "Test podaci (odlaze sa čišćenjem)",
+    "peekEmpty": "Još ništa.",
+    "peekOpenFull": "Otvori cijelu listu",
+    "peekRsvpOnly": "Javili da dolaze, bez prijave",
+    "peekGuestOf": "gost: {name}",
+    "pagesDraftSuffix": "{count, plural, one {+# nacrt} few {+# nacrta} other {+# nacrta}}"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

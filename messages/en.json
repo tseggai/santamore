@@ -1438,7 +1438,12 @@
     "markTestConfirm": "{count, plural, one {Mark this record and everything attached to it as test data?} other {Mark # records and everything attached to them as test data?}} Gifts, hand-overs, pages and teams that hang off them stop counting the moment test mode is off, lose their immutability, and go with the next purge. Real money that is not attached is untouched.",
     "markLive": "Mark as live",
     "markLiveConfirm": "{count, plural, one {Qualify this record and everything attached to it for live mode?} other {Qualify # records and everything attached to them for live mode?}} They count from now on, their gifts and hand-overs become immutable, and the purge leaves them alone. A record under a parent that stays test still goes with the purge.",
-    "yearTestData": "Test data (goes with the purge)"
+    "yearTestData": "Test data (goes with the purge)",
+    "peekEmpty": "Nothing here yet.",
+    "peekOpenFull": "Open the full list",
+    "peekRsvpOnly": "Said they are coming, no registration",
+    "peekGuestOf": "guest of {name}",
+    "pagesDraftSuffix": "{count, plural, one {+# draft} other {+# drafts}}"
   },
   "forms": {
     "nameLabel": "Full name",
