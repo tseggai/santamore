@@ -19,7 +19,7 @@ export default async function BeneficiariesPage({ params }: { params: Promise<{ 
   ]);
   return (
     <div className="pb-8">
-      <SectionHeader title={t("bnHeading")} hint={t("bnHint")} />
+      <SectionHeader title={t("bnHeading")} />
       <div className="mt-6">
         <BeneficiariesManager rows={(rows ?? []) as BeneficiaryRow[]} causes={((causes ?? []) as { id: string; title: string }[]).map((c) => ({ id: c.id, title: c.title }))} canManage={await isAdmin()} />
       </div>

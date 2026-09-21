@@ -10,7 +10,7 @@ export default async function SupportersLayout({ children, params }: { children:
   setRequestLocale(locale);
   const t = await getTranslations("admin");
   return (
-    <SectionHeader title={t("supportersTitle")} hint={t("supportersSectionHint")}>
+    <SectionHeader title={t("supportersTitle")}>
       <SupportersTabs />
       <div className="[&>div]:pt-4">{children}</div>
     </SectionHeader>

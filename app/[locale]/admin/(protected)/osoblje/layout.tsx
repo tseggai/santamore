@@ -10,7 +10,7 @@ export default async function StaffLayout({ children, params }: { children: Reac
   setRequestLocale(locale);
   const t = await getTranslations("admin");
   return (
-    <SectionHeader title={t("navStaff")} hint={t("staffSectionHint")}>
+    <SectionHeader title={t("navStaff")}>
       <StaffTabs />
       <div className="[&>div]:pt-4">{children}</div>
     </SectionHeader>
