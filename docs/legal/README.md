@@ -12,7 +12,7 @@ translation for founders who do not read it.
 | `registration/statute-additions.md` | Draft statute chapters for the Board, Grants Committee, chapters and proxy voting |
 | `governance/*.md` | The policies and agreements the Board adopts and the public pages are regenerated from |
 | `dist/*.docx` | Word renders: A4, Montenegrin left, English right, one row per article; the completion guide as a single column |
-| `web/index.html` | The team review site: the five filing documents pre-filled with editable blue fields, the fourteen drafts editable in place, PDF download and print, shared saving; published as a claude.ai artifact |
+| `../../content/legal-pack/pack.json` | The registration pack the console serves at `/admin/registracija`: the five filing documents with pre-filled blanks, the founding checklist and the drafts, in both languages |
 
 ## Rebuilding the Word files
 
@@ -26,14 +26,18 @@ Ministry template with its translation by article number, step or bullet (`paire
 renders the completion guide as it is (`plain`). Edit the Markdown, rerun the script,
 commit both.
 
-## Rebuilding the review site
+## Rebuilding the registration pack
 
 ```
-node scripts/legal/build-web.js
+node scripts/legal/build-pack.js
 ```
 
-`scripts/legal/build-web.js` turns the Ministry's originals into forms whose blanks are pre-filled
-from the completion guide (unknown facts stay as bracketed placeholders), attaches the English
-translations per article, and embeds the drafts. `web-app.css` and `web-app.js` are the page's
-stylesheet and script. Publish the built file as an artifact with the `artifact` and `downloads`
-capabilities; the page saves the team's edits by republishing itself.
+`scripts/legal/build-pack.js` turns the Ministry's originals into templates whose blanks are
+pre-filled from the completion guide (unknown facts stay as bracketed placeholders), attaches
+the English translations per article, and embeds the drafts, into `content/legal-pack/pack.json`.
+The console page `/admin/registracija` (staff only) renders it: one language on screen, blue
+editable blanks shared by every form, the checklist, the drafts editable in place, Print / PDF,
+and Save for the whole team. Edits live in the `legal_pack` table (migration
+`20260921000069_legal_pack.sql`); switching languages translates the blanks changed on the
+other side through the same Claude helper the rest of the console uses. `lib/legal-pack.test.ts`
+checks that every blank is defined and matched across languages after a rebuild.
