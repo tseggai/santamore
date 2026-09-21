@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
-import { goingFor, pagesFor, type EventLinked, type LinkedRegistration } from "@/components/admin/EventPeekPanel";
+import { goingFor, pagesFor, type EventLinked, type LinkedRegistration } from "@/lib/event-linked";
 import { EventsManager, type EventListRow } from "@/components/admin/EventsManager";
 import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
 import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
