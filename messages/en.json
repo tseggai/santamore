@@ -1501,7 +1501,37 @@
       "adjustment": "Correction"
     },
     "yearFilterLabel": "Year",
-    "yearFilterAll": "All years"
+    "yearFilterAll": "All years",
+    "navRegistration": "Registration",
+    "legalPack": {
+      "title": "Registering the association",
+      "hint": "The five Ministry forms with their blanks filled in (blue, editable; one value serves every form), the step checklist and the policy drafts. One language on screen; switching languages translates whatever you changed. Save keeps it for the whole team. Print gives the document alone, in black, with the signature lines empty.",
+      "loadFailed": "The saved state could not be loaded; the recommended values are shown. If the legal_pack table does not exist yet, apply migration 20260921000069.",
+      "documents": "Documents",
+      "forms": "Forms",
+      "drafts": "Drafts",
+      "language": "Language",
+      "langMe": "Crnogorski",
+      "langEn": "English",
+      "both": "Both languages",
+      "save": "Save",
+      "saving": "Saving…",
+      "nothingToSave": "Saved",
+      "saved": "Saved for the whole team.",
+      "saveFailed": "Saving failed. Try again.",
+      "saveForbidden": "You are not allowed to change these documents.",
+      "print": "Print / PDF",
+      "translating": "Translating {n} fields…",
+      "translated": "{n} fields translated. Read the translation before saving.",
+      "translateFailed": "Translation failed; the fields marked red still wait for it.",
+      "translateUnconfigured": "Translation is not configured (ANTHROPIC_API_KEY). The fields marked red still wait for it.",
+      "translateNow": "Translate {n} fields",
+      "staleHint": "This field was changed in the other language and waits for translation.",
+      "fieldEmpty": "empty",
+      "lastSaved": "Last saved: {when}",
+      "neverSaved": "Nothing saved yet; the recommended values are shown.",
+      "draftHint": "The draft is bilingual; edit the text directly in either language. Tick both languages to see them side by side."
+    }
   },
   "forms": {
     "nameLabel": "Full name",

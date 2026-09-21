@@ -1501,7 +1501,37 @@
       "adjustment": "Ispravka"
     },
     "yearFilterLabel": "Godina",
-    "yearFilterAll": "Sve godine"
+    "yearFilterAll": "Sve godine",
+    "navRegistration": "Registracija",
+    "legalPack": {
+      "title": "Registracija udruženja",
+      "hint": "Pet obrazaca Ministarstva sa unaprijed popunjenim poljima (plavo, može se mijenjati; ista vrijednost važi u svim obrascima), lista koraka i nacrti pravila. Jedan jezik na ekranu; kad promijenite jezik, izmijenjena polja se prevode. „Sačuvaj“ čuva za cijeli tim. Štampa daje sam dokument, crno, sa praznim linijama za potpis.",
+      "loadFailed": "Sačuvano stanje nije moglo da se učita; prikazane su preporučene vrijednosti. Ako tabela legal_pack ne postoji, primijenite migraciju 20260921000069.",
+      "documents": "Dokumenti",
+      "forms": "Obrasci",
+      "drafts": "Nacrti",
+      "language": "Jezik",
+      "langMe": "Crnogorski",
+      "langEn": "English",
+      "both": "Oba jezika",
+      "save": "Sačuvaj",
+      "saving": "Čuvanje…",
+      "nothingToSave": "Sačuvano",
+      "saved": "Sačuvano za cijeli tim.",
+      "saveFailed": "Čuvanje nije uspjelo. Pokušajte ponovo.",
+      "saveForbidden": "Nemate pravo da mijenjate ove dokumente.",
+      "print": "Štampaj / PDF",
+      "translating": "Prevodim {n} polja…",
+      "translated": "Prevedeno {n} polja. Pregledajte prevod prije čuvanja.",
+      "translateFailed": "Prevod nije uspio; polja označena crvenom još čekaju prevod.",
+      "translateUnconfigured": "Prevod nije podešen (ANTHROPIC_API_KEY). Polja označena crvenom još čekaju prevod.",
+      "translateNow": "Prevedi {n} polja",
+      "staleHint": "Ovo polje je izmijenjeno na drugom jeziku i čeka prevod.",
+      "fieldEmpty": "prazno",
+      "lastSaved": "Poslednje sačuvano: {when}",
+      "neverSaved": "Još ništa nije sačuvano; prikazane su preporučene vrijednosti.",
+      "draftHint": "Nacrt je dvojezičan; tekst se mijenja direktno na oba jezika. Potvrdite oba jezika da vidite jedan uz drugi."
+    }
   },
   "forms": {
     "nameLabel": "Ime i prezime",
