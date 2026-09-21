@@ -4,8 +4,9 @@ Working files (all seven documents of the pack) for registering Santamore as a n
 (*nevladino udruženje*) in Montenegro, the first prerequisite for the bank
 account, the PIB and the Monri merchant account (brief §15, `docs/PLACEHOLDERS.md`).
 
-The Montenegrin originals were supplied to the team by a third party in
-September 2026 and are not stored here; the team holds them. This folder has:
+The Montenegrin originals as received in September 2026 are in `originals/`; Word renders
+of everything, Montenegrin left and English right, are in `../dist/` (see `../README.md`
+for how to rebuild them). This folder has:
 
 | File | What it is |
 |---|---|
