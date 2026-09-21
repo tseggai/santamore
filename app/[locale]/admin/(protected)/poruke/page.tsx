@@ -51,7 +51,6 @@ export default async function AdminMessagesPage({
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("messagesTitle")}</h1>
-      <p className="mt-1 text-[14px] text-black/60">{t("messagesHint")}</p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         {[null, ...KINDS].map((kindOption) => {
