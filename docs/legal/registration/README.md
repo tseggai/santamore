@@ -23,4 +23,4 @@ Rules from `CLAUDE.md` apply: no fabricated names, numbers, addresses or legal
 text. Every fact the founders must supply is marked `[[PLACEHOLDER]]`, every
 point to confirm with the Ministry or the lawyer is marked **CHECK**.
 
-Related: `docs/legal/governance/grants-criteria.md`, the beneficiary funding criteria the Grants Committee proposes and the Board publishes under Article 38 of the statute additions.
+Related governance drafts in `docs/legal/governance/`: `grants-criteria.md` (the beneficiary funding criteria under Article 38 of the statute additions) and `chapter-rules.md` (the Chapter Rules under Article 43).
