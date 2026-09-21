@@ -769,7 +769,7 @@
     "navBeneficiaries": "Beneficiaries",
     "navSettings": "Settings",
     "settingsTitle": "Settings",
-    "settingsHint": "What is not a record of something: the editorial pages, news, every photo set at a glance, and the demo data tool. Causes, events, beneficiaries, supporters, members and money each have their own place in the left nav.",
+    "settingsHint": "What is not a record of something: the editorial pages, news, every photo set at a glance, and the test and demo tools. Causes, events, beneficiaries, supporters, pages, staff and money each have their own place in the left nav.",
     "settingsTabPages": "Pages",
     "settingsTabNews": "News",
     "settingsTabPhotos": "Photos",
@@ -1190,7 +1190,7 @@
     "sitePageLinesHint": "One entry per line.",
     "pickByRole": "Everyone with a role:",
     "pickByName": "And by name:",
-    "pickNoPeople": "No one on the team yet. Add people under People → Team.",
+    "pickNoPeople": "No one on the team yet. Add people under Staff.",
     "pickNone": "Nothing to pick yet.",
     "sectionsHint": "The page is a list of sections. Open one to edit its text in the language tab above, attach people, supporters or beneficiaries to it, move it, or remove it. Add a section with a structure the site already uses. Save writes all three languages.",
     "sectionNew": "New section",
@@ -1469,7 +1469,9 @@
     "pagesHint": "Every fundraising page: who runs it, which cause and team it raises for, and its state. A fundraiser is a person and may hold several pages.",
     "pagesDeleteConfirm": "{count, plural, one {Delete this page?} other {Delete # pages?}} A page that took gifts is refused.",
     "pgColFundraiser": "Fundraiser",
-    "pgColTeam": "Team"
+    "pgColTeam": "Team",
+    "galleryDeleteConfirm": "Delete this photo?",
+    "demoAdminOnly": "Generating and purging demo data is for an admin."
   },
   "forms": {
     "nameLabel": "Full name",

@@ -60,9 +60,12 @@ export function ProposalsManager({
   proposals,
   criteria,
   chapters,
+  canManage = false,
 }: {
   locale: Locale;
   lead: string;
+  /** Admin: the test flag is theirs (set_record_test). */
+  canManage?: boolean;
   proposals: ProposalRow[];
   criteria: CriterionRow[];
   chapters: { id: string; name: string }[];
@@ -158,7 +161,7 @@ export function ProposalsManager({
       </section>
 
       <SidePanel open={current !== null} title={current?.title ?? ""} onClose={() => setOpen(null)}>
-        {current ? <ProposalPanel proposal={current} chapters={chapters} locale={locale} onDone={() => setOpen(null)} /> : null}
+        {current ? <ProposalPanel proposal={current} chapters={chapters} locale={locale} canManage={canManage} onDone={() => setOpen(null)} /> : null}
       </SidePanel>
       <SidePanel open={criterionOpen !== null} title={t("criteriaEdit")} onClose={() => setCriterionOpen(null)}>
         {criterionOpen ? <CriterionForm criterion={criterionOpen === "new" ? null : criterionOpen} nextOrder={(criteria.at(-1)?.sort_order ?? 0) + 10} onDone={() => setCriterionOpen(null)} /> : null}
@@ -167,7 +170,7 @@ export function ProposalsManager({
   );
 }
 
-function ProposalPanel({ proposal, chapters, locale, onDone }: { proposal: ProposalRow; chapters: { id: string; name: string }[]; locale: Locale; onDone: () => void }) {
+function ProposalPanel({ proposal, chapters, locale, canManage, onDone }: { proposal: ProposalRow; chapters: { id: string; name: string }[]; locale: Locale; canManage: boolean; onDone: () => void }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [note, setNote] = useState(proposal.staff_note ?? "");
@@ -208,9 +211,11 @@ function ProposalPanel({ proposal, chapters, locale, onDone }: { proposal: Propo
       {proposal.campaign_id ? (
         <Link href="/admin/kampanje" className="inline-block text-[14.5px] font-semibold text-sea underline underline-offset-2">{t("prChosenCause")} →</Link>
       ) : null}
-      <div className="flex flex-wrap gap-2">
-        <TestFlagButtons kind="proposal" ids={[proposal.id]} isTest={() => Boolean(proposal.is_test)} clear={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold hover:bg-mist-2 disabled:opacity-60" />
-      </div>
+      {canManage ? (
+        <div className="flex flex-wrap gap-2">
+          <TestFlagButtons kind="proposal" ids={[proposal.id]} isTest={() => Boolean(proposal.is_test)} clear={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold hover:bg-mist-2 disabled:opacity-60" />
+        </div>
+      ) : null}
 
       {!decided ? (
         <>

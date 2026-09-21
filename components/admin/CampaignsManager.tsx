@@ -423,11 +423,14 @@ export function CampaignsManager({
   title,
   lead,
   initialOpenId = "",
+  canManage = false,
 }: {
   title: string;
   lead: string;
   locale: Locale;
   campaigns: CampaignRow[];
+  /** Admin: deleting and the test flag are theirs (delete_campaign, set_record_test). */
+  canManage?: boolean;
   chapters: Option[];
   /** A cause to open straight away, e.g. from a year report's "Edit cause". */
   initialOpenId?: string;
@@ -568,8 +571,8 @@ export function CampaignsManager({
           <>
             <button type="button" disabled={busy} onClick={() => setPublic(ids, true, clear)} className={bulkButton}>{t("galleryPublish")}</button>
             <button type="button" disabled={busy} onClick={() => setPublic(ids, false, clear)} className={bulkButton}>{t("galleryUnpublish")}</button>
-            <TestFlagButtons kind="campaign" ids={ids} isTest={isTest} clear={clear} disabled={busy} />
-            <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button>
+            {canManage ? <TestFlagButtons kind="campaign" ids={ids} isTest={isTest} clear={clear} disabled={busy} /> : null}
+            {canManage ? <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button> : null}
           </>
         )}
       />

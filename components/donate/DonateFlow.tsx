@@ -67,6 +67,7 @@ export function DonateFlow({
       name: "",
       email: "",
       message: "",
+      website: "",
     },
   });
 
@@ -461,6 +462,8 @@ export function DonateFlow({
             ) : null}
           </div>
           <div>
+            {/* honeypot: hidden from people, filled by bots */}
+            <input type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" {...register("website")} />
             <label htmlFor="donorEmail" className="text-[14px] font-semibold">
               {t("emailLabel")}
             </label>

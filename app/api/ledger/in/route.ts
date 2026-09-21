@@ -1,4 +1,5 @@
 import { toCsv } from "@/lib/csv";
+import { centsToEuros } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -20,10 +21,11 @@ export async function GET() {
 
   const csv = toCsv([
     ["type", "date", "amount_eur", "display_name", "fundraiser", "campaign", "chapter", "rail"],
-    ...(rows ?? []).map((row) => [
+    // corrections are ledger rows too; they follow with their reason
+    ...(rows ?? []).filter((row) => row.source !== "adjustment").map((row) => [
       "entry",
       row.entry_date,
-      (row.amount_cents / 100).toFixed(2),
+      centsToEuros(row.amount_cents),
       row.display_name,
       row.fundraiser_title,
       row.campaign_title,
@@ -33,7 +35,7 @@ export async function GET() {
     ...(adjustments ?? []).map((row) => [
       "correction",
       row.entry_date,
-      (row.amount_cents / 100).toFixed(2),
+      centsToEuros(row.amount_cents),
       row.reason,
       null,
       null,

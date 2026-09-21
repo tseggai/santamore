@@ -34,7 +34,7 @@ export async function setFundraiserModeration(input: unknown): Promise<ActionRes
     .single();
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/prikupljaci", "page");
+  revalidatePath("/[locale]/admin", "layout");
   revalidatePath("/[locale]/admin/novac", "layout");
   return { ok: true };
 }
@@ -58,7 +58,7 @@ export async function setMessageHidden(input: unknown): Promise<ActionResult> {
     .single();
   if (error) return { ok: false };
 
-  revalidatePath("/[locale]/admin/prikupljaci", "page");
+  revalidatePath("/[locale]/admin", "layout");
   revalidatePath("/[locale]/admin/novac", "layout");
   return { ok: true };
 }

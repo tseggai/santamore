@@ -46,7 +46,7 @@ export async function saveMemberProfile(input: unknown): Promise<MemberActionRes
     console.error("[admin] member profile save failed:", error.code);
     return { ok: false, error: error.code === "42501" ? "forbidden" : "server" };
   }
-  revalidatePath("/[locale]/admin/clanovi", "page");
+  revalidatePath("/[locale]/admin", "layout");
   revalidatePath("/[locale]/o-nama", "page");
   return { ok: true };
 }
@@ -90,7 +90,7 @@ export async function deleteTeams(input: unknown): Promise<PeopleDeleteResult> {
     deleted += 1;
   }
   if (deleted > 0) {
-    revalidatePath("/[locale]/admin/clanovi", "layout");
+    revalidatePath("/[locale]/admin", "layout");
     revalidatePath("/[locale]/admin/dogadjaji", "layout");
     revalidatePath("/[locale]/prikupljaci", "page");
   }
@@ -116,7 +116,7 @@ export async function deleteFundraiser(input: unknown): Promise<PeopleDeleteResu
     return { ok: true, blocked: [{ name: result.name ?? "", reason: result.reason ?? "missing", count: Number(result.count ?? 0) }], deleted: 0 };
   }
   if (result.photo_path) await supabase.storage.from("fundraiser-photos").remove([result.photo_path]);
-  revalidatePath("/[locale]/admin/clanovi", "layout");
+  revalidatePath("/[locale]/admin", "layout");
   revalidatePath("/[locale]/admin/dogadjaji", "layout");
   revalidatePath("/[locale]/prikupljaci", "page");
   return { ok: true, blocked: [], deleted: 1 };

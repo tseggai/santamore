@@ -34,7 +34,7 @@ export default async function MoneyOverviewPage({
       .eq("status", "pending")
       .gt("amount_due_cents", 0)
       .not("payment_reference", "is", null),
-    supabase.from("sponsors").select("amount_cents, is_in_kind, status").limit(1000),
+    supabase.from("v_public_year_stats").select("sponsor_cash_cents"),
     supabase.from("disbursements").select("id", { count: "exact", head: true }),
   ]);
 
@@ -42,9 +42,8 @@ export default async function MoneyOverviewPage({
     cents < 0
       ? formatSignedCents(cents, locale as Locale, { trimWholeCents: true })
       : formatCents(cents, locale as Locale, { trimWholeCents: true });
-  const sponsorCash = (sponsorships.data ?? [])
-    .filter((s) => !s.is_in_kind && (s.status === "signed" || s.status === "active"))
-    .reduce((sum, s) => sum + (s.amount_cents ?? 0), 0);
+  // Sponsorship cash over the years, from the year view's column.
+  const sponsorCash = ((sponsorships.data ?? []) as { sponsor_cash_cents: number }[]).reduce((sum, row) => sum + row.sponsor_cash_cents, 0);
 
   const impact = [
     { label: t("dashReceived"), value: money(summary.data?.received_cents ?? 0) },

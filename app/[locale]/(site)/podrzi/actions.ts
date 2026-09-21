@@ -39,6 +39,10 @@ export async function createSepaPledge(input: unknown): Promise<PledgeResult> {
   if (!parsed.success) {
     return { ok: false, error: "invalid" };
   }
+  // Bot filled the honeypot: refuse quietly, store nothing, email no one.
+  if (parsed.data.website) {
+    return { ok: false, error: "invalid" };
+  }
   const pledge = parsed.data;
 
   // No bank details, no pledge: a pending row the donor cannot pay (and an
@@ -65,18 +69,21 @@ export async function createSepaPledge(input: unknown): Promise<PledgeResult> {
     if (pledge.fundraiserSlug !== undefined) {
       const { data: fundraiser } = await supabase
         .from("fundraisers")
-        .select("id, title, status, payment_reference, event:events(chapter_id)")
+        .select("id, title, status, payment_reference, campaign_id, event:events(chapter_id)")
         .eq("slug", pledge.fundraiserSlug)
         .single();
       if (fundraiser && fundraiser.status === "active") {
         const event = Array.isArray(fundraiser.event)
           ? fundraiser.event[0]
           : fundraiser.event;
+        // The gift records the cause the donor saw, so a page moving to
+        // another cause later never moves money with it.
         target = {
           title: fundraiser.title,
           reference: fundraiser.payment_reference,
           chapterId: event?.chapter_id ?? null,
           fundraiserId: fundraiser.id,
+          campaignId: fundraiser.campaign_id ?? undefined,
         };
       }
     } else {

@@ -161,6 +161,10 @@ select * from (values
                and pg_get_functiondef(p.oid) like '%Marking a live gift as test data%'))
   ,('20260920000058_proposal_edit',
      to_regprocedure('public.update_my_proposal(uuid, text, text, text, text, bigint)') is not null)
+  ,('20260920000062_ledger_integrity',
+     to_regclass('public.v_money_in_daily') is not null
+     and exists (select 1 from information_schema.columns
+                 where table_schema = 'public' and table_name = 'v_public_year_stats' and column_name = 'sponsor_cash_cents'))
   ,('20260920000061_accounting_role',
      exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
              where n.nspname = 'public' and p.proname = 'is_staff'

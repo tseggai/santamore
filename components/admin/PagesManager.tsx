@@ -88,7 +88,9 @@ export function PagesManager({ pages, canManage, focus = null }: { pages: Member
         rows={pages}
         getId={(p) => p.id}
         columns={columns}
-        onOpen={(p) => window.open(`/f/${p.slug}`, "_blank", "noopener")}
+        onOpen={(p) => {
+          if (p.status === "active") window.open(`/f/${p.slug}`, "_blank", "noopener");
+        }}
         searchText={(p) => `${p.title} ${p.owner_name} ${p.event_name} ${p.team_name ?? ""}`}
         emptyLabel={t("pagesEmpty")}
         filterSlot={focus ? <FocusChip label={focus.label} clearHref={focus.clearHref} /> : undefined}

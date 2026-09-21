@@ -37,7 +37,7 @@ export function EpcQrCode({ payload, alt }: { payload: string; alt: string }) {
       width={148}
       height={148}
       alt={alt}
-      className="h-[148px] w-[148px] rounded-lg bg-mist bg-paper"
+      className="h-[148px] w-[148px] rounded-lg bg-paper"
     />
   );
 }

@@ -91,6 +91,9 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     if (data.distance !== null && !distances.includes(data.distance)) {
       return { ok: false, error: "invalid" };
     }
+    if (distances.length > 0 && data.distance === null && event.kind !== "social") {
+      return { ok: false, error: "invalid" };
+    }
     // Free events (no tiers) register at zero; priced events need a tier
     // that is still on offer today (early-bird dates are enforced here).
     const tiers = withOrganizer ? [] : activeTiers(parseTiers(event.price_tiers));
@@ -185,7 +188,13 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
           status,
         })),
       );
-      if (guestError) console.error("[events] guest rows failed:", guestError.code);
+      if (guestError) {
+        // The payer owes the party total: without the guest rows the
+        // registration is wrong, so it goes back to nothing.
+        console.error("[events] guest rows failed:", guestError.code);
+        await service.from("registrations").delete().eq("id", primaryId);
+        return { ok: false, error: "server" };
+      }
     }
 
     // A gathering registration is also the loudest "I'm coming".

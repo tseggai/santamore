@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { CampaignsManager, type CampaignRow } from "@/components/admin/CampaignsManager";
 import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
+import { isAdmin } from "@/lib/server/access";
 import { createClient } from "@/lib/supabase/server";
 import type { Locale } from "@/i18n/routing";
 
@@ -62,6 +63,7 @@ export default async function AdminCampaignsPage({
         campaigns={rows}
         chapters={(chapters ?? []) as { id: string; name: string }[]}
         initialOpenId={uredi ?? ""}
+        canManage={await isAdmin()}
       />
     </div>
   );

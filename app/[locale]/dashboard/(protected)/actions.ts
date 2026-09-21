@@ -204,7 +204,8 @@ export async function updateFundraiserPage(
     if (current.campaign_id !== parsed.data.causeId) {
       const service = createServiceClient();
       const [{ count: gifts }, { data: target }] = await Promise.all([
-        service.from("donations").select("id", { count: "exact", head: true }).eq("fundraiser_id", parsed.data.fundraiserId).in("status", ["approved", "refunded"]).eq("is_test", false),
+        // a pending pledge counts too: the donor already has the reference in hand
+        service.from("donations").select("id", { count: "exact", head: true }).eq("fundraiser_id", parsed.data.fundraiserId).in("status", ["pending", "approved", "refunded"]).eq("is_test", false),
         service.from("campaigns").select("id").eq("id", parsed.data.causeId).eq("is_public", true).maybeSingle(),
       ]);
       if ((gifts ?? 0) > 0) return { ok: false, error: "causeLocked" };
@@ -359,7 +360,7 @@ export async function logCash(input: unknown): Promise<DashboardActionResult> {
     const service = createServiceClient();
     const { data: mine } = await service
       .from("fundraisers")
-      .select("id, event:events(chapter_id)")
+      .select("id, campaign_id, event:events(chapter_id)")
       .eq("id", parsed.data.fundraiserId)
       .eq("user_id", user.id)
       .maybeSingle();
@@ -371,6 +372,7 @@ export async function logCash(input: unknown): Promise<DashboardActionResult> {
       amount_cents: parsed.data.amountCents,
       fee_covered_cents: 0,
       fundraiser_id: mine.id,
+      campaign_id: mine.campaign_id,
       chapter_id: event?.chapter_id ?? null,
       donor_name: donorName || null,
       display_name: donorName || null,

@@ -19,7 +19,6 @@ import { demoPersonAvatar, demoTeamAvatar } from "@/lib/demo/avatar";
 import { generatePaymentReference } from "@/lib/references";
 import { slugify } from "@/lib/slug";
 import { createServiceClient } from "@/lib/supabase/admin";
-import { isStaffRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 
 // Demo data is service-role work (auth users, active pages, approved
@@ -55,7 +54,7 @@ function suffix(): string {
   return String(Math.floor(Math.random() * 10000)).padStart(4, "0");
 }
 
-async function requireStaff(): Promise<boolean> {
+async function requireAdmin(): Promise<boolean> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -66,7 +65,7 @@ async function requireStaff(): Promise<boolean> {
     .select("role")
     .eq("id", user.id)
     .single();
-  return isStaffRole(profile?.role);
+  return profile?.role === "admin";
 }
 
 /**
@@ -77,7 +76,7 @@ async function requireStaff(): Promise<boolean> {
 export async function generateDemoData(input: unknown): Promise<DemoResult> {
   const parsed = generateSchema.safeParse(input);
   if (!parsed.success) return { ok: false, error: "invalid" };
-  if (!(await requireStaff())) return { ok: false, error: "forbidden" };
+  if (!(await requireAdmin())) return { ok: false, error: "forbidden" };
 
   const service = createServiceClient();
   const created = { users: 0, teams: 0, fundraisers: 0, donations: 0 };
@@ -272,7 +271,7 @@ export async function generateDemoData(input: unknown): Promise<DemoResult> {
 
 /** Remove everything the generator created, then the demo users and their photos. */
 export async function purgeDemoData(): Promise<DemoResult> {
-  if (!(await requireStaff())) return { ok: false, error: "forbidden" };
+  if (!(await requireAdmin())) return { ok: false, error: "forbidden" };
 
   try {
     // Staff session: the RPC checks is_staff() itself.
@@ -309,7 +308,7 @@ export async function purgeDemoData(): Promise<DemoResult> {
  * never a real person's page.
  */
 export async function refreshDemoPhotos(): Promise<DemoResult> {
-  if (!(await requireStaff())) return { ok: false, error: "forbidden" };
+  if (!(await requireAdmin())) return { ok: false, error: "forbidden" };
   const service = createServiceClient();
   const { data: records } = await service.from("demo_records").select("kind, row_id").in("kind", ["fundraiser", "team"]);
   const fundraiserIds = (records ?? []).filter((r) => r.kind === "fundraiser").map((r) => r.row_id);

@@ -246,18 +246,19 @@ Also: `robots.txt`, `sitemap.xml`, per-page OpenGraph images (dynamic for fundra
 /admin/kampanje         Causes · proposals
 /admin/dogadjaji        Events (with their photos and offers) · registrations (waivers, sizes, bibs, CSV)
 /admin/korisnici        Beneficiaries: stories, photos, websites, the cause that reached them
-/admin/podrska          Supporters: sponsors and individual donors, sponsorships by year and fund
-/admin/clanovi          People: team (officers, staff, board, committee, volunteers) · accounts (pages, registrations, access levels)
+/admin/podrska          Supporters: sponsors · fundraisers · donors · participants · teams
+/admin/stranice         Pages: every fundraising page with its fundraiser, cause, team and state
+/admin/osoblje          Staff: team records (officers, staff, board, committee, volunteers) · accounts with access levels
 /admin/poruke           Inbox
-/admin/podesavanja      Settings: editorial pages · news · photos overview · demo data
+/admin/podesavanja      Settings: editorial pages · news · photos overview · test mode and demo data
 ```
 
 One place per record; a form that needs a cause, supporter or member picks
 an existing one and links to its section to add a new one. Old routes
 (`/admin/donacije`, `/admin/isplate`, `/admin/prijave`, `/admin/prikupljaci`,
-`/admin/partneri`, `/admin/sadrzaj`, `/admin/demo`) redirect.
+`/admin/partneri`, `/admin/sadrzaj`, `/admin/demo`, `/admin/clanovi`) redirect.
 
-Admin gated on `profiles.role in ('admin','chapter_lead')`, enforced in **RLS and middleware**. Hiding UI is not access control.
+Console gated on `is_staff()` (`profiles.role in ('admin','chapter_lead','accounting')`), enforced in **RLS and middleware**; admin-only functions check `is_admin()`. Hiding UI is not access control. See docs/ROLES.md.
 
 ---
 

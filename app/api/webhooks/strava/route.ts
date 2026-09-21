@@ -70,7 +70,9 @@ export async function POST(request: Request) {
         .update({ processed_at: new Date().toISOString() })
         .eq("provider_event_id", key);
     } catch (processError) {
+      // Forget the key so a re-delivery is processed, not answered "duplicate".
       console.error("[strava] webhook processing failed:", processError);
+      await service.from("webhook_events").delete().eq("provider_event_id", key).is("processed_at", null);
     }
   });
 

@@ -8,7 +8,7 @@ Strava API Agreement at strava.com/legal/api, all read on 2026-09-10.
 ## The product
 
 A **partner challenge** (`/izazovi`, table `perk_challenges`) is a rule plus a
-reward, defined by staff in `/admin/izazovi`:
+reward, defined by staff in `/admin/dogadjaji` (Strava webhook panel):
 
 | Field | "5 km a day" (cafe) | "Fast 5" | "3 runs a week" (Lotta) |
 |---|---|---|---|
@@ -168,7 +168,7 @@ Quotes from strava.com/legal/api:
 2. Set `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET` and a long random
    `STRAVA_WEBHOOK_VERIFY_TOKEN` in the environment (`.env.example`).
 3. Apply migration `20260910000009_campaign_pages_strava_perks.sql`.
-4. Deploy, then open `/admin/izazovi` and click **Register webhook**. It
+4. Deploy, then open `/admin/dogadjaji` (Strava webhook panel) and click **Register webhook**. It
    creates the single subscription for `https://<host>/api/webhooks/strava`
    (replacing one pointing elsewhere). Strava validates the URL immediately,
    so the deployment must be live first.
@@ -199,7 +199,7 @@ Quotes from strava.com/legal/api:
 - The runner's page shows progress against every active challenge
   ("2 of 3 days", "1.9 km more today") from `my_perk_progress()`, which
   reuses `perk_activity_qualifies` so it can never disagree with the engine.
-- Staff: `/admin/sportisti` lists connected athletes with activity and
+- Staff: `/admin/podrska/ucesnici` lists connected athletes with activity and
   reward counts (aggregates only — individual runs stay with the athlete,
   per the API Agreement).
 - Strava's `sport_type` is normalised by removing spaces (`Trail Run` →

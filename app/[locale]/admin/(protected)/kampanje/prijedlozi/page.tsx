@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ProposalsManager, type CriterionRow, type ProposalRow } from "@/components/admin/ProposalsManager";
+import { isAdmin } from "@/lib/server/access";
 import { createClient } from "@/lib/supabase/server";
 import type { Locale } from "@/i18n/routing";
 
@@ -36,6 +37,7 @@ export default async function ProposalsPage({ params }: { params: Promise<{ loca
         proposals={rows}
         criteria={(criteria ?? []) as CriterionRow[]}
         chapters={(chapters ?? []) as { id: string; name: string }[]}
+        canManage={await isAdmin()}
       />
     </div>
   );
