@@ -17,6 +17,7 @@ const ITEMS = [
   { href: "/admin/osoblje", key: "navStaff", exact: false },
   { href: "/admin/poruke", key: "navMessages", exact: false },
   { href: "/admin/podesavanja", key: "navSettings", exact: false },
+  { href: "/admin/registracija", key: "navRegistration", exact: false },
 ] as const;
 
 /** Console nav: one vertical list, in the desktop rail and the phone drawer alike; the role decides which sections show. */
