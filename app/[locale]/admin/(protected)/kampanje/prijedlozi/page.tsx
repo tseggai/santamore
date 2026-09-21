@@ -33,7 +33,6 @@ export default async function ProposalsPage({ params }: { params: Promise<{ loca
     <div className="pb-8">
       <ProposalsManager
         locale={locale as Locale}
-        lead={t("proposalsHint")}
         proposals={rows}
         criteria={(criteria ?? []) as CriterionRow[]}
         chapters={(chapters ?? []) as { id: string; name: string }[]}

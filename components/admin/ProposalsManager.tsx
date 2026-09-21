@@ -61,14 +61,12 @@ const inputClass = "mt-1 w-full rounded-lg bg-paper px-3.5 py-2.5 text-[15px] ou
  */
 export function ProposalsManager({
   locale,
-  lead,
   proposals,
   criteria,
   chapters,
   canManage = false,
 }: {
   locale: Locale;
-  lead: string;
   /** Admin: the test flag is theirs (set_record_test). */
   canManage?: boolean;
   proposals: ProposalRow[];
@@ -96,8 +94,6 @@ export function ProposalsManager({
 
   return (
     <div className="space-y-5">
-      <p className="text-[14px] leading-relaxed text-black/60">{lead}</p>
-
       <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={t("prFilter")}>
         {(["all", "open", "shortlisted", "chosen", "declined", "rejected"] as Filter[]).map((value) => (
           <button key={value} type="button" aria-pressed={filter === value} onClick={() => setFilter(value)} className={chip(filter === value)}>

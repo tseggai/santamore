@@ -25,7 +25,6 @@ export default async function TeamsPage({
   const focus = dogadjaj && teams.length > 0 ? { label: t("focusTeamsFor", { name: teams[0].event_name }), clearHref: "/admin/podrska/timovi" } : null;
   return (
     <div className="pb-8">
-      <p className="max-w-2xl text-[14px] leading-relaxed text-black/60">{t("tmHint")}</p>
       <div className="mb-4"><YearSelect years={years} value={year} /></div>
       <TeamsManager teams={teams} canManage={people.canManage} focus={focus} />
     </div>
