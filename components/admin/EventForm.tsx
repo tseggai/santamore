@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
 import { createChapter, saveEvent } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
@@ -112,8 +112,11 @@ export function EventForm({
   gallery = [],
   onDone,
   onCreated,
+  extra = null,
 }: {
   event: EventFormValues | null;
+  /** Admin-only buttons for an existing event: the test flag and Delete, at the end of the footer. */
+  extra?: ReactNode;
   chapters: Option[];
   campaigns: Option[];
   supporters?: Option[];
@@ -626,6 +629,7 @@ export function EventForm({
           {t("cancel")}
         </button>
       ) : null}
+      {extra ? <span className="ml-auto flex flex-wrap items-center gap-2">{extra}</span> : null}
     </div>
     </div>
   );

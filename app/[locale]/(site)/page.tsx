@@ -19,7 +19,7 @@ async function fetchLanding() {
   try {
     const supabase = await createClient();
     const nowIso = new Date().toISOString();
-    const [summary, events, board, gallery, causes, proposals, sponsors] = await Promise.all([
+    const [summary, events, board, gallery, causes, proposals, sponsors, testMode, homePhoto] = await Promise.all([
       supabase.from("v_public_ledger_summary").select("received_cents, disbursed_cents").single(),
       supabase
         .from("v_public_events")
@@ -55,6 +55,8 @@ async function fetchLanding() {
         .eq("kind", "sponsor")
         .order("year", { ascending: false })
         .limit(60),
+      supabase.rpc("test_mode"),
+      supabase.rpc("public_setting", { p_key: "home_photo" }),
     ]);
     const sponsorRows = (sponsors.data ?? []) as (PublicSponsor & { year: number })[];
     const sponsorYear = sponsorRows[0]?.year ?? null;
@@ -68,6 +70,8 @@ async function fetchLanding() {
       proposals: (proposals.data ?? []) as PublicProposal[],
       sponsors: sponsorYear ? sponsorRows.filter((row) => row.year === sponsorYear) : [],
       sponsorYear,
+      testMode: Boolean(testMode.data),
+      homePhoto: typeof homePhoto.data === "string" ? homePhoto.data : null,
     };
   } catch {
     return {
@@ -80,6 +84,8 @@ async function fetchLanding() {
       proposals: [],
       sponsors: [] as PublicSponsor[],
       sponsorYear: null,
+      testMode: false,
+      homePhoto: null as string | null,
     };
   }
 }
@@ -100,7 +106,7 @@ export default async function HomePage({
   ]);
   const content = landingContent[locale as Locale];
   const data = await fetchLanding();
-  const { receivedCents, disbursedCents, events, board, gallery, causes, proposals } = data;
+  const { receivedCents, disbursedCents, events, board, gallery, causes, proposals, testMode, homePhoto } = data;
   const [tCampaigns, tRunner] = await Promise.all([getTranslations("campaigns"), getTranslations("runner")]);
 
   const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
@@ -128,7 +134,7 @@ export default async function HomePage({
       eyebrow: t("slideIntroEyebrow"),
       title: t("title"),
       text: t("sub"),
-      image: null,
+      image: galleryImageUrl(homePhoto),
       card: { type: "total" as const, value: money(receivedCents), label: t("proofReceived") },
       primary: { href: "/podrzi", label: t("ctaDonate"), donate: true },
       secondary: { href: "/dashboard/prikupljaj", label: t("ctaStartPage") },
@@ -218,8 +224,8 @@ export default async function HomePage({
   return (
     <div>
       {/* the hero starts under the transparent header, full height */}
-      {/* negative margin = header height incl. its hairline (py-3 + 40px logo; sm: py-4 + 44px) */}
-      <div className="-mt-[65px] sm:-mt-[77px]">
+      {/* negative margin = header height incl. its hairline (py-3 + 40px logo; sm: py-4 + 44px), plus the 36px test-mode bar when it is on */}
+      <div className={testMode ? "-mt-[101px] sm:-mt-[113px]" : "-mt-[65px] sm:-mt-[77px]"}>
         <HeroSlides slides={slides} />
       </div>
 

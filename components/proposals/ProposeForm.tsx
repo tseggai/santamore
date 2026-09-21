@@ -1,13 +1,16 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 
 import { deleteProposal, proposeCause, updateProposal } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
 import { useDialog } from "@/components/console/useDialog";
 import { centsToEuros } from "@/lib/money";
 import { parseEurosToCents } from "@/lib/money";
+import { downscaleToJpeg } from "@/lib/images";
 import { allAnswered, failedCriteria } from "@/lib/proposals";
+import { proposalPhotoUrl } from "@/lib/storage";
+import { createClient } from "@/lib/supabase/client";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
@@ -30,6 +33,8 @@ export interface ProposalDraft {
   location: string | null;
   beneficiary: string | null;
   amountCents: number | null;
+  linkUrl: string | null;
+  photoPath: string | null;
 }
 
 export function ProposeForm({
@@ -56,6 +61,31 @@ export function ProposeForm({
   const [location, setLocation] = useState(edit?.location ?? "");
   const [beneficiary, setBeneficiary] = useState(edit?.beneficiary ?? "");
   const [amount, setAmount] = useState(edit?.amountCents != null ? centsToEuros(edit.amountCents).replace(/\.00$/, "") : "");
+  const [linkUrl, setLinkUrl] = useState(edit?.linkUrl ?? "");
+  const [photoPath, setPhotoPath] = useState<string | null>(edit?.photoPath ?? null);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
+  const photoInput = useRef<HTMLInputElement>(null);
+
+  // The photo goes to the proposer's own folder; the server accepts no other.
+  const uploadPhoto = async (file: File) => {
+    setPhotoBusy(true);
+    setPhotoError(false);
+    try {
+      const supabase = createClient();
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) throw new Error("signed out");
+      const blob = await downscaleToJpeg(file, 1600);
+      const path = `${auth.user.id}/proposal-${Date.now()}.jpg`;
+      const { error } = await supabase.storage.from("proposal-photos").upload(path, blob, { contentType: "image/jpeg" });
+      if (error) throw error;
+      setPhotoPath(path);
+    } catch {
+      setPhotoError(true);
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
   const [state, setState] = useState<"idle" | "busy" | "error" | "done" | "rejected" | "locked">("idle");
   const [reasons, setReasons] = useState<string[]>([]);
   // Two screens: the questions, then — only once they pass — the proposal.
@@ -87,6 +117,7 @@ export function ProposeForm({
       setState("error");
       return;
     }
+    const link = linkUrl.trim() === "" ? null : /^https?:\/\//i.test(linkUrl.trim()) ? linkUrl.trim() : `https://${linkUrl.trim()}`;
     setState("busy");
     if (edit) {
       const saved = await updateProposal({
@@ -96,6 +127,8 @@ export function ProposeForm({
         location: location.trim() || null,
         beneficiary: beneficiary.trim() || null,
         amountCents,
+        linkUrl: link,
+        photoPath,
       }).catch(() => ({ ok: false as const, error: "server" as const }));
       if (saved.ok) {
         setState("done");
@@ -111,6 +144,8 @@ export function ProposeForm({
       location: location.trim() || null,
       beneficiary: beneficiary.trim() || null,
       amountCents,
+      linkUrl: link,
+      photoPath,
       answers: Object.fromEntries(criteria.map((criterion) => [criterion.id, answers[criterion.id] === true])),
       locale,
     }).catch(() => ({ ok: false as const, error: "server" as const }));
@@ -250,6 +285,29 @@ export function ProposeForm({
             </div>
           </div>
           <div>
+            <label htmlFor="prLink" className={labelClass}>{t("linkLabel")}</label>
+            <input id="prLink" type="url" inputMode="url" maxLength={300} placeholder="https://" value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} className={fieldClass} />
+            <p className="mt-1 text-[13px] text-black/55">{t("linkHint")}</p>
+          </div>
+          <div>
+            <span className={labelClass}>{t("photoLabel")}</span>
+            <div className="mt-1 flex flex-wrap items-center gap-3">
+              {photoPath ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={proposalPhotoUrl(photoPath) ?? ""} alt="" className="h-20 w-28 rounded-lg bg-mist object-cover" />
+              ) : null}
+              <input ref={photoInput} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const file = e.target.files?.[0]; if (file) void uploadPhoto(file); e.target.value = ""; }} />
+              <button type="button" disabled={photoBusy} onClick={() => photoInput.current?.click()} className="rounded-lg bg-paper px-3 py-2 text-[14px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-60">
+                {photoBusy ? "…" : photoPath ? t("photoReplace") : t("photoAdd")}
+              </button>
+              {photoPath ? (
+                <button type="button" onClick={() => setPhotoPath(null)} className="text-[14px] font-semibold text-black/60 underline underline-offset-2 hover:text-red-dark">{t("photoRemove")}</button>
+              ) : null}
+            </div>
+            <p className="mt-1 text-[13px] text-black/55">{t("photoHint")}</p>
+            {photoError ? <p role="alert" className="mt-1 text-[13.5px] font-semibold text-red-dark">{tDonate("errServer")}</p> : null}
+          </div>
+          <div>
             <label htmlFor="prAmount" className={labelClass}>{t("amountLabel")}</label>
             <input id="prAmount" type="text" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} className={`${fieldClass} font-mono sm:max-w-xs`} />
             <p className="mt-1 text-[13px] text-black/55">{t("amountHint")}</p>
@@ -259,7 +317,7 @@ export function ProposeForm({
 
       {state === "error" ? <p role="alert" className="text-[14px] font-semibold text-red-dark">{tDonate("errServer")}</p> : null}
       <div className="flex flex-wrap gap-2">
-        <button type="submit" disabled={state === "busy"} className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60">
+        <button type="submit" disabled={state === "busy" || photoBusy} className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60">
           {edit ? t("editSave") : t("submit")}
         </button>
         {edit ? (

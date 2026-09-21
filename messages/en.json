@@ -1484,7 +1484,12 @@
     "caMarkCompleted": "Mark as completed",
     "caReopen": "Reopen",
     "caCompletedChip": "Completed",
-    "caCompleteConfirm": "{count, plural, one {Mark this cause as completed?} other {Mark # causes as completed?}} It takes no more gifts and no new pages, and every page shows it as completed with the goal met or not. Reopen undoes it."
+    "caCompleteConfirm": "{count, plural, one {Mark this cause as completed?} other {Mark # causes as completed?}} It takes no more gifts and no new pages, and every page shows it as completed with the goal met or not. Reopen undoes it.",
+    "homePhotoTitle": "Home page photo",
+    "homePhotoHint": "The picture behind the opening slide of the landing page. Landscape, wide; it sits under a dark tint with the headline on top. None means the plain sea colour.",
+    "homePhotoAdd": "Add a photo",
+    "homePhotoReplace": "Replace the photo",
+    "homePhotoRemove": "Remove"
   },
   "forms": {
     "nameLabel": "Full name",
@@ -2023,7 +2028,15 @@
     "readMore": "Read more",
     "readLess": "Show less",
     "voteFailed": "Your vote did not register. Try again.",
-    "voteClosed": "This proposal is no longer open for votes."
+    "voteClosed": "This proposal is no longer open for votes.",
+    "linkLabel": "Link (optional)",
+    "linkHint": "A website, an article, a social post: where people can read more.",
+    "photoLabel": "Photo (optional)",
+    "photoAdd": "Add a photo",
+    "photoReplace": "Replace the photo",
+    "photoRemove": "Remove",
+    "photoHint": "One picture of the need or the people behind it. Never someone's photo without their say.",
+    "openLink": "Read more at the link"
   },
   "beneficiaries": {
     "eyebrow": "Beneficiaries",

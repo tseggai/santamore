@@ -1484,7 +1484,12 @@
     "caMarkCompleted": "Označi kao završen",
     "caReopen": "Ponovo otvori",
     "caCompletedChip": "Završen",
-    "caCompleteConfirm": "{count, plural, one {Označiti ovaj cilj kao završen?} few {Označiti # cilja kao završena?} other {Označiti # ciljeva kao završene?}} Ne prima više poklone ni nove stranice, a svaka stranica ga prikazuje kao završen, sa dostignutim ciljem ili ne. „Ponovo otvori“ to poništava."
+    "caCompleteConfirm": "{count, plural, one {Označiti ovaj cilj kao završen?} few {Označiti # cilja kao završena?} other {Označiti # ciljeva kao završene?}} Ne prima više poklone ni nove stranice, a svaka stranica ga prikazuje kao završen, sa dostignutim ciljem ili ne. „Ponovo otvori“ to poništava.",
+    "homePhotoTitle": "Fotografija početne strane",
+    "homePhotoHint": "Slika iza uvodnog slajda početne strane. Pejzažna, široka; ide ispod tamnog tona sa naslovom preko. Bez nje ostaje čista boja mora.",
+    "homePhotoAdd": "Dodaj fotografiju",
+    "homePhotoReplace": "Zamijeni fotografiju",
+    "homePhotoRemove": "Ukloni"
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -2023,7 +2028,15 @@
     "readMore": "Pročitaj više",
     "readLess": "Prikaži manje",
     "voteFailed": "Glas nije zabilježen. Pokušaj ponovo.",
-    "voteClosed": "Ovaj prijedlog više ne prima glasove."
+    "voteClosed": "Ovaj prijedlog više ne prima glasove.",
+    "linkLabel": "Link (opciono)",
+    "linkHint": "Sajt, članak, objava: gdje ljudi mogu pročitati više.",
+    "photoLabel": "Fotografija (opciono)",
+    "photoAdd": "Dodaj fotografiju",
+    "photoReplace": "Zamijeni fotografiju",
+    "photoRemove": "Ukloni",
+    "photoHint": "Jedna slika potrebe ili ljudi iza nje. Nikad nečija fotografija bez pristanka.",
+    "openLink": "Pročitaj više na linku"
   },
   "beneficiaries": {
     "eyebrow": "Korisnici",
