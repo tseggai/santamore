@@ -22,6 +22,8 @@ export interface PackField {
   meOnly?: boolean;
   /** Several lines: rendered as a block. */
   block?: boolean;
+  /** May stay empty (founders beyond the legal minimum): a list or signature row of only empty optional fields does not print. */
+  optional?: boolean;
 }
 
 export type PackBlock =
@@ -50,6 +52,8 @@ export interface LegalPack {
   fields: Record<string, PackField>;
   forms: PackForm[];
   drafts: PackDraft[];
+  /** The founders' guide: read-only, English, shown in both languages. */
+  guide?: { title: Bilingual; file: string; html: string };
   builtAt: string;
 }
 
@@ -116,6 +120,12 @@ export function packProblems(pack: LegalPack): string[] {
     });
   }
   return problems;
+}
+
+/** True when a template's blanks are all optional and all empty: the item is left out of the printed page. */
+export function isEmptyOptional(template: string, fields: Record<string, FieldState>, meta: Record<string, PackField>): boolean {
+  const ids = placeholderIds(template);
+  return ids.length > 0 && ids.every((id) => meta[id]?.optional && !(fields[id]?.me.trim() || fields[id]?.en.trim()));
 }
 
 /** The initial field state: the pack's recommended values, nothing stale. */

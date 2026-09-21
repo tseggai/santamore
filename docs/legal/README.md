@@ -8,6 +8,7 @@ translation for founders who do not read it.
 |---|---|
 | `registration/originals/` | The Ministry's seven Montenegrin documents as received (five templates, two guidance notes) |
 | `registration/*.en.md` | English translations of those seven, paragraph for paragraph |
+| `registration/HOW-TO-COMPLETE.md` | The founders' working guide: what to collect, what to decide, where each fact goes, what every draft is for and who reviews it; also the first entry of the console page |
 | `registration/completion-guide.md` | Field-by-field guide to completing the four filing documents, bilingual in table columns |
 | `registration/statute-additions.md` | Draft statute chapters for the Board, Grants Committee, chapters and proxy voting |
 | `governance/*.md` | The policies and agreements the Board adopts and the public pages are regenerated from |

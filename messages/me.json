@@ -1530,7 +1530,9 @@
       "fieldEmpty": "prazno",
       "lastSaved": "Poslednje sačuvano: {when}",
       "neverSaved": "Još ništa nije sačuvano; prikazane su preporučene vrijednosti.",
-      "draftHint": "Nacrt je dvojezičan; tekst se mijenja direktno na oba jezika. Potvrdite oba jezika da vidite jedan uz drugi."
+      "draftHint": "Nacrt je dvojezičan; tekst se mijenja direktno na oba jezika. Potvrdite oba jezika da vidite jedan uz drugi.",
+      "saveMissingTable": "Tabela legal_pack još ne postoji u bazi. Primijenite migraciju 20260921000069_legal_pack.sql (Supabase → SQL editor) i sačuvajte ponovo.",
+      "guideHint": "Vodič za osnivače: šta prikupiti, šta odlučiti, gdje koji podatak ide i čemu služi svaki nacrt. Samo na engleskom, ne mijenja se ovdje."
     }
   },
   "forms": {
