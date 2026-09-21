@@ -37,7 +37,7 @@ const labelClass = "text-[13.5px] font-semibold";
 const inputClass = "mt-1 w-full rounded-lg bg-paper px-3.5 py-2.5 text-[15px] outline-none ring-sea/40 focus:ring-2";
 
 /** Who the money reached: one row each, the story in the panel. */
-export function BeneficiariesManager({ rows, causes }: { rows: BeneficiaryRow[]; causes: CauseOption[] }) {
+export function BeneficiariesManager({ rows, causes, canManage = false }: { rows: BeneficiaryRow[]; causes: CauseOption[]; canManage?: boolean }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [open, setOpen] = useState<"" | "new" | string>("");
@@ -124,7 +124,7 @@ export function BeneficiariesManager({ rows, causes }: { rows: BeneficiaryRow[];
           )}
           bulkActions={(ids, clear) => (
             <>
-              <TestFlagButtons kind="beneficiary" ids={ids} isTest={(id) => Boolean(rows.find((r) => r.id === id)?.is_test)} clear={clear} disabled={busy} />
+              {canManage ? <TestFlagButtons kind="beneficiary" ids={ids} isTest={(id) => Boolean(rows.find((r) => r.id === id)?.is_test)} clear={clear} disabled={busy} /> : null}
               <button type="button" disabled={busy} onClick={() => removeMany(ids, clear)} className={`${bulkButton} text-red-dark`}>{t("suDelete")}</button>
             </>
           )}

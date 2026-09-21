@@ -115,7 +115,7 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
     }
   }
 
-  revalidatePath("/[locale]/admin/izazovi", "page");
+  revalidatePath("/[locale]/admin/dogadjaji", "layout");
   revalidatePath("/[locale]/izazovi", "layout");
   return { ok: true };
 }
@@ -132,7 +132,7 @@ export async function setPerkChallengeActive(input: unknown): Promise<PerkAction
     .select("id")
     .single();
   if (error) return { ok: false, error: "server" };
-  revalidatePath("/[locale]/admin/izazovi", "page");
+  revalidatePath("/[locale]/admin/dogadjaji", "layout");
   revalidatePath("/[locale]/izazovi", "layout");
   return { ok: true };
 }
@@ -189,7 +189,7 @@ export async function registerStravaWebhook(): Promise<PerkActionResult> {
     if (!existing.some((subscription) => subscription.callback_url === callback)) {
       await createSubscription(callback);
     }
-    revalidatePath("/[locale]/admin/izazovi", "page");
+    revalidatePath("/[locale]/admin/dogadjaji", "layout");
     return { ok: true };
   } catch (error) {
     return { ok: false, error: "server", message: error instanceof Error ? error.message : "" };

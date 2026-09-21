@@ -769,7 +769,7 @@
     "navBeneficiaries": "Korisnici",
     "navSettings": "Podešavanja",
     "settingsTitle": "Podešavanja",
-    "settingsHint": "Ono što nije evidencija nečega: uređivačke stranice, vijesti, pregled svih fotografija i alat za demo podatke. Ciljevi, događaji, korisnici, podržavaoci, članovi i novac imaju svoje mjesto u lijevoj navigaciji.",
+    "settingsHint": "Ono što nije evidencija nečega: uređivačke stranice, vijesti, pregled svih fotografija i alati za test i demo. Ciljevi, događaji, korisnici, podrška, stranice, osoblje i novac imaju svoje mjesto u lijevoj navigaciji.",
     "settingsTabPages": "Stranice",
     "settingsTabNews": "Vijesti",
     "settingsTabPhotos": "Fotografije",
@@ -1190,7 +1190,7 @@
     "sitePageLinesHint": "Jedna stavka po redu.",
     "pickByRole": "Svi sa ulogom:",
     "pickByName": "I po imenu:",
-    "pickNoPeople": "Još niko nije u timu. Dodajte ljude pod Ljudi → Tim.",
+    "pickNoPeople": "Još niko nije u timu. Dodajte ljude pod Osoblje.",
     "pickNone": "Još nema šta da se izabere.",
     "sectionsHint": "Stranica je niz odjeljaka. Otvorite jedan da uredite tekst na jeziku iz kartice iznad, vežete ljude, podržavaoce ili korisnike, pomjerite ga ili uklonite. Dodajte odjeljak sa strukturom koju sajt već koristi. Sačuvaj upisuje sva tri jezika.",
     "sectionNew": "Novi odjeljak",
@@ -1469,7 +1469,9 @@
     "pagesHint": "Svaka stranica za prikupljanje: ko je vodi, za koji cilj i tim prikuplja, i u kom je stanju. Prikupljač je osoba i može imati više stranica.",
     "pagesDeleteConfirm": "{count, plural, one {Obrisati ovu stranicu?} few {Obrisati # stranice?} other {Obrisati # stranica?}} Stranica koja je primila poklone se odbija.",
     "pgColFundraiser": "Prikupljač",
-    "pgColTeam": "Tim"
+    "pgColTeam": "Tim",
+    "galleryDeleteConfirm": "Obrisati ovu fotografiju?",
+    "demoAdminOnly": "Generisanje i čišćenje demo podataka radi admin."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

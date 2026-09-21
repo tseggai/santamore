@@ -5,6 +5,7 @@ import { EventsManager, type EventListRow } from "@/components/admin/EventsManag
 import type { GalleryAdminItem } from "@/components/admin/GalleryManager";
 import type { PerkChallengeAdminRow } from "@/components/admin/OffersPanel";
 import { localToday } from "@/lib/strava/sync";
+import { isAdmin } from "@/lib/server/access";
 import { createClient } from "@/lib/supabase/server";
 import { stravaWebhookStatus } from "../izazovi/actions";
 import { htmlLang, type Locale } from "@/i18n/routing";
@@ -152,6 +153,7 @@ export default async function AdminEventsPage({
         webhook={webhook}
         dateLabels={dateLabels}
         initialOpenId={uredi ?? ""}
+        canManage={await isAdmin()}
       />
     </div>
   );

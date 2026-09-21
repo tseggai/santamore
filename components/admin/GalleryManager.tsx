@@ -11,6 +11,7 @@ import {
   setGalleryPublished,
 } from "@/app/[locale]/admin/(protected)/sadrzaj/actions";
 import { SidePanel } from "@/components/console/SidePanel";
+import { useDialog } from "@/components/console/useDialog";
 import { downscaleToJpeg } from "@/lib/images";
 import { galleryImageUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
@@ -53,6 +54,7 @@ export function GalleryManager({
 }) {
   const t = useTranslations("admin");
   const router = useRouter();
+  const dialog = useDialog();
   const [paths, setPaths] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [state, setState] = useState<State>("idle");
@@ -116,6 +118,7 @@ export function GalleryManager({
   };
 
   const remove = async (item: GalleryAdminItem) => {
+    if (!(await dialog.confirm(t("galleryDeleteConfirm")))) return;
     setRowBusy(item.id);
     await deleteGalleryItem({ itemId: item.id }).catch(() => ({ ok: false }));
     setRowBusy(null);
@@ -173,6 +176,7 @@ export function GalleryManager({
 
   return (
     <div className={inline ? "" : "mt-4"}>
+      {dialog.element}
       {inline ? (
         form
       ) : (

@@ -61,7 +61,7 @@ export async function saveTeamMember(input: unknown): Promise<TeamActionResult> 
     if (error.code === "23505") return { ok: false, error: "account_taken", detail: `${error.code}: ${error.message}` };
     return { ok: false, error: "server", detail: `${error.code}: ${error.message}` };
   }
-  revalidatePath("/[locale]/admin/clanovi", "layout");
+  revalidatePath("/[locale]/admin", "layout");
   revalidatePath("/[locale]/o-nama", "page");
   revalidatePath("/[locale]/transparentnost", "page");
   return { ok: true };
@@ -76,7 +76,7 @@ export async function deleteTeamMember(input: unknown): Promise<TeamActionResult
   const photos = supabase.storage.from("team-photos");
   const { data: files } = await photos.list(parsed.data.id);
   if (files && files.length > 0) await photos.remove(files.map((file) => `${parsed.data.id}/${file.name}`));
-  revalidatePath("/[locale]/admin/clanovi", "layout");
+  revalidatePath("/[locale]/admin", "layout");
   revalidatePath("/[locale]/o-nama", "page");
   revalidatePath("/[locale]/transparentnost", "page");
   return { ok: true };

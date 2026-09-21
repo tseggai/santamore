@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { BeneficiariesManager, type BeneficiaryRow } from "@/components/admin/BeneficiariesManager";
+import { isAdmin } from "@/lib/server/access";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +21,7 @@ export default async function BeneficiariesPage({ params }: { params: Promise<{ 
       <h1 className="type-display text-2xl">{t("bnHeading")}</h1>
       <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("bnHint")}</p>
       <div className="mt-6">
-        <BeneficiariesManager rows={(rows ?? []) as BeneficiaryRow[]} causes={((causes ?? []) as { id: string; title: string }[]).map((c) => ({ id: c.id, title: c.title }))} />
+        <BeneficiariesManager rows={(rows ?? []) as BeneficiaryRow[]} causes={((causes ?? []) as { id: string; title: string }[]).map((c) => ({ id: c.id, title: c.title }))} canManage={await isAdmin()} />
       </div>
     </div>
   );

@@ -54,11 +54,14 @@ export function EventsManager({
   title,
   lead,
   initialOpenId = "",
+  canManage = false,
 }: {
   title: string;
   lead: string;
   /** An event to open straight away, e.g. from the Photos overview. */
   initialOpenId?: string;
+  /** Admin: deleting and the test flag are theirs (delete_event, set_record_test). */
+  canManage?: boolean;
   events: EventListRow[];
   /** The rows behind the counts, for the quick look. */
   linked: EventLinked;
@@ -254,8 +257,8 @@ export function EventsManager({
           <>
             <button type="button" disabled={busy === "bulk"} onClick={() => bulkPublish(ids, true, clear)} className={bulkButton}>{t("galleryPublish")}</button>
             <button type="button" disabled={busy === "bulk"} onClick={() => bulkPublish(ids, false, clear)} className={bulkButton}>{t("galleryUnpublish")}</button>
-            <TestFlagButtons kind="event" ids={ids} isTest={isTest} clear={clear} disabled={busy === "bulk"} />
-            <button type="button" disabled={busy === "bulk"} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button>
+            {canManage ? <TestFlagButtons kind="event" ids={ids} isTest={isTest} clear={clear} disabled={busy === "bulk"} /> : null}
+            {canManage ? <button type="button" disabled={busy === "bulk"} onClick={() => remove(ids, clear)} className={bulkButton}>{t("evDelete")}</button> : null}
           </>
         )}
       />

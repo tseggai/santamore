@@ -45,6 +45,7 @@ export interface SponsorshipRow {
   status: "prospect" | "negotiating" | "signed" | "active" | "ended";
   year: number | null;
   fund: "operations" | "impact";
+  is_test?: boolean;
 }
 
 interface OfferRow {
@@ -437,10 +438,13 @@ export function SupportersManager({
   events,
   title,
   lead,
+  canManage = false,
 }: {
   title: string;
   lead: string;
   locale: Locale;
+  /** Admin: the test flag is theirs (set_record_test). */
+  canManage?: boolean;
   supporters: SupporterRow[];
   sponsorships: SponsorshipRow[];
   offers: OfferRow[];
@@ -623,6 +627,7 @@ export function SupportersManager({
                       <li key={deal.id} className="rounded-lg bg-paper px-3.5 py-2.5 text-[14px]">
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                           <Chip tone={deal.status === "active" || deal.status === "signed" ? "sea" : "paper"}>{t(`spStatusValue.${deal.status}`)}</Chip>
+                          {deal.is_test ? <Chip tone="red">{t("testChip")}</Chip> : null}
                           {deal.tier ? <span className="font-semibold">{deal.tier}</span> : null}
                           {deal.amount_cents ? (
                             <span className="font-mono tabular-nums">
@@ -729,7 +734,7 @@ export function SupportersManager({
           <>
             <button type="button" disabled={busy} onClick={() => setActive(ids, true, clear)} className={bulkButton}>{t("table.activate")}</button>
             <button type="button" disabled={busy} onClick={() => setActive(ids, false, clear)} className={bulkButton}>{t("table.deactivate")}</button>
-            <TestFlagButtons kind="supporter" ids={ids} isTest={(id) => Boolean(supporters.find((s) => s.id === id)?.is_test)} clear={clear} disabled={busy} />
+            {canManage ? <TestFlagButtons kind="supporter" ids={ids} isTest={(id) => Boolean(supporters.find((s) => s.id === id)?.is_test)} clear={clear} disabled={busy} /> : null}
             <button type="button" disabled={busy} onClick={() => remove(ids, clear)} className={`${bulkButton} text-red-dark`}>{t("suDelete")}</button>
           </>
         )}

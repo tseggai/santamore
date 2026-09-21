@@ -5,6 +5,7 @@ import {
   type SponsorshipRow,
   type SupporterRow,
 } from "@/components/admin/SupportersManager";
+import { isAdmin } from "@/lib/server/access";
 import { createClient } from "@/lib/supabase/server";
 import type { Locale } from "@/i18n/routing";
 
@@ -23,7 +24,7 @@ export default async function AdminSupportersPage({
   const [{ data: supporters }, { data: sponsorships }, { data: offers }, { data: chapters }, { data: campaigns }, { data: events }] =
     await Promise.all([
       supabase.from("supporters").select("*").order("name"),
-      supabase.from("sponsors").select("id, supporter_id, tier, chapter_id, campaign_id, event_id, amount_cents, is_in_kind, status, year, fund").limit(1000),
+      supabase.from("sponsors").select("id, supporter_id, tier, chapter_id, campaign_id, event_id, amount_cents, is_in_kind, status, year, fund, is_test").limit(1000),
       supabase.from("perk_challenges").select("id, supporter_id, title, reward_label, is_active, event_id").limit(1000),
       supabase.from("chapters").select("id, name").order("name"),
       supabase.from("campaigns").select("id, title").order("title"),
@@ -42,6 +43,7 @@ export default async function AdminSupportersPage({
         chapters={(chapters ?? []) as { id: string; name: string }[]}
         campaigns={((campaigns ?? []) as { id: string; title: string }[]).map((c) => ({ id: c.id, name: c.title }))}
         events={(events ?? []) as { id: string; name: string }[]}
+        canManage={await isAdmin()}
       />
     </div>
   );
