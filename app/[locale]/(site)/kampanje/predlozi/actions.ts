@@ -91,6 +91,9 @@ export async function toggleVote(input: unknown): Promise<VoteResult> {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "server" };
+  // The insert trigger guards the way in; the way out is guarded here.
+  const { data: proposal } = await supabase.from("v_public_cause_proposals").select("status").eq("id", parsed.data.proposalId).maybeSingle();
+  if (!proposal || (proposal.status !== "open" && proposal.status !== "shortlisted")) return { ok: false, error: "closed" };
   const { error } = parsed.data.on
     ? await supabase.from("cause_votes").upsert({ proposal_id: parsed.data.proposalId, user_id: user.id }, { onConflict: "proposal_id,user_id" })
     : await supabase.from("cause_votes").delete().eq("proposal_id", parsed.data.proposalId).eq("user_id", user.id);

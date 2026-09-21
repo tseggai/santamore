@@ -5,7 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SignInForm } from "@/components/admin/SignInForm";
 import { SepaPanel } from "@/components/donate/SepaPanel";
 import { RegistrationForm, type TierOption } from "@/components/events/RegistrationForm";
-import { parseTiers } from "@/lib/events";
+import { activeTiers, parseTiers } from "@/lib/events";
 import { getOrgBankDetails } from "@/lib/org";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
@@ -44,7 +44,7 @@ export default async function EventRegistrationPage({
   const supabase = await createClient();
   const { data: event } = await supabase
     .from("v_public_events")
-    .select("id, slug, name, kind, distances, price_tiers, offers_shirts")
+    .select("id, slug, name, kind, distances, price_tiers, offers_shirts, hosting, registration_mode, bib_policy, bib_capacity, bibs_claimed, max_guests")
     .eq("slug", slug)
     .maybeSingle();
   if (!event) notFound();
@@ -129,7 +129,12 @@ export default async function EventRegistrationPage({
     );
   }
 
-  const tiers: TierOption[] = parseTiers(event.price_tiers).map((tier) => ({ label: tier.label, amountCents: tier.amount_cents }));
+  // The same rules as the event page: only tiers on offer today, no waiver
+  // or fee for a race registered with its organiser, our bibs while they last.
+  const external = event.hosting === "external";
+  const withOrganizer = external && (event.registration_mode ?? "organizer") === "organizer";
+  const tiers: TierOption[] = (withOrganizer ? [] : activeTiers(parseTiers(event.price_tiers))).map((tier) => ({ label: tier.label, amountCents: tier.amount_cents, until: tier.until ?? null }));
+  const bibsLeft = external && !withOrganizer && event.bib_policy === "we_buy" ? Math.max(0, (event.bib_capacity ?? 0) - (event.bibs_claimed ?? 0)) : null;
 
   return (
     <div className="mx-auto max-w-xl px-5 py-14">
@@ -148,6 +153,9 @@ export default async function EventRegistrationPage({
           distances={Array.isArray(event.distances) ? (event.distances as string[]) : []}
           tiers={tiers}
           offersShirts={Boolean(event.offers_shirts)}
+          hosting={external ? "external" : "own"}
+          bibsLeft={bibsLeft}
+          maxGuests={event.max_guests ?? 0}
           defaultName={registrations.length > 0 ? "" : (profile?.full_name ?? "")}
           defaultEmail={registrations.length > 0 ? "" : (user.email ?? "")}
         />

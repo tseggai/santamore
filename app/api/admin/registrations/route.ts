@@ -1,5 +1,6 @@
 import { toCsv } from "@/lib/csv";
 import { isStaffRole } from "@/lib/roles";
+import { centsToEuros } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -80,8 +81,8 @@ export async function GET(request: Request) {
       row.tier_label,
       row.bib_number,
       row.status,
-      (row.amount_due_cents / 100).toFixed(2),
-      (row.amount_paid_cents / 100).toFixed(2),
+      centsToEuros(row.amount_due_cents),
+      centsToEuros(row.amount_paid_cents),
       row.payment_reference,
       row.waiver_signed_at,
       row.waiver_version,

@@ -15,6 +15,8 @@ export const donationFormSchema = z.object({
   name: z.string().trim().min(1).max(100),
   email: z.string().trim().email().max(100),
   message: z.string().trim().max(MAX_MESSAGE_LENGTH),
+  /** Honeypot: a hidden field people never see; a bot that fills it is ignored. */
+  website: z.string().max(200).optional(),
 });
 
 export const donationPledgeSchema = donationFormSchema

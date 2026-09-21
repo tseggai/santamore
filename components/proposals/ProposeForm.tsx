@@ -5,6 +5,7 @@ import { useState, type FormEvent } from "react";
 
 import { deleteProposal, proposeCause, updateProposal } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
 import { useDialog } from "@/components/console/useDialog";
+import { centsToEuros } from "@/lib/money";
 import { parseEurosToCents } from "@/lib/money";
 import { allAnswered, failedCriteria } from "@/lib/proposals";
 import { Link } from "@/i18n/navigation";
@@ -54,7 +55,7 @@ export function ProposeForm({
   const [summary, setSummary] = useState(edit?.summary ?? "");
   const [location, setLocation] = useState(edit?.location ?? "");
   const [beneficiary, setBeneficiary] = useState(edit?.beneficiary ?? "");
-  const [amount, setAmount] = useState(edit?.amountCents != null ? String(edit.amountCents / 100) : "");
+  const [amount, setAmount] = useState(edit?.amountCents != null ? centsToEuros(edit.amountCents).replace(/\.00$/, "") : "");
   const [state, setState] = useState<"idle" | "busy" | "error" | "done" | "rejected" | "locked">("idle");
   const [reasons, setReasons] = useState<string[]>([]);
   // Two screens: the questions, then — only once they pass — the proposal.
