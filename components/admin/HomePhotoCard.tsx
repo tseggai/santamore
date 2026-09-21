@@ -49,7 +49,6 @@ export function HomePhotoCard({ path }: { path: string | null }) {
   return (
     <section className="rounded-lg bg-mist px-5 py-5">
       <h2 className="text-[16px] font-bold">{t("homePhotoTitle")}</h2>
-      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("homePhotoHint")}</p>
       <div className="mt-4 flex flex-wrap items-center gap-4">
         {src ? <Image src={src} alt="" width={320} height={180} className="aspect-[16/9] w-64 rounded-lg bg-paper object-cover" /> : null}
         <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(e) => { const file = e.target.files?.[0]; if (file) void upload(file); e.target.value = ""; }} />
