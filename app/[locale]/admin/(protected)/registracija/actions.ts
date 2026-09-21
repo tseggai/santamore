@@ -16,7 +16,7 @@ const FIELD_IDS = new Set(Object.keys(pack.fields));
 const CHECK_IDS = new Set(pack.forms.flatMap((f) => f.blocks.flatMap((b) => (b.type === "check" ? [b.id] : []))));
 const DRAFT_IDS = new Set(pack.drafts.map((d) => d.id));
 
-export type SaveLegalPackResult = { ok: true; updatedAt: string } | { ok: false; error: "invalid" | "forbidden" | "server" };
+export type SaveLegalPackResult = { ok: true; updatedAt: string } | { ok: false; error: "invalid" | "forbidden" | "missing_table" | "server" };
 
 const fieldState = z.object({ me: z.string().max(20_000), en: z.string().max(20_000), stale: z.enum(["me", "en"]).nullable() });
 
@@ -47,7 +47,9 @@ export async function saveLegalPack(input: unknown): Promise<SaveLegalPackResult
     .from("legal_pack")
     .upsert({ key: parsed.data.key, value, updated_at: updatedAt, updated_by: user.id }, { onConflict: "key" });
   if (error) {
-    console.error("[legal-pack] save failed:", error.message);
+    console.error("[legal-pack] save failed:", error.code, error.message);
+    // 42P01: the table does not exist; PGRST205: PostgREST's schema cache has never seen it.
+    if (error.code === "42P01" || error.code === "PGRST205") return { ok: false, error: "missing_table" };
     return { ok: false, error: error.code === "42501" ? "forbidden" : "server" };
   }
   return { ok: true, updatedAt };

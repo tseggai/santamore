@@ -1530,7 +1530,9 @@
       "fieldEmpty": "empty",
       "lastSaved": "Last saved: {when}",
       "neverSaved": "Nothing saved yet; the recommended values are shown.",
-      "draftHint": "The draft is bilingual; edit the text directly in either language. Tick both languages to see them side by side."
+      "draftHint": "The draft is bilingual; edit the text directly in either language. Tick both languages to see them side by side.",
+      "saveMissingTable": "The legal_pack table does not exist in the database yet. Apply migration 20260921000069_legal_pack.sql (Supabase → SQL editor) and save again.",
+      "guideHint": "The founders' guide: what to collect, what to decide, where each fact goes and what every draft is for. English only, read-only here."
     }
   },
   "forms": {

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { saveLegalPack } from "@/app/[locale]/admin/(protected)/registracija/actions";
 import { translateFields } from "@/app/[locale]/admin/(protected)/translate-actions";
-import { initialFields, sanitizeDraftHtml, segments, type FieldState, type LegalPack, type PackBlock, type PackLang } from "@/lib/legal-pack";
+import { initialFields, isEmptyOptional, sanitizeDraftHtml, segments, type FieldState, type LegalPack, type PackBlock, type PackLang } from "@/lib/legal-pack";
 import type { Locale } from "@/i18n/routing";
 
 /*
@@ -72,6 +72,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   });
 
   const form = pack.forms.find((f) => f.id === doc) ?? null;
+  const guide = doc === "guide" ? pack.guide ?? null : null;
   const draft = doc.startsWith("draft:") ? pack.drafts.find((d) => `draft:${d.id}` === doc) ?? null : null;
   const isDirty = Object.keys(dirty).length > 0;
   const staleNow = useMemo(() => Object.entries(fields).filter(([id, f]) => f.stale === lang && !pack.fields[id]?.meOnly).map(([id]) => id), [fields, lang, pack.fields]);
@@ -148,7 +149,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
         last = result.updatedAt;
         setDirty((d) => { const rest = { ...d }; delete rest[key]; return rest; });
       } else {
-        failed = result.error === "forbidden" ? t("saveForbidden") : t("saveFailed");
+        failed = result.error === "forbidden" ? t("saveForbidden") : result.error === "missing_table" ? t("saveMissingTable") : t("saveFailed");
         break;
       }
     }
@@ -159,7 +160,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
 
   const print = () => {
     const title = document.title;
-    document.title = `${form?.file ?? draft?.file ?? "santamore"}-${lang}`;
+    document.title = `${form?.file ?? draft?.file ?? guide?.file ?? "santamore"}-${lang}`;
     window.print();
     document.title = title;
   };
@@ -175,6 +176,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
         <label className="block md:hidden">
           <span className="type-eyebrow block text-black/60">{t("documents")}</span>
           <select value={doc} onChange={(e) => setDoc(e.target.value)} className="mt-1 w-full rounded-brand bg-mist px-3 py-2 text-[15px]">
+            {pack.guide ? <option value="guide">{pack.guide.title[lang]}</option> : null}
             <optgroup label={t("forms")}>
               {pack.forms.map((f) => <option key={f.id} value={f.id}>{f.id} · {f.title[lang]}</option>)}
             </optgroup>
@@ -184,6 +186,11 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
           </select>
         </label>
         <div className="hidden md:block md:sticky md:top-6">
+          {pack.guide ? (
+            <ul className="mb-4 flex flex-col gap-0.5">
+              <NavItem active={doc === "guide"} onClick={() => setDoc("guide")} label={pack.guide.title[lang]} />
+            </ul>
+          ) : null}
           <p className="type-eyebrow text-black/60">{t("forms")}</p>
           <ul className="mt-1.5 flex flex-col gap-0.5">
             {pack.forms.map((f) => <NavItem key={f.id} active={doc === f.id} onClick={() => setDoc(f.id)} label={`${f.id} · ${f.title[lang]}`} />)}
@@ -230,8 +237,17 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
         </p>
 
         {/* The document */}
-        <div id="legal-doc" className={`lp-doc mt-4 ${draft && both ? "lp-both" : ""}`} lang={lang === "me" ? "sr-Latn-ME" : "en"} data-lang={lang}>
-          {form ? (
+        <div id="legal-doc" className={`lp-doc mt-4 ${(draft && both) || guide ? "lp-both" : ""}`} lang={guide ? "en" : lang === "me" ? "sr-Latn-ME" : "en"} data-lang={lang}>
+          {guide ? (
+            <>
+              <div className="lp-head">
+                <p className="lp-file">{guide.file}</p>
+                <h2 className="lp-title">{guide.title[lang]}</h2>
+                <p className="lp-subtitle lp-screen">{t("guideHint")}</p>
+              </div>
+              <div className="lp-prose lp-guide" dangerouslySetInnerHTML={{ __html: guide.html }} />
+            </>
+          ) : form ? (
             <>
               <div className="lp-head">
                 <p className="lp-file">{form.file}-{lang}</p>
@@ -305,7 +321,7 @@ function Block(props: BlockProps) {
     case "list":
       return (
         <ol className="lp-list">
-          {block[lang].map((item, i) => <li key={i}><Template text={item} {...props} /></li>)}
+          {block[lang].map((item, i) => <li key={i} className={isEmptyOptional(item, props.fields, props.pack.fields) ? "lp-opt-empty" : undefined}><Template text={item} {...props} /></li>)}
         </ol>
       );
     case "check": {
@@ -321,7 +337,7 @@ function Block(props: BlockProps) {
       return (
         <div className="lp-sigrow">
           {block.items.map((item, i) => (
-            <div key={i} className="lp-sig">
+            <div key={i} className={`lp-sig ${isEmptyOptional(item[lang] || item.me, props.fields, props.pack.fields) ? "lp-opt-empty" : ""}`}>
               <p className="lp-p"><Template text={item[lang] || item.me} {...props} /></p>
               <p className="lp-siglbl">{item.lbl[lang] || item.lbl.me}</p>
             </div>
@@ -355,7 +371,7 @@ function Template({ text, lang, pack, fields, onField, placeholderHint, staleHin
       const shown = meta.meOnly && lang === "en" ? "" : f[lang];
       return (
         <Editable key={j} value={shown} block={!!meta.block} label={meta.label[lang] || meta.label.me}
-          placeholder={`${meta.label[lang] || meta.label.me} — ${placeholderHint}`}
+          placeholder={meta.optional ? meta.label[lang] || meta.label.me : `${meta.label[lang] || meta.label.me} — ${placeholderHint}`}
           stale={f.stale === lang && !meta.meOnly ? staleHint : null}
           onChange={(v) => onField(seg.id, v)} />
       );
@@ -412,6 +428,9 @@ const CSS = `
 .lp-field:empty::before { content: attr(data-placeholder); color: rgba(11,87,208,.55); font-style: italic; }
 .lp-field.lp-block { display: block; white-space: pre-wrap; padding: .3rem .5rem; margin: .25rem 0; }
 .lp-field.lp-stale { box-shadow: 0 0 0 1.5px #F35353; }
+.lp-opt-empty { opacity: .55; }
+.lp-guide p.en { color: #000; }
+.lp-guide li { margin: .25rem 0; }
 .lp-prose { outline: none; }
 .lp-prose:focus { box-shadow: 0 0 0 2px rgba(14,58,70,.25); border-radius: 4px; }
 .lp-prose h2 { font-weight: 800; font-size: 16px; margin: 1.3rem 0 .4rem; }
@@ -438,6 +457,7 @@ const CSS = `
   .lp-field, .lp-field.lp-block { color: #000; background: none; box-shadow: none; padding: 0; margin: 0; transition: none; }
   .lp-field.lp-block { display: block; }
   .lp-field:empty::before { content: "____________"; color: #000; font-style: normal; }
+  .lp-opt-empty { display: none !important; }
   .lp-check { border: none; break-inside: avoid; }
   .lp-check input { -webkit-appearance: checkbox; }
   .lp-sigrow { break-inside: avoid; margin-top: 2rem; }
