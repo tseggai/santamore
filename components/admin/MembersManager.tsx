@@ -60,6 +60,8 @@ export interface MemberPage {
   /** Who runs it and which team it is in, for the Pages screen. */
   owner_name: string;
   team_name: string | null;
+  /** The year of its cause. */
+  year: number | null;
 }
 
 export interface MemberRegistration {
@@ -76,6 +78,8 @@ export interface MemberRegistration {
   amount_paid_cents: number;
   payment_reference: string | null;
   status: "pending" | "confirmed" | "cancelled";
+  /** The year of its event. */
+  year: number | null;
 }
 
 export interface MemberTeam {
@@ -91,6 +95,8 @@ export interface MemberTeam {
   /** Pages in the team. */
   pages: number;
   is_test?: boolean;
+  /** The year of its cause, else its event. */
+  year: number | null;
 }
 
 type Kind = "team" | "fundraisers" | "athletes" | "participants" | "captains" | "donors";

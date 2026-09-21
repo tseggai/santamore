@@ -161,6 +161,8 @@ select * from (values
                and pg_get_functiondef(p.oid) like '%Marking a live gift as test data%'))
   ,('20260920000058_proposal_edit',
      to_regprocedure('public.update_my_proposal(uuid, text, text, text, text, bigint)') is not null)
+  ,('20260920000068_donors_by_year',
+     to_regclass('public.v_donor_years') is not null)
   ,('20260920000067_donors_view',
      to_regclass('public.v_donors') is not null)
   ,('20260920000066_vote_guard',
