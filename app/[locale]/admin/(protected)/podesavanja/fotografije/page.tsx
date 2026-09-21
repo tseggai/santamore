@@ -78,8 +78,7 @@ export default async function SettingsPhotosPage({ params }: { params: Promise<{
   return (
     <div className="pb-8">
       <HomePhotoCard path={typeof homePhoto === "string" ? homePhoto : null} />
-      <p className="mt-6 text-[14px] leading-relaxed text-black/60">{t("photosHint")}</p>
-      {loose > 0 ? <p className="mt-2 text-[14px] font-semibold text-red-dark">{t("photosLoose", { count: loose })}</p> : null}
+      {loose > 0 ? <p className="mt-6 text-[14px] font-semibold text-red-dark">{t("photosLoose", { count: loose })}</p> : null}
       {withPhotos.length > 0 ? (
         <>
           <h2 className="mt-5 text-[15px] font-bold">{t("photosWith")}</h2>

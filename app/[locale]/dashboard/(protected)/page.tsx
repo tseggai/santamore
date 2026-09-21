@@ -104,9 +104,6 @@ export default async function DashboardOverviewPage({
   const nextEvent = (events ?? [])
     .filter((event) => event.starts_at && new Date(event.starts_at).getTime() >= now)
     .sort((a, b) => new Date(a.starts_at!).getTime() - new Date(b.starts_at!).getTime())[0];
-  const daysLeft = nextEvent?.starts_at
-    ? Math.max(0, Math.ceil((new Date(nextEvent.starts_at).getTime() - now) / 86_400_000))
-    : null;
 
   const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
 
@@ -157,11 +154,6 @@ export default async function DashboardOverviewPage({
       <h1 className="type-display mt-2 text-3xl">
         {t("welcome", { name: profile?.full_name?.split(" ")[0] ?? "" }).trim()}
       </h1>
-      {nextEvent && daysLeft !== null ? (
-        <p className="mt-1 text-[14.5px] text-black/60">
-          {t("daysLeft", { count: daysLeft })} · {nextEvent.name}
-        </p>
-      ) : null}
 
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {tiles.map((tile) => (

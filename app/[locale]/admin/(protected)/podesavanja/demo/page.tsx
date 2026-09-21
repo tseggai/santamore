@@ -44,7 +44,6 @@ export default async function AdminDemoPage() {
     <div className="pb-8">
       <TestModeCard on={Boolean(testMode)} canManage={profile?.role === "admin"} />
       <h2 className="mt-8 text-[16px] font-bold">{t("demoTitle")}</h2>
-      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("demoHint")}</p>
       {profile?.role === "admin" ? <DemoTool counts={counts} /> : <p className="mt-3 text-[14px] text-black/60">{t("demoAdminOnly")}</p>}
     </div>
   );

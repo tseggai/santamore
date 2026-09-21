@@ -57,7 +57,6 @@ export function TestModeCard({ on, canManage }: { on: boolean; canManage: boolea
               {on ? t("testModeOn") : t("testModeOff")}
             </span>
           </p>
-          <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/65">{t("testModeHint")}</p>
         </div>
         {canManage ? (
           <div className="flex flex-wrap gap-2">

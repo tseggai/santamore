@@ -30,8 +30,7 @@ export default async function FundraisersPage({
   const focus = causePages && causePages.length > 0 ? { label: t("focusPagesFor", { name: causePages[0].event_name }), clearHref: "/admin/podrska/prikupljaci" } : null;
   return (
     <div className="pb-8">
-      <p className="max-w-2xl text-[14px] leading-relaxed text-black/60">{t("fundraisersPeopleHint")}</p>
-      <div className="mt-4"><YearSelect years={years} value={year} /></div>
+      <div><YearSelect years={years} value={year} /></div>
       <MembersManager
         locale={locale as Locale}
         mode="fundraisers"

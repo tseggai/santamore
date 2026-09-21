@@ -16,7 +16,6 @@ export default async function PagesPage({ params, searchParams }: { params: Prom
   return (
     <div className="pt-8 pb-8">
       <h1 className="type-display text-2xl">{t("navPages")}</h1>
-      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("pagesHint")}</p>
       <div className="mt-5">
         <PagesManager pages={pages} canManage={people.canManage} focus={focus} />
       </div>

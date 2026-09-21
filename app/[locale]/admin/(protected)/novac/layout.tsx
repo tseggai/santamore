@@ -17,7 +17,6 @@ export default async function MoneyLayout({
   return (
     <div className="pt-8">
       <h1 className="type-display text-2xl">{t("moneyTitle")}</h1>
-      <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("moneyHint")}</p>
       <MoneyTabs />
       <div className="[&>div]:pt-4">{children}</div>
     </div>

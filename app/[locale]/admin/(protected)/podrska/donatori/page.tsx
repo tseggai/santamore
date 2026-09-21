@@ -1,4 +1,4 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 
 import { DonorsManager, type DonorGift, type DonorRow } from "@/components/admin/DonorsManager";
 import { YearSelect } from "@/components/console/YearSelect";
@@ -16,7 +16,6 @@ export default async function DonorsPage({ params, searchParams }: { params: Pro
   const [{ locale }, { godina }] = await Promise.all([params, searchParams]);
   const year = parseYear(godina);
   setRequestLocale(locale);
-  const t = await getTranslations("admin");
   const supabase = await createClient();
   const [{ data: donors }, { data: gifts }, { data: yearRows }] = await Promise.all([
     year === null
@@ -29,8 +28,7 @@ export default async function DonorsPage({ params, searchParams }: { params: Pro
   const giftRows = ((gifts ?? []) as DonorGift[]).filter((g) => year === null || g.year === year);
   return (
     <div className="pb-8">
-      <p className="max-w-2xl text-[14px] leading-relaxed text-black/60">{t("donorsHint")}</p>
-      <div className="mt-4"><YearSelect years={years} value={year} /></div>
+      <div><YearSelect years={years} value={year} /></div>
       <div className="mt-4">
         <DonorsManager donors={(donors ?? []) as DonorRow[]} gifts={giftRows} />
       </div>
