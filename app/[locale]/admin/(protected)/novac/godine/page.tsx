@@ -128,8 +128,7 @@ export default async function YearsPage({ params }: { params: Promise<{ locale: 
 
   return (
     <div className="pb-8">
-      <p className="text-[14px] leading-relaxed text-black/60">{t("yearsHint")}</p>
-      <div className="mt-4">
+      <div>
         <YearsManager rows={rows} />
       </div>
     </div>

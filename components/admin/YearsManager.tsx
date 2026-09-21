@@ -214,7 +214,6 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
 
       {/* Story */}
       <div className={`${section("story")} mt-4 space-y-4`}>
-        <p className="text-[14px] leading-relaxed text-black/60">{t("yearFormHint")}</p>
         <div>
           <label htmlFor="yHeadline" className={labelClass}>{t("yearHeadline")}</label>
           <input id="yHeadline" type="text" maxLength={160} value={headline} onChange={(e) => setHeadline(e.target.value)} className={inputClass} />
@@ -238,7 +237,6 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
 
       {/* Causes: the year's causes and their money, from the ledger */}
       <div className={`${section("causes")} mt-4`}>
-        <p className="text-[14px] leading-relaxed text-black/60">{t("yearCausesHint")}</p>
         {row.causes.length === 0 ? (
           <p className="mt-3 text-[14px] text-black/55">{t("yearCausesEmpty")}</p>
         ) : (
@@ -278,7 +276,7 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
 
       {/* Sponsors: from the supporter records, read-only here */}
       <div className={`${section("sponsors")} mt-4`}>
-        <p className="text-[14px] leading-relaxed text-black/60">{t("yearSponsorsHint")} <Link href={`/${locale}/admin/podrska`} className={linkClass}>{t("yearSponsorsLink")}</Link></p>
+        <p className="text-[14px]"><Link href={`/${locale}/admin/podrska`} className={linkClass}>{t("yearSponsorsLink")}</Link></p>
         {row.sponsorships.length === 0 ? (
           <p className="mt-3 text-[14px] text-black/55">{t("yearSponsorsEmpty")}</p>
         ) : (
@@ -297,7 +295,7 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
 
       {/* Hand-overs: from the ledger, plus what was recorded outside it */}
       <div className={`${section("handovers")} mt-4 space-y-4`}>
-        <p className="text-[14px] leading-relaxed text-black/60">{t("yearHandOversHint")} <Link href={`/${locale}/admin/novac/odliv`} className={linkClass}>{t("yearManageHandOvers")}</Link></p>
+        <p className="text-[14px]"><Link href={`/${locale}/admin/novac/odliv`} className={linkClass}>{t("yearManageHandOvers")}</Link></p>
         <div>
           <label htmlFor="yBeneficiariesList" className={labelClass}>{t("yearBeneficiariesList")}</label>
           <textarea id="yBeneficiariesList" rows={4} value={beneficiariesText} onChange={(e) => setBeneficiariesText(e.target.value)} className={`${inputClass} font-mono text-[14px]`} />
