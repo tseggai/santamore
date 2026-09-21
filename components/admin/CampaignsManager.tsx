@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState, type FormEvent } from "react";
+import { useState, type ReactNode, type FormEvent } from "react";
 
 import { deleteCampaigns, saveCampaign, setCampaignsCompleted, setCampaignsPublic } from "@/app/[locale]/admin/(protected)/kampanje/actions";
 import { CoverField } from "@/components/admin/CoverField";
@@ -96,10 +96,13 @@ function CampaignForm({
   campaign,
   chapters,
   onDone,
+  extra = null,
 }: {
   campaign: CampaignRow | null;
   chapters: Option[];
   onDone: () => void;
+  /** Admin-only buttons for an existing cause: the test flag and Delete, at the end of the footer. */
+  extra?: ReactNode;
 }) {
   const t = useTranslations("admin");
   const router = useRouter();
@@ -412,6 +415,7 @@ function CampaignForm({
       >
         {t("cancel")}
       </button>
+      {extra ? <span className="ml-auto flex flex-wrap items-center gap-2">{extra}</span> : null}
     </div>
     </div>
   );
@@ -551,7 +555,20 @@ export function CampaignsManager({
         onClose={() => setOpen("")}
         wide
       >
-        <CampaignForm key={open} campaign={openCampaign} chapters={chapters} onDone={() => setOpen("")} />
+        <CampaignForm
+          key={open}
+          campaign={openCampaign}
+          chapters={chapters}
+          onDone={() => setOpen("")}
+          extra={canManage && openCampaign ? (
+            <>
+              <TestFlagButtons kind="campaign" ids={[openCampaign.id]} isTest={isTest} disabled={busy} className="rounded-lg bg-paper px-3 py-2 text-[14px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-60" />
+              <button type="button" disabled={busy} onClick={() => void remove([openCampaign.id], () => undefined)} className="rounded-lg px-3 py-2 text-[14px] font-semibold text-red-dark transition-colors hover:bg-mist-2 disabled:opacity-60">
+                {t("evDelete")}
+              </button>
+            </>
+          ) : null}
+        />
       </SidePanel>
 
       {notice.length > 0 ? (

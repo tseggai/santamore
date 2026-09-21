@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { HomePhotoCard } from "@/components/admin/HomePhotoCard";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 
@@ -20,10 +21,11 @@ export default async function SettingsPhotosPage({ params }: { params: Promise<{
   setRequestLocale(locale);
   const t = await getTranslations("admin");
   const supabase = await createClient();
-  const [{ data: items }, { data: events }, { data: campaigns }] = await Promise.all([
+  const [{ data: items }, { data: events }, { data: campaigns }, { data: homePhoto }] = await Promise.all([
     supabase.from("gallery_items").select("event_id, campaign_id, is_published").limit(10_000),
     supabase.from("events").select("id, name, starts_at").order("starts_at", { ascending: false }).limit(500),
     supabase.from("campaigns").select("id, title, starts_at").order("starts_at", { ascending: false }).limit(500),
+    supabase.rpc("public_setting", { p_key: "home_photo" }),
   ]);
   const counts = new Map<string, { total: number; published: number }>();
   let loose = 0;
@@ -75,7 +77,8 @@ export default async function SettingsPhotosPage({ params }: { params: Promise<{
 
   return (
     <div className="pb-8">
-      <p className="text-[14px] leading-relaxed text-black/60">{t("photosHint")}</p>
+      <HomePhotoCard path={typeof homePhoto === "string" ? homePhoto : null} />
+      <p className="mt-6 text-[14px] leading-relaxed text-black/60">{t("photosHint")}</p>
       {loose > 0 ? <p className="mt-2 text-[14px] font-semibold text-red-dark">{t("photosLoose", { count: loose })}</p> : null}
       {withPhotos.length > 0 ? (
         <>

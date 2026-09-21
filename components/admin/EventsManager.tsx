@@ -220,6 +220,14 @@ export function EventsManager({
           offers={openEvent?.offers}
           gallery={openEvent?.gallery}
           onDone={() => setOpen("")}
+          extra={canManage && openEvent ? (
+            <>
+              <TestFlagButtons kind="event" ids={[openEvent.id]} isTest={isTest} disabled={busy === "bulk"} className="rounded-lg bg-paper px-3 py-2 text-[14px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-60" />
+              <button type="button" disabled={busy === "bulk"} onClick={() => void remove([openEvent.id], () => undefined)} className="rounded-lg px-3 py-2 text-[14px] font-semibold text-red-dark transition-colors hover:bg-mist-2 disabled:opacity-60">
+                {t("evDelete")}
+              </button>
+            </>
+          ) : null}
           onCreated={(id) => setOpen(id)}
         />
       </SidePanel>

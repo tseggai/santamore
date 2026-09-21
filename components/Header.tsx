@@ -38,7 +38,7 @@ const ABOUT_ITEMS = [
  * hero, white logo and links, and turns to the paper version once the
  * page scrolls; everywhere else it is the paper version from the start.
  */
-export default function Header() {
+export default function Header({ notice = null }: { notice?: string | null }) {
   const t = useTranslations();
   const pathname = usePathname();
   const overHero = pathname === "/";
@@ -61,6 +61,11 @@ export default function Header() {
         glass ? "border-transparent bg-transparent" : "border-line bg-paper"
       }`}
     >
+      {notice ? (
+        <p role="status" className="flex h-9 items-center justify-center bg-red px-5 text-[13.5px] font-bold text-paper">
+          <span className="truncate">{notice}</span>
+        </p>
+      ) : null}
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded-md focus:bg-paper focus:px-3 focus:py-2"

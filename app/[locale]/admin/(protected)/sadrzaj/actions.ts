@@ -250,3 +250,15 @@ export async function savePostGroup(input: unknown): Promise<PostGroupResult> {
   revalidatePath("/[locale]/vijesti", "layout");
   return { ok: true, ids };
 }
+
+/** The landing page's opening picture (site setting home_photo, migration 0065): a path in the gallery bucket, or none. */
+export async function setHomePhoto(input: unknown): Promise<ActionResult> {
+  const parsed = z.object({ path: z.string().trim().min(1).max(300).regex(/^home\/[\w.-]+$/).nullable() }).safeParse(input);
+  if (!parsed.success) return { ok: false };
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("set_site_setting", { p_key: "home_photo", p_value: parsed.data.path });
+  if (error) return { ok: false, detail: `${error.code}: ${error.message}` };
+  revalidatePath("/[locale]/admin/podesavanja", "layout");
+  revalidatePath("/[locale]", "page");
+  return { ok: true };
+}

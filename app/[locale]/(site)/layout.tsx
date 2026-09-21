@@ -24,12 +24,8 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
   const t = await getTranslations("home");
   return (
     <DonateProvider>
-      <Header />
-      {testMode ? (
-        <p role="status" className="bg-red px-5 py-2 text-center text-[13.5px] font-bold text-paper">
-          {t("testModeBanner")}
-        </p>
-      ) : null}
+      {/* the test-mode bar is part of the header, so the landing hero can sit under both */}
+      <Header notice={testMode ? t("testModeBanner") : null} />
       <main id="main" className="flex-1">
         {children}
       </main>
