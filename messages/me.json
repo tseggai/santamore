@@ -1967,7 +1967,11 @@
     "editSaved": "Sačuvano.",
     "editCancel": "Otkaži",
     "editLocked": "Neko je glasao otkako si otvorio/la izmjenu, pa je tekst sada fiksiran.",
-    "editLockedShort": "tvoj — fiksiran nakon prvog glasa"
+    "editLockedShort": "tvoj — fiksiran nakon prvog glasa",
+    "allProposals": "{count, plural, one {Svi prijedlozi (#)} few {Svi prijedlozi (#)} other {Svi prijedlozi (#)}}",
+    "backToCauses": "Ciljevi",
+    "delete": "Povuci prijedlog",
+    "deleteConfirm": "Povući ovaj prijedlog? Uklanja se sa liste. Možeš predložiti ponovo kad god želiš."
   },
   "beneficiaries": {
     "eyebrow": "Korisnici",

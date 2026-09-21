@@ -134,3 +134,20 @@ export async function updateProposal(input: unknown): Promise<EditProposalResult
   revalidatePath("/[locale]/predlozi", "page");
   return { ok: true };
 }
+
+/** The proposer withdraws their proposal under the same rule as an edit (delete_my_proposal, migration 0060). */
+export async function deleteProposal(input: unknown): Promise<EditProposalResult> {
+  const parsed = z.object({ proposalId: z.string().uuid() }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const supabase = await createClient();
+  const { data: result, error } = await supabase.rpc("delete_my_proposal", { p_id: parsed.data.proposalId });
+  if (error) {
+    console.error("[proposals] delete failed:", error.code, error.message);
+    return { ok: false, error: "server" };
+  }
+  const row = result as { ok: boolean; reason?: string };
+  if (!row.ok) return { ok: false, error: row.reason === "voted" ? "voted" : "closed" };
+  revalidatePath("/[locale]/kampanje", "layout");
+  revalidatePath("/[locale]", "page");
+  return { ok: true };
+}

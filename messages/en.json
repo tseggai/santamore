@@ -1967,7 +1967,11 @@
     "editSaved": "Saved.",
     "editCancel": "Cancel",
     "editLocked": "Someone has voted since you opened this, so the wording is now fixed.",
-    "editLockedShort": "yours — fixed after the first vote"
+    "editLockedShort": "yours — fixed after the first vote",
+    "allProposals": "{count, plural, one {All proposals (#)} other {All proposals (#)}}",
+    "backToCauses": "Causes",
+    "delete": "Withdraw the proposal",
+    "deleteConfirm": "Withdraw this proposal? It is removed from the list. You can propose again any time."
   },
   "beneficiaries": {
     "eyebrow": "Beneficiaries",
