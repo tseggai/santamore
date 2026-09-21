@@ -138,7 +138,6 @@ export function ProposalsManager({
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-[16px] font-bold">{t("criteriaHeading")}</h2>
-            <p className="mt-1 max-w-2xl text-[14px] leading-relaxed text-black/60">{t("criteriaHint")}</p>
           </div>
           <button type="button" onClick={() => setCriterionOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
             + {t("criteriaAdd")}
