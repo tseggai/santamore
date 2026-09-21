@@ -1470,7 +1470,7 @@
     "supportersTabDonors": "Donors",
     "supportersTabParticipants": "Participants",
     "supportersTabTeams": "Teams",
-    "donorsHint": "Everyone a gift belongs to, from the ledger: gifts matched here, names recorded on a year report, a supporter's cash. One row per donor, whether or not they have an account; the row opens their gifts.",
+    "donorsHint": "Everyone a gift belongs to, from the ledger: gifts matched here, names recorded on a year report, an individual supporter's cash. One row per donor, whether or not they have an account; the row opens their gifts. An organisation's sponsorship is on the Sponsors tab.",
     "participantsHint": "Everyone registered for an event or who said they are coming, and the athletes with Strava on. Open a row for their registrations and activity.",
     "staffSectionHint": "The staff records that make up the team, and every account with its access level: member, accounting, staff or admin.",
     "staffTabTeam": "Staff",
@@ -1504,7 +1504,9 @@
       "recorded": "Recorded",
       "sponsorship": "Supporter",
       "adjustment": "Correction"
-    }
+    },
+    "yearFilterLabel": "Year",
+    "yearFilterAll": "All years"
   },
   "forms": {
     "nameLabel": "Full name",

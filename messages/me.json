@@ -1470,7 +1470,7 @@
     "supportersTabDonors": "Donatori",
     "supportersTabParticipants": "Učesnici",
     "supportersTabTeams": "Timovi",
-    "donorsHint": "Svi kojima pripada poklon, iz knjige: pokloni upareni ovdje, imena zapisana na godišnjem izvještaju, novac podržavaoca. Jedan red po donatoru, sa nalogom ili bez; red otvara njegove poklone.",
+    "donorsHint": "Svi kojima pripada poklon, iz knjige: pokloni upareni ovdje, imena zapisana na godišnjem izvještaju, novac pojedinca podržavaoca. Jedan red po donatoru, sa nalogom ili bez; red otvara njegove poklone. Sponzorstvo organizacije je na kartici Sponzori.",
     "participantsHint": "Svi prijavljeni na događaj ili koji su javili da dolaze, i sportisti sa uključenom Stravom. Otvori red za prijave i aktivnost.",
     "staffSectionHint": "Zapisi osoblja koji čine tim, i svaki nalog sa nivoom pristupa: član, računovodstvo, osoblje ili admin.",
     "staffTabTeam": "Osoblje",
@@ -1504,7 +1504,9 @@
       "recorded": "Zapisano",
       "sponsorship": "Podržavalac",
       "adjustment": "Ispravka"
-    }
+    },
+    "yearFilterLabel": "Godina",
+    "yearFilterAll": "Sve godine"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

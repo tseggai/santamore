@@ -27,6 +27,7 @@ export interface DonorGift {
   donor_key: string;
   source: string;
   entry_date: string;
+  year: number;
   amount_cents: number;
   rail: string;
   name: string | null;
