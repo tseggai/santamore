@@ -10,7 +10,7 @@ export default async function CausesLayout({ children, params }: { children: Rea
   setRequestLocale(locale);
   const t = await getTranslations("admin");
   return (
-    <SectionHeader title={t("campaignsTitle")} hint={t("campaignsHint")}>
+    <SectionHeader title={t("campaignsTitle")}>
       <CausesTabs />
       <div className="[&>div]:pt-4">{children}</div>
     </SectionHeader>
