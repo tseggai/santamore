@@ -1,6 +1,6 @@
 # NGO registration pack
 
-Working files for registering Santamore as a non-governmental association
+Working files (all seven documents of the pack) for registering Santamore as a non-governmental association
 (*nevladino udruženje*) in Montenegro, the first prerequisite for the bank
 account, the PIB and the Monri merchant account (brief §15, `docs/PLACEHOLDERS.md`).
 
@@ -14,9 +14,9 @@ September 2026 and are not stored here; the team holds them. This folder has:
 | `03-registration-application.en.md` | English translation of *Obrazac prijave za upis u registar MIRN* |
 | `04-statute.en.md` | English translation of *Obrazac statuta udruženja* |
 | `05-founding-assembly-minutes.en.md` | English translation of *Obrazac zapisnika sa osnivačke skupštine* |
+| `06-guidance-founding-act.en.md` | English translation of *Uputstvo za popunjavanje osnivačkog akta*, the official note on what the founding decision must contain (Law Art. 11) |
+| `07-guidance-statute.en.md` | English translation of *Uputstvo za izradu statuta udruženja*, the official note on what the statute must regulate |
 | `completion-guide.md` | Bilingual (EN / ME) field-by-field guide: what to write in every blank, template defects to fix, suggested goals and activities, consistency checklist, path to Monri, open questions |
-
-Two more documents from the same pack are still to come and will be added here.
 
 Rules from `CLAUDE.md` apply: no fabricated names, numbers, addresses or legal
 text. Every fact the founders must supply is marked `[[PLACEHOLDER]]`, every
