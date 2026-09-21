@@ -23,4 +23,4 @@ Rules from `CLAUDE.md` apply: no fabricated names, numbers, addresses or legal
 text. Every fact the founders must supply is marked `[[PLACEHOLDER]]`, every
 point to confirm with the Ministry or the lawyer is marked **CHECK**.
 
-Related governance drafts in `docs/legal/governance/`: `grants-criteria.md` (the beneficiary funding criteria under Article 38 of the statute additions) and `chapter-rules.md` (the Chapter Rules under Article 43).
+Related governance drafts in `docs/legal/governance/`: `grants-criteria.md` (the beneficiary funding criteria under Article 38 of the statute additions), `chapter-rules.md` (the Chapter Rules under Article 43) and `conflict-of-interest-policy.md` (the conflict of interest policy under Article 34, with the pay rules).
