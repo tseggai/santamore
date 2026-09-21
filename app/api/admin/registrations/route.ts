@@ -1,4 +1,5 @@
 import { toCsv } from "@/lib/csv";
+import { isStaffRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -38,7 +39,7 @@ export async function GET(request: Request) {
     .select("role")
     .eq("id", user.id)
     .single();
-  if (profile?.role !== "admin" && profile?.role !== "chapter_lead") {
+  if (!isStaffRole(profile?.role)) {
     return new Response("Forbidden", { status: 403 });
   }
 

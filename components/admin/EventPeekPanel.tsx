@@ -95,8 +95,8 @@ export function EventPeekPanel({
     : peek.kind === "going"
       ? `/admin/dogadjaji/prijave?event=${peek.eventId}`
       : peek.kind === "pages"
-        ? `/admin/clanovi/prikupljaci?cilj=${peek.campaignId ?? ""}`
-        : `/admin/clanovi/timovi?dogadjaj=${peek.eventId}`;
+        ? `/admin/stranice?cilj=${peek.campaignId ?? ""}`
+        : `/admin/podrska/timovi?dogadjaj=${peek.eventId}`;
 
   let body: React.ReactNode = null;
   if (peek?.kind === "going") {

@@ -625,7 +625,8 @@
       "exportCsv": "Izvezi CSV",
       "colLanguages": "Jezici",
       "colSigned": "Dato",
-      "colTeams": "Timovi"
+      "colTeams": "Timovi",
+      "colCauses": "Ciljevi"
     },
     "confirmCash": "Potvrdi primopredaju",
     "railCash": "keš",
@@ -1032,14 +1033,8 @@
     "webhookStateMissing": "Nije pretplaćen",
     "webhookStateUnconfigured": "Nije podešen",
     "spNew": "Novo sponzorstvo",
-    "navMembers": "Ljudi",
     "membersTitle": "Članovi",
     "membersHint": "Svaki nalog i šta osoba radi: sportista kad je Strava uključena, učesnik kad je prijavljen, kapiten, donator. Otvorite red za stranice, prijave, Stravu i nivo pristupa.",
-    "peopleTitle": "Ljudi",
-    "peopleHint": "Osoblje, sa nalogom ili bez njega, svaki nalog sa onim što osoba radi i smije, i timovi za prikupljanje.",
-    "peopleTabTeam": "Osoblje",
-    "peopleTabFundraisers": "Prikupljači",
-    "peopleTabAccounts": "Članovi",
     "teamHint": "Rukovodstvo, tim, odbor, komisija i volonteri. Zapis stoji sam za sebe; nalog povežite samo da vežete nivo pristupa za osobu. Javni se prikazuju na stranici O nama; volonteri se računaju za godine u kojima su bili aktivni.",
     "teamNew": "Nova osoba",
     "teamCreate": "Dodaj osobu",
@@ -1085,7 +1080,8 @@
     "memberRole": {
       "admin": "Admin",
       "chapter_lead": "Vođa ogranka",
-      "member": "Član"
+      "member": "Član",
+      "accounting": "Računovodstvo"
     },
     "memberProfileHeading": "Profil i pristup",
     "memberProfileHint": "Ime i šta ovaj nalog smije u administraciji.",
@@ -1095,7 +1091,8 @@
     "memberAccessHint": {
       "member": "Vodi stranice, pridružuje se timovima i događajima. Bez pristupa administraciji.",
       "chapter_lead": "Sve u administraciji osim nivoa pristupa članova.",
-      "admin": "Sve, uključujući ko je admin."
+      "admin": "Sve, uključujući ko je admin.",
+      "accounting": "Sekcija Novac i podrška iza nje. Ništa drugo u konzoli."
     },
     "memberTitle": "Uloga u timu",
     "memberTitleHint": "npr. suosnivač, blagajnik, direktor događaja",
@@ -1382,8 +1379,6 @@
     "yearDonorsHint": "Jedan po redu: ime · euri. Napiši Anonimno za one koji nisu htjeli da budu imenovani.",
     "yearRecordedCause": "Ovi zabilježeni pokloni i isplate pripadaju cilju",
     "yearRecordedCauseHint": "Cilj te godine. Njegov prikupljeni iznos onda uključuje listu donatora ispod i sponzorski novac predat korisnicima.",
-    "peopleTabAll": "Svi",
-    "allPeopleHint": "Svi odjednom: svaki nalog i svaki zapis osoblja, jedan filter za sve vrste. Osoba bez naloga otvara se na kartici Osoblje.",
     "fundraisersPeopleHint": "Nalozi koji drže stranicu za prikupljanje: koliko je svako prikupio i njihove stranice za moderaciju.",
     "evDelete": "Obriši",
     "evDeleteConfirm": "{count, plural, one {Obrisati ovaj događaj?} few {Obrisati # događaja?} other {Obrisati # događaja?}} Neplaćene prijave i potvrde dolaska brišu se s njim; stranice, timovi, fotografije, sponzorstva i ponude ostaju. Ovo se ne može poništiti. Ako ga samo želiš sakriti sa sajta, povuci objavu.",
@@ -1408,7 +1403,6 @@
     "caDeleteReason_pages": "{count, plural, one {za njega prikuplja jedna stranica} few {za njega prikupljaju # stranice} other {za njega prikuplja # stranica}}",
     "caDeleteReason_teams": "{count, plural, one {za njega prikuplja jedan tim} few {za njega prikupljaju # tima} other {za njega prikuplja # timova}}",
     "caDeleteReason_missing": "više ne postoji",
-    "peopleTabTeams": "Timovi",
     "tmHint": "Timovi za prikupljanje: stranice koje zajedno prikupljaju za događaj, sa kapitenom. Brisanje tima odvaja njegove stranice i čuva svaki euro; tim čije su stranice primile donacije ne može se obrisati.",
     "tmColEvent": "Događaj",
     "tmColCause": "Cilj",
@@ -1443,7 +1437,24 @@
     "peekOpenFull": "Otvori cijelu listu",
     "peekRsvpOnly": "Javili da dolaze, bez prijave",
     "peekGuestOf": "gost: {name}",
-    "pagesDraftSuffix": "{count, plural, one {+# nacrt} few {+# nacrta} other {+# nacrta}}"
+    "pagesDraftSuffix": "{count, plural, one {+# nacrt} few {+# nacrta} other {+# nacrta}}",
+    "navPages": "Stranice",
+    "navStaff": "Osoblje",
+    "supportersSectionHint": "Svi kroz koje novac dolazi: organizacije koje nas sponzorišu, ljudi koji prikupljaju na stranici, donatori, učesnici i timovi.",
+    "supportersTabSponsors": "Sponzori",
+    "supportersTabFundraisers": "Prikupljači",
+    "supportersTabDonors": "Donatori",
+    "supportersTabParticipants": "Učesnici",
+    "supportersTabTeams": "Timovi",
+    "donorsHint": "Nalozi iza odobrenih poklona, sa iznosom svakog. Pokloni bez naloga su samo u knjizi.",
+    "participantsHint": "Svi prijavljeni na događaj ili koji su javili da dolaze, i sportisti sa uključenom Stravom. Otvori red za prijave i aktivnost.",
+    "staffSectionHint": "Zapisi osoblja koji čine tim, i svaki nalog sa nivoom pristupa: član, računovodstvo, osoblje ili admin.",
+    "staffTabTeam": "Osoblje",
+    "staffTabAccounts": "Nalozi",
+    "pagesHint": "Svaka stranica za prikupljanje: ko je vodi, za koji cilj i tim prikuplja, i u kom je stanju. Prikupljač je osoba i može imati više stranica.",
+    "pagesDeleteConfirm": "{count, plural, one {Obrisati ovu stranicu?} few {Obrisati # stranice?} other {Obrisati # stranica?}} Stranica koja je primila poklone se odbija.",
+    "pgColFundraiser": "Prikupljač",
+    "pgColTeam": "Tim"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

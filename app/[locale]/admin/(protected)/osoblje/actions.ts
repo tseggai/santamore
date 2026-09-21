@@ -24,7 +24,7 @@ const schema = z.object({
   photoPath: z.string().trim().max(300).nullable(),
   isTeam: z.boolean(),
   teamOrder: z.number().int().min(0).max(999),
-  role: z.enum(["member", "chapter_lead", "admin"]),
+  role: z.enum(["member", "accounting", "chapter_lead", "admin"]),
 });
 
 export async function saveMemberProfile(input: unknown): Promise<MemberActionResult> {

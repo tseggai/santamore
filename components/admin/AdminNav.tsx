@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 
+import { SECTIONS_BY_ROLE, type Role } from "@/lib/roles";
 import { Link } from "@/i18n/navigation";
 
 const ITEMS = [
@@ -12,21 +13,23 @@ const ITEMS = [
   { href: "/admin/dogadjaji", key: "navEvents", exact: false },
   { href: "/admin/korisnici", key: "navBeneficiaries", exact: false },
   { href: "/admin/podrska", key: "navSupporters", exact: false },
-  { href: "/admin/clanovi", key: "navMembers", exact: false },
+  { href: "/admin/stranice", key: "navPages", exact: false },
+  { href: "/admin/osoblje", key: "navStaff", exact: false },
   { href: "/admin/poruke", key: "navMessages", exact: false },
   { href: "/admin/podesavanja", key: "navSettings", exact: false },
 ] as const;
 
-/** Console nav: one vertical list, in the desktop rail and the phone drawer alike. */
-export function AdminNav() {
+/** Console nav: one vertical list, in the desktop rail and the phone drawer alike; the role decides which sections show. */
+export function AdminNav({ role }: { role: Role }) {
   const t = useTranslations("admin");
   // Strip the locale prefix so matching works for every locale.
   const pathname = usePathname().replace(/^\/(me|en|ru)(?=\/|$)/, "");
+  const sections = SECTIONS_BY_ROLE[role];
 
   return (
     <nav aria-label={t("adminTitle")} className="min-w-0">
       <ul className="flex flex-col gap-0.5">
-        {ITEMS.map((item) => {
+        {ITEMS.filter((item) => sections.includes(item.href)).map((item) => {
           const active = item.exact
             ? pathname === item.href
             : pathname.startsWith(item.href);

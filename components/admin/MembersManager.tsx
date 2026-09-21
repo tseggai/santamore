@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { deleteFundraiser, saveMemberProfile } from "@/app/[locale]/admin/(protected)/clanovi/actions";
+import { deleteFundraiser, saveMemberProfile } from "@/app/[locale]/admin/(protected)/osoblje/actions";
 
 import { Chip, DataTable, Thumb, bulkButton, type Column } from "@/components/console/DataTable";
 import { formatShortDate } from "@/lib/dates";
@@ -16,13 +16,14 @@ import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 import { FundraiserStatusButtons } from "@/components/admin/FundraiserModeration";
 import { RegistrationRowActions } from "@/components/admin/RegistrationRowActions";
 import { formatCents } from "@/lib/money";
+import { ROLES } from "@/lib/roles";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
 export interface MemberRow {
   id: string;
   full_name: string | null;
-  role: "member" | "chapter_lead" | "admin";
+  role: "member" | "accounting" | "chapter_lead" | "admin";
   email: string | null;
   joined_at: string | null;
   pages: number;
@@ -56,6 +57,9 @@ export interface MemberPage {
   team_id: string | null;
   campaign_id: string | null;
   is_test?: boolean;
+  /** Who runs it and which team it is in, for the Pages screen. */
+  owner_name: string;
+  team_name: string | null;
 }
 
 export interface MemberRegistration {
@@ -92,9 +96,12 @@ export interface MemberTeam {
 type Kind = "team" | "fundraisers" | "athletes" | "participants" | "captains" | "donors";
 const KINDS: Kind[] = ["team", "fundraisers", "athletes", "participants", "captains", "donors"];
 /** Which kinds each People tab filters by. */
-const KINDS_BY_MODE: Record<"all" | "fundraisers" | "members", Kind[]> = {
+type Mode = "all" | "fundraisers" | "donors" | "participants" | "members";
+const KINDS_BY_MODE: Record<Mode, Kind[]> = {
   all: KINDS,
   fundraisers: [],
+  donors: [],
+  participants: ["athletes", "captains"],
   members: ["athletes", "participants", "captains", "donors"],
 };
 /** One fixed dot per role, brand tones; a tooltip names it. */
@@ -141,8 +148,8 @@ export function MembersManager({
   /** The list narrowed by a link from elsewhere, e.g. an event's pages. */
   focus?: { label: string; clearHref: string } | null;
   locale: Locale;
-  /** Which People tab this list is: sets the kinds the filter offers. */
-  mode?: "all" | "fundraisers" | "members";
+  /** Which list this is: sets the kinds the filter offers and the columns that matter. */
+  mode?: Mode;
   members: MemberRow[];
   pages: MemberPage[];
   registrations: MemberRegistration[];
@@ -220,7 +227,7 @@ export function MembersManager({
       cell: (m) => <span className="block max-w-[240px] truncate text-black/60">{m.email ?? "—"}</span>,
       sort: (m) => m.email,
     },
-    {
+    ...(kinds.length === 0 ? [] : [{
       key: "kind",
       header: t("table.colRoles"),
       cell: (m) => (
@@ -242,9 +249,20 @@ export function MembersManager({
       ),
       filter: {
         options: kinds.map((kind) => ({ value: kind, label: t(`memberFilter.${kind}`) })),
-        match: (m, value) => isKind(m, value as Kind),
+        match: (m: MemberRow, value: string) => isKind(m, value as Kind),
       },
-    },
+    } satisfies Column<MemberRow>]),
+    ...(mode === "fundraisers"
+      ? ([
+          { key: "pages", header: t("table.colPages"), align: "right", cell: (m) => <span className="font-mono tabular-nums">{m.pages}</span>, sort: (m) => m.pages },
+          {
+            key: "causes",
+            header: t("table.colCauses"),
+            cell: (m) => <span className="block max-w-[260px] truncate text-black/70">{[...new Set(pages.filter((p) => p.user_id === m.id).map((p) => p.event_name))].join(" · ") || "—"}</span>,
+            sort: (m) => pages.filter((p) => p.user_id === m.id).map((p) => p.event_name).join(" "),
+          },
+        ] satisfies Column<MemberRow>[])
+      : []),
     {
       key: "raised",
       header: t("table.colRaised"),
@@ -294,7 +312,7 @@ export function MembersManager({
         getId={(m) => m.id}
         columns={columns}
         leading={(m) => <Thumb src={m.avatar_url ?? null} initial={displayName(m).charAt(0).toUpperCase()} rounded />}
-        onOpen={(m) => (m.team_only ? router.push(`/${locale}/admin/clanovi/tim?uredi=${m.team_id ?? m.id}`) : setOpen(m.id))}
+        onOpen={(m) => (m.team_only ? router.push(`/${locale}/admin/osoblje?uredi=${m.team_id ?? m.id}`) : setOpen(m.id))}
         searchText={(m) => `${m.full_name ?? ""} ${m.email ?? ""}`}
         searchPlaceholder={t("memberSearch")}
         emptyLabel={t("membersEmpty")}
@@ -448,7 +466,7 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
       <p className="type-eyebrow text-black/60">{t("memberProfileHeading")}</p>
       <p className="mt-1 text-[13.5px] text-black/60">
         {canManage ? t("memberProfileHint") : t("memberProfileReadOnly")}{" "}
-        <Link href="/admin/clanovi/tim" className="font-semibold text-sea underline underline-offset-2">{t("memberTeamLink")}</Link>
+        <Link href="/admin/osoblje" className="font-semibold text-sea underline underline-offset-2">{t("memberTeamLink")}</Link>
       </p>
       <div className="mt-3 grid gap-4 sm:grid-cols-2">
         <div>
@@ -458,7 +476,7 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
         <div>
           <label htmlFor="mpRole" className={labelClass}>{t("memberAccess")}</label>
           <select id="mpRole" disabled={disabled} value={role} onChange={(e) => setRole(e.target.value as MemberRow["role"])} className={`${inputClass} disabled:opacity-60`}>
-            {(["member", "chapter_lead", "admin"] as const).map((value) => (
+            {ROLES.map((value) => (
               <option key={value} value={value}>{t(`memberRole.${value}`)}</option>
             ))}
           </select>

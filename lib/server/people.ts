@@ -32,9 +32,13 @@ export async function loadPeople() {
 
   const eventName = new Map(((events ?? []) as { id: string; name: string }[]).map((e) => [e.id, e.name]));
   const causeTitle = new Map(((causeRows ?? []) as { id: string; title: string }[]).map((c) => [c.id, c.title]));
+  const teamName = new Map(((teams ?? []) as { id: string; name: string }[]).map((tm) => [tm.id, tm.name]));
+  const ownerName = new Map(accounts.map((m) => [m.id, m.full_name?.trim() || m.email || m.id.slice(0, 8)]));
   const memberPages: MemberPage[] = ((pages ?? []) as { id: string; user_id: string; slug: string; title: string; status: "draft" | "active" | "hidden"; goal_cents: number | null; campaign_id: string | null; team_id: string | null; is_test: boolean }[]).map((page) => ({
     ...page,
     event_name: (page.campaign_id && causeTitle.get(page.campaign_id)) || "—",
+    owner_name: ownerName.get(page.user_id) ?? "—",
+    team_name: page.team_id ? (teamName.get(page.team_id) ?? null) : null,
   }));
   const memberRegistrations: MemberRegistration[] = ((registrations ?? []) as Omit<MemberRegistration, "event_name">[]).map((row) => ({
     ...row,

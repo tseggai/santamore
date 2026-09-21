@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { AdminNav } from "@/components/admin/AdminNav";
 import { SignOutButton } from "@/components/admin/SignOutButton";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
+import { isStaffRole, type Role } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
@@ -44,7 +45,8 @@ export default async function AdminLayout({
     .select("role")
     .eq("id", user.id)
     .single();
-  const isStaff = profile?.role === "admin" || profile?.role === "chapter_lead";
+  const role = (profile?.role ?? "member") as Role;
+  const isStaff = isStaffRole(role);
 
   if (!isStaff) {
     return (
@@ -71,7 +73,7 @@ export default async function AdminLayout({
       menuLabel={t("menuOpen")}
       closeLabel={t("menuClose")}
       width="max-w-5xl"
-      nav={<AdminNav />}
+      nav={<AdminNav role={role} />}
       footer={
         <>
           <Link

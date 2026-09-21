@@ -161,6 +161,10 @@ select * from (values
                and pg_get_functiondef(p.oid) like '%Marking a live gift as test data%'))
   ,('20260920000058_proposal_edit',
      to_regprocedure('public.update_my_proposal(uuid, text, text, text, text, bigint)') is not null)
+  ,('20260920000061_accounting_role',
+     exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+             where n.nspname = 'public' and p.proname = 'is_staff'
+               and pg_get_functiondef(p.oid) like '%accounting%'))
   ,('20260920000060_proposal_delete',
      to_regprocedure('public.delete_my_proposal(uuid)') is not null)
   ,('20260920000059_set_record_test',

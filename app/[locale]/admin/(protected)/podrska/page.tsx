@@ -31,9 +31,9 @@ export default async function AdminSupportersPage({
     ]);
 
   return (
-    <div className="py-8">
+    <div className="pb-8">
       <SupportersManager
-        title={t("supportersTitle")}
+        title={t("supportersTabSponsors")}
         lead={t("supportersHint")}
         locale={locale as Locale}
         supporters={(supporters ?? []) as SupporterRow[]}

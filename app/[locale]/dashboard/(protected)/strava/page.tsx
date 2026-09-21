@@ -9,6 +9,7 @@ import { stravaConfig } from "@/lib/strava/api";
 import { localToday, syncIfStale } from "@/lib/strava/sync";
 import { weeklyTotals } from "@/lib/strava/weeks";
 import { formatMetricValue } from "@/lib/metrics";
+import { isStaffRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, type Locale } from "@/i18n/routing";
@@ -256,7 +257,7 @@ export default async function StravaPage({
           connection={connection}
           configured={stravaConfig().configured}
           status={status ?? null}
-          isStaff={profile?.role === "admin" || profile?.role === "chapter_lead"}
+          isStaff={isStaffRole(profile?.role)}
         />
       </div>
 

@@ -11,6 +11,7 @@ import {
 } from "@/lib/strava/api";
 import { siteOrigin } from "@/lib/site";
 import { slugify } from "@/lib/slug";
+import { isStaffRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 
 // Staff-session actions; perk_challenges_staff_* policies enforce. The
@@ -143,7 +144,7 @@ async function requireStaff(): Promise<boolean> {
   } = await supabase.auth.getUser();
   if (!user) return false;
   const { data } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-  return data?.role === "admin" || data?.role === "chapter_lead";
+  return isStaffRole(data?.role);
 }
 
 export interface WebhookStatus {

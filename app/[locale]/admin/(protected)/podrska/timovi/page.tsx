@@ -18,7 +18,7 @@ export default async function TeamsPage({
   const t = await getTranslations("admin");
   const people = await loadPeople();
   const teams = dogadjaj ? people.teams.filter((team) => team.event_id === dogadjaj) : people.teams;
-  const focus = dogadjaj && teams.length > 0 ? { label: t("focusTeamsFor", { name: teams[0].event_name }), clearHref: "/admin/clanovi/timovi" } : null;
+  const focus = dogadjaj && teams.length > 0 ? { label: t("focusTeamsFor", { name: teams[0].event_name }), clearHref: "/admin/podrska/timovi" } : null;
   return (
     <div className="pb-8">
       <p className="max-w-2xl text-[14px] leading-relaxed text-black/60">{t("tmHint")}</p>

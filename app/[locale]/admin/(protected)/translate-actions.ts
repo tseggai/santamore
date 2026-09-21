@@ -4,6 +4,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 
 import { TRANSLATE_MODEL, describeError, translateFieldsWithClaude } from "@/lib/server/translate";
+import { isStaffRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { routing } from "@/i18n/routing";
 
@@ -26,7 +27,7 @@ async function isStaff(): Promise<boolean> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return false;
   const { data } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-  return data?.role === "admin" || data?.role === "chapter_lead";
+  return isStaffRole(data?.role);
 }
 
 export async function translateFields(input: unknown): Promise<TranslateFieldsResult> {
