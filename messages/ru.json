@@ -486,7 +486,20 @@
     "causeDraft": "ещё не опубликована",
     "consoleBadgeTest": "Тестовый режим",
     "causeLocked": "На эту цель уже пришли пожертвования, поэтому страница остаётся с ней.",
-    "causeTakenNotice": "У вас уже есть страница для этой цели."
+    "causeTakenNotice": "У вас уже есть страница для этой цели.",
+    "navProfile": "Мой профиль",
+    "profileTitle": "Мой профиль",
+    "profileHint": "Запись за вашим аккаунтом: имя, по которому мы к вам обращаемся, телефон на день события и язык, на котором мы вам пишем. Название страницы меняется на самой странице.",
+    "profileEmail": "Email",
+    "profilePhone": "Телефон (необязательно)",
+    "profileLocale": "Язык",
+    "profileLocaleName": {
+      "me": "Crnogorski",
+      "en": "English",
+      "ru": "Русский"
+    },
+    "profileSave": "Сохранить",
+    "profileAdminLink": "Открыть админ-консоль"
   },
   "email": {
     "instructions": {

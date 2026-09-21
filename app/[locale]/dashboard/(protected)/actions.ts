@@ -632,3 +632,28 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
     cash: (cashRows ?? []) as PageEditorData["cash"],
   };
 }
+
+/** The signed-in person's own record: the column grants (migration 0002) allow exactly these three. */
+export async function updateMyProfile(input: unknown): Promise<{ ok: boolean }> {
+  const parsed = z
+    .object({
+      fullName: z.string().trim().min(2).max(80),
+      phone: z.string().trim().max(30),
+      locale: z.enum(["me", "en", "ru"]),
+    })
+    .safeParse(input);
+  if (!parsed.success) return { ok: false };
+  const { supabase, user } = await currentUser();
+  if (!user) return { ok: false };
+  const { error } = await supabase
+    .from("profiles")
+    .update({ full_name: parsed.data.fullName, phone: parsed.data.phone || null, locale: parsed.data.locale })
+    .eq("id", user.id);
+  if (error) {
+    console.error("[dashboard] profile update failed:", error.code);
+    return { ok: false };
+  }
+  revalidatePath("/[locale]/dashboard", "layout");
+  revalidatePath("/[locale]/admin", "layout");
+  return { ok: true };
+}

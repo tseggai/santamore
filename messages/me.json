@@ -485,7 +485,20 @@
     "causeDraft": "još nije objavljen",
     "consoleBadgeTest": "Test režim",
     "causeLocked": "Za ovaj cilj su stigli pokloni, pa stranica ostaje uz njega.",
-    "causeTakenNotice": "Već imaš stranicu za taj cilj."
+    "causeTakenNotice": "Već imaš stranicu za taj cilj.",
+    "navProfile": "Moj profil",
+    "profileTitle": "Moj profil",
+    "profileHint": "Zapis iza tvog naloga: ime kojim ti se obraćamo, telefon za dan događaja i jezik na kojem ti pišemo. Ime stranice se mijenja na samoj stranici.",
+    "profileEmail": "Email",
+    "profilePhone": "Telefon (opciono)",
+    "profileLocale": "Jezik",
+    "profileLocaleName": {
+      "me": "Crnogorski",
+      "en": "English",
+      "ru": "Русский"
+    },
+    "profileSave": "Sačuvaj",
+    "profileAdminLink": "Otvori admin konzolu"
   },
   "email": {
     "instructions": {

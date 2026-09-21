@@ -485,7 +485,20 @@
     "causeDraft": "not published yet",
     "consoleBadgeTest": "Test mode",
     "causeLocked": "Gifts came in for this cause, so the page stays with it.",
-    "causeTakenNotice": "You already have a page for that cause."
+    "causeTakenNotice": "You already have a page for that cause.",
+    "navProfile": "My profile",
+    "profileTitle": "My profile",
+    "profileHint": "The record behind your account: your name as we address you, a phone for event day, and the language we write to you in. Your page's name is edited on the page itself.",
+    "profileEmail": "Email",
+    "profilePhone": "Phone (optional)",
+    "profileLocale": "Language",
+    "profileLocaleName": {
+      "me": "Crnogorski",
+      "en": "English",
+      "ru": "Русский"
+    },
+    "profileSave": "Save",
+    "profileAdminLink": "Open the admin console"
   },
   "email": {
     "instructions": {
