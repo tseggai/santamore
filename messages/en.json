@@ -219,7 +219,8 @@
     "eyebrow": "Fundraiser",
     "runsWith": "Takes part with",
     "story": "Story",
-    "wallEmpty": "No donations yet — be the first."
+    "wallEmpty": "No donations yet — be the first.",
+    "raisingFor": "Raising funds for"
   },
   "leaderboard": {
     "title": "Leaderboard",
@@ -498,7 +499,15 @@
       "ru": "Русский"
     },
     "profileSave": "Save",
-    "profileAdminLink": "Open the admin console"
+    "profileAdminLink": "Open the admin console",
+    "evEventsHeading": "Events",
+    "evCurrentCauses": "Current causes",
+    "evPastCauses": "Past causes ({count})",
+    "evNoCurrentCauses": "No open cause right now.",
+    "evCompleted": "Completed",
+    "evGoalMet": "Goal met",
+    "evGoalMissed": "Goal not met",
+    "evRaised": "You raised"
   },
   "email": {
     "instructions": {
@@ -1471,7 +1480,11 @@
     "pgColFundraiser": "Fundraiser",
     "pgColTeam": "Team",
     "galleryDeleteConfirm": "Delete this photo?",
-    "demoAdminOnly": "Generating and purging demo data is for an admin."
+    "demoAdminOnly": "Generating and purging demo data is for an admin.",
+    "caMarkCompleted": "Mark as completed",
+    "caReopen": "Reopen",
+    "caCompletedChip": "Completed",
+    "caCompleteConfirm": "{count, plural, one {Mark this cause as completed?} other {Mark # causes as completed?}} It takes no more gifts and no new pages, and every page shows it as completed with the goal met or not. Reopen undoes it."
   },
   "forms": {
     "nameLabel": "Full name",
@@ -1701,7 +1714,9 @@
     "statusCompleted": "Completed",
     "statusGoalReached": "Goal reached",
     "statusHandedOver": "<amount></amount> handed over to the beneficiaries",
-    "moneyWentCta": "See where the money went"
+    "moneyWentCta": "See where the money went",
+    "statusGoalMissed": "Goal not met",
+    "statusRaisedOf": "{raised} raised of {goal}"
   },
   "perks": {
     "title": "Partner challenges",
