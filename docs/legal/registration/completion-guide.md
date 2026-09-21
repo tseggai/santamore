@@ -179,7 +179,7 @@ Once steps 1 to 5 are done, fill the corresponding rows in `docs/PLACEHOLDERS.md
 ## 10. Open questions for the Ministry or the lawyer / Otvorena pitanja
 
 1. Does "Santamore" pass the foreign-word rule in Law Art. 13, and is it free in the register? / Da li „Santamore“ prolazi pravilo o stranim riječima iz čl. 13 Zakona i da li je slobodan?
-2. ~~Foreign founder without a JMB~~ settled by document 6: passport number and issuing state. / Riješeno dokumentom 6: broj putne isprave i država izdavanja.
+2. Foreign founder without a JMB: settled by document 6, passport number and issuing state. / Riješeno dokumentom 6: broj putne isprave i država izdavanja.
 3. How many copies of each document does the registry office want, and must the statute be bound or initialled? / Koliko primjeraka traži arhiva i da li statut mora biti uvezan ili parafiran?
 4. Are event entry fees and merchandise sales an economic activity? If yes, document 7 is clear that CRPS entry must come before the first sale. / Da li su kotizacije i prodaja promotivnih proizvoda privredna djelatnost? Ako jesu, dokument 7 je jasan: upis u CRPS prije prve prodaje.
 5. Board, Grants Committee, chapters and the proxy chapter: add now (Option 1) or amend later (Option 2)? / Upravni odbor, Komisija za dodjelu sredstava, ogranci i poglavlje o punomoćjima: dodati sada ili izmijeniti kasnije?
