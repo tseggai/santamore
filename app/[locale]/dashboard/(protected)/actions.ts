@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { causeState } from "@/lib/cause-status";
 import { MAX_CENTS } from "@/lib/money";
 import { generatePaymentReference } from "@/lib/references";
 import { slugify } from "@/lib/slug";
@@ -22,7 +23,7 @@ import { createClient } from "@/lib/supabase/server";
 export interface DashboardActionResult {
   ok: boolean;
   slug?: string;
-  error?: "incomplete" | "server" | "invalid";
+  error?: "incomplete" | "server" | "invalid" | "causeLocked" | "causeTaken";
 }
 
 const createPageSchema = z.object({
@@ -46,6 +47,8 @@ const updatePageSchema = z.object({
   goalCents: z.number().int().min(0).max(MAX_CENTS).nullable(),
   teamId: z.string().uuid().nullable(),
   photoPath: ownedPhotoPath,
+  /** The cause the page raises for; left out, it stays as it is. */
+  causeId: z.string().uuid().optional(),
 });
 
 const teamFieldsSchema = z.object({
@@ -190,14 +193,40 @@ export async function updateFundraiserPage(
   if (!user) return { ok: false, error: "server" };
   if (!ownsPhoto(user.id, parsed.data.photoPath)) return { ok: false, error: "invalid" };
 
+  // Moving the page to another cause moves nothing that already came in:
+  // a page with approved gifts stays with its cause. The target must be a
+  // published cause, and the team must belong to it or is dropped.
+  let teamId = parsed.data.teamId;
+  let causeChange: { campaign_id: string } | null = null;
+  if (parsed.data.causeId) {
+    const { data: current } = await supabase.from("fundraisers").select("campaign_id").eq("id", parsed.data.fundraiserId).eq("user_id", user.id).maybeSingle();
+    if (!current) return { ok: false, error: "invalid" };
+    if (current.campaign_id !== parsed.data.causeId) {
+      const service = createServiceClient();
+      const [{ count: gifts }, { data: target }] = await Promise.all([
+        service.from("donations").select("id", { count: "exact", head: true }).eq("fundraiser_id", parsed.data.fundraiserId).in("status", ["approved", "refunded"]).eq("is_test", false),
+        service.from("campaigns").select("id").eq("id", parsed.data.causeId).eq("is_public", true).maybeSingle(),
+      ]);
+      if ((gifts ?? 0) > 0) return { ok: false, error: "causeLocked" };
+      if (!target) return { ok: false, error: "invalid" };
+      causeChange = { campaign_id: target.id };
+    }
+  }
+  if (teamId) {
+    const { data: team } = await supabase.from("teams").select("id, campaign_id").eq("id", teamId).maybeSingle();
+    const causeId = causeChange?.campaign_id ?? parsed.data.causeId ?? team?.campaign_id;
+    if (!team || (team.campaign_id && team.campaign_id !== causeId)) teamId = null;
+  }
+
   const { error } = await supabase
     .from("fundraisers")
     .update({
       title: parsed.data.title,
       story: parsed.data.story === "" ? null : parsed.data.story,
       goal_cents: parsed.data.goalCents,
-      team_id: parsed.data.teamId,
+      team_id: teamId,
       photo_path: parsed.data.photoPath,
+      ...(causeChange ?? {}),
     })
     .eq("id", parsed.data.fundraiserId)
     .eq("user_id", user.id)
@@ -207,6 +236,8 @@ export async function updateFundraiserPage(
     // P0001: the integrity trigger — an ACTIVE page cannot lose its photo,
     // goal or story; unpublish first.
     if (error.code === "P0001") return { ok: false, error: "incomplete" };
+    // One page per cause per person (migration 0024).
+    if (error.code === "23505") return { ok: false, error: "causeTaken" };
     console.error("[dashboard] page update failed:", error.code);
     return { ok: false, error: "server" };
   }
@@ -510,6 +541,8 @@ export interface PageEditorData {
     /** Staff have published the cause; until then the page cannot go live for donors. */
     causePublic: boolean;
   };
+  /** The published causes still open, plus the page's own: where the page may move until a gift comes in. */
+  causes: { id: string; title: string }[];
   teams: { id: string; name: string; description: string | null; photoPath: string | null }[];
   captainOf: string[];
   raisedCents: number;
@@ -537,9 +570,14 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
   // The cause by id, public or not: a runner may build a page on a cause
   // staff have not published yet, and the editor should still name it.
   const { data: cause } = await service.from("campaigns").select("slug, title, is_public").eq("id", mine.campaign_id).maybeSingle();
+  const { data: openCauses } = await supabase.from("v_public_campaigns").select("id, title, goal_cents, raised_cents, disbursed_cents, ends_at").order("starts_at", { ascending: false, nullsFirst: false });
+  const causes = ((openCauses ?? []) as { id: string; title: string; goal_cents: number | null; raised_cents: number; disbursed_cents: number | null; ends_at: string | null }[])
+    .filter((row) => row.id === mine.campaign_id || !causeState(row).completed)
+    .map((row) => ({ id: row.id, title: row.title }));
+  if (!causes.some((row) => row.id === mine.campaign_id)) causes.unshift({ id: mine.campaign_id, title: cause?.title ?? "" });
   const [{ data: teams }, { data: captained }, { data: totals }, { data: challenge }, { data: activityRows }, { data: cashRows }] =
     await Promise.all([
-      supabase.from("v_team_totals").select("id, name, description, photo_path").eq("campaign_id", mine.campaign_id).order("name"),
+      supabase.from("v_team_totals").select("id, name, description, photo_path, campaign_id").in("campaign_id", causes.map((row) => row.id)).order("name"),
       supabase.from("teams").select("id").eq("captain_id", user.id),
       supabase.from("v_fundraiser_totals").select("raised_cents, donor_count").eq("slug", mine.slug).maybeSingle(),
       // A challenge under this cause makes the activity log relevant.
@@ -578,11 +616,13 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
       causeTitle: cause?.title ?? "",
       causePublic: Boolean(cause?.is_public),
     },
-    teams: ((teams ?? []) as { id: string; name: string; description: string | null; photo_path: string | null }[]).map((team) => ({
+    causes,
+    teams: ((teams ?? []) as { id: string; name: string; description: string | null; photo_path: string | null; campaign_id: string | null }[]).map((team) => ({
       id: team.id,
       name: team.name,
       description: team.description,
       photoPath: team.photo_path,
+      causeId: team.campaign_id ?? undefined,
     })),
     captainOf: (captained ?? []).map((row) => row.id),
     raisedCents: totals?.raised_cents ?? 0,

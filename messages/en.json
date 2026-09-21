@@ -483,7 +483,9 @@
     "teamDeleteRefused": "This team cannot be deleted: {count, plural, one {a donation} other {# donations}} went to its pages.",
     "teamDeleteFailed": "Something went wrong — the team was not deleted. Please try again.",
     "causeDraft": "not published yet",
-    "consoleBadgeTest": "Test mode"
+    "consoleBadgeTest": "Test mode",
+    "causeLocked": "Gifts came in for this cause, so the page stays with it.",
+    "causeTakenNotice": "You already have a page for that cause."
   },
   "email": {
     "instructions": {

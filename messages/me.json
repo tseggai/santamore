@@ -483,7 +483,9 @@
     "teamDeleteRefused": "Ovaj tim se ne može obrisati: na njegove stranice {count, plural, one {je stigla jedna donacija} few {su stigle # donacije} other {je stiglo # donacija}}.",
     "teamDeleteFailed": "Nešto nije u redu — tim nije obrisan. Pokušaj ponovo.",
     "causeDraft": "još nije objavljen",
-    "consoleBadgeTest": "Test režim"
+    "consoleBadgeTest": "Test režim",
+    "causeLocked": "Za ovaj cilj su stigli pokloni, pa stranica ostaje uz njega.",
+    "causeTakenNotice": "Već imaš stranicu za taj cilj."
   },
   "email": {
     "instructions": {
