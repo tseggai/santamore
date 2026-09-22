@@ -30,15 +30,48 @@ type Notice = { tone: "ok" | "warn"; text: string } | null;
 
 const other = (lang: PackLang): PackLang => (lang === "me" ? "en" : "me");
 
-function readSavedFields(pack: LegalPack, saved: SavedRows): Record<string, FieldState> {
+function readSavedFields(pack: LegalPack, saved: SavedRows): { fields: Record<string, FieldState>; migrated: boolean } {
   const base = initialFields(pack);
   const row = saved.fields?.value as Record<string, Partial<FieldState>> | undefined;
-  if (!row || typeof row !== "object") return base;
+  if (!row || typeof row !== "object") return { fields: base, migrated: false };
   for (const [id, f] of Object.entries(row)) {
     if (!base[id] || !f) continue;
     base[id] = { me: typeof f.me === "string" ? f.me : base[id].me, en: typeof f.en === "string" ? f.en : base[id].en, stale: f.stale === "me" || f.stale === "en" ? f.stale : null };
   }
-  return base;
+  return { fields: base, migrated: migrateApplicant(row, base) };
+}
+
+/**
+ * The Application's applicant block was once a single free-text blank.
+ * It is now built from the shared blanks, so a saved free text is split
+ * into them once (address, chair, phone, email), where those are still
+ * at their placeholder, and offered for saving.
+ */
+function migrateApplicant(row: Record<string, Partial<FieldState>>, fields: Record<string, FieldState>): boolean {
+  const old = row.applicant;
+  if (!old || fields.applicant) return false;
+  const isPlaceholder = (id: string) => /^\s*(\[|$)/.test(fields[id]?.me ?? "") && /^\s*(\[|$)/.test(fields[id]?.en ?? "");
+  let changed = false;
+  const set = (id: string, text: string) => {
+    const value = text.trim();
+    if (!value || value.startsWith("[") || !fields[id] || !isPlaceholder(id)) return;
+    fields[id] = { me: value, en: value, stale: null };
+    changed = true;
+  };
+  for (const text of [old.en, old.me]) {
+    if (typeof text !== "string") continue;
+    const lines = text.split(/\n/).map((l) => l.trim()).filter(Boolean);
+    if (lines[1] && !/^(represented|zastupano)/i.test(lines[1])) set("addr", lines[1]);
+    for (const line of lines) {
+      const chair = line.match(/^(?:represented by the Chair of the Founding Assembly|zastupano po predsjedavajućem Osnivačke skupštine):?\s*(.+)$/i);
+      if (chair) set("chair", chair[1]);
+      const phone = line.match(/^tel\.?:?\s*(.+)$/i);
+      if (phone) set("phone", phone[1]);
+      const email = line.match(/^(?:email|e-pošta|e-mail):?\s*(.+)$/i);
+      if (email) set("email", email[1]);
+    }
+  }
+  return changed;
 }
 
 function readSavedChecks(saved: SavedRows): Record<string, boolean> {
@@ -60,10 +93,11 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   const [lang, setLang] = useState<PackLang>(locale === "en" ? "en" : "me");
   const [both, setBoth] = useState(false);
   const [doc, setDoc] = useState<string>(pack.forms[0]?.id ?? "01");
-  const [fields, setFields] = useState(() => readSavedFields(pack, saved));
+  const [loaded] = useState(() => readSavedFields(pack, saved));
+  const [fields, setFields] = useState(loaded.fields);
   const [checks, setChecks] = useState(() => readSavedChecks(saved));
   const draftsRef = useRef(readSavedDrafts(pack, saved));
-  const [dirty, setDirty] = useState<Record<string, true>>({});
+  const [dirty, setDirty] = useState<Record<string, true>>(loaded.migrated ? { fields: true } : {});
   const [busy, setBusy] = useState<"saving" | "translating" | null>(null);
   const [notice, setNotice] = useState<Notice>(null);
   const [savedAt, setSavedAt] = useState<string | null>(() => {
@@ -430,9 +464,9 @@ const CSS = `
 .lp-sig .lp-p { margin-bottom: 0; }
 .lp-siglbl { font-size: 12.5px; color: rgba(0,0,0,.55); }
 .lp-sigline { display: inline-block; width: 11rem; max-width: 100%; border-bottom: 1px solid #000; vertical-align: baseline; height: 1.4em; }
-.lp-field { display: inline; min-width: 2.5rem; padding: 0 .15em; border-radius: 3px; color: #0B57D0; background: rgba(11,87,208,.07); box-decoration-break: clone; -webkit-box-decoration-break: clone; outline: none; }
-.lp-field:focus { background: rgba(11,87,208,.14); box-shadow: 0 0 0 2px rgba(11,87,208,.35); }
-.lp-field:empty::before { content: attr(data-placeholder); color: rgba(11,87,208,.55); font-style: italic; }
+.lp-field { display: inline; min-width: 2.5rem; padding: 0 .15em; border-radius: 3px; color: #B0246B; background: rgba(176,36,107,.07); box-decoration-break: clone; -webkit-box-decoration-break: clone; outline: none; }
+.lp-field:focus { background: rgba(176,36,107,.14); box-shadow: 0 0 0 2px rgba(176,36,107,.35); }
+.lp-field:empty::before { content: attr(data-placeholder); color: rgba(176,36,107,.55); font-style: italic; }
 .lp-field.lp-block { display: block; white-space: pre-wrap; padding: .3rem .5rem; margin: .25rem 0; }
 .lp-field.lp-stale { box-shadow: 0 0 0 1.5px #F35353; }
 .lp-opt-empty { opacity: .55; }
@@ -461,9 +495,10 @@ const CSS = `
   #legal-doc, #legal-doc * { visibility: visible; }
   #legal-doc { position: absolute; left: 0; top: 0; width: 100%; padding: 0; font-size: 11.5pt; line-height: 1.45; }
   .lp-note, .lp-screen { display: none !important; }
-  .lp-field, .lp-field.lp-block { color: #000; background: none; box-shadow: none; padding: 0; margin: 0; transition: none; }
+  /* A completed blank stays recognisable in black and white: serif, underlined. */
+  .lp-field, .lp-field.lp-block { color: #000; background: none; box-shadow: none; padding: 0; margin: 0; transition: none; font-family: Georgia, "Times New Roman", serif; text-decoration: underline; text-decoration-thickness: 0.6px; text-underline-offset: 2px; }
   .lp-field.lp-block { display: block; }
-  .lp-field:empty::before { content: "____________"; color: #000; font-style: normal; }
+  .lp-field:empty::before { content: "____________"; color: #000; font-style: normal; text-decoration: none; }
   .lp-opt-empty { display: none !important; }
   .lp-check { border: none; break-inside: avoid; }
   .lp-check input { -webkit-appearance: checkbox; }

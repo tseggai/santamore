@@ -110,7 +110,7 @@ const F = {
   rep_title: T('Funkcija ovlašćenog lica', 'Title of the authorised person', 'Izvršni direktor', 'Executive Director'),
   rep_name: T('Ovlašćeno lice, ime i prezime', 'Authorised person, full name', '[Ime i prezime]', '[Full name]', { neutral: true }), rep_jmb: NEUTRAL('Ovlašćeno lice, JMB', 'Authorised person, JMB', '[JMB]'), rep_addr: T('Ovlašćeno lice, adresa', 'Authorised person, address', '[adresa prebivališta]', '[home address]', { neutral: true }),
   chair: T('Predsjedavajući Osnivačke skupštine', 'Chair of the Founding Assembly', '[Ime i prezime]', '[Full name]', { neutral: true }), deputy: T('Zamjenik predsjednika Skupštine', 'Deputy President of the Assembly', '[Ime i prezime]', '[Full name]', { neutral: true }), recorder: T('Zapisničar', 'Recorder', '[Ime i prezime]', '[Full name]', { neutral: true }),
-  applicant: T('Podnosilac', 'Applicant', 'Nevladino udruženje „Santamore“ u osnivanju\n[ulica i broj], Tivat\nzastupano po predsjedavajućem Osnivačke skupštine: [Ime i prezime]\ntel. [telefon]\ne-pošta: [e-pošta]', 'Non-governmental association "Santamore" in formation\n[street and number], Tivat\nrepresented by the Chair of the Founding Assembly: [Full name]\ntel. [phone]\nemail: [email]', { block: true }),
+  phone: T('Telefon predsjedavajućeg', 'Chair\'s phone', '[telefon]', '[phone]', { neutral: true }), email: T('E-pošta predsjedavajućeg', 'Chair\'s email', '[e-pošta]', '[email]', { neutral: true }),
   date_app: T('Datum prijave', 'Filing date', '[datum predaje]', '[filing date]', { neutral: true }),
   start: NEUTRAL('Vrijeme početka', 'Start time', '[18:00]'), end: NEUTRAL('Vrijeme završetka', 'End time', '[19:30]'), venue: T('Adresa mjesta održavanja', 'Venue address', '[adresa mjesta održavanja], Tivat', '[venue address], Tivat', { neutral: true }),
   salut: T('g./gđa', 'Mr/Ms', 'g.', 'Mr'), v1: T('izložio/la', '', 'izložio', '', { meOnly: true }), v2: T('upoznao/la', '', 'upoznao', '', { meOnly: true }),
@@ -149,7 +149,7 @@ const form03 = { id: '03', title: { me: 'Prijava za upis u Registar NVO', en: 'A
   blocks: [
     P('Vlada Crne Gore<br>Ministarstvo regionalno-investicionog razvoja i saradnje sa nevladinim organizacijama', 'Government of Montenegro<br>Ministry of Regional-Investment Development and Cooperation with Non-Governmental Organisations'),
     P('<b>Predmet:</b> Prijava za upis u Registar nevladinih organizacija', '<b>Subject:</b> Application for entry in the Register of Non-Governmental Organisations'),
-    P('<b>Podnosilac:</b> {{applicant}}', '<b>Applicant:</b> {{applicant}}'),
+    P('<b>Podnosilac:</b><br>{{org}} u osnivanju<br>{{addr}}<br>zastupano po predsjedavajućem Osnivačke skupštine: {{chair}}<br>tel. {{phone}}<br>e-pošta: {{email}}', '<b>Applicant:</b><br>{{org}} in formation<br>{{addr}}<br>represented by the Chair of the Founding Assembly: {{chair}}<br>tel. {{phone}}<br>email: {{email}}'),
     { type: 'h2', me: 'Obrazloženje', en: 'Explanation' },
     P('Dana {{date}} godine sastala se Osnivačka Skupština {{org}} i donijela sljedeće odluke:', 'On {{date}}, the Founding Assembly of {{org}} met and adopted the following decisions:'),
     { type: 'list', me: ['da osnuje udruženje naziva: {{org}}', 'da usvoji Statut', 'da podnese prijavu za upis u Registar nevladinih organizacija.'], en: ['to found an association named: {{org}}', 'to adopt the Statute', 'to submit an application for entry in the Register of Non-Governmental Organisations.'] },
