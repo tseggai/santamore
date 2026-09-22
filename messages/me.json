@@ -1536,7 +1536,10 @@
       "printIncompleteTitle": "Nije popunjeno: {n}",
       "printIncompleteHint": "Ova polja su još prazna ili u uglastim zagradama. Možete se vratiti i popuniti ih, ili štampati ovakav dokument.",
       "printAnyway": "Ipak štampaj",
-      "printBack": "Nazad na popunjavanje"
+      "printBack": "Nazad na popunjavanje",
+      "samePerson": "Ista osoba kao osnivač…",
+      "otherPerson": "Upisano ručno",
+      "founderN": "Osnivač {n}"
     }
   },
   "forms": {

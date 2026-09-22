@@ -1536,7 +1536,10 @@
       "printIncompleteTitle": "{n} blanks not completed",
       "printIncompleteHint": "These blanks are still empty or in square brackets. Go back and complete them, or print the document as it is.",
       "printAnyway": "Print anyway",
-      "printBack": "Back to editing"
+      "printBack": "Back to editing",
+      "samePerson": "Same person as a founder…",
+      "otherPerson": "Typed by hand",
+      "founderN": "Founder {n}"
     }
   },
   "forms": {

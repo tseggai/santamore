@@ -26,6 +26,11 @@ export interface PackField {
   block?: boolean;
   /** May stay empty (founders beyond the legal minimum): a list or signature row of only empty optional fields does not print. */
   optional?: boolean;
+  /** A person blank that may follow a founder: the id of its link field, and which founder part it mirrors. */
+  link?: string;
+  part?: "name" | "jmb" | "addr";
+  /** A link field: holds "f1" to "f5" (which founder a person blank follows) or "". Never rendered. */
+  isLink?: boolean;
 }
 
 export type PackBlock =
@@ -122,6 +127,25 @@ export function packProblems(pack: LegalPack): string[] {
     });
   }
   return problems;
+}
+
+export const FOUNDER_IDS = ["f1", "f2", "f3", "f4", "f5"] as const;
+
+/**
+ * The values as shown: a person blank that follows a founder shows that
+ * founder's name, JMB or address. The raw map (what is saved) is left as
+ * it is; every render, print and completeness check uses this one.
+ */
+export function resolveFields(pack: LegalPack, fields: Record<string, FieldState>): Record<string, FieldState> {
+  const out = { ...fields };
+  for (const [id, meta] of Object.entries(pack.fields)) {
+    if (!meta.link || !meta.part) continue;
+    const founder = fields[meta.link]?.me;
+    if (!founder || !(FOUNDER_IDS as readonly string[]).includes(founder)) continue;
+    const source = fields[`${founder}_${meta.part}`];
+    if (source) out[id] = { me: source.me, en: source.en, stale: null };
+  }
+  return out;
 }
 
 /** A blank still to be completed: empty, or left at its bracketed placeholder. */
