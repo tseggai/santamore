@@ -168,7 +168,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   const savedLabel = savedAt ? new Date(savedAt).toLocaleString(locale === "me" ? "sr-Latn-ME" : locale, { dateStyle: "short", timeStyle: "short" }) : null;
 
   return (
-    <div className="lp-app md:grid md:grid-cols-[13.5rem_minmax(0,1fr)] md:gap-6">
+    <div className="lp-app md:grid md:grid-cols-[14rem_minmax(0,1fr)] md:gap-10">
       <style>{CSS}</style>
 
       {/* Document list: a select on the phone, a list on desktop. */}
@@ -176,7 +176,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
         <label className="block md:hidden">
           <span className="type-eyebrow block text-black/60">{t("documents")}</span>
           <select value={doc} onChange={(e) => setDoc(e.target.value)} className="mt-1 w-full rounded-brand bg-mist px-3 py-2 text-[15px]">
-            {pack.guide ? <option value="guide">{pack.guide.title[lang]}</option> : null}
+            {pack.guide ? <optgroup label={t("guide")}><option value="guide">{pack.guide.title[lang]}</option></optgroup> : null}
             <optgroup label={t("forms")}>
               {pack.forms.map((f) => <option key={f.id} value={f.id}>{f.id} · {f.title[lang]}</option>)}
             </optgroup>
@@ -187,24 +187,31 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
         </label>
         <div className="hidden md:block md:sticky md:top-6">
           {pack.guide ? (
-            <ul className="mb-4 flex flex-col gap-0.5">
-              <NavItem active={doc === "guide"} onClick={() => setDoc("guide")} label={pack.guide.title[lang]} />
-            </ul>
+            <section className="pb-5">
+              <p className="type-eyebrow text-black/60">{t("guide")}</p>
+              <ul className="mt-2 flex flex-col gap-1">
+                <NavItem active={doc === "guide"} onClick={() => setDoc("guide")} label={pack.guide.title[lang]} />
+              </ul>
+            </section>
           ) : null}
-          <p className="type-eyebrow text-black/60">{t("forms")}</p>
-          <ul className="mt-1.5 flex flex-col gap-0.5">
-            {pack.forms.map((f) => <NavItem key={f.id} active={doc === f.id} onClick={() => setDoc(f.id)} label={`${f.id} · ${f.title[lang]}`} />)}
-          </ul>
-          <p className="type-eyebrow mt-5 text-black/60">{t("drafts")}</p>
-          <ul className="mt-1.5 flex flex-col gap-0.5">
-            {pack.drafts.map((d) => <NavItem key={d.id} active={doc === `draft:${d.id}`} onClick={() => setDoc(`draft:${d.id}`)} label={d.title[lang]} />)}
-          </ul>
+          <section className="border-t-[0.5px] border-black/20 py-5">
+            <p className="type-eyebrow text-black/60">{t("forms")}</p>
+            <ul className="mt-2 flex flex-col gap-1">
+              {pack.forms.map((f) => <NavItem key={f.id} active={doc === f.id} onClick={() => setDoc(f.id)} label={`${f.id} · ${f.title[lang]}`} />)}
+            </ul>
+          </section>
+          <section className="border-t-[0.5px] border-black/20 pt-5">
+            <p className="type-eyebrow text-black/60">{t("drafts")}</p>
+            <ul className="mt-2 flex flex-col gap-1">
+              {pack.drafts.map((d) => <NavItem key={d.id} active={doc === `draft:${d.id}`} onClick={() => setDoc(`draft:${d.id}`)} label={d.title[lang]} />)}
+            </ul>
+          </section>
         </div>
       </nav>
 
-      <div className="mt-5 min-w-0 md:mt-0">
+      <div className="mt-6 min-w-0 md:mt-0">
         {/* Toolbar */}
-        <div className="lp-toolbar flex flex-wrap items-center gap-2 rounded-brand bg-mist px-3 py-2.5">
+        <div className="lp-toolbar flex flex-wrap items-center gap-2 rounded-brand bg-mist px-3.5 py-3">
           <div role="group" aria-label={t("language")} className="flex overflow-hidden rounded-brand bg-paper">
             {(["me", "en"] as const).map((l) => (
               <button key={l} type="button" aria-pressed={lang === l} disabled={busy !== null} onClick={() => void switchLang(l)}
@@ -232,12 +239,12 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
             {busy === "saving" ? t("saving") : isDirty ? t("save") : t("nothingToSave")}
           </button>
         </div>
-        <p role="status" aria-live="polite" className={`mt-2 min-h-5 text-[13.5px] ${notice?.tone === "warn" ? "text-red-dark" : "text-black/60"}`}>
+        <p role="status" aria-live="polite" className={`mt-3 min-h-5 text-[13.5px] ${notice?.tone === "warn" ? "text-red-dark" : "text-black/60"}`}>
           {notice?.text ?? (savedLabel ? t("lastSaved", { when: savedLabel }) : t("neverSaved"))}
         </p>
 
         {/* The document */}
-        <div id="legal-doc" className={`lp-doc mt-4 ${(draft && both) || guide ? "lp-both" : ""}`} lang={guide ? "en" : lang === "me" ? "sr-Latn-ME" : "en"} data-lang={lang}>
+        <div id="legal-doc" className={`lp-doc mt-8 ${(draft && both) || guide ? "lp-both" : ""}`} lang={guide ? "en" : lang === "me" ? "sr-Latn-ME" : "en"} data-lang={lang}>
           {guide ? (
             <>
               <div className="lp-head">
@@ -288,7 +295,7 @@ function NavItem({ active, onClick, label }: { active: boolean; onClick: () => v
   return (
     <li>
       <button type="button" onClick={onClick} aria-current={active ? "page" : undefined}
-        className={`block w-full rounded-brand px-2.5 py-1.5 text-left text-[14px] leading-snug ${active ? "bg-mist font-semibold text-black" : "text-black/70 hover:bg-mist"}`}>
+        className={`block w-full rounded-brand px-3 py-2 text-left text-[14px] leading-snug ${active ? "bg-mist font-semibold text-black" : "text-black/70 hover:bg-mist"}`}>
         {label}
       </button>
     </li>
@@ -405,21 +412,21 @@ function Editable({ value, block, label, placeholder, stale, onChange }: { value
 }
 
 const CSS = `
-.lp-doc { background: #fff; padding: 0 0 2rem; font-size: 15px; line-height: 1.55; color: #000; }
-.lp-head { border-bottom: 0.5px solid rgba(0,0,0,.25); padding-bottom: .75rem; margin-bottom: 1rem; }
+.lp-doc { background: #fff; padding: 0 0 3rem; font-size: 15px; line-height: 1.6; color: #000; }
+.lp-head { border-bottom: 0.5px solid rgba(0,0,0,.25); padding-bottom: 1.25rem; margin-bottom: 1.75rem; }
 .lp-file { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 12px; letter-spacing: .04em; color: rgba(0,0,0,.5); }
 .lp-title { font-family: var(--font-display); font-size: 22px; letter-spacing: .02em; margin-top: .25rem; }
 .lp-subtitle { color: rgba(0,0,0,.6); font-size: 14px; margin-top: .25rem; }
-.lp-note { margin-top: .6rem; padding: .6rem .8rem; background: #F6F3EE; border-radius: 8px; font-size: 13.5px; color: rgba(0,0,0,.7); }
-.lp-h { text-align: center; font-family: var(--font-display); font-size: 20px; margin: 1.4rem 0 .6rem; }
-.lp-h2 { text-align: center; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; font-size: 14px; margin: 1.2rem 0 .4rem; }
-.lp-h3 { text-align: center; font-weight: 700; font-size: 15px; margin: .9rem 0 .25rem; }
-.lp-p { margin: .35rem 0; white-space: pre-wrap; }
-.lp-list { list-style: decimal; padding-left: 1.5rem; margin: .35rem 0; }
-.lp-list li { margin: .2rem 0; }
-.lp-check { display: flex; gap: .6rem; align-items: flex-start; padding: .35rem 0; border-bottom: 0.5px solid rgba(0,0,0,.12); }
+.lp-note { margin-top: 1rem; padding: .7rem .9rem; background: #F6F3EE; border-radius: 8px; font-size: 13.5px; color: rgba(0,0,0,.7); }
+.lp-h { text-align: center; font-family: var(--font-display); font-size: 20px; margin: 2rem 0 1rem; }
+.lp-h2 { text-align: center; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; font-size: 14px; margin: 1.75rem 0 .6rem; }
+.lp-h3 { text-align: center; font-weight: 700; font-size: 15px; margin: 1.4rem 0 .4rem; }
+.lp-p { margin: .5rem 0; white-space: pre-wrap; }
+.lp-list { list-style: decimal; padding-left: 1.5rem; margin: .5rem 0; }
+.lp-list li { margin: .3rem 0; }
+.lp-check { display: flex; gap: .75rem; align-items: flex-start; padding: .7rem 0; border-bottom: 0.5px solid rgba(0,0,0,.12); }
 .lp-check input:checked + span { color: rgba(0,0,0,.5); text-decoration: line-through; text-decoration-color: rgba(0,0,0,.35); }
-.lp-sigrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1rem 2rem; margin: 1.4rem 0 .6rem; }
+.lp-sigrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.25rem 2rem; margin: 2rem 0 .75rem; }
 .lp-sig .lp-p { margin-bottom: 0; }
 .lp-siglbl { font-size: 12.5px; color: rgba(0,0,0,.55); }
 .lp-sigline { display: inline-block; width: 11rem; max-width: 100%; border-bottom: 1px solid #000; vertical-align: baseline; height: 1.4em; }
@@ -433,9 +440,9 @@ const CSS = `
 .lp-guide li { margin: .25rem 0; }
 .lp-prose { outline: none; }
 .lp-prose:focus { box-shadow: 0 0 0 2px rgba(14,58,70,.25); border-radius: 4px; }
-.lp-prose h2 { font-weight: 800; font-size: 16px; margin: 1.3rem 0 .4rem; }
-.lp-prose h3 { font-weight: 700; font-size: 15px; margin: 1rem 0 .3rem; }
-.lp-prose p { margin: .4rem 0; }
+.lp-prose h2 { font-weight: 800; font-size: 16px; margin: 1.75rem 0 .6rem; }
+.lp-prose h3 { font-weight: 700; font-size: 15px; margin: 1.25rem 0 .4rem; }
+.lp-prose p { margin: .55rem 0; }
 .lp-prose p.en { color: rgba(0,0,0,.6); }
 .lp-prose ul, .lp-prose ol { padding-left: 1.5rem; margin: .4rem 0; }
 .lp-prose ul { list-style: disc; } .lp-prose ol { list-style: decimal; }

@@ -59,7 +59,8 @@ function enSegments(md, isAnchor) {
 }
 
 // ---------- fields: defaults in both languages ----------
-// neutral: the same value in both languages (names, numbers, dates). meOnly: exists in the Montenegrin text only.
+// neutral: the same value in both languages (names, addresses, numbers, dates): typed once, copied to the other
+// language, never translated. The placeholder alone differs per language. meOnly: exists in the Montenegrin text only.
 const goalsME = `1. pružanje humanitarne, materijalne i druge podrške pojedincima, porodicama, djeci, malim preduzećima i organizacijama u stanju socijalne potrebe, prvenstveno u Tivtu i Boki Kotorskoj, a zatim i u ostalim opštinama Crne Gore;
 2. prikupljanje dobrovoljnih priloga i donacija putem javnih sportskih, rekreativnih, humanitarnih i kulturnih događaja i putem internet platforme za prikupljanje sredstava, uz potpunu javnost prihoda i rashoda;
 3. promocija sporta, rekreacije, zdravih stilova života i volonterizma;
@@ -97,21 +98,21 @@ const F = {
   org: T('Naziv udruženja', 'Name of the association', 'Nevladino udruženje „Santamore“', 'Non-governmental association "Santamore"'),
   short: T('Skraćeni naziv', 'Short name', 'NVU „Santamore“', 'NGA "Santamore"'),
   seat: NEUTRAL('Sjedište', 'Seat', 'Tivat'),
-  addr: T('Adresa', 'Address', '[ulica i broj], Tivat', '[street and number], Tivat'),
-  date: T('Datum osnivačke skupštine', 'Date of the founding assembly', '[datum sjednice]', '[date of the meeting]'),
-  f1_name: T('Osnivač 1, ime i prezime', 'Founder 1, full name', '[Ime i prezime]', '[Full name]'), f1_jmb: NEUTRAL('Osnivač 1, JMB', 'Founder 1, JMB', '[JMB]'), f1_addr: T('Osnivač 1, adresa', 'Founder 1, address', '[adresa prebivališta]', '[home address]'),
-  f2_name: T('Osnivač 2, ime i prezime', 'Founder 2, full name', '[Ime i prezime]', '[Full name]'), f2_jmb: NEUTRAL('Osnivač 2, JMB', 'Founder 2, JMB', '[JMB]'), f2_addr: T('Osnivač 2, adresa', 'Founder 2, address', '[adresa prebivališta]', '[home address]'),
-  f3_name: T('Osnivač 3, ime i prezime', 'Founder 3, full name', '[Ime i prezime]', '[Full name]'), f3_jmb: NEUTRAL('Osnivač 3, JMB', 'Founder 3, JMB', '[JMB]'), f3_addr: T('Osnivač 3, adresa', 'Founder 3, address', '[adresa prebivališta]', '[home address]'),
+  addr: T('Adresa', 'Address', '[ulica i broj], Tivat', '[street and number], Tivat', { neutral: true }),
+  date: T('Datum osnivačke skupštine', 'Date of the founding assembly', '[datum sjednice]', '[date of the meeting]', { neutral: true }),
+  f1_name: T('Osnivač 1, ime i prezime', 'Founder 1, full name', '[Ime i prezime]', '[Full name]', { neutral: true }), f1_jmb: NEUTRAL('Osnivač 1, JMB', 'Founder 1, JMB', '[JMB]'), f1_addr: T('Osnivač 1, adresa', 'Founder 1, address', '[adresa prebivališta]', '[home address]', { neutral: true }),
+  f2_name: T('Osnivač 2, ime i prezime', 'Founder 2, full name', '[Ime i prezime]', '[Full name]', { neutral: true }), f2_jmb: NEUTRAL('Osnivač 2, JMB', 'Founder 2, JMB', '[JMB]'), f2_addr: T('Osnivač 2, adresa', 'Founder 2, address', '[adresa prebivališta]', '[home address]', { neutral: true }),
+  f3_name: T('Osnivač 3, ime i prezime', 'Founder 3, full name', '[Ime i prezime]', '[Full name]', { neutral: true }), f3_jmb: NEUTRAL('Osnivač 3, JMB', 'Founder 3, JMB', '[JMB]'), f3_addr: T('Osnivač 3, adresa', 'Founder 3, address', '[adresa prebivališta]', '[home address]', { neutral: true }),
   // Founders 4 and 5 are optional: three is the legal minimum. Left empty, their rows do not print.
-  f4_name: T('Osnivač 4, ime i prezime (opciono)', 'Founder 4, full name (optional)', '', '', { optional: true }), f4_jmb: NEUTRAL('Osnivač 4, JMB', 'Founder 4, JMB', '', { optional: true }), f4_addr: T('Osnivač 4, adresa', 'Founder 4, address', '', '', { optional: true }),
-  f5_name: T('Osnivač 5, ime i prezime (opciono)', 'Founder 5, full name (optional)', '', '', { optional: true }), f5_jmb: NEUTRAL('Osnivač 5, JMB', 'Founder 5, JMB', '', { optional: true }), f5_addr: T('Osnivač 5, adresa', 'Founder 5, address', '', '', { optional: true }),
+  f4_name: T('Osnivač 4, ime i prezime (opciono)', 'Founder 4, full name (optional)', '', '', { optional: true, neutral: true }), f4_jmb: NEUTRAL('Osnivač 4, JMB', 'Founder 4, JMB', '', { optional: true }), f4_addr: T('Osnivač 4, adresa', 'Founder 4, address', '', '', { optional: true, neutral: true }),
+  f5_name: T('Osnivač 5, ime i prezime (opciono)', 'Founder 5, full name (optional)', '', '', { optional: true, neutral: true }), f5_jmb: NEUTRAL('Osnivač 5, JMB', 'Founder 5, JMB', '', { optional: true }), f5_addr: T('Osnivač 5, adresa', 'Founder 5, address', '', '', { optional: true, neutral: true }),
   goals: T('Ciljevi', 'Goals', goalsME, goalsEN, { block: true }), activities: T('Djelatnosti', 'Activities', activitiesME, activitiesEN, { block: true }),
   rep_title: T('Funkcija ovlašćenog lica', 'Title of the authorised person', 'Izvršni direktor', 'Executive Director'),
-  rep_name: T('Ovlašćeno lice, ime i prezime', 'Authorised person, full name', '[Ime i prezime]', '[Full name]'), rep_jmb: NEUTRAL('Ovlašćeno lice, JMB', 'Authorised person, JMB', '[JMB]'), rep_addr: T('Ovlašćeno lice, adresa', 'Authorised person, address', '[adresa prebivališta]', '[home address]'),
-  chair: T('Predsjedavajući Osnivačke skupštine', 'Chair of the Founding Assembly', '[Ime i prezime]', '[Full name]'), deputy: T('Zamjenik predsjednika Skupštine', 'Deputy President of the Assembly', '[Ime i prezime]', '[Full name]'), recorder: T('Zapisničar', 'Recorder', '[Ime i prezime]', '[Full name]'),
+  rep_name: T('Ovlašćeno lice, ime i prezime', 'Authorised person, full name', '[Ime i prezime]', '[Full name]', { neutral: true }), rep_jmb: NEUTRAL('Ovlašćeno lice, JMB', 'Authorised person, JMB', '[JMB]'), rep_addr: T('Ovlašćeno lice, adresa', 'Authorised person, address', '[adresa prebivališta]', '[home address]', { neutral: true }),
+  chair: T('Predsjedavajući Osnivačke skupštine', 'Chair of the Founding Assembly', '[Ime i prezime]', '[Full name]', { neutral: true }), deputy: T('Zamjenik predsjednika Skupštine', 'Deputy President of the Assembly', '[Ime i prezime]', '[Full name]', { neutral: true }), recorder: T('Zapisničar', 'Recorder', '[Ime i prezime]', '[Full name]', { neutral: true }),
   applicant: T('Podnosilac', 'Applicant', 'Nevladino udruženje „Santamore“ u osnivanju\n[ulica i broj], Tivat\nzastupano po predsjedavajućem Osnivačke skupštine: [Ime i prezime]\ntel. [telefon]\ne-pošta: [e-pošta]', 'Non-governmental association "Santamore" in formation\n[street and number], Tivat\nrepresented by the Chair of the Founding Assembly: [Full name]\ntel. [phone]\nemail: [email]', { block: true }),
-  date_app: T('Datum prijave', 'Filing date', '[datum predaje]', '[filing date]'),
-  start: NEUTRAL('Vrijeme početka', 'Start time', '[18:00]'), end: NEUTRAL('Vrijeme završetka', 'End time', '[19:30]'), venue: T('Adresa mjesta održavanja', 'Venue address', '[adresa mjesta održavanja], Tivat', '[venue address], Tivat'),
+  date_app: T('Datum prijave', 'Filing date', '[datum predaje]', '[filing date]', { neutral: true }),
+  start: NEUTRAL('Vrijeme početka', 'Start time', '[18:00]'), end: NEUTRAL('Vrijeme završetka', 'End time', '[19:30]'), venue: T('Adresa mjesta održavanja', 'Venue address', '[adresa mjesta održavanja], Tivat', '[venue address], Tivat', { neutral: true }),
   salut: T('g./gđa', 'Mr/Ms', 'g.', 'Mr'), v1: T('izložio/la', '', 'izložio', '', { meOnly: true }), v2: T('upoznao/la', '', 'upoznao', '', { meOnly: true }),
   term: T('Mandat', 'Term', '4 (četiri)', '4 (four)'), vote: T('Rezultat glasanja', 'Vote', 'jednoglasno', 'unanimously'),
   seal_text: T('Tekst po obodu pečata', 'Text on the rim of the seal', 'Nevladino udruženje „Santamore“, Tivat', 'Non-governmental association "Santamore", Tivat'), seal_symbol: T('Znak u sredini pečata', 'Symbol in the centre of the seal', '[opis znaka Santamore]', '[description of the Santamore mark]'),
