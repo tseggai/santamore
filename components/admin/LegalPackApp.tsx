@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { saveLegalPack } from "@/app/[locale]/admin/(protected)/registracija/actions";
 import { translateFields } from "@/app/[locale]/admin/(protected)/translate-actions";
-import { incompleteFields, initialFields, isEmptyOptional, isIncomplete, sanitizeDraftHtml, segments, type FieldState, type LegalPack, type PackBlock, type PackLang } from "@/lib/legal-pack";
+import { FOUNDER_IDS, incompleteFields, initialFields, isEmptyOptional, isIncomplete, resolveFields, sanitizeDraftHtml, segments, type FieldState, type LegalPack, type PackBlock, type PackLang } from "@/lib/legal-pack";
 import type { Locale } from "@/i18n/routing";
 
 /*
@@ -109,7 +109,9 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   const guide = doc === "guide" ? pack.guide ?? null : null;
   const draft = doc.startsWith("draft:") ? pack.drafts.find((d) => `draft:${d.id}` === doc) ?? null : null;
   const isDirty = Object.keys(dirty).length > 0;
-  const staleNow = useMemo(() => Object.entries(fields).filter(([id, f]) => f.stale === lang && !pack.fields[id]?.meOnly).map(([id]) => id), [fields, lang, pack.fields]);
+  /** What the documents show: person blanks that follow a founder take that founder's values. */
+  const shown = useMemo(() => resolveFields(pack, fields), [pack, fields]);
+  const staleNow = useMemo(() => Object.entries(shown).filter(([id, f]) => f.stale === lang && !pack.fields[id]?.meOnly).map(([id]) => id), [shown, lang, pack.fields]);
 
   useEffect(() => {
     if (!isDirty) return;
@@ -123,12 +125,20 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   const setField = (id: string, text: string) => {
     setFields((prev) => {
       const f = prev[id];
-      if (!f || f[lang] === text) return prev;
       const meta = pack.fields[id];
+      const linked = meta?.link && prev[meta.link]?.me ? meta.link : null;
+      if (!f || (f[lang] === text && !linked)) return prev;
       const stale = meta?.meOnly ? null : meta?.neutral ? null : other(lang);
       const next: FieldState = meta?.neutral ? { me: text, en: text, stale: null } : { ...f, [lang]: text, stale };
-      return { ...prev, [id]: next };
+      // Typing into a blank that followed a founder makes it its own again.
+      return linked ? { ...prev, [id]: next, [linked]: { me: "", en: "", stale: null } } : { ...prev, [id]: next };
     });
+    markDirty("fields");
+  };
+
+  /** Make a person blank (and its JMB and address, where it has them) follow a founder, or none. */
+  const setLink = (linkId: string, founder: string) => {
+    setFields((prev) => ({ ...prev, [linkId]: { me: founder, en: founder, stale: null } }));
     markDirty("fields");
   };
 
@@ -201,7 +211,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
     setTimeout(() => { window.print(); document.title = title; }, 50);
   };
   const print = () => {
-    const missing = form ? incompleteFields(form, lang, fields, pack.fields) : [];
+    const missing = form ? incompleteFields(form, lang, shown, pack.fields) : [];
     if (missing.length === 0) { doPrint(); return; }
     setPrintWarn(missing.map((id) => pack.fields[id]?.label[lang] || pack.fields[id]?.label.me || id));
   };
@@ -320,7 +330,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
                 <p className="lp-note" dangerouslySetInnerHTML={{ __html: form.note[lang] }} />
               </div>
               {form.blocks.map((block, i) => (
-                <Block key={i} block={block} lang={lang} pack={pack} fields={fields} checks={checks} onField={setField} onCheck={(id, on) => { setChecks((c) => ({ ...c, [id]: on })); markDirty("checks"); }} placeholderHint={t("fieldEmpty")} staleHint={t("staleHint")} />
+                <Block key={i} block={block} lang={lang} pack={pack} fields={shown} checks={checks} onField={setField} onLink={setLink} onCheck={(id, on) => { setChecks((c) => ({ ...c, [id]: on })); markDirty("checks"); }} placeholderHint={t("fieldEmpty")} staleHint={t("staleHint")} pickerLabel={t("samePerson")} pickerNone={t("otherPerson")} founderLabel={(n) => t("founderN", { n })} />
               ))}
             </>
           ) : draft ? (
@@ -366,9 +376,13 @@ interface BlockProps {
   fields: Record<string, FieldState>;
   checks: Record<string, boolean>;
   onField: (id: string, text: string) => void;
+  onLink: (linkId: string, founder: string) => void;
   onCheck: (id: string, on: boolean) => void;
   placeholderHint: string;
   staleHint: string;
+  pickerLabel: string;
+  pickerNone: string;
+  founderLabel: (n: number) => string;
 }
 
 function Block(props: BlockProps) {
@@ -417,7 +431,7 @@ function Block(props: BlockProps) {
  * honoured, so the text is split on them and everything else is escaped
  * by React.
  */
-function Template({ text, lang, pack, fields, onField, placeholderHint, staleHint }: BlockProps & { text: string }) {
+function Template({ text, lang, pack, fields, onField, onLink, placeholderHint, staleHint, pickerLabel, pickerNone, founderLabel }: BlockProps & { text: string }) {
   const parts = text.split(/(<br\s*\/?>|<\/?b>)/i);
   let bold = false;
   const out: React.ReactNode[] = [];
@@ -433,12 +447,26 @@ function Template({ text, lang, pack, fields, onField, placeholderHint, staleHin
       const f = fields[seg.id];
       if (!meta || !f) return `{{${seg.id}}}`;
       const shown = meta.meOnly && lang === "en" ? "" : f[lang];
-      return (
+      const editable = (
         <Editable key={j} value={shown} block={!!meta.block} label={meta.label[lang] || meta.label.me} todo={isIncomplete(shown)}
           placeholder={meta.optional ? meta.label[lang] || meta.label.me : `${meta.label[lang] || meta.label.me} — ${placeholderHint}`}
           stale={f.stale === lang && !meta.meOnly ? staleHint : null}
           onChange={(v) => onField(seg.id, v)} />
       );
+      if (meta.link && meta.part === "name") {
+        // A person blank may follow a founder: the founders with a name are offered next to it.
+        const founders = FOUNDER_IDS.map((fid, n) => ({ fid, n: n + 1, name: fields[`${fid}_name`]?.[lang] ?? "" })).filter((x) => !isIncomplete(x.name));
+        return (
+          <span key={j} className="lp-person">
+            {editable}
+            <select className="lp-pick lp-screen" aria-label={pickerLabel} title={pickerLabel} value={fields[meta.link]?.me ?? ""} onChange={(e) => onLink(meta.link!, e.target.value)}>
+              <option value="">{pickerNone}</option>
+              {founders.map((x) => <option key={x.fid} value={x.fid}>{founderLabel(x.n)}: {x.name}</option>)}
+            </select>
+          </span>
+        );
+      }
+      return editable;
     });
     out.push(bold ? <b key={i}>{nodes}</b> : <span key={i}>{nodes}</span>);
   });
@@ -495,6 +523,11 @@ const CSS = `
 .lp-field.lp-todo:focus { background: rgba(11,87,208,.14); box-shadow: 0 0 0 2px rgba(11,87,208,.35); }
 .lp-field.lp-block { display: block; white-space: pre-wrap; padding: .3rem .5rem; margin: .25rem 0; }
 .lp-field.lp-stale { box-shadow: 0 0 0 1.5px #F35353; }
+.lp-person { white-space: nowrap; }
+.lp-pick { display: inline-block; width: 1.25rem; height: 1.25rem; margin-left: .15rem; vertical-align: middle; border: 0; border-radius: 4px; background: #E3EBED url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%2336434B' stroke-width='2'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E") center/14px no-repeat; color: transparent; font-size: 14px; cursor: pointer; appearance: none; -webkit-appearance: none; }
+.lp-pick:hover { background-color: #d3dfe2; }
+.lp-pick:focus-visible { outline: 2px solid #0E3A46; outline-offset: 1px; }
+.lp-pick option { color: #000; }
 .lp-opt-empty { opacity: .55; }
 .lp-guide p.en { color: #000; }
 .lp-guide li { margin: .25rem 0; }

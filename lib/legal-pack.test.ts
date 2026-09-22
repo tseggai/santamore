@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import packJson from "@/content/legal-pack/pack.json";
-import { incompleteFields, initialFields, isIncomplete, packProblems, placeholderIds, sanitizeDraftHtml, savePackSchema, segments, type LegalPack } from "./legal-pack";
+import { incompleteFields, initialFields, isIncomplete, resolveFields, packProblems, placeholderIds, sanitizeDraftHtml, savePackSchema, segments, type LegalPack } from "./legal-pack";
 
 const pack = packJson as unknown as LegalPack;
 
@@ -102,5 +102,20 @@ describe("incomplete blanks", () => {
     expect(before).not.toContain("org");
     fields.f1_name = { me: "Ana Anić", en: "Ana Anić", stale: null };
     expect(incompleteFields(form, "en", fields, pack.fields)).not.toContain("f1_name");
+  });
+});
+
+describe("resolveFields", () => {
+  it("makes a person blank follow the chosen founder", () => {
+    const fields = initialFields(pack);
+    fields.f2_name = { me: "Ana Anić", en: "Ana Anić", stale: null };
+    fields.f2_jmb = { me: "0101990000000", en: "0101990000000", stale: null };
+    fields.rep_of = { me: "f2", en: "f2", stale: null };
+    const shown = resolveFields(pack, fields);
+    expect(shown.rep_name.me).toBe("Ana Anić");
+    expect(shown.rep_jmb.en).toBe("0101990000000");
+    expect(shown.rep_addr.me).toBe(fields.f2_addr.me);
+    expect(shown.chair.me).toBe("[Ime i prezime]");
+    expect(fields.rep_name.me).toBe("[Ime i prezime]");
   });
 });

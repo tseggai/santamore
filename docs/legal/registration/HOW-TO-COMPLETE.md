@@ -18,12 +18,12 @@ This is the working guide for the founders. It says what to collect, what to dec
 
 | Fact | Blank in the console | Used in | Who has it |
 |---|---|---|---|
-| Founders' full names, JMB (personal number), home addresses; three founders are the legal minimum, five blanks are available | Founder 1 to 5 | 02 Decision, 04 Statute (signatures), 05 Minutes | Each founder, from the identity card |
+| Founders' full names, JMB and home addresses; three founders are the legal minimum, five blanks are available. JMB (jedinstveni matični broj) is the 13-digit personal identification number printed on the Montenegrin identity card; a foreign founder gives the number from their passport or residence permit instead | Founder 1 to 5 | 02 Decision, 04 Statute (signatures), 05 Minutes | Each founder, from the identity card |
 | Address of the seat (street and number, Tivat) | Address | 02, 03, 05 | Whoever provides the premises; the Ministry needs a real address, a founder's home is acceptable |
 | Date of the founding assembly | Date of the founding assembly | 02, 03, 04, 05 | Set by the founders |
 | Start and end time, venue of the assembly | Start time, End time, Venue address | 05 | Set by the founders |
 | Who chairs the assembly, who takes the minutes, who is Deputy President | Chair, Recorder, Deputy | 04, 05 | Elected at the assembly; decide beforehand |
-| The Executive Director (the person authorised for representation): name, JMB, address | Authorised person | 02, 03, 05 | The founders' decision; this person signs contracts and the Monri and bank paperwork |
+| The Executive Director (the person authorised for representation): name, JMB, address. If they are one of the founders, pick the founder from the small menu next to the blank and the three values follow that founder. The same menu exists for the chair, deputy and recorder | Authorised person | 02, 03, 05 | The founders' decision; this person signs contracts and the Monri and bank paperwork |
 | Chair's phone and email for the Ministry | Chair's phone, Chair's email | 03 (the applicant block is built from the name, address and chair blanks plus these two) | The chair |
 | Filing date | Filing date | 03 | The day you hand the documents in |
 | Description of the mark in the centre of the seal | Symbol in the centre of the seal | 04 Art. 8 | Brand: the Santamore icon; describe it in words |
