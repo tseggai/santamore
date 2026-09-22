@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import packJson from "@/content/legal-pack/pack.json";
-import { initialFields, packProblems, placeholderIds, sanitizeDraftHtml, savePackSchema, segments, type LegalPack } from "./legal-pack";
+import { incompleteFields, initialFields, isIncomplete, packProblems, placeholderIds, sanitizeDraftHtml, savePackSchema, segments, type LegalPack } from "./legal-pack";
 
 const pack = packJson as unknown as LegalPack;
 
@@ -81,5 +81,26 @@ describe("savePackSchema", () => {
 
   it("accepts the whole initial field state", () => {
     expect(schema.safeParse({ key: "fields", value: initialFields(pack) }).success).toBe(true);
+  });
+});
+
+describe("incomplete blanks", () => {
+  it("treats empty and bracketed values as not completed", () => {
+    expect(isIncomplete("")).toBe(true);
+    expect(isIncomplete("  [Full name]")).toBe(true);
+    expect(isIncomplete("Ana Anić")).toBe(false);
+    expect(isIncomplete("4 (four)")).toBe(false);
+  });
+
+  it("lists what the Decision still needs, skipping empty optional founders", () => {
+    const form = pack.forms.find((f) => f.id === "02")!;
+    const fields = initialFields(pack);
+    const before = incompleteFields(form, "en", fields, pack.fields);
+    expect(before).toContain("f1_name");
+    expect(before).toContain("date");
+    expect(before).not.toContain("f4_name");
+    expect(before).not.toContain("org");
+    fields.f1_name = { me: "Ana Anić", en: "Ana Anić", stale: null };
+    expect(incompleteFields(form, "en", fields, pack.fields)).not.toContain("f1_name");
   });
 });

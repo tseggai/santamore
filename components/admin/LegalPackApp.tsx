@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { saveLegalPack } from "@/app/[locale]/admin/(protected)/registracija/actions";
 import { translateFields } from "@/app/[locale]/admin/(protected)/translate-actions";
-import { initialFields, isEmptyOptional, sanitizeDraftHtml, segments, type FieldState, type LegalPack, type PackBlock, type PackLang } from "@/lib/legal-pack";
+import { incompleteFields, initialFields, isEmptyOptional, isIncomplete, sanitizeDraftHtml, segments, type FieldState, type LegalPack, type PackBlock, type PackLang } from "@/lib/legal-pack";
 import type { Locale } from "@/i18n/routing";
 
 /*
@@ -192,11 +192,18 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
     setNotice(failed ? { tone: "warn", text: failed } : { tone: "ok", text: t("saved") });
   };
 
-  const print = () => {
+  const [printWarn, setPrintWarn] = useState<string[] | null>(null);
+  const doPrint = () => {
+    setPrintWarn(null);
     const title = document.title;
     document.title = `${form?.file ?? draft?.file ?? guide?.file ?? "santamore"}-${lang}`;
-    window.print();
-    document.title = title;
+    // Let the dialog close before the print dialog takes over.
+    setTimeout(() => { window.print(); document.title = title; }, 50);
+  };
+  const print = () => {
+    const missing = form ? incompleteFields(form, lang, fields, pack.fields) : [];
+    if (missing.length === 0) { doPrint(); return; }
+    setPrintWarn(missing.map((id) => pack.fields[id]?.label[lang] || pack.fields[id]?.label.me || id));
   };
 
   const savedLabel = savedAt ? new Date(savedAt).toLocaleString(locale === "me" ? "sr-Latn-ME" : locale, { dateStyle: "short", timeStyle: "short" }) : null;
@@ -276,6 +283,22 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
         <p role="status" aria-live="polite" className={`mt-3 min-h-5 text-[13.5px] ${notice?.tone === "warn" ? "text-red-dark" : "text-black/60"}`}>
           {notice?.text ?? (savedLabel ? t("lastSaved", { when: savedLabel }) : t("neverSaved"))}
         </p>
+
+        {printWarn ? (
+          <div role="alertdialog" aria-modal="true" aria-labelledby="lp-print-title" className="lp-screen fixed inset-0 z-50 flex items-center justify-center bg-ink/55 px-4">
+            <div className="w-full max-w-md rounded-brand bg-paper p-6 shadow-none">
+              <h3 id="lp-print-title" className="text-[17px] font-bold">{t("printIncompleteTitle", { n: printWarn.length })}</h3>
+              <p className="mt-2 text-[14px] leading-relaxed text-black/60">{t("printIncompleteHint")}</p>
+              <ul className="mt-3 max-h-56 overflow-y-auto rounded-brand bg-mist px-4 py-3 text-[14px]">
+                {printWarn.map((label, i) => <li key={i} className="py-0.5 text-[#0B57D0]">{label}</li>)}
+              </ul>
+              <div className="mt-5 flex flex-wrap justify-end gap-2">
+                <button type="button" autoFocus onClick={() => setPrintWarn(null)} className="rounded-brand bg-mist px-3.5 py-2 text-[14px] font-semibold text-black/80 hover:bg-mist-2">{t("printBack")}</button>
+                <button type="button" onClick={doPrint} className="rounded-brand bg-red px-3.5 py-2 text-[14px] font-bold text-paper hover:bg-red-dark">{t("printAnyway")}</button>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         {/* The document */}
         <div id="legal-doc" className={`lp-doc mt-8 ${(draft && both) || guide ? "lp-both" : ""}`} lang={guide ? "en" : lang === "me" ? "sr-Latn-ME" : "en"} data-lang={lang}>
@@ -411,7 +434,7 @@ function Template({ text, lang, pack, fields, onField, placeholderHint, staleHin
       if (!meta || !f) return `{{${seg.id}}}`;
       const shown = meta.meOnly && lang === "en" ? "" : f[lang];
       return (
-        <Editable key={j} value={shown} block={!!meta.block} label={meta.label[lang] || meta.label.me}
+        <Editable key={j} value={shown} block={!!meta.block} label={meta.label[lang] || meta.label.me} todo={isIncomplete(shown)}
           placeholder={meta.optional ? meta.label[lang] || meta.label.me : `${meta.label[lang] || meta.label.me} — ${placeholderHint}`}
           stale={f.stale === lang && !meta.meOnly ? staleHint : null}
           onChange={(v) => onField(seg.id, v)} />
@@ -422,7 +445,7 @@ function Template({ text, lang, pack, fields, onField, placeholderHint, staleHin
   return <>{out}</>;
 }
 
-function Editable({ value, block, label, placeholder, stale, onChange }: { value: string; block: boolean; label: string; placeholder: string; stale: string | null; onChange: (v: string) => void }) {
+function Editable({ value, block, label, placeholder, stale, todo, onChange }: { value: string; block: boolean; label: string; placeholder: string; stale: string | null; todo: boolean; onChange: (v: string) => void }) {
   const ref = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -438,7 +461,7 @@ function Editable({ value, block, label, placeholder, stale, onChange }: { value
       aria-multiline={block}
       title={stale ?? undefined}
       data-placeholder={placeholder}
-      className={`lp-field ${block ? "lp-block" : ""} ${stale ? "lp-stale" : ""}`}
+      className={`lp-field ${block ? "lp-block" : ""} ${stale ? "lp-stale" : ""} ${todo ? "lp-todo" : ""}`}
       onInput={(e) => onChange(e.currentTarget.innerText)}
       onKeyDown={block ? undefined : (e) => { if (e.key === "Enter") e.preventDefault(); }}
     />
@@ -466,7 +489,10 @@ const CSS = `
 .lp-sigline { display: inline-block; width: 11rem; max-width: 100%; border-bottom: 1px solid #000; vertical-align: baseline; height: 1.4em; }
 .lp-field { display: inline; min-width: 2.5rem; padding: 0 .15em; border-radius: 3px; color: #B0246B; background: rgba(176,36,107,.07); box-decoration-break: clone; -webkit-box-decoration-break: clone; outline: none; }
 .lp-field:focus { background: rgba(176,36,107,.14); box-shadow: 0 0 0 2px rgba(176,36,107,.35); }
-.lp-field:empty::before { content: attr(data-placeholder); color: rgba(176,36,107,.55); font-style: italic; }
+.lp-field:empty::before { content: attr(data-placeholder); font-style: italic; opacity: .7; }
+/* Still to complete (empty or bracketed): blue. Completed: pink. */
+.lp-field.lp-todo { color: #0B57D0; background: rgba(11,87,208,.07); }
+.lp-field.lp-todo:focus { background: rgba(11,87,208,.14); box-shadow: 0 0 0 2px rgba(11,87,208,.35); }
 .lp-field.lp-block { display: block; white-space: pre-wrap; padding: .3rem .5rem; margin: .25rem 0; }
 .lp-field.lp-stale { box-shadow: 0 0 0 1.5px #F35353; }
 .lp-opt-empty { opacity: .55; }

@@ -1532,7 +1532,11 @@
       "draftHint": "The draft is bilingual; edit the text directly in either language. Tick both languages to see them side by side.",
       "saveMissingTable": "The legal_pack table does not exist in the database yet. Apply migration 20260921000069_legal_pack.sql (Supabase → SQL editor) and save again.",
       "guideHint": "The founders' guide: what to collect, what to decide, where each fact goes and what every draft is for. English only, read-only here.",
-      "guide": "Guide"
+      "guide": "Guide",
+      "printIncompleteTitle": "{n} blanks not completed",
+      "printIncompleteHint": "These blanks are still empty or in square brackets. Go back and complete them, or print the document as it is.",
+      "printAnyway": "Print anyway",
+      "printBack": "Back to editing"
     }
   },
   "forms": {
