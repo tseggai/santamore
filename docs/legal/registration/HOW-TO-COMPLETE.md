@@ -24,7 +24,7 @@ This is the working guide for the founders. It says what to collect, what to dec
 | Start and end time, venue of the assembly | Start time, End time, Venue address | 05 | Set by the founders |
 | Who chairs the assembly, who takes the minutes, who is Deputy President | Chair, Recorder, Deputy | 04, 05 | Elected at the assembly; decide beforehand |
 | The Executive Director (the person authorised for representation): name, JMB, address | Authorised person | 02, 03, 05 | The founders' decision; this person signs contracts and the Monri and bank paperwork |
-| Chair's phone and email for the Ministry | Applicant | 03 | The chair |
+| Chair's phone and email for the Ministry | Chair's phone, Chair's email | 03 (the applicant block is built from the name, address and chair blanks plus these two) | The chair |
 | Filing date | Filing date | 03 | The day you hand the documents in |
 | Description of the mark in the centre of the seal | Symbol in the centre of the seal | 04 Art. 8 | Brand: the Santamore icon; describe it in words |
 
