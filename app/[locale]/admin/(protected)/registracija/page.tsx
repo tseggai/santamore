@@ -21,11 +21,10 @@ export default async function RegistrationPage({ params }: { params: Promise<{ l
   return (
     <div className="pb-8">
       <h1 className="type-display text-2xl">{t("title")}</h1>
-      <p className="mt-2 text-[14px] leading-relaxed text-black/60">{t("hint")}</p>
       {error ? (
         <p className="mt-4 rounded-brand bg-red/5 px-4 py-3 text-[14px] text-red-dark">{t("loadFailed")}</p>
       ) : null}
-      <div className="mt-5">
+      <div className="mt-8">
         <LegalPackApp pack={pack} saved={saved} locale={locale as Locale} />
       </div>
     </div>
