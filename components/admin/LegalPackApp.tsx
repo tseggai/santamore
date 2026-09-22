@@ -185,7 +185,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
             </optgroup>
           </select>
         </label>
-        <div className="hidden md:block md:sticky md:top-6">
+        <div className="hidden md:sticky md:top-6 md:block md:max-h-[calc(100vh-3rem)] md:overflow-y-auto md:overscroll-contain md:pr-2">
           {pack.guide ? (
             <section className="pb-5">
               <p className="type-eyebrow text-black/60">{t("guide")}</p>
