@@ -124,6 +124,35 @@ export function packProblems(pack: LegalPack): string[] {
   return problems;
 }
 
+/** A blank still to be completed: empty, or left at its bracketed placeholder. */
+export function isIncomplete(value: string): boolean {
+  return value.trim() === "" || /^\s*\[/.test(value);
+}
+
+/** The ids of the blanks a form still needs in the given language, in document order. */
+export function incompleteFields(form: PackForm, lang: PackLang, fields: Record<string, FieldState>, meta: Record<string, PackField>): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const visit = (template: string) => {
+    for (const id of placeholderIds(template)) {
+      if (seen.has(id)) continue;
+      seen.add(id);
+      const m = meta[id];
+      const f = fields[id];
+      if (!m || !f) continue;
+      if (m.meOnly && lang === "en") continue;
+      if (m.optional && !f.me.trim() && !f.en.trim()) continue;
+      if (isIncomplete(f[lang])) out.push(id);
+    }
+  };
+  for (const block of form.blocks) {
+    if (block.type === "list") block[lang].forEach(visit);
+    else if (block.type === "sigrow") block.items.forEach((item) => visit(item[lang] || item.me));
+    else visit(block[lang] || block.me);
+  }
+  return out;
+}
+
 /** True when a template's blanks are all optional and all empty: the item is left out of the printed page. */
 export function isEmptyOptional(template: string, fields: Record<string, FieldState>, meta: Record<string, PackField>): boolean {
   const ids = placeholderIds(template);
