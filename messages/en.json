@@ -1558,7 +1558,11 @@
     "evTierDistance": "For",
     "evTierAllDistances": "All distances",
     "discardChanges": "Discard the unsaved changes in this form?",
-    "discard": "Discard"
+    "discard": "Discard",
+    "uploadUnreadable": "The browser can't read this picture. Use a JPEG or PNG; a HEIC photo from an iPhone needs converting first (share it as JPEG, or set Camera › Formats to Most Compatible).",
+    "uploadTooLarge": "The picture is over the size this storage accepts. Use a smaller one.",
+    "uploadForbidden": "The storage refused the upload for this account. Sign out and in again; if it persists, the bucket policy needs checking.",
+    "uploadFailed": "The upload failed: {detail}"
   },
   "forms": {
     "nameLabel": "Full name",

@@ -9,7 +9,7 @@ import { Chip, DataTable, Thumb, rowButton, type Column } from "@/components/con
 import { HeaderAction } from "@/components/console/HeaderAction";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
-import { downscaleToJpeg } from "@/lib/images";
+import { describeUploadError, downscaleToJpeg } from "@/lib/images";
 import { teamPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 import { Link } from "@/i18n/navigation";
@@ -172,8 +172,10 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
       const { error } = await createClient().storage.from("team-photos").upload(path, blob, { contentType: "image/jpeg" });
       if (error) throw error;
       setPhotoPath(path);
-    } catch {
+    } catch (error) {
+      const why = describeUploadError(error);
       setState("error");
+      setDetail(why.key === "uploadFailed" ? t(why.key, { detail: why.detail }) : t(why.key));
     } finally {
       setPhotoBusy(false);
     }
@@ -308,7 +310,7 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
       ) : null}
       {state === "account_taken" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("teamAccountTaken")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
-      <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-line bg-paper px-5 py-3 shadow-[0_-8px_24px_rgba(14,58,70,0.08)] sm:-mx-6 sm:px-6">
+      <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
         <button type="submit" disabled={state === "busy" || photoBusy} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
           {row ? t("evSave") : t("teamCreate")}
         </button>

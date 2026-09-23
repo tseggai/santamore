@@ -180,7 +180,7 @@ export function PostEditor({ group, onSaved }: { group: PostGroup | null; onSave
         </article>
       </PreviewFrame>
 
-      <div className="sticky bottom-0 -mx-5 flex items-center gap-2 border-t-[0.5px] border-line bg-paper px-5 py-3 shadow-[0_-8px_24px_rgba(14,58,70,0.08)] sm:-mx-6 sm:px-6">
+      <div className="sticky bottom-0 -mx-5 flex items-center gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
         <button
           type="button"
           aria-pressed={preview}

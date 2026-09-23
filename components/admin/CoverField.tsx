@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useRef, useState } from "react";
 
-import { downscaleToJpeg } from "@/lib/images";
+import { describeUploadError, downscaleToJpeg } from "@/lib/images";
 import { galleryImageUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 
@@ -26,20 +26,21 @@ export function CoverField({
   const t = useTranslations("admin");
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
   const src = galleryImageUrl(value);
 
   const upload = async (file: File) => {
     setBusy(true);
-    setFailed(false);
+    setFailed(null);
     try {
       const blob = await downscaleToJpeg(file, 2000);
       const path = `${folder}/cover-${Date.now()}.jpg`;
       const { error } = await createClient().storage.from("gallery").upload(path, blob, { contentType: "image/jpeg" });
       if (error) throw error;
       onChange(path);
-    } catch {
-      setFailed(true);
+    } catch (error) {
+      const why = describeUploadError(error);
+      setFailed(why.key === "uploadFailed" ? t(why.key, { detail: why.detail }) : t(why.key));
     } finally {
       setBusy(false);
     }
@@ -76,7 +77,7 @@ export function CoverField({
               </button>
             ) : null}
           </div>
-          <p className="mt-1 text-[13px] text-black/55">{failed ? t("actionError") : t("coverHint")}</p>
+          <p className={`mt-1 text-[13px] ${failed ? "font-semibold text-red-dark" : "text-black/55"}`}>{failed ?? t("coverHint")}</p>
         </div>
       </div>
     </div>

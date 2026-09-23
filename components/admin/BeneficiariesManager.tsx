@@ -11,7 +11,7 @@ import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
 import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 import { TranslateBar } from "@/components/admin/TranslateBar";
-import { downscaleToJpeg } from "@/lib/images";
+import { describeUploadError, downscaleToJpeg } from "@/lib/images";
 import { beneficiaryPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 import { routing, type Locale } from "@/i18n/routing";
@@ -151,6 +151,7 @@ function BeneficiaryForm({ row, causes, onDone }: { row: BeneficiaryRow | null; 
   const [story, setStory] = useState<Record<Locale, string>>({ me: row?.story.me ?? "", en: row?.story.en ?? "", ru: row?.story.ru ?? "" });
   const [photoPath, setPhotoPath] = useState<string | null | undefined>(undefined);
   const [photoBusy, setPhotoBusy] = useState(false);
+  const [uploadNote, setUploadNote] = useState<string | null>(null);
   const photoInput = useRef<HTMLInputElement>(null);
   const [folder] = useState(() => row?.id ?? `new-${crypto.randomUUID()}`);
   const [state, setState] = useState<"idle" | "busy" | "error" | "invalid">("idle");
@@ -165,8 +166,10 @@ function BeneficiaryForm({ row, causes, onDone }: { row: BeneficiaryRow | null; 
       const { error } = await createClient().storage.from("beneficiary-photos").upload(path, blob, { contentType: "image/jpeg" });
       if (error) throw error;
       setPhotoPath(path);
-    } catch {
+    } catch (error) {
+      const why = describeUploadError(error);
       setState("error");
+      setUploadNote(why.key === "uploadFailed" ? t(why.key, { detail: why.detail }) : t(why.key));
     } finally {
       setPhotoBusy(false);
     }
@@ -260,9 +263,9 @@ function BeneficiaryForm({ row, causes, onDone }: { row: BeneficiaryRow | null; 
           {t("bnPublish")}
         </label>
       </div>
-      {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
+      {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{uploadNote ?? t("actionError")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
-      <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-line bg-paper px-5 py-3 shadow-[0_-8px_24px_rgba(14,58,70,0.08)] sm:-mx-6 sm:px-6">
+      <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
         <button type="submit" disabled={state === "busy" || photoBusy} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
           {row ? t("evSave") : t("bnCreate")}
         </button>
