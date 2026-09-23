@@ -677,7 +677,13 @@ function Editable({ id, value, block, label, placeholder, stale, todo, onChange 
     const el = ref.current;
     if (el && el.innerText !== value) el.innerText = value;
   }, [value]);
-  return (
+  // On paper a block of several lines is set line by line, numbered lines with a hanging indent; the editable itself is not printed.
+  const printed = block && !todo ? (
+    <span className="lp-print-block" aria-hidden="true">
+      {value.split("\n").map((line, i) => <span key={i} className={/^(\d+[.)]|[-•–])\s/.test(line) ? "lp-line lp-line-num" : "lp-line"}>{line || " "}</span>)}
+    </span>
+  ) : null;
+  return (<>
     <span
       ref={ref}
       contentEditable="plaintext-only"
@@ -692,7 +698,8 @@ function Editable({ id, value, block, label, placeholder, stale, todo, onChange 
       onInput={(e) => onChange(e.currentTarget.innerText)}
       onKeyDown={block ? undefined : (e) => { if (e.key === "Enter") e.preventDefault(); }}
     />
-  );
+    {printed}
+  </>);
 }
 
 /** One blank in the Complete panel: label, hint, the value in the language on screen, and the founder menu for a person blank. */
@@ -766,6 +773,7 @@ const CSS = `
 .lp-field.lp-todo:focus { background: rgba(11,87,208,.14); box-shadow: 0 0 0 2px rgba(11,87,208,.35); }
 .lp-field.lp-block { display: block; white-space: pre-wrap; padding: .3rem .5rem; margin: .25rem 0; }
 .lp-field.lp-stale { box-shadow: 0 0 0 1.5px #F35353; }
+.lp-print-block { display: none; }
 .lp-person { white-space: nowrap; }
 .lp-pick { display: inline-block; width: 1.25rem; height: 1.25rem; margin-left: .15rem; vertical-align: middle; border: 0; border-radius: 4px; background: #E3EBED url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%2336434B' stroke-width='2'%3E%3Cpath d='M6 8l4 4 4-4'/%3E%3C/svg%3E") center/14px no-repeat; color: transparent; font-size: 14px; cursor: pointer; appearance: none; -webkit-appearance: none; }
 .lp-pick:hover { background-color: #d3dfe2; }
@@ -811,9 +819,13 @@ const CSS = `
   .lp-file { display: none; }
   .lp-head { padding-bottom: 4mm; margin-bottom: 6mm; }
   .lp-note, .lp-screen { display: none !important; }
-  /* A completed blank stays recognisable in black and white: serif, underlined. */
-  .lp-field, .lp-field.lp-block { color: #000; background: none; box-shadow: none; padding: 0; margin: 0; transition: none; font-family: Georgia, "Times New Roman", serif; text-decoration: underline; text-decoration-thickness: 0.6px; text-underline-offset: 2px; }
-  .lp-field.lp-block { display: block; }
+  /* A completed blank reads in the same face as the rest, a shade lighter to tell it apart. */
+  .lp-field, .lp-field.lp-block { color: rgba(0,0,0,.7); background: none; box-shadow: none; padding: 0; margin: 0; transition: none; font-weight: 500; }
+  .lp-field.lp-block { display: none; }
+  .lp-field.lp-block.lp-todo { display: block; }
+  .lp-print-block { display: block; color: rgba(0,0,0,.7); margin: .25rem 0; }
+  .lp-line { display: block; white-space: pre-wrap; }
+  .lp-line-num { padding-left: 1.6em; text-indent: -1.6em; }
   /* A blank still to be completed prints as a line to write on, never as its placeholder. */
   .lp-field.lp-todo { display: inline-block; position: relative; min-width: 12rem; color: transparent; background: none; text-decoration: none; vertical-align: baseline; }
   .lp-field.lp-todo::after { content: ""; position: absolute; left: 0; right: 0; bottom: .15em; border-bottom: 1px solid #000; }
