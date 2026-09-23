@@ -1735,7 +1735,9 @@
     "wayMoneyWentSub": "Ovaj događaj je završen. Svaki euro koji je prikupio, i kome je predat, stoji na stranici novca za tu godinu.",
     "moneyWentCta": "Pogledaj gdje je novac otišao",
     "placesOnDistance": "Mjesta: {count}",
-    "tiersOrganizerNote": "Cijene kako ih je odredio organizator ({organizer}); prijava i plaćanje su kod njih."
+    "tiersOrganizerNote": "Cijene kako ih je odredio organizator ({organizer}); prijava i plaćanje su kod njih.",
+    "distancesHeading": "Distance i kotizacija",
+    "distancesCount": "{count, plural, one {# distanca} few {# distance} other {# distanci}}"
   },
   "gallery": {
     "eyebrow": "Galerija",

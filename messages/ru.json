@@ -1736,7 +1736,9 @@
     "wayMoneyWentSub": "Это событие завершено. Каждый собранный евро и кому он передан — на странице денег за тот год.",
     "moneyWentCta": "Посмотреть, куда ушли деньги",
     "placesOnDistance": "Мест: {count}",
-    "tiersOrganizerNote": "Цены, установленные организатором ({organizer}); регистрация и оплата у него."
+    "tiersOrganizerNote": "Цены, установленные организатором ({organizer}); регистрация и оплата у него.",
+    "distancesHeading": "Дистанции и взнос",
+    "distancesCount": "{count, plural, one {# дистанция} few {# дистанции} other {# дистанций}}"
   },
   "gallery": {
     "eyebrow": "Галерея",
