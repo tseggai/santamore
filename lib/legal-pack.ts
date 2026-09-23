@@ -186,6 +186,16 @@ export function isIncomplete(value: string): boolean {
   return value.trim() === "" || /^\s*\[/.test(value);
 }
 
+/** An optional blank that may stay empty: an unnamed founder's parts. Once the founder is named, their JMB and address are needed. */
+export function isOptionalEmpty(id: string, fields: Record<string, FieldState>, meta: Record<string, PackField>, lang: PackLang): boolean {
+  const m = meta[id];
+  const f = fields[id];
+  if (!m?.optional || !f || f[lang].trim() !== "") return false;
+  const group = id.match(/^(f[1-5])_(jmb|addr)$/);
+  if (group && (fields[`${group[1]}_name`]?.[lang] ?? "").trim() !== "") return false;
+  return true;
+}
+
 /** Every blank a form uses, in document order. */
 export function formFieldIds(form: PackForm, lang: PackLang): string[] {
   const seen = new Set<string>();
@@ -212,7 +222,7 @@ export function incompleteFields(form: PackForm, lang: PackLang, fields: Record<
       const f = fields[id];
       if (!m || !f) continue;
       if (m.meOnly && lang === "en") continue;
-      if (m.optional && !PACK_LANGS.some((l) => f[l].trim())) continue;
+      if (isOptionalEmpty(id, fields, meta, lang)) continue;
       if (isIncomplete(f[lang])) out.push(id);
     }
   };
