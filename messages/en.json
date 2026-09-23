@@ -1539,7 +1539,14 @@
       "printBack": "Back to editing",
       "samePerson": "Same person as a founder…",
       "otherPerson": "Typed by hand",
-      "founderN": "Founder {n}"
+      "founderN": "Founder {n}",
+      "complete": "Complete",
+      "completeTitle": "Complete the form",
+      "completeProgress": "{done} of {total} completed",
+      "close": "Close",
+      "translatingDoc": "Translating this document into {lang}… {done}/{total}",
+      "cacheFailed": "The translation is shown but could not be kept for the team.",
+      "draftReadOnly": "A translation for reading. Edit the text in Montenegrin or English."
     }
   },
   "forms": {

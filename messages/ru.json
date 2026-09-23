@@ -1540,7 +1540,14 @@
       "printBack": "Вернуться к заполнению",
       "samePerson": "Тот же человек, что учредитель…",
       "otherPerson": "Введено вручную",
-      "founderN": "Учредитель {n}"
+      "founderN": "Учредитель {n}",
+      "complete": "Заполнить",
+      "completeTitle": "Заполнение формы",
+      "completeProgress": "Заполнено {done} из {total}",
+      "close": "Закрыть",
+      "translatingDoc": "Перевожу документ на {lang}… {done}/{total}",
+      "cacheFailed": "Перевод показан, но не сохранён для команды.",
+      "draftReadOnly": "Перевод для чтения. Текст правится на черногорском или английском."
     }
   },
   "forms": {

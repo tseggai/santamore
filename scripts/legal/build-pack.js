@@ -39,7 +39,7 @@ function blockHtml(b, cls) {
   if (b.type === 'table') return `<div class="tablewrap"><table>${b.rows.map((r, i) => `<tr>${r.map(x => i ? `<td>${inline(x)}</td>` : `<th>${inline(x)}</th>`).join('')}</tr>`).join('')}</table></div>`;
   return '';
 }
-function draftHtml(md) {
+function draftParts(md) {
   const out = []; let sawH2 = false;
   for (const b of parseBlocks(md)) {
     if (b.type === 'h1') continue;
@@ -49,8 +49,9 @@ function draftHtml(md) {
     const text = b.items ? b.items.join(' ') : b.text;
     out.push(blockHtml(b, (!sawH2 || lang(text) === 'en') ? 'en' : ''));
   }
-  return out.join('\n');
+  return out;
 }
+function draftHtml(md) { return draftParts(md).join('\n'); }
 // English source per anchored segment, as plain paragraph strings (translator's notes dropped)
 function enSegments(md, isAnchor) {
   const segs = [[]];
@@ -123,6 +124,46 @@ const F = {
   econ: T('Privredne djelatnosti', 'Economic activities', econME, econEN, { block: true }),
 };
 void N;
+
+// Hints shown next to each blank in the console's Complete panel.
+const HINTS = {
+  org: ['Puni naziv sa pravnim oblikom, tačno kako će stajati u rješenju o registraciji i na pečatu.', 'Full name with the legal form, exactly as it will appear on the registration decision and the seal.'],
+  short: ['Kraći oblik naziva za svakodnevnu upotrebu; ne smije dovoditi u zabludu.', 'A shorter form of the name for everyday use; it must not mislead.'],
+  seat: ['Opština sjedišta. Tivat, prema odluci osnivača.', 'The municipality of the seat. Tivat, by the founders\' decision.'],
+  addr: ['Ulica i broj u Tivtu. Ministarstvo traži stvarnu adresu; stan osnivača je prihvatljiv.', 'Street and number in Tivat. The Ministry needs a real address; a founder\'s home is acceptable.'],
+  date: ['Datum sjednice Osnivačke skupštine, npr. 15. 10. 2026. Isti datum u sva četiri dokumenta.', 'The date of the founding assembly, e.g. 15. 10. 2026. The same date in all four documents.'],
+  goals: ['Član 6 Statuta. Isti tekst mora stajati i u Odluci o osnivanju; ovo je isto polje.', 'Article 6 of the Statute. The same text must appear in the Decision on founding; this is the same blank.'],
+  activities: ['Član 7 Statuta. Isti tekst mora stajati i u Odluci o osnivanju; ovo je isto polje.', 'Article 7 of the Statute. The same text must appear in the Decision on founding; this is the same blank.'],
+  rep_title: ['Naziv funkcije lica ovlašćenog za zastupanje; obrazac nudi Izvršni direktor, Predsjednik ili Generalni sekretar.', 'The title of the person authorised for representation; the template offers Executive Director, President or General Secretary.'],
+  rep_name: ['Ko potpisuje ugovore i papire za banku i Monri. Ako je jedan od osnivača, izaberite ga iz menija.', 'Who signs contracts and the bank and Monri paperwork. If they are a founder, pick them from the menu.'],
+  chair: ['Predsjedava Osnivačkom skupštinom i potpisuje zapisnik i prijavu. Obično jedan od osnivača.', 'Chairs the founding assembly and signs the minutes and the application. Usually a founder.'],
+  deputy: ['Bira se na Osnivačkoj skupštini; mijenja predsjednika Skupštine kad je odsutan.', 'Elected at the founding assembly; stands in for the President of the Assembly when absent.'],
+  recorder: ['Vodi zapisnik i potpisuje ga uz predsjedavajućeg.', 'Takes the minutes and signs them with the chair.'],
+  phone: ['Broj na kojem Ministarstvo može dobiti predsjedavajućeg, npr. +382 67 000 000.', 'A number where the Ministry can reach the chair, e.g. +382 67 000 000.'],
+  email: ['E-pošta za dopise Ministarstva.', 'The email the Ministry writes to.'],
+  date_app: ['Dan predaje dokumenata u pisarnicu Ministarstva.', 'The day the documents are handed in at the Ministry\'s registry office.'],
+  start: ['Vrijeme početka sjednice, npr. 18:00.', 'When the session started, e.g. 18:00.'],
+  end: ['Vrijeme zaključenja sjednice, npr. 19:30.', 'When the session closed, e.g. 19:30.'],
+  venue: ['Gdje je sjednica održana: adresa prostorija u Tivtu.', 'Where the session was held: the address of the premises in Tivat.'],
+  salut: ['Oslovljavanje predsjedavajućeg: g. ili gđa.', 'How the chair is addressed: Mr or Ms.'],
+  v1: ['Glagolski oblik prema rodu predsjedavajućeg: izložio (m) ili izložila (ž).', ''],
+  v2: ['Glagolski oblik prema rodu predsjedavajućeg: upoznao (m) ili upoznala (ž).', ''],
+  term: ['Mandat izabranih lica u godinama; obrazac podrazumijeva 4.', 'The elected persons\' term in years; the template assumes 4.'],
+  vote: ['Kako su odluke donijete: jednoglasno, ili većinom glasova.', 'How the decisions were taken: unanimously, or by majority.'],
+  seal_text: ['Tekst po obodu pečata: naziv i sjedište.', 'The text on the rim of the seal: name and seat.'],
+  seal_symbol: ['Opišite riječima znak u sredini pečata (znak Santamore). Pečat se izrađuje tek po rješenju o registraciji.', 'Describe in words the mark in the centre of the seal (the Santamore mark). The seal is made only after the registration decision.'],
+  term_pres: ['Mandat predsjednika Skupštine u godinama.', 'The term of the President of the Assembly in years.'],
+  term_assembly: ['Mandat Skupštine u godinama.', 'The term of the Assembly in years.'],
+  term_rep: ['Mandat lica ovlašćenog za zastupanje u godinama.', 'The term of the person authorised for representation in years.'],
+  econ: ['Član 35: privredne djelatnosti udruženja. Zadržati samo ako se planira upis u CRPS (korak 3).', 'Article 35: the association\'s economic activities. Keep only if registration with the CRPS (step 3) is planned.'],
+};
+for (const n of [1, 2, 3, 4, 5]) {
+  HINTS[`f${n}_name`] = ['Ime i prezime kao na ličnoj karti.', 'Full name as on the identity card.'];
+  HINTS[`f${n}_jmb`] = ['JMB: jedinstveni matični broj, 13 cifara sa lične karte. Strani osnivač daje broj pasoša ili dozvole boravka.', 'JMB: the 13-digit personal identification number on the identity card. A foreign founder gives the passport or residence permit number.'];
+  HINTS[`f${n}_addr`] = ['Adresa prebivališta kao na ličnoj karti.', 'Home address as on the identity card.'];
+}
+HINTS.rep_jmb = HINTS.f1_jmb; HINTS.rep_addr = HINTS.f1_addr;
+for (const [id, [me, en]] of Object.entries(HINTS)) if (F[id]) F[id].hint = { me, en };
 
 // ---------- form 02 ----------
 const en02 = enSegments(read(path.join(R, '02-founding-decision.en.md')), b => b.type === 'h3' && /^Article/.test(b.text));

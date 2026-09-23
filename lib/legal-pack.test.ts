@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import packJson from "@/content/legal-pack/pack.json";
-import { incompleteFields, initialFields, isIncomplete, resolveFields, packProblems, placeholderIds, sanitizeDraftHtml, savePackSchema, segments, type LegalPack } from "./legal-pack";
+import { docTexts, incompleteFields, initialFields, isIncomplete, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, splitTopLevel, packProblems, placeholderIds, sanitizeDraftHtml, savePackSchema, segments, type LegalPack } from "./legal-pack";
 
 const pack = packJson as unknown as LegalPack;
 
@@ -70,8 +70,10 @@ describe("savePackSchema", () => {
   const schema = savePackSchema(pack);
 
   it("accepts each part of the pack and rejects unknown ids", () => {
-    expect(schema.safeParse({ key: "fields", value: { org: { me: "a", en: "b", stale: null } } }).success).toBe(true);
-    expect(schema.safeParse({ key: "fields", value: { nope: { me: "a", en: "b", stale: null } } }).success).toBe(false);
+    expect(schema.safeParse({ key: "fields", value: { org: { me: "a", en: "b", ru: "", tr: "", stale: ["ru", "tr"] } } }).success).toBe(true);
+    expect(schema.safeParse({ key: "i18n:form:02:ru", value: { t: "Решение", "b3.0": "x" } }).success).toBe(true);
+    expect(schema.safeParse({ key: "i18n:form:09:ru", value: { t: "x" } }).success).toBe(false);
+    expect(schema.safeParse({ key: "fields", value: { nope: sameEverywhere("a") } }).success).toBe(false);
     expect(schema.safeParse({ key: "checks", value: { s1_1: true } }).success).toBe(true);
     expect(schema.safeParse({ key: "checks", value: { s9_999: true } }).success).toBe(false);
     expect(schema.safeParse({ key: "draft:impressum", value: { html: "<p>x</p>" } }).success).toBe(true);
@@ -100,7 +102,7 @@ describe("incomplete blanks", () => {
     expect(before).toContain("date");
     expect(before).not.toContain("f4_name");
     expect(before).not.toContain("org");
-    fields.f1_name = { me: "Ana Anić", en: "Ana Anić", stale: null };
+    fields.f1_name = sameEverywhere("Ana Anić");
     expect(incompleteFields(form, "en", fields, pack.fields)).not.toContain("f1_name");
   });
 });
@@ -108,14 +110,39 @@ describe("incomplete blanks", () => {
 describe("resolveFields", () => {
   it("makes a person blank follow the chosen founder", () => {
     const fields = initialFields(pack);
-    fields.f2_name = { me: "Ana Anić", en: "Ana Anić", stale: null };
-    fields.f2_jmb = { me: "0101990000000", en: "0101990000000", stale: null };
-    fields.rep_of = { me: "f2", en: "f2", stale: null };
+    fields.f2_name = sameEverywhere("Ana Anić");
+    fields.f2_jmb = sameEverywhere("0101990000000");
+    fields.rep_of = sameEverywhere("f2");
     const shown = resolveFields(pack, fields);
     expect(shown.rep_name.me).toBe("Ana Anić");
     expect(shown.rep_jmb.en).toBe("0101990000000");
     expect(shown.rep_addr.me).toBe(fields.f2_addr.me);
     expect(shown.chair.me).toBe("[Ime i prezime]");
     expect(fields.rep_name.me).toBe("[Ime i prezime]");
+  });
+});
+
+describe("four languages", () => {
+  it("reads an older two-language row and marks the new languages as waiting", () => {
+    const base = initialFields(pack);
+    const org = normalizeFieldState({ me: "NVU", en: "NGA", stale: "en" }, pack.fields.org, base.org);
+    expect(org).toEqual({ me: "NVU", en: "NGA", ru: "", tr: "", stale: expect.arrayContaining(["en", "ru", "tr"]) });
+    const jmb = normalizeFieldState({ me: "123", en: "123", stale: null }, pack.fields.f1_jmb, base.f1_jmb);
+    expect(jmb).toEqual({ me: "123", en: "123", ru: "123", tr: "123", stale: [] });
+  });
+
+  it("extracts a form's texts by path and a draft's English elements", () => {
+    const texts = docTexts(pack, "form:02");
+    expect(texts.t).toBe("Decision on founding");
+    expect(Object.keys(texts).some((k) => /^b\d+\.\d+$/.test(k))).toBe(true);
+    const draft = docTexts(pack, "draft:impressum");
+    expect(Object.values(draft).every((v) => !/^<p>/.test(v))).toBe(true);
+    expect(Object.keys(docTexts(pack, "labels"))).toContain("f:f1_jmb.h");
+  });
+
+  it("splits html into top-level elements and checks placeholders survive translation", () => {
+    expect(splitTopLevel('<h2>A</h2>\n<p class="en">x<br>y</p><div class="tablewrap"><table><tr><td>1</td></tr></table></div>')).toHaveLength(3);
+    expect(keepsPlaceholders("Osnivač {{f1_name}} {{sig}}", "Kurucu {{f1_name}} {{sig}}")).toBe(true);
+    expect(keepsPlaceholders("Osnivač {{f1_name}} {{sig}}", "Kurucu {{f1name}} {{sig}}")).toBe(false);
   });
 });

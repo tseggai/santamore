@@ -36,9 +36,13 @@ node scripts/legal/build-pack.js
 `scripts/legal/build-pack.js` turns the Ministry's originals into templates whose blanks are
 pre-filled from the completion guide (unknown facts stay as bracketed placeholders), attaches
 the English translations per article, and embeds the drafts, into `content/legal-pack/pack.json`.
-The console page `/admin/registracija` (staff only) renders it: one language on screen, blue
-editable blanks shared by every form, the checklist, the drafts editable in place, Print / PDF,
-and Save for the whole team. Edits live in the `legal_pack` table (migration
+The console page `/admin/registracija` (staff only) renders it: one language on screen
+(Montenegrin, English, Russian or Turkish), editable blanks shared by every form (blue until
+completed, pink after), a Complete panel that lists a form's blanks with a hint each, the
+checklist, the drafts editable in place, Print / PDF, and Save for the whole team. The
+templates exist in Montenegrin and English; Russian and Turkish are translated on first use,
+document by document, through the same Claude helper and cached in `legal_pack` under
+`i18n:<document>:<language>` rows. Edits live in the `legal_pack` table (migration
 `20260921000069_legal_pack.sql`); switching languages translates the blanks changed on the
 other side through the same Claude helper the rest of the console uses. `lib/legal-pack.test.ts`
 checks that every blank is defined and matched across languages after a rebuild.
