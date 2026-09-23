@@ -1734,7 +1734,8 @@
     "wayMoneyWentFor": "Gdje je otišao novac za: {cause}",
     "wayMoneyWentSub": "Ovaj događaj je završen. Svaki euro koji je prikupio, i kome je predat, stoji na stranici novca za tu godinu.",
     "moneyWentCta": "Pogledaj gdje je novac otišao",
-    "placesOnDistance": "Mjesta: {count}"
+    "placesOnDistance": "Mjesta: {count}",
+    "tiersOrganizerNote": "Cijene kako ih je odredio organizator ({organizer}); prijava i plaćanje su kod njih."
   },
   "gallery": {
     "eyebrow": "Galerija",

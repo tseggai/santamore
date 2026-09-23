@@ -676,7 +676,7 @@ export function SupportersManager({
             </>
           ) : null}
 
-          <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+          <div className="sticky bottom-0 -mx-5 -mb-5 mt-6 flex gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
             <button type="submit" form="supporter-form" className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90">
               {supporter ? t("evSave") : t("suCreate")}
             </button>

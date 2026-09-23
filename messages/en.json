@@ -1734,7 +1734,8 @@
     "wayMoneyWentFor": "Where the money for {cause} went",
     "wayMoneyWentSub": "This event is over. Every euro it raised, and where it was handed over, is on the money page for that year.",
     "moneyWentCta": "See where the money went",
-    "placesOnDistance": "{count} places"
+    "placesOnDistance": "{count} places",
+    "tiersOrganizerNote": "Prices as set by {organizer}; registration and payment are with them."
   },
   "gallery": {
     "eyebrow": "Gallery",
