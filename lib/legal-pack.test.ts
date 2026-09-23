@@ -28,7 +28,7 @@ describe("legal pack", () => {
 
   it("never fabricates a fact: unknown values are bracketed", () => {
     const fields = initialFields(pack);
-    for (const id of ["f1_jmb", "f2_jmb", "f3_jmb", "rep_jmb", "date", "addr"]) {
+    for (const id of ["f1_jmb", "rep_jmb", "date", "addr"]) {
       expect(fields[id].me, id).toMatch(/^\[/);
     }
     expect(fields.org.me).toContain("Santamore");
@@ -100,10 +100,17 @@ describe("incomplete blanks", () => {
     const before = incompleteFields(form, "en", fields, pack.fields);
     expect(before).toContain("f1_name");
     expect(before).toContain("date");
+    expect(before).not.toContain("f2_name");
     expect(before).not.toContain("f4_name");
     expect(before).not.toContain("org");
     fields.f1_name = sameEverywhere("Ana Anić");
     expect(incompleteFields(form, "en", fields, pack.fields)).not.toContain("f1_name");
+    // Naming founder 2 makes their JMB and address needed.
+    fields.f2_name = sameEverywhere("Bo Bošković");
+    const after = incompleteFields(form, "en", fields, pack.fields);
+    expect(after).toContain("f2_jmb");
+    expect(after).toContain("f2_addr");
+    expect(after).not.toContain("f3_jmb");
   });
 });
 

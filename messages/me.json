@@ -1546,7 +1546,9 @@
       "close": "Zatvori",
       "translatingDoc": "Prevodim dokument na {lang}… {done}/{total}",
       "cacheFailed": "Prevod je prikazan, ali nije sačuvan za tim.",
-      "draftReadOnly": "Prevod za čitanje. Tekst se mijenja na crnogorskom ili engleskom."
+      "draftReadOnly": "Prevod za čitanje. Tekst se mijenja na crnogorskom ili engleskom.",
+      "addFounder": "Dodaj osnivača",
+      "fewFounders": "Upisano osnivača: {n}. Zakon o NVO traži najmanje tri osnivača za udruženje."
     }
   },
   "forms": {

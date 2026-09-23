@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { saveLegalPack, translatePackTexts } from "@/app/[locale]/admin/(protected)/registracija/actions";
 import {
-  FOUNDER_IDS, LANG_LABELS, PACK_LANGS, docTexts, formFieldIds, i18nKey, incompleteFields, initialFields, isEmptyOptional, isIncomplete,
+  FOUNDER_IDS, LANG_LABELS, PACK_LANGS, docTexts, formFieldIds, i18nKey, incompleteFields, initialFields, isEmptyOptional, isIncomplete, isOptionalEmpty,
   isSourceLang, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, sanitizeDraftHtml, segments, splitTopLevel,
   type DocTexts, type FieldState, type LegalPack, type PackBlock, type PackLang, type SourceLang,
 } from "@/lib/legal-pack";
@@ -133,6 +133,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   const [busy, setBusy] = useState<"saving" | "translating" | null>(null);
   const [notice, setNotice] = useState<Notice>(null);
   const [complete, setComplete] = useState(false);
+  const [revealed, setRevealed] = useState<string[]>([]);
   const [printWarn, setPrintWarn] = useState<string[] | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(() => {
     const times = Object.values(saved).map((r) => r.updatedAt).sort();
@@ -304,13 +305,21 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
     setTimeout(() => { window.print(); document.title = title; }, 50);
   };
   const print = () => {
-    const missing = form ? incompleteFields(form, lang, shown, pack.fields) : [];
+    const missing = form ? incompleteFields(form, lang, shown, pack.fields).map(labelOf) : [];
+    if (form && formIds.includes("f2_name") && namedFounders < 3) missing.push(t("fewFounders", { n: namedFounders }));
     if (missing.length === 0) { doPrint(); return; }
-    setPrintWarn(missing.map(labelOf));
+    setPrintWarn(missing);
   };
 
   const savedLabel = savedAt ? new Date(savedAt).toLocaleString(locale === "me" ? "sr-Latn-ME" : locale, { dateStyle: "short", timeStyle: "short" }) : null;
   const formIds = useMemo(() => (form ? formFieldIds(form, lang) : []), [form, lang]);
+  const founderOf = (id: string) => { const m = id.match(/^(f[2-5])_/); return m ? m[1] : null; };
+  const founderHasValue = (fid: string) => ["name", "jmb", "addr"].some((part) => (shown[`${fid}_${part}`]?.[lang] ?? "").trim() !== "");
+  /** The panel's blanks: an optional founder appears once named, or when added with the button. */
+  const panelIds = useMemo(() => formIds.filter((id) => { const fid = founderOf(id); return !fid || founderHasValue(fid) || revealed.includes(fid); }), [formIds, revealed, shown, lang]); // eslint-disable-line react-hooks/exhaustive-deps
+  const nextFounder = FOUNDER_IDS.find((fid) => fid !== "f1" && formIds.some((id) => id.startsWith(`${fid}_`)) && !founderHasValue(fid) && !revealed.includes(fid)) ?? null;
+  const panelDone = panelIds.filter((id) => !isIncomplete(shown[id]?.[lang] ?? "") || isOptionalEmpty(id, shown, pack.fields, lang)).length;
+  const namedFounders = FOUNDER_IDS.filter((fid) => !isIncomplete(shown[`${fid}_name`]?.[lang] ?? "")).length;
   const missingNow = useMemo(() => (form ? incompleteFields(form, lang, shown, pack.fields) : []), [form, lang, shown, pack.fields]);
   const docKey = docKeyOf(doc);
   const waitingForDoc = !isSourceLang(lang) && !i18n[i18nKey(docKey, lang)];
@@ -475,15 +484,22 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
           <div className="flex shrink-0 items-center gap-3 border-b-[0.5px] border-line px-5 py-4">
             <div className="min-w-0 flex-1">
               <h2 className="truncate text-[17px] font-bold">{t("completeTitle")}</h2>
-              <p className="text-[13px] text-black/60">{t("completeProgress", { done: formIds.length - missingNow.length, total: formIds.length })}</p>
+              <p className="text-[13px] text-black/60">{t("completeProgress", { done: panelDone, total: panelIds.length })}</p>
             </div>
             <button type="button" onClick={() => setComplete(false)} aria-label={t("close")} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist text-[19px] leading-none text-black/70 transition-colors hover:bg-mist-2 hover:text-sea">×</button>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-mist px-5 py-5">
             <div className="flex flex-col gap-4">
-              {formIds.map((id) => (
-                <CompleteField key={id} id={id} lang={lang} pack={pack} fields={shown} raw={fields} label={labelOf(id)} hint={hintOf(id)} onField={setField} onLink={setLink} pickerNone={t("otherPerson")} founderLabel={(n) => t("founderN", { n })} sameAs={t("samePerson")} />
+              {panelIds.map((id, i) => (
+                <div key={id} className={founderOf(id) && !founderOf(panelIds[i - 1] ?? "") ? "border-t-[0.5px] border-black/20 pt-4" : undefined}>
+                  <CompleteField id={id} lang={lang} pack={pack} fields={shown} raw={fields} label={labelOf(id)} hint={hintOf(id)} onField={setField} onLink={setLink} pickerNone={t("otherPerson")} founderLabel={(n) => t("founderN", { n })} sameAs={t("samePerson")} />
+                </div>
               ))}
+              {nextFounder ? (
+                <button type="button" onClick={() => setRevealed((r) => [...r, nextFounder])} className="self-start rounded-brand bg-paper px-3.5 py-2 text-[14px] font-semibold text-sea hover:bg-mist-2">
+                  + {t("addFounder")}
+                </button>
+              ) : null}
             </div>
           </div>
           <div className="flex shrink-0 items-center justify-end gap-2 border-t-[0.5px] border-line px-5 py-3">
@@ -666,7 +682,8 @@ function CompleteField({ id, lang, pack, fields, raw, label, hint, onField, onLi
   if (!meta || !f) return null;
   if (meta.meOnly && lang !== "me") return null;
   const value = displayValue(f, lang);
-  const todo = isIncomplete(value) && !(meta.optional && !value.trim());
+  const optionalEmpty = isOptionalEmpty(id, fields, pack.fields, lang);
+  const todo = isIncomplete(value) && !optionalEmpty;
   const linked = meta.link ? raw[meta.link]?.me ?? "" : "";
   const founders = meta.link && meta.part === "name" ? FOUNDER_IDS.map((fid, n) => ({ fid, n: n + 1, name: fields[`${fid}_name`]?.[lang] ?? "" })).filter((x) => !isIncomplete(x.name)) : [];
   const inputId = `lp-c-${id}`;
@@ -674,11 +691,11 @@ function CompleteField({ id, lang, pack, fields, raw, label, hint, onField, onLi
     const el = document.querySelector<HTMLElement>(`#legal-doc [data-id="${id}"]`);
     el?.scrollIntoView({ block: "center", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   };
-  const cls = `mt-1 w-full rounded-lg bg-paper px-3.5 py-2.5 text-[15px] outline-none ring-sea/40 focus:ring-2 ${todo ? "text-[#0B57D0]" : "text-[#B0246B]"} ${linked ? "opacity-70" : ""}`;
+  const cls = `mt-1 w-full rounded-lg bg-paper px-3.5 py-2.5 text-[15px] outline-none ring-sea/40 focus:ring-2 ${todo ? "text-[#0B57D0]" : optionalEmpty ? "text-black" : "text-[#B0246B]"} ${linked ? "opacity-70" : ""}`;
   return (
     <div>
       <label htmlFor={inputId} className="flex items-center gap-2 text-[13.5px] font-semibold">
-        <span aria-hidden className={`inline-block h-2 w-2 rounded-full ${todo ? "bg-[#0B57D0]" : "bg-[#B0246B]"}`} />
+        <span aria-hidden className={`inline-block h-2 w-2 rounded-full ${todo ? "bg-[#0B57D0]" : optionalEmpty ? "bg-black/25" : "bg-[#B0246B]"}`} />
         {label}
       </label>
       {founders.length > 0 ? (
@@ -729,7 +746,7 @@ const CSS = `
 .lp-pick:hover { background-color: #d3dfe2; }
 .lp-pick:focus-visible { outline: 2px solid #0E3A46; outline-offset: 1px; }
 .lp-pick option { color: #000; }
-.lp-opt-empty { opacity: .55; }
+.lp-opt-empty { display: none; }
 .lp-guide p.en { color: #000; }
 .lp-guide li { margin: .25rem 0; }
 .lp-prose { outline: none; }
