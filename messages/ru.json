@@ -1724,7 +1724,7 @@
     "ticketsHeading": "Билеты",
     "runForUsCta": "Я участвую за Santamore",
     "registerWithCta": "Зарегистрироваться у {name}",
-    "theOrganizer": "организатора",
+    "theOrganizer": "организатор",
     "factOrganizer": "Организует",
     "wayRunOrganizer": "Зарегистрируйтесь у организатора, участвуйте за Santamore",
     "wayRunOrganizerSub": "{name} организует это событие и принимает регистрации. Запишитесь у них, затем сообщите нам, что участвуете в наших цветах — и соберите деньги на цель, если хотите.",
@@ -1735,7 +1735,8 @@
     "wayMoneyWentFor": "Куда ушли деньги для «{cause}»",
     "wayMoneyWentSub": "Это событие завершено. Каждый собранный евро и кому он передан — на странице денег за тот год.",
     "moneyWentCta": "Посмотреть, куда ушли деньги",
-    "placesOnDistance": "Мест: {count}"
+    "placesOnDistance": "Мест: {count}",
+    "tiersOrganizerNote": "Цены, установленные организатором ({organizer}); регистрация и оплата у него."
   },
   "gallery": {
     "eyebrow": "Галерея",

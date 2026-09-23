@@ -330,7 +330,7 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
 
-      <div className="sticky bottom-0 -mx-5 mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+      <div className="sticky bottom-0 -mx-5 -mb-5 mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
         <label className="flex items-center gap-2 text-[14.5px]">
           <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} className="h-4 w-4 accent-red" />
           {t("yearPublic")}

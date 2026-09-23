@@ -183,7 +183,9 @@ export function EventPageView({
   const organizer = event.organizer_name?.trim() || null;
   const bibsLeft = external && !withOrganizer && event.bib_policy === "we_buy" ? Math.max(0, (event.bib_capacity ?? 0) - (event.bibs_claimed ?? 0)) : null;
   // Only tiers still on offer today; early-bird deadlines shown beside the price.
-  const tiersToday = withOrganizer ? [] : activeTiers(event.tiers);
+  // Prices still on offer today. With the organiser taking registrations they are shown for information only, not offered here.
+  const tiersShown = activeTiers(event.tiers);
+  const tiersToday = withOrganizer ? [] : tiersShown;
   const raceCta = external ? (withOrganizer ? t("runForUsCta") : t("registerCta")) : t("registerCta");
   const organizerCta = organizer ? t("registerWithCta", { name: organizer }) : t("organizerLink");
 
@@ -339,14 +341,15 @@ export function EventPageView({
       </div>
 
       {/* 4 — the details, by kind */}
-      {event.kind !== "challenge" && tiersToday.length > 0 ? (
+      {event.kind !== "challenge" && tiersShown.length > 0 ? (
         <section className="mt-10">
           <h2 className="type-display text-2xl">{event.kind === "social" ? t("ticketsHeading") : t("tiersHeading")}</h2>
-          {tiersToday.some((tier) => tier.distance) ? (
+          {withOrganizer ? <p className="mt-2 text-[14px] text-black/60">{t("tiersOrganizerNote", { organizer: organizer || t("theOrganizer") })}</p> : null}
+          {tiersShown.some((tier) => tier.distance) ? (
             // Prices per distance: each distance with its own tiers and the general ones; general-only tiers last.
             <div className="mt-3 grid gap-6 sm:grid-cols-2">
               {event.distances.map((d) => {
-                const rows = tiersFor(tiersToday, d.name);
+                const rows = tiersFor(tiersShown, d.name);
                 if (rows.length === 0) return null;
                 return (
                   <div key={d.name}>
@@ -358,7 +361,7 @@ export function EventPageView({
               })}
             </div>
           ) : (
-            <div className="max-w-md">{tierList(tiersToday)}</div>
+            <div className="max-w-md">{tierList(tiersShown)}</div>
           )}
           {event.offers_shirts ? <p className="mt-3 text-[14px] text-black/60">{t("shirtsNote")}</p> : null}
         </section>

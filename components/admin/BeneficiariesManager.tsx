@@ -265,7 +265,7 @@ function BeneficiaryForm({ row, causes, onDone }: { row: BeneficiaryRow | null; 
       </div>
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{uploadNote ?? t("actionError")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
-      <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+      <div className="sticky bottom-0 -mx-5 -mb-5 mt-6 flex gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
         <button type="submit" disabled={state === "busy" || photoBusy} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
           {row ? t("evSave") : t("bnCreate")}
         </button>
