@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { saveLegalPack, translatePackTexts } from "@/app/[locale]/admin/(protected)/registracija/actions";
 import {
-  FOUNDER_IDS, LANG_LABELS, PACK_LANGS, docTexts, formFieldIds, i18nKey, incompleteFields, initialFields, isEmptyOptional, isIncomplete, isOptionalEmpty,
+  FOUNDER_IDS, LANG_LABELS, PACK_LANGS, docHash, docTexts, formFieldIds, i18nKey, incompleteFields, initialFields, isEmptyOptional, isIncomplete, isOptionalEmpty,
   isSourceLang, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, sanitizeDraftHtml, segments, splitTopLevel,
   type DocTexts, type FieldState, type LegalPack, type PackBlock, type PackLang, type SourceLang,
 } from "@/lib/legal-pack";
@@ -181,14 +181,16 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   // ---- on-demand translation of whole documents ---------------------------------------
   const ensureDoc = useCallback(async (docKey: string, to: PackLang) => {
     const key = i18nKey(docKey, to);
-    if (isSourceLang(to) || i18n[key] || jobsRef.current.has(key)) return;
+    if (isSourceLang(to) || jobsRef.current.has(key)) return;
     const draftId = docKey.startsWith("draft:") ? docKey.slice(6) : null;
     const source = docTexts(pack, docKey, draftId ? draftsRef.current[draftId] : undefined);
+    // A cached translation made from an older template is translated again.
+    if (i18n[key] && i18n[key].v === docHash(source)) return;
     const parts = chunk(source);
     if (parts.length === 0) return;
     jobsRef.current.add(key);
     setJob({ done: 0, total: parts.length });
-    const result: DocTexts = {};
+    const result: DocTexts = { v: docHash(source) };
     let failed: string | null = null;
     for (let i = 0; i < parts.length; i++) {
       const res = await translatePackTexts({ from: "en", to, texts: parts[i] }).catch(() => ({ ok: false as const, error: "server" as const }));
@@ -334,6 +336,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   const missingNow = useMemo(() => (form ? incompleteFields(form, lang, shown, pack.fields) : []), [form, lang, shown, pack.fields]);
   const docKey = docKeyOf(doc);
   const waitingForDoc = !isSourceLang(lang) && !i18n[i18nKey(docKey, lang)];
+  const lastFounderId = [...panelIds].reverse().find((id) => /^f[1-5]$/.test(pack.fields[id]?.group ?? "")) ?? null;
 
   const blockProps = {
     lang, src, pack, fields: shown, checks, onField: setField, onLink: setLink,
@@ -488,7 +491,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
               )}
             </>
           ) : null}
-          </td></tr></tbody><tfoot><tr><td className="lp-pgbot" aria-hidden="true">{`${form?.file ?? draft?.file ?? guide?.file ?? ""}-${lang} · ${shown.org?.[lang] || shown.org?.me || ""}`}</td></tr></tfoot></table>
+          </td></tr></tbody><tfoot><tr><td className="lp-pgbot" aria-hidden="true" /></tr></tfoot></table>
         </div>
       </div>
 
@@ -511,14 +514,15 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
                   <div key={id} className={first && i > 0 ? "mt-2 border-t-[0.5px] border-black/25 pt-5" : undefined}>
                     {first ? <p className="type-eyebrow mb-3 text-black/60">{groupOf(group)}</p> : null}
                     <CompleteField id={id} lang={lang} pack={pack} fields={shown} raw={fields} label={labelOf(id)} hint={hintOf(id)} onField={setField} onLink={setLink} pickerNone={t("otherPerson")} founderLabel={(n) => t("founderN", { n })} sameAs={t("samePerson")} />
+                    {/* The button to add the next founder sits right under the last founder shown, where the next one would go. */}
+                    {id === lastFounderId && nextFounder ? (
+                      <button type="button" onClick={() => setRevealed((r) => [...r, nextFounder])} className="mt-4 rounded-brand bg-sea px-3.5 py-2 text-[14px] font-bold text-paper hover:bg-sea-2">
+                        + {t("addFounder")}
+                      </button>
+                    ) : null}
                   </div>
                 );
               })}
-              {nextFounder ? (
-                <button type="button" onClick={() => setRevealed((r) => [...r, nextFounder])} className="self-start rounded-brand bg-paper px-3.5 py-2 text-[14px] font-semibold text-sea hover:bg-mist-2">
-                  + {t("addFounder")}
-                </button>
-              ) : null}
             </div>
           </div>
           <div className="flex shrink-0 items-center justify-end gap-2 border-t-[0.5px] border-line px-5 py-3">
@@ -747,7 +751,7 @@ const CSS = `
 .lp-h3 { text-align: center; font-weight: 700; font-size: 15px; margin: 1.4rem 0 .4rem; }
 .lp-p { margin: .5rem 0; white-space: pre-wrap; }
 .lp-list { list-style: decimal; padding-left: 1.5rem; margin: .5rem 0; }
-.lp-list li { margin: .3rem 0; }
+.lp-list li { margin: .5rem 0; white-space: pre-wrap; }
 .lp-check { display: flex; gap: .75rem; align-items: flex-start; padding: .7rem 0; border-bottom: 0.5px solid rgba(0,0,0,.12); }
 .lp-check input:checked + span { color: rgba(0,0,0,.5); text-decoration: line-through; text-decoration-color: rgba(0,0,0,.35); }
 .lp-sigrow { display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: 1.25rem 2rem; margin: 2rem 0 .75rem; }
@@ -803,7 +807,8 @@ const CSS = `
   .lp-page > * > tr > td { display: table-cell; vertical-align: top; }
   .lp-page > thead > tr > td.lp-pgtop { display: table-cell; height: 18mm; padding: 0; }
   .lp-page > tbody > tr > td.lp-pgbody { padding: 0 18mm; }
-  .lp-page > tfoot > tr > td.lp-pgbot { display: table-cell; height: 18mm; padding: 5mm 18mm 0; font-size: 8pt; letter-spacing: .03em; color: rgba(0,0,0,.45); }
+  .lp-page > tfoot > tr > td.lp-pgbot { display: table-cell; height: 18mm; padding: 0; }
+  .lp-file { display: none; }
   .lp-head { padding-bottom: 4mm; margin-bottom: 6mm; }
   .lp-note, .lp-screen { display: none !important; }
   /* A completed blank stays recognisable in black and white: serif, underlined. */

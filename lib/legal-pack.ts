@@ -333,6 +333,15 @@ export function splitTopLevel(html: string): string[] {
   return parts.map((p) => p.trim()).filter(Boolean);
 }
 
+/** A short hash of a document's source texts: a cached translation whose hash differs was made from an older template. */
+export function docHash(texts: DocTexts): string {
+  let h = 5381;
+  for (const [k, v] of Object.entries(texts).sort(([a], [b]) => (a < b ? -1 : 1))) {
+    for (const ch of `${k}=${v};`) h = ((h * 33) ^ ch.charCodeAt(0)) >>> 0;
+  }
+  return h.toString(36);
+}
+
 /** The key under which a document's translation is cached. */
 export const i18nKey = (docKey: string, lang: PackLang) => `i18n:${docKey}:${lang}`;
 
