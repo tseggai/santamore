@@ -12,12 +12,19 @@
 
 import { z } from "zod";
 
-export type PackLang = "me" | "en";
-export type Bilingual = Record<PackLang, string>;
+/** The languages the pack can be read and completed in. The templates exist in the first two; the others are translated on demand and cached. */
+export const PACK_LANGS = ["me", "en", "ru", "tr"] as const;
+export type PackLang = (typeof PACK_LANGS)[number];
+export type SourceLang = "me" | "en";
+export type Bilingual = Record<SourceLang, string>;
+export const LANG_LABELS: Record<PackLang, string> = { me: "Crnogorski", en: "English", ru: "Русский", tr: "Türkçe" };
+export const isSourceLang = (lang: PackLang): lang is SourceLang => lang === "me" || lang === "en";
 
 export interface PackField {
   label: Bilingual;
   value: Bilingual;
+  /** What the blank is for and how to fill it, shown in the Complete panel. */
+  hint?: Bilingual;
   /** Same value in both languages (names, numbers, dates): copied, never translated. */
   neutral?: boolean;
   /** Exists in the Montenegrin text only (grammatical forms). */
@@ -55,6 +62,9 @@ export interface PackDraft {
   html: string;
 }
 
+/** A translation of one document's texts into one language, keyed by text path. */
+export type DocTexts = Record<string, string>;
+
 export interface LegalPack {
   fields: Record<string, PackField>;
   forms: PackForm[];
@@ -64,11 +74,34 @@ export interface LegalPack {
   builtAt: string;
 }
 
-/** A field's saved state: both languages, and which side is out of date. */
+/** A field's saved state: a value per language, and which languages are out of date since the last edit. */
 export interface FieldState {
   me: string;
   en: string;
-  stale: PackLang | null;
+  ru: string;
+  tr: string;
+  stale: PackLang[];
+}
+
+/** The same value in every language, nothing stale. */
+export function sameEverywhere(value: string): FieldState {
+  return { me: value, en: value, ru: value, tr: value, stale: [] };
+}
+
+/** A saved field state in today's shape, whatever shape it was saved in (an older row had two languages and one stale side). */
+export function normalizeFieldState(raw: unknown, meta: PackField | undefined, base: FieldState): FieldState {
+  const r = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const str = (v: unknown, fallback: string) => (typeof v === "string" ? v : fallback);
+  const me = str(r.me, base.me);
+  const en = str(r.en, base.en);
+  const stale = new Set<PackLang>(Array.isArray(r.stale) ? r.stale.filter((l): l is PackLang => (PACK_LANGS as readonly string[]).includes(l as string)) : typeof r.stale === "string" && (PACK_LANGS as readonly string[]).includes(r.stale) ? [r.stale as PackLang] : []);
+  const extra = (lang: "ru" | "tr") => {
+    if (typeof r[lang] === "string") return r[lang] as string;
+    if (meta?.neutral) return me;
+    stale.add(lang);
+    return "";
+  };
+  return { me, en, ru: extra("ru"), tr: extra("tr"), stale: [...stale] };
 }
 
 export type Segment =
@@ -143,7 +176,7 @@ export function resolveFields(pack: LegalPack, fields: Record<string, FieldState
     const founder = fields[meta.link]?.me;
     if (!founder || !(FOUNDER_IDS as readonly string[]).includes(founder)) continue;
     const source = fields[`${founder}_${meta.part}`];
-    if (source) out[id] = { me: source.me, en: source.en, stale: null };
+    if (source) out[id] = { ...source, stale: [] };
   }
   return out;
 }
@@ -151,6 +184,20 @@ export function resolveFields(pack: LegalPack, fields: Record<string, FieldState
 /** A blank still to be completed: empty, or left at its bracketed placeholder. */
 export function isIncomplete(value: string): boolean {
   return value.trim() === "" || /^\s*\[/.test(value);
+}
+
+/** Every blank a form uses, in document order. */
+export function formFieldIds(form: PackForm, lang: PackLang): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const visit = (template: string) => { for (const id of placeholderIds(template)) if (!seen.has(id)) { seen.add(id); out.push(id); } };
+  const src: SourceLang = lang === "me" ? "me" : "en";
+  for (const block of form.blocks) {
+    if (block.type === "list") block[src].forEach(visit);
+    else if (block.type === "sigrow") block.items.forEach((item) => visit(item[src] || item.me));
+    else visit(block[src] || block.me);
+  }
+  return out;
 }
 
 /** The ids of the blanks a form still needs in the given language, in document order. */
@@ -165,14 +212,15 @@ export function incompleteFields(form: PackForm, lang: PackLang, fields: Record<
       const f = fields[id];
       if (!m || !f) continue;
       if (m.meOnly && lang === "en") continue;
-      if (m.optional && !f.me.trim() && !f.en.trim()) continue;
+      if (m.optional && !PACK_LANGS.some((l) => f[l].trim())) continue;
       if (isIncomplete(f[lang])) out.push(id);
     }
   };
+  const src: SourceLang = lang === "me" ? "me" : "en";
   for (const block of form.blocks) {
-    if (block.type === "list") block[lang].forEach(visit);
-    else if (block.type === "sigrow") block.items.forEach((item) => visit(item[lang] || item.me));
-    else visit(block[lang] || block.me);
+    if (block.type === "list") block[src].forEach(visit);
+    else if (block.type === "sigrow") block.items.forEach((item) => visit(item[src] || item.me));
+    else visit(block[src] || block.me);
   }
   return out;
 }
@@ -180,15 +228,18 @@ export function incompleteFields(form: PackForm, lang: PackLang, fields: Record<
 /** True when a template's blanks are all optional and all empty: the item is left out of the printed page. */
 export function isEmptyOptional(template: string, fields: Record<string, FieldState>, meta: Record<string, PackField>): boolean {
   const ids = placeholderIds(template);
-  return ids.length > 0 && ids.every((id) => meta[id]?.optional && !(fields[id]?.me.trim() || fields[id]?.en.trim()));
+  return ids.length > 0 && ids.every((id) => meta[id]?.optional && !PACK_LANGS.some((l) => fields[id]?.[l].trim()));
 }
 
-/** The initial field state: the pack's recommended values, nothing stale. */
+/** The initial field state: the pack's recommended values; the other languages wait for a translation, except where the value is the same everywhere. */
 export function initialFields(pack: LegalPack): Record<string, FieldState> {
-  return Object.fromEntries(Object.entries(pack.fields).map(([id, f]) => [id, { me: f.value.me, en: f.value.en, stale: null }]));
+  return Object.fromEntries(Object.entries(pack.fields).map(([id, f]) => [id, f.neutral
+    ? { me: f.value.me, en: f.value.en, ru: f.value.me, tr: f.value.me, stale: [] }
+    : { me: f.value.me, en: f.value.en, ru: "", tr: "", stale: f.meOnly ? [] : ["ru", "tr"] }]));
 }
 
 export const DRAFT_KEY = /^draft:([a-z0-9-]{1,60})$/;
+export const I18N_KEY = /^i18n:(labels|guide|form:[0-9]{2}|draft:[a-z0-9-]{1,60}):(ru|tr)$/;
 
 // A draft is edited as HTML in the browser and shown again to other staff,
 // so what is stored is reduced to the markup the drafts are written in:
@@ -233,10 +284,87 @@ export function savePackSchema(pack: LegalPack) {
   const fieldIds = new Set(Object.keys(pack.fields));
   const checkIds = new Set(pack.forms.flatMap((f) => f.blocks.flatMap((b) => (b.type === "check" ? [b.id] : []))));
   const draftIds = new Set(pack.drafts.map((d) => d.id));
-  const fieldState = z.object({ me: z.string().max(20_000), en: z.string().max(20_000), stale: z.enum(["me", "en"]).nullable() });
+  const formIds = new Set(pack.forms.map((f) => f.id));
+  const text = z.string().max(20_000);
+  const fieldState = z.object({ me: text, en: text, ru: text, tr: text, stale: z.array(z.enum(PACK_LANGS)).max(4) });
   return z.union([
     z.object({ key: z.literal("fields"), value: z.record(z.string().regex(/^[a-z0-9_]{1,40}$/), fieldState).refine((v) => Object.keys(v).every((id) => fieldIds.has(id))) }),
     z.object({ key: z.literal("checks"), value: z.record(z.string().regex(/^s\d_\d{1,3}$/), z.boolean()).refine((v) => Object.keys(v).every((id) => checkIds.has(id))) }),
     z.object({ key: z.string().regex(DRAFT_KEY).refine((k) => draftIds.has(k.slice("draft:".length))), value: z.object({ html: z.string().max(400_000) }) }),
+    // A cached translation of one document into one language, keyed by text path.
+    z.object({ key: z.string().regex(I18N_KEY).refine((k) => { const m = k.match(I18N_KEY); if (!m) return false; return m[1] === "labels" || m[1] === "guide" || (m[1].startsWith("form:") && formIds.has(m[1].slice(5))) || (m[1].startsWith("draft:") && draftIds.has(m[1].slice(6))); }), value: z.record(z.string().regex(/^[a-z0-9_:.-]{1,60}$/), z.string().max(60_000)).refine((v) => JSON.stringify(v).length <= 600_000) }),
   ]);
+}
+
+/** Split HTML into its top-level elements (a draft is a flat list of them). */
+export function splitTopLevel(html: string): string[] {
+  const parts: string[] = [];
+  const VOID = new Set(["br", "hr", "img", "input", "wbr"]);
+  let depth = 0;
+  let start = -1;
+  const re = /<\/?([a-zA-Z][a-zA-Z0-9]*)[^>]*>/g;
+  for (const m of html.matchAll(re)) {
+    const name = m[1].toLowerCase();
+    const closing = m[0].startsWith("</");
+    const selfClosing = VOID.has(name) || m[0].endsWith("/>");
+    if (!closing) {
+      if (depth === 0) start = m.index;
+      if (!selfClosing) depth++;
+      if (selfClosing && depth === 0) { parts.push(m[0]); start = -1; }
+    } else {
+      depth = Math.max(0, depth - 1);
+      if (depth === 0 && start >= 0) { parts.push(html.slice(start, m.index + m[0].length)); start = -1; }
+    }
+  }
+  return parts.map((p) => p.trim()).filter(Boolean);
+}
+
+/** The key under which a document's translation is cached. */
+export const i18nKey = (docKey: string, lang: PackLang) => `i18n:${docKey}:${lang}`;
+
+/**
+ * The texts of one document in a source language, keyed by path, as sent
+ * for translation: a form's title, subtitle, note and every block; a
+ * draft's top-level elements that carry English (the Montenegrin twins
+ * are left out); the labels and hints of every blank plus every title.
+ */
+export function docTexts(pack: LegalPack, docKey: string, draftHtml?: string): DocTexts {
+  const out: DocTexts = {};
+  if (docKey === "labels") {
+    for (const [id, f] of Object.entries(pack.fields)) {
+      if (f.isLink) continue;
+      if (f.label.en) out[`f:${id}`] = f.label.en;
+      if (f.hint?.en) out[`f:${id}.h`] = f.hint.en;
+    }
+    for (const f of pack.forms) out[`form:${f.id}.t`] = f.title.en;
+    for (const d of pack.drafts) out[`draft:${d.id}.t`] = d.title.en;
+    if (pack.guide) out["guide.t"] = pack.guide.title.en;
+    return out;
+  }
+  if (docKey.startsWith("form:")) {
+    const form = pack.forms.find((f) => f.id === docKey.slice(5));
+    if (!form) return out;
+    out.t = form.title.en; out.s = form.subtitle.en; out.n = form.note.en;
+    form.blocks.forEach((b, i) => {
+      if (b.type === "list") b.en.forEach((item, j) => { out[`b${i}.${j}`] = item; });
+      else if (b.type === "sigrow") b.items.forEach((item, j) => { out[`b${i}.s${j}`] = item.en || item.me; out[`b${i}.s${j}.l`] = item.lbl.en || item.lbl.me; });
+      else out[`b${i}`] = b.en || b.me;
+    });
+    return out;
+  }
+  const html = docKey === "guide" ? pack.guide?.html : draftHtml ?? pack.drafts.find((d) => `draft:${d.id}` === docKey)?.html;
+  if (!html) return out;
+  splitTopLevel(html).forEach((part, i) => {
+    // A draft paragraph without the "en" class is the Montenegrin twin of the English one after it: not translated again.
+    if (docKey !== "guide" && /^<p(?![^>]*class="[^"]*\ben\b)/.test(part)) return;
+    out[`e${i}`] = part;
+  });
+  return out;
+}
+
+/** A translated template is used only if it kept every blank of the original. */
+export function keepsPlaceholders(source: string, translated: string): boolean {
+  const a = placeholderIds(source).sort().join(",");
+  const b = placeholderIds(translated).sort().join(",");
+  return a === b && (source.match(/\{\{sig\}\}/g) ?? []).length === (translated.match(/\{\{sig\}\}/g) ?? []).length;
 }
