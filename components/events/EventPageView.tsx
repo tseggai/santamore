@@ -11,7 +11,7 @@ import { PerkRule, type PerkChallengeFields } from "@/components/perks/PerkRule"
 import type { GalleryImage } from "@/components/gallery/GalleryGrid";
 import { PublicGallery } from "@/components/gallery/PublicGallery";
 import { galleryImageUrl } from "@/lib/storage";
-import { activeTiers, type EventTier } from "@/lib/events";
+import { activeTiers, tiersFor, type EventDistance, type EventTier } from "@/lib/events";
 import { formatCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, type Locale } from "@/i18n/routing";
@@ -52,7 +52,7 @@ export interface EventView {
   venue: string | null;
   registration_opens_at: string | null;
   registration_closes_at: string | null;
-  distances: string[];
+  distances: EventDistance[];
   tiers: EventTier[];
   offers_shirts?: boolean;
   going_count?: number;
@@ -115,6 +115,22 @@ export function EventPageView({
   const starts = event.starts_at ? new Date(event.starts_at) : null;
   const sameDay = starts && event.ends_at ? fmt(event.starts_at) === fmt(event.ends_at) : true;
   const daysLeft = starts ? Math.ceil((starts.getTime() - now) / 86_400_000) : null;
+
+  const tierList = (rows: EventTier[]) => (
+    <ul className="mt-2">
+      {rows.map((tier) => (
+        <li key={`${tier.distance ?? ""}:${tier.label}`} className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-2.5 text-[15px] last:border-b-0">
+          <span>
+            {tier.label}
+            {tier.until ? <span className="ml-2 text-[13px] text-black/55">{t("tierUntil", { date: fmt(tier.until) })}</span> : null}
+          </span>
+          <span className="font-mono font-semibold tabular-nums">
+            {tier.amount_cents === 0 ? t("free") : formatCents(tier.amount_cents, locale, { trimWholeCents: true })}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
 
   const fact = (label: string, value: ReactNode) => (
     <div className="rounded-lg bg-mist px-4 py-3">
@@ -183,8 +199,8 @@ export function EventPageView({
             slug: event.slug,
             name: event.name,
             kind: event.kind,
-            distances: event.distances,
-            tiers: tiersToday.map((tier) => ({ label: tier.label, amountCents: tier.amount_cents, until: tier.until ?? null })),
+            distances: event.distances.map((d) => d.name),
+            tiers: tiersToday.map((tier) => ({ label: tier.label, amountCents: tier.amount_cents, until: tier.until ?? null, distance: tier.distance ?? null })),
             offersShirts: Boolean(event.offers_shirts),
             hosting: external ? "external" : "own",
             externalUrl: event.external_url ?? null,
@@ -230,7 +246,12 @@ export function EventPageView({
             )}
         {event.venue ? fact(t("factWhere"), event.venue) : null}
         {event.kind === "race" && event.distances.length > 0
-          ? fact(t("factDistances"), <span className="font-mono tabular-nums">{event.distances.join(" · ")}</span>)
+          ? fact(
+              t("factDistances"),
+              <span className="flex flex-col gap-0.5">
+                {event.distances.map((d) => <span key={d.name} className="font-mono tabular-nums">{d.name}</span>)}
+              </span>,
+            )
           : null}
         {event.kind === "social" && (event.going_count ?? 0) > 0 ? fact(t("factGoing"), t("goingCount", { count: event.going_count ?? 0 })) : null}
         {external && organizer ? fact(t("factOrganizer"), organizer) : null}
@@ -321,19 +342,24 @@ export function EventPageView({
       {event.kind !== "challenge" && tiersToday.length > 0 ? (
         <section className="mt-10">
           <h2 className="type-display text-2xl">{event.kind === "social" ? t("ticketsHeading") : t("tiersHeading")}</h2>
-          <ul className="mt-3 max-w-md">
-            {tiersToday.map((tier) => (
-              <li key={tier.label} className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-2.5 text-[15px] last:border-b-0">
-                <span>
-                  {tier.label}
-                  {tier.until ? <span className="ml-2 text-[13px] text-black/55">{t("tierUntil", { date: fmt(tier.until) })}</span> : null}
-                </span>
-                <span className="font-mono font-semibold tabular-nums">
-                  {tier.amount_cents === 0 ? t("free") : formatCents(tier.amount_cents, locale, { trimWholeCents: true })}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {tiersToday.some((tier) => tier.distance) ? (
+            // Prices per distance: each distance with its own tiers and the general ones; general-only tiers last.
+            <div className="mt-3 grid gap-6 sm:grid-cols-2">
+              {event.distances.map((d) => {
+                const rows = tiersFor(tiersToday, d.name);
+                if (rows.length === 0) return null;
+                return (
+                  <div key={d.name}>
+                    <h3 className="text-[15px] font-bold">{d.name}</h3>
+                    {tierList(rows)}
+                    {d.capacity != null ? <p className="mt-2 text-[13px] text-black/55">{t("placesOnDistance", { count: d.capacity })}</p> : null}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="max-w-md">{tierList(tiersToday)}</div>
+          )}
           {event.offers_shirts ? <p className="mt-3 text-[14px] text-black/60">{t("shirtsNote")}</p> : null}
         </section>
       ) : null}

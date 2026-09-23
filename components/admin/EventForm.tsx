@@ -6,6 +6,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
 import { createChapter, saveEvent } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
+import { parseDistances, type EventDistance } from "@/lib/events";
 import { DateTimeField } from "@/components/admin/DateTimeField";
 import { CoverField } from "@/components/admin/CoverField";
 import { GalleryManager, type GalleryAdminItem } from "@/components/admin/GalleryManager";
@@ -57,6 +58,14 @@ interface TierRow {
   euros: string;
   /** YYYY-MM-DD or empty: the last day this price is offered. */
   until: string;
+  /** The distance this price is for, or empty for every distance. */
+  distance: string;
+}
+
+interface DistanceRow {
+  name: string;
+  /** Places on this distance, or empty for no limit of its own. */
+  capacity: string;
 }
 
 const KINDS: EventKind[] = ["race", "challenge", "social"];
@@ -88,7 +97,7 @@ function tiersFromValue(value: unknown): TierRow[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((tier) =>
     typeof tier?.label === "string" && typeof tier?.amount_cents === "number"
-      ? [{ label: tier.label, euros: (tier.amount_cents / 100).toFixed(2).replace(/\.00$/, ""), until: typeof tier.until === "string" ? tier.until : "" }]
+      ? [{ label: tier.label, euros: (tier.amount_cents / 100).toFixed(2).replace(/\.00$/, ""), until: typeof tier.until === "string" ? tier.until : "", distance: typeof tier.distance === "string" ? tier.distance : "" }]
       : [],
   );
 }
@@ -148,8 +157,8 @@ export function EventForm({
   const [capacity, setCapacity] = useState(event?.capacity?.toString() ?? "");
   const [regOpens, setRegOpens] = useState(toLocalInput(event?.registration_opens_at ?? null));
   const [regCloses, setRegCloses] = useState(toLocalInput(event?.registration_closes_at ?? null));
-  const [distances, setDistances] = useState(
-    Array.isArray(event?.distances) ? (event!.distances as string[]).join(", ") : "",
+  const [distances, setDistances] = useState<DistanceRow[]>(() =>
+    parseDistances(event?.distances).map((d) => ({ name: d.name, capacity: d.capacity == null ? "" : String(d.capacity) })),
   );
   const [tiers, setTiers] = useState<TierRow[]>(tiersFromValue(event?.price_tiers));
   const [offersShirts, setOffersShirts] = useState(event?.offers_shirts ?? false);
@@ -174,12 +183,17 @@ export function EventForm({
     .map((tier) => {
       const cents = eurosToCents(tier.euros);
       return tier.label.trim() && cents !== null
-        ? { label: tier.label.trim(), amount_cents: cents, ...(tier.until ? { until: tier.until } : {}) }
+        ? { label: tier.label.trim(), amount_cents: cents, ...(tier.until ? { until: tier.until } : {}), ...(tier.distance ? { distance: tier.distance } : {}) }
         : null;
     });
   const tiersValid = parsedTiers.every((tier) => tier !== null);
-  const cleanTiers = parsedTiers.filter((tier): tier is { label: string; amount_cents: number; until?: string } => tier !== null);
-  const distanceList = kind === "race" ? distances.split(",").map((part) => part.trim()).filter(Boolean) : [];
+  const cleanTiers = parsedTiers.filter((tier): tier is { label: string; amount_cents: number; until?: string; distance?: string } => tier !== null);
+  const distanceList: EventDistance[] = kind === "race"
+    ? distances.filter((d) => d.name.trim()).map((d) => ({ name: d.name.trim(), capacity: /^\d+$/.test(d.capacity.trim()) ? Number(d.capacity.trim()) : null }))
+    : [];
+  const distanceNamesNow = distanceList.map((d) => d.name);
+  const withDistances = kind === "race" && distanceNamesNow.length > 0;
+  const tierCols = withDistances ? "sm:grid-cols-[minmax(0,1fr)_10rem_7rem_13rem_2.5rem]" : "sm:grid-cols-[minmax(0,1fr)_7rem_13rem_2.5rem]";
 
   const previewEvent = {
     slug: slug || slugify(name) || "dogadjaj",
@@ -235,7 +249,7 @@ export function EventForm({
       registrationOpensAt: toIso(regOpens),
       registrationClosesAt: toIso(regCloses),
       distances: distanceList,
-      priceTiers: cleanTiers,
+      priceTiers: cleanTiers.map((tier) => ({ ...tier, distance: tier.distance && distanceNamesNow.includes(tier.distance) ? tier.distance : null })),
       isPublished: published,
       description: description.trim() || null,
       offersShirts: kind === "social" ? false : offersShirts,
@@ -473,8 +487,59 @@ export function EventForm({
         ) : null}
         {kind === "race" ? (
           <div className="sm:col-span-2">
-            <label htmlFor="evDistances" className={labelClass}>{t("evDistances")}</label>
-            <input id="evDistances" type="text" value={distances} onChange={(e) => setDistances(e.target.value)} placeholder="5 km, 10 km" className={inputClass} />
+            <p className={labelClass}>{t("evDistances")}</p>
+            <p className="text-[13px] text-black/55">{t("evDistancesHint")}</p>
+            <div className="mt-2 space-y-2">
+              {distances.length > 0 ? (
+                <div className="hidden gap-2 text-[13px] font-semibold text-black/60 sm:grid sm:grid-cols-[minmax(0,1fr)_7rem_2.5rem]">
+                  <span>{t("evDistanceName")}</span>
+                  <span>{t("evDistancePlaces")}</span>
+                  <span />
+                </div>
+              ) : null}
+              {distances.map((row, index) => (
+                <div key={index} className="grid grid-cols-[minmax(0,1fr)_2.5rem] items-center gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_2.5rem]">
+                  <input
+                    type="text"
+                    value={row.name}
+                    onChange={(e) => {
+                      const next = e.target.value;
+                      const previous = row.name;
+                      setDistances((rows) => rows.map((r, i) => (i === index ? { ...r, name: next } : r)));
+                      // A price tied to this distance follows its new name.
+                      setTiers((rows) => rows.map((r) => (r.distance === previous && previous !== "" ? { ...r, distance: next } : r)));
+                    }}
+                    placeholder={t("evDistanceName")}
+                    aria-label={t("evDistanceName")}
+                    className={`${inputClass} mt-0 min-w-0`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDistances((rows) => rows.filter((_, i) => i !== index));
+                      setTiers((rows) => rows.map((r) => (r.distance === row.name ? { ...r, distance: "" } : r)));
+                    }}
+                    aria-label={t("evRemoveDistance")}
+                    title={t("evRemoveDistance")}
+                    className="h-10 w-10 shrink-0 rounded-lg bg-paper text-[18px] leading-none hover:bg-mist-2 hover:text-red-dark sm:order-last"
+                  >
+                    ×
+                  </button>
+                  <input
+                    type="number"
+                    min={0}
+                    value={row.capacity}
+                    onChange={(e) => setDistances((rows) => rows.map((r, i) => (i === index ? { ...r, capacity: e.target.value } : r)))}
+                    placeholder="—"
+                    aria-label={t("evDistancePlaces")}
+                    className={`${inputClass} mt-0 min-w-0 font-mono`}
+                  />
+                </div>
+              ))}
+            </div>
+            <button type="button" onClick={() => setDistances((rows) => [...rows, { name: "", capacity: "" }])} className="mt-2 rounded-lg bg-paper px-3.5 py-2 text-[14px] font-semibold hover:bg-mist-2">
+              {t("evAddDistance")}
+            </button>
           </div>
         ) : null}
         <div className="sm:col-span-2">
@@ -482,15 +547,16 @@ export function EventForm({
           <p className="text-[13px] text-black/55">{t("evTiersHint")}</p>
           <div className="mt-2 space-y-2">
             {tiers.length > 0 ? (
-              <div className="hidden gap-2 text-[13px] font-semibold text-black/60 sm:grid sm:grid-cols-[minmax(0,1fr)_7rem_13rem_2.5rem]">
+              <div className={`hidden gap-2 text-[13px] font-semibold text-black/60 sm:grid ${tierCols}`}>
                 <span>{t("evTierLabel")}</span>
+                {withDistances ? <span>{t("evTierDistance")}</span> : null}
                 <span>{t("evTierPrice")}</span>
                 <span>{t("evTierUntil")}</span>
                 <span />
               </div>
             ) : null}
             {tiers.map((tier, index) => (
-              <div key={index} className="grid grid-cols-[minmax(0,1fr)_2.5rem] items-center gap-2 sm:grid-cols-[minmax(0,1fr)_7rem_13rem_2.5rem]">
+              <div key={index} className={`grid grid-cols-[minmax(0,1fr)_2.5rem] items-center gap-2 sm:grid ${tierCols}`}>
                 <input
                   type="text"
                   value={tier.label}
@@ -508,6 +574,17 @@ export function EventForm({
                 >
                   ×
                 </button>
+                {withDistances ? (
+                  <select
+                    value={distanceNamesNow.includes(tier.distance) ? tier.distance : ""}
+                    onChange={(e) => setTiers((rows) => rows.map((r, i) => (i === index ? { ...r, distance: e.target.value } : r)))}
+                    aria-label={t("evTierDistance")}
+                    className={`${inputClass} mt-0 min-w-0`}
+                  >
+                    <option value="">{t("evTierAllDistances")}</option>
+                    {distanceNamesNow.map((name) => <option key={name} value={name}>{name}</option>)}
+                  </select>
+                ) : null}
                 <span className="flex items-center gap-1">
                   <span aria-hidden className="text-black/50">€</span>
                   <input
@@ -531,7 +608,7 @@ export function EventForm({
               </div>
             ))}
           </div>
-          <button type="button" onClick={() => setTiers((rows) => [...rows, { label: "", euros: "", until: "" }])} className="mt-2 rounded-lg bg-paper px-3.5 py-2 text-[14px] font-semibold hover:bg-mist-2">
+          <button type="button" onClick={() => setTiers((rows) => [...rows, { label: "", euros: "", until: "", distance: "" }])} className="mt-2 rounded-lg bg-paper px-3.5 py-2 text-[14px] font-semibold hover:bg-mist-2">
             {t("evAddTier")}
           </button>
         </div>
@@ -620,7 +697,7 @@ export function EventForm({
       </div>
     ) : null}
 
-    <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-line bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+    <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-line bg-paper px-5 py-3 shadow-[0_-8px_24px_rgba(14,58,70,0.08)] sm:-mx-6 sm:px-6">
       <button type="submit" form={formId} disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
         {event ? t("evSave") : t("evCreate")}
       </button>

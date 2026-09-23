@@ -24,6 +24,13 @@ const tierSchema = z.object({
   label: z.string().trim().min(1).max(100),
   amount_cents: z.number().int().min(0).max(MAX_CENTS),
   until: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().optional(),
+  /** The distance this price is for; null for every distance. */
+  distance: z.string().trim().max(40).nullable().optional(),
+});
+
+const distanceSchema = z.object({
+  name: z.string().trim().min(1).max(40),
+  capacity: z.number().int().min(0).max(1_000_000).nullable(),
 });
 
 const eventSchema = z
@@ -43,7 +50,7 @@ const eventSchema = z
     capacity: z.number().int().min(0).max(1_000_000).nullable(),
     registrationOpensAt: isoDate.nullable(),
     registrationClosesAt: isoDate.nullable(),
-    distances: z.array(z.string().trim().min(1).max(40)).max(20),
+    distances: z.array(distanceSchema).max(20),
     priceTiers: z.array(tierSchema).max(20),
     isPublished: z.boolean(),
     description: z.string().trim().max(4000).nullable(),
@@ -56,6 +63,14 @@ const eventSchema = z
     bibPolicy: z.enum(["none", "we_buy"]).default("none"),
     bibCapacity: z.number().int().min(0).max(100_000).nullable().default(null),
     maxGuests: z.number().int().min(0).max(20).default(0),
+  })
+  .refine((data) => data.priceTiers.every((tier) => !tier.distance || data.distances.some((d) => d.name === tier.distance)), {
+    message: "a tier's distance must be one of the event's distances",
+    path: ["priceTiers"],
+  })
+  .refine((data) => new Set(data.distances.map((d) => d.name)).size === data.distances.length, {
+    message: "distances must have distinct names",
+    path: ["distances"],
   })
   .refine((data) => data.kind !== "challenge" || data.challengeMetric !== null, {
     message: "a challenge needs a metric",
@@ -87,7 +102,7 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
     registration_opens_at: data.registrationOpensAt,
     registration_closes_at: data.registrationClosesAt,
     distances: data.distances,
-    price_tiers: data.priceTiers.map((tier) => ({ label: tier.label, amount_cents: tier.amount_cents, ...(tier.until ? { until: tier.until } : {}) })),
+    price_tiers: data.priceTiers.map((tier) => ({ label: tier.label, amount_cents: tier.amount_cents, ...(tier.until ? { until: tier.until } : {}), ...(tier.distance ? { distance: tier.distance } : {}) })),
     is_published: data.isPublished,
     // Only a race can be someone else's; only a gathering brings guests.
     hosting: data.kind === "race" ? data.hosting : "own",

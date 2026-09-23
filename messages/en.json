@@ -840,7 +840,7 @@
     "evCapacity": "Capacity",
     "evRegOpens": "Registration opens",
     "evRegCloses": "Registration closes",
-    "evDistances": "Distances (comma-separated)",
+    "evDistances": "Distances",
     "evTiers": "Entry tiers",
     "evTiersHint": "Label and price in euros; €0 confirms without payment.",
     "evPublished": "Published — visible on the site",
@@ -1549,7 +1549,16 @@
       "draftReadOnly": "A translation for reading. Edit the text in Montenegrin or English.",
       "addFounder": "Founder",
       "fewFounders": "Founders named: {n}. The Law on NGOs requires at least three founders for an association."
-    }
+    },
+    "evDistancesHint": "One line per distance or category, with its own number of places if it has one. Prices can be tied to a distance below.",
+    "evDistanceName": "Distance or category (e.g. 10 km, Half distance 1.9 / 90 / 21)",
+    "evDistancePlaces": "Places",
+    "evAddDistance": "+ Add distance",
+    "evRemoveDistance": "Remove distance",
+    "evTierDistance": "For",
+    "evTierAllDistances": "All distances",
+    "discardChanges": "Discard the unsaved changes in this form?",
+    "discard": "Discard"
   },
   "forms": {
     "nameLabel": "Full name",
@@ -1720,7 +1729,8 @@
     "wayMoneyWent": "Where the money went",
     "wayMoneyWentFor": "Where the money for {cause} went",
     "wayMoneyWentSub": "This event is over. Every euro it raised, and where it was handed over, is on the money page for that year.",
-    "moneyWentCta": "See where the money went"
+    "moneyWentCta": "See where the money went",
+    "placesOnDistance": "{count} places"
   },
   "gallery": {
     "eyebrow": "Gallery",

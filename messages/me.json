@@ -840,7 +840,7 @@
     "evCapacity": "Kapacitet",
     "evRegOpens": "Prijave se otvaraju",
     "evRegCloses": "Prijave se zatvaraju",
-    "evDistances": "Distance (odvojene zarezom)",
+    "evDistances": "Distance",
     "evTiers": "Kategorije kotizacije",
     "evTiersHint": "Naziv i cijena u eurima; €0 potvrđuje bez plaćanja.",
     "evPublished": "Objavljen — vidljiv na sajtu",
@@ -1549,7 +1549,16 @@
       "draftReadOnly": "Prevod za čitanje. Tekst se mijenja na crnogorskom ili engleskom.",
       "addFounder": "Osnivač",
       "fewFounders": "Upisano osnivača: {n}. Zakon o NVO traži najmanje tri osnivača za udruženje."
-    }
+    },
+    "evDistancesHint": "Jedan red po distanci ili kategoriji, sa sopstvenim brojem mjesta ako ga ima. Cijene se ispod mogu vezati za distancu.",
+    "evDistanceName": "Distanca ili kategorija (npr. 10 km, Polovina 1.9 / 90 / 21)",
+    "evDistancePlaces": "Mjesta",
+    "evAddDistance": "+ Dodaj distancu",
+    "evRemoveDistance": "Ukloni distancu",
+    "evTierDistance": "Za",
+    "evTierAllDistances": "Sve distance",
+    "discardChanges": "Odbaciti nesačuvane izmjene u ovom obrascu?",
+    "discard": "Odbaci"
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -1720,7 +1729,8 @@
     "wayMoneyWent": "Gdje je novac otišao",
     "wayMoneyWentFor": "Gdje je otišao novac za: {cause}",
     "wayMoneyWentSub": "Ovaj događaj je završen. Svaki euro koji je prikupio, i kome je predat, stoji na stranici novca za tu godinu.",
-    "moneyWentCta": "Pogledaj gdje je novac otišao"
+    "moneyWentCta": "Pogledaj gdje je novac otišao",
+    "placesOnDistance": "Mjesta: {count}"
   },
   "gallery": {
     "eyebrow": "Galerija",

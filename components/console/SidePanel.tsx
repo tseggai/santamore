@@ -3,12 +3,16 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, type ReactNode } from "react";
 
+import { useDialog } from "@/components/console/useDialog";
+
 /**
  * Right-hand slide-over for console forms. The list behind it stays put:
  * a native <dialog> gives the focus trap, Escape and the inert page; we
  * add the scroll lock, the backdrop close and the slide-in (which
  * `prefers-reduced-motion` turns off). Children mount only while open,
- * so a form always starts fresh.
+ * so a form always starts fresh. Once something inside has been typed
+ * or changed, a click on the backdrop, Escape or the × asks before
+ * discarding it; a form that closes itself after saving is not asked.
  */
 export function SidePanel({
   open,
@@ -25,6 +29,9 @@ export function SidePanel({
 }) {
   const t = useTranslations("admin");
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const dirty = useRef(false);
+  const asking = useRef(false);
+  const confirmBox = useDialog();
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -32,10 +39,30 @@ export function SidePanel({
     if (open && !dialog.open) dialog.showModal();
     if (!open && dialog.open) dialog.close();
     document.body.style.overflow = open ? "hidden" : "";
+    dirty.current = false;
     return () => {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  // Work in progress also survives a closed tab only by asking first.
+  useEffect(() => {
+    if (!open) return;
+    const warn = (event: BeforeUnloadEvent) => { if (dirty.current) event.preventDefault(); };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [open]);
+
+  /** Close now, or first ask when something inside was changed. */
+  const requestClose = () => {
+    if (!dirty.current) { onClose(); return; }
+    if (asking.current) return;
+    asking.current = true;
+    void confirmBox.confirm(t("discardChanges"), { confirmLabel: t("discard"), danger: true }).then((ok) => {
+      asking.current = false;
+      if (ok) onClose();
+    });
+  };
 
   return (
     <dialog
@@ -50,15 +77,17 @@ export function SidePanel({
       onCancel={(event) => {
         if (event.target !== event.currentTarget) return;
         event.preventDefault();
-        onClose();
+        requestClose();
       }}
       onClick={(event) => {
         // A click on the backdrop closes the panel, unless another modal
         // (the console confirm) is open on top: that click is theirs.
         if (event.target !== event.currentTarget) return;
         if (document.querySelectorAll("dialog[open]").length > 1) return;
-        onClose();
+        requestClose();
       }}
+      onInputCapture={() => { dirty.current = true; }}
+      onChangeCapture={() => { dirty.current = true; }}
       className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none justify-end bg-transparent p-0 backdrop:bg-ink/55 open:flex"
     >
       {open ? (
@@ -71,7 +100,7 @@ export function SidePanel({
             <h2 className="min-w-0 flex-1 truncate text-[17px] font-bold">{title}</h2>
             <button
               type="button"
-              onClick={onClose}
+              onClick={requestClose}
               aria-label={t("panelClose")}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist text-[19px] leading-none text-black/70 transition-colors hover:bg-mist-2 hover:text-sea"
             >
@@ -83,6 +112,7 @@ export function SidePanel({
           </div>
         </div>
       ) : null}
+      {confirmBox.element}
     </dialog>
   );
 }
