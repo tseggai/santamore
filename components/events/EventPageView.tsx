@@ -248,12 +248,7 @@ export function EventPageView({
             )}
         {event.venue ? fact(t("factWhere"), event.venue) : null}
         {event.kind === "race" && event.distances.length > 0
-          ? fact(
-              t("factDistances"),
-              <span className="flex flex-col gap-0.5">
-                {event.distances.map((d) => <span key={d.name} className="font-mono tabular-nums">{d.name}</span>)}
-              </span>,
-            )
+          ? fact(t("factDistances"), <a href="#distances" className="underline-offset-2 hover:underline">{t("distancesCount", { count: event.distances.length })}</a>)
           : null}
         {event.kind === "social" && (event.going_count ?? 0) > 0 ? fact(t("factGoing"), t("goingCount", { count: event.going_count ?? 0 })) : null}
         {external && organizer ? fact(t("factOrganizer"), organizer) : null}
@@ -341,28 +336,42 @@ export function EventPageView({
       </div>
 
       {/* 4 — the details, by kind */}
-      {event.kind !== "challenge" && tiersShown.length > 0 ? (
+      {event.kind === "race" && event.distances.length > 0 ? (
+        // Each distance is a card: its name, its places, and the prices that apply to it (its own and the general ones).
+        <section id="distances" className="mt-10 scroll-mt-24">
+          <h2 className="type-display text-2xl">{t("distancesHeading")}</h2>
+          {withOrganizer && tiersShown.length > 0 ? <p className="mt-2 text-[14px] text-black/60">{t("tiersOrganizerNote", { organizer: organizer || t("theOrganizer") })}</p> : null}
+          <div className="mt-4 grid items-start gap-3 sm:grid-cols-2">
+            {event.distances.map((d) => {
+              const rows = tiersFor(tiersShown, d.name);
+              return (
+                <div key={d.name} className="rounded-lg bg-mist px-5 py-4">
+                  <h3 className="text-[16px] font-bold leading-snug">{d.name}</h3>
+                  {d.capacity != null ? <p className="mt-0.5 text-[13px] text-black/55">{t("placesOnDistance", { count: d.capacity })}</p> : null}
+                  {rows.length > 0 ? (
+                    <ul className="mt-3">
+                      {rows.map((tier) => (
+                        <li key={`${tier.distance ?? ""}:${tier.label}`} className="flex items-baseline justify-between gap-3 border-t-[0.5px] border-black/15 py-2 text-[14.5px]">
+                          <span>
+                            {tier.label}
+                            {tier.until ? <span className="ml-2 text-[13px] text-black/55">{t("tierUntil", { date: fmt(tier.until) })}</span> : null}
+                          </span>
+                          <span className="font-mono font-semibold tabular-nums">{tier.amount_cents === 0 ? t("free") : formatCents(tier.amount_cents, locale, { trimWholeCents: true })}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+          {event.offers_shirts ? <p className="mt-3 text-[14px] text-black/60">{t("shirtsNote")}</p> : null}
+        </section>
+      ) : event.kind !== "challenge" && tiersShown.length > 0 ? (
         <section className="mt-10">
           <h2 className="type-display text-2xl">{event.kind === "social" ? t("ticketsHeading") : t("tiersHeading")}</h2>
           {withOrganizer ? <p className="mt-2 text-[14px] text-black/60">{t("tiersOrganizerNote", { organizer: organizer || t("theOrganizer") })}</p> : null}
-          {tiersShown.some((tier) => tier.distance) ? (
-            // Prices per distance: each distance with its own tiers and the general ones; general-only tiers last.
-            <div className="mt-3 grid gap-6 sm:grid-cols-2">
-              {event.distances.map((d) => {
-                const rows = tiersFor(tiersShown, d.name);
-                if (rows.length === 0) return null;
-                return (
-                  <div key={d.name}>
-                    <h3 className="text-[15px] font-bold">{d.name}</h3>
-                    {tierList(rows)}
-                    {d.capacity != null ? <p className="mt-2 text-[13px] text-black/55">{t("placesOnDistance", { count: d.capacity })}</p> : null}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="max-w-md">{tierList(tiersShown)}</div>
-          )}
+          <div className="max-w-md">{tierList(tiersShown)}</div>
           {event.offers_shirts ? <p className="mt-3 text-[14px] text-black/60">{t("shirtsNote")}</p> : null}
         </section>
       ) : null}

@@ -1735,7 +1735,9 @@
     "wayMoneyWentSub": "This event is over. Every euro it raised, and where it was handed over, is on the money page for that year.",
     "moneyWentCta": "See where the money went",
     "placesOnDistance": "{count} places",
-    "tiersOrganizerNote": "Prices as set by {organizer}; registration and payment are with them."
+    "tiersOrganizerNote": "Prices as set by {organizer}; registration and payment are with them.",
+    "distancesHeading": "Distances and entry",
+    "distancesCount": "{count, plural, one {# distance} other {# distances}}"
   },
   "gallery": {
     "eyebrow": "Gallery",
