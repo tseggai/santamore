@@ -430,6 +430,8 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
 
         {/* The document */}
         <div id="legal-doc" className={`lp-doc mt-8 ${(draft && both) || guide || !isSourceLang(lang) ? "lp-both" : ""}`} lang={guide ? "en" : lang === "me" ? "sr-Latn-ME" : lang} data-lang={lang}>
+          {/* On paper the page is a table: its header and footer rows repeat on every printed page and carry the margins, so the browser prints no URL or date of its own. */}
+          <table className="lp-page"><thead><tr><td className="lp-pgtop" aria-hidden="true" /></tr></thead><tbody><tr><td className="lp-pgbody">
           {waitingForDoc && job ? <p className="lp-screen mb-4 rounded-brand bg-sand px-4 py-3 text-[14px] text-black/70">{t("translatingDoc", { lang: LANG_LABELS[lang], done: job.done, total: job.total })}</p> : null}
           {guide ? (
             <>
@@ -475,6 +477,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
               )}
             </>
           ) : null}
+          </td></tr></tbody><tfoot><tr><td className="lp-pgbot" aria-hidden="true">{`${form?.file ?? draft?.file ?? guide?.file ?? ""}-${lang} · ${shown.org?.[lang] || shown.org?.me || ""}`}</td></tr></tfoot></table>
         </div>
       </div>
 
@@ -716,6 +719,8 @@ function CompleteField({ id, lang, pack, fields, raw, label, hint, onField, onLi
 
 const CSS = `
 .lp-doc { background: #fff; padding: 0 0 3rem; font-size: 15px; line-height: 1.6; color: #000; }
+.lp-page, .lp-page > thead, .lp-page > tbody, .lp-page > tfoot, .lp-page > * > tr, .lp-page > * > tr > td { display: block; width: 100%; padding: 0; border: 0; }
+.lp-pgtop, .lp-pgbot { display: none; }
 .lp-head { border-bottom: 0.5px solid rgba(0,0,0,.25); padding-bottom: 1.25rem; margin-bottom: 1.75rem; }
 .lp-file { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 12px; letter-spacing: .04em; color: rgba(0,0,0,.5); }
 .lp-title { font-family: var(--font-display); font-size: 22px; letter-spacing: .02em; margin-top: .25rem; }
@@ -768,15 +773,31 @@ const CSS = `
 .lp-doc[data-lang="ru"] .lp-prose p.en, .lp-doc[data-lang="tr"] .lp-prose p.en { color: #000; }
 @media (prefers-reduced-motion: no-preference) { .lp-field { transition: background-color .15s; } }
 @media print {
-  @page { size: A4; margin: 18mm 16mm; }
+  /* No page margin: the browser then prints no header or footer of its own. The margins come from the page table's repeating rows. */
+  @page { size: A4; margin: 0; }
+  html, body { margin: 0; padding: 0; background: #fff; }
   body * { visibility: hidden; }
   #legal-doc, #legal-doc * { visibility: visible; }
-  #legal-doc { position: absolute; left: 0; top: 0; width: 100%; padding: 0; font-size: 11.5pt; line-height: 1.45; }
+  #legal-doc { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; font-size: 11.5pt; line-height: 1.45; }
+  .lp-page { display: table; width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .lp-page > thead { display: table-header-group; }
+  .lp-page > tbody { display: table-row-group; }
+  .lp-page > tfoot { display: table-footer-group; }
+  .lp-page > * > tr { display: table-row; }
+  .lp-page > * > tr > td { display: table-cell; vertical-align: top; }
+  .lp-page > thead > tr > td.lp-pgtop { display: table-cell; height: 18mm; padding: 0; }
+  .lp-page > tbody > tr > td.lp-pgbody { padding: 0 18mm; }
+  .lp-page > tfoot > tr > td.lp-pgbot { display: table-cell; height: 18mm; padding: 5mm 18mm 0; font-size: 8pt; letter-spacing: .03em; color: rgba(0,0,0,.45); }
+  .lp-head { padding-bottom: 4mm; margin-bottom: 6mm; }
   .lp-note, .lp-screen { display: none !important; }
   /* A completed blank stays recognisable in black and white: serif, underlined. */
   .lp-field, .lp-field.lp-block { color: #000; background: none; box-shadow: none; padding: 0; margin: 0; transition: none; font-family: Georgia, "Times New Roman", serif; text-decoration: underline; text-decoration-thickness: 0.6px; text-underline-offset: 2px; }
   .lp-field.lp-block { display: block; }
-  .lp-field:empty::before { content: "____________"; color: #000; font-style: normal; text-decoration: none; }
+  /* A blank still to be completed prints as a line to write on, never as its placeholder. */
+  .lp-field.lp-todo { display: inline-block; position: relative; min-width: 12rem; color: transparent; background: none; text-decoration: none; vertical-align: baseline; }
+  .lp-field.lp-todo::after { content: ""; position: absolute; left: 0; right: 0; bottom: .15em; border-bottom: 1px solid #000; }
+  .lp-field.lp-todo.lp-block { display: block; min-height: 3.2em; }
+  .lp-field:empty::before { content: ""; }
   .lp-opt-empty { display: none !important; }
   .lp-check { border: none; break-inside: avoid; }
   .lp-check input { -webkit-appearance: checkbox; }
