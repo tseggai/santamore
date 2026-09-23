@@ -289,7 +289,16 @@ function buildStatute() {
     if (art === 13) t = t.replace(/mandat od _+ godine/, 'mandat od {{term_pres}} godine');
     if (art === 18) t = t.replace(/je _+ godina/, 'je {{term_assembly}} godine');
     if (art === 22) t = t.replace('iz stava 4 ovog člana', 'iz stava 1 ovog člana');
-    if (art === 27) t = t.replace(/mandat od _+ godine/, 'mandat od {{term_rep}} godine');
+    if (art === 27) {
+      t = t.replace(/mandat od _+ godine/, 'mandat od {{term_rep}} godine');
+      // Re-election and continuity, in the words the Statute additions use for the Board (Art. 33).
+      if (/se bira odlukom Skupštine/.test(t)) {
+        push(t, enQueue.shift());
+        push('Isto lice može biti ponovo birano bez ograničenja broja mandata.', 'The same person may be re-elected without limit on the number of terms.');
+        push('Lice ovlašćeno za zastupanje kome je istekao mandat ostaje na dužnosti do izbora novog lica ovlašćenog za zastupanje, a najduže šest mjeseci.', 'A person authorised for representation whose term has ended stays in office until a successor is elected, for at most six months.');
+        continue;
+      }
+    }
     if (art === 35) { t = t.replace(/djelatnosti _+\s*\./, 'djelatnosti: {{econ}}.'); push(t, enQueue.shift()); push('Na korišćenje prihoda ostvarenog privrednom djelatnošću neposredno se primjenjuju odredbe Zakona o nevladinim organizacijama.', enQueue.shift()); continue; }
     if (art === 36 && /^O evidenciji članova/.test(t)) t = 'Registar članova vodi Izvršni direktor.';
     if (art === 37 && /^Članu se mora omogućiti/.test(t)) { push(t, enQueue.shift()); push('Odluku o isključenju donosi Skupština većinom glasova prisutnih članova. Isključeni član može podnijeti prigovor Skupštini u roku od 15 dana; odluka Skupštine po prigovoru je konačna.', enQueue.shift()); continue; }
@@ -298,7 +307,7 @@ function buildStatute() {
     void firstOfArticle;
   }
   return { id: '04', title: { me: 'Statut', en: 'Statute' }, subtitle: { me: 'Usvaja Osnivačka skupština po članu 12 Zakona o NVO', en: 'Adopted by the Founding Assembly under Article 12 of the Law on NGOs' }, file: 'santamore-04-statut',
-    note: { me: 'Obrazac CRNVO sa primijenjenim izmjenama iz uputstva: skraćeni naziv (čl. 2), uklonjena praznina (čl. 5), ispravljeno upućivanje (čl. 22), naziv funkcije Izvršni direktor (čl. 27 do 31), drugi stav u čl. 35, ko vodi registar članova (čl. 36), pravo na prigovor (čl. 37), „sa sjedištem u Crnoj Gori“ (čl. 40). <b>Opcija 1</b> (Upravni odbor, Komisija za dodjelu sredstava, ogranci, punomoćja) je u nacrtu „Dopune statuta“; ako se usvoji, članovi se prenumerišu pri potpisivanju.', en: 'The CRNVO template with the guide\'s edits applied: short name (Art. 2), the removed blank (Art. 5), the corrected cross-reference (Art. 22), the title Executive Director (Arts. 27 to 31), a second paragraph in Art. 35, who keeps the register of members (Art. 36), the right to object (Art. 37), "with its seat in Montenegro" (Art. 40). <b>Option 1</b> (Board, Grants Committee, chapters, proxies) is in the draft "Statute additions"; if adopted, articles are renumbered at signing.' },
+    note: { me: 'Obrazac CRNVO sa primijenjenim izmjenama iz uputstva: skraćeni naziv (čl. 2), uklonjena praznina (čl. 5), ispravljeno upućivanje (čl. 22), naziv funkcije Izvršni direktor (čl. 27 do 31), ponovni izbor i ostanak na dužnosti do izbora nasljednika (čl. 27), drugi stav u čl. 35, ko vodi registar članova (čl. 36), pravo na prigovor (čl. 37), „sa sjedištem u Crnoj Gori“ (čl. 40). <b>Opcija 1</b> (Upravni odbor, Komisija za dodjelu sredstava, ogranci, punomoćja) je u nacrtu „Dopune statuta“; ako se usvoji, članovi se prenumerišu pri potpisivanju.', en: 'The CRNVO template with the guide\'s edits applied: short name (Art. 2), the removed blank (Art. 5), the corrected cross-reference (Art. 22), the title Executive Director (Arts. 27 to 31), re-election and staying on until a successor is elected (Art. 27), a second paragraph in Art. 35, who keeps the register of members (Art. 36), the right to object (Art. 37), "with its seat in Montenegro" (Art. 40). <b>Option 1</b> (Board, Grants Committee, chapters, proxies) is in the draft "Statute additions"; if adopted, articles are renumbered at signing.' },
     blocks };
 }
 
