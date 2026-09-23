@@ -6,7 +6,7 @@ import { useRef, useState, type FormEvent } from "react";
 
 import { deleteSupporters, saveSponsorship, saveSupporter, setSupportersActive } from "@/app/[locale]/admin/(protected)/podrska/actions";
 import type { Option } from "@/components/admin/EventForm";
-import { downscaleToPng } from "@/lib/images";
+import { describeUploadError, downscaleToPng } from "@/lib/images";
 import { formatCents, parseEurosToCents } from "@/lib/money";
 import { Chip, DataTable, Thumb, bulkButton, rowButton, type Column } from "@/components/console/DataTable";
 import { PageHeader } from "@/components/console/PageHeader";
@@ -100,6 +100,7 @@ export function SupporterForm({
   const [active, setActive] = useState(supporter?.is_active ?? true);
   const [logoPath, setLogoPath] = useState<string | null | undefined>(undefined);
   const [logoBusy, setLogoBusy] = useState(false);
+  const [uploadNote, setUploadNote] = useState<string | null>(null);
   const logoInput = useRef<HTMLInputElement>(null);
   // A new supporter has no id yet; its logo lives under a fresh folder.
   const [logoFolder] = useState(() => supporter?.id ?? `new-${crypto.randomUUID()}`);
@@ -116,8 +117,10 @@ export function SupporterForm({
       const { error } = await createClient().storage.from("supporter-logos").upload(path, blob, { contentType: "image/png" });
       if (error) throw error;
       setLogoPath(path);
-    } catch {
+    } catch (error) {
+      const why = describeUploadError(error);
       setState("error");
+      setUploadNote(why.key === "uploadFailed" ? t(why.key, { detail: why.detail }) : t(why.key));
     } finally {
       setLogoBusy(false);
     }
@@ -282,7 +285,7 @@ export function SupporterForm({
           </div>
         </fieldset>
       )}
-      {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
+      {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{uploadNote ?? t("actionError")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
       {formId ? null : (
         <div className="mt-4 flex gap-2">
@@ -673,7 +676,7 @@ export function SupportersManager({
             </>
           ) : null}
 
-          <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-line bg-paper px-5 py-3 shadow-[0_-8px_24px_rgba(14,58,70,0.08)] sm:-mx-6 sm:px-6">
+          <div className="sticky bottom-0 -mx-5 mt-6 flex gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
             <button type="submit" form="supporter-form" className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90">
               {supporter ? t("evSave") : t("suCreate")}
             </button>

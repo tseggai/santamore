@@ -1558,7 +1558,11 @@
     "evTierDistance": "Za",
     "evTierAllDistances": "Sve distance",
     "discardChanges": "Odbaciti nesačuvane izmjene u ovom obrascu?",
-    "discard": "Odbaci"
+    "discard": "Odbaci",
+    "uploadUnreadable": "Pregledač ne može da pročita ovu sliku. Koristite JPEG ili PNG; HEIC fotografiju sa iPhone-a treba prvo pretvoriti (podijelite je kao JPEG ili u Kameri › Formati izaberite Najkompatibilnije).",
+    "uploadTooLarge": "Slika je veća nego što ovo skladište prima. Koristite manju.",
+    "uploadForbidden": "Skladište je odbilo otpremanje za ovaj nalog. Odjavite se i prijavite ponovo; ako se ponovi, treba provjeriti pravila skladišta.",
+    "uploadFailed": "Otpremanje nije uspjelo: {detail}"
   },
   "forms": {
     "nameLabel": "Ime i prezime",
