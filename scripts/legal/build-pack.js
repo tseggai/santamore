@@ -165,6 +165,22 @@ for (const n of [1, 2, 3, 4, 5]) {
 HINTS.rep_jmb = HINTS.f1_jmb; HINTS.rep_addr = HINTS.f1_addr;
 for (const [id, [me, en]] of Object.entries(HINTS)) if (F[id]) F[id].hint = { me, en };
 
+// Sections of the Complete panel: a heading and a rule between groups of blanks.
+const GROUPS = {
+  org: { me: 'Udruženje', en: 'The association' },
+  f1: { me: 'Osnivač 1', en: 'Founder 1' }, f2: { me: 'Osnivač 2', en: 'Founder 2' }, f3: { me: 'Osnivač 3', en: 'Founder 3' }, f4: { me: 'Osnivač 4', en: 'Founder 4' }, f5: { me: 'Osnivač 5', en: 'Founder 5' },
+  rep: { me: 'Lice ovlašćeno za zastupanje', en: 'Person authorised for representation' },
+  assembly: { me: 'Osnivačka skupština', en: 'The founding assembly' },
+  filing: { me: 'Prijava Ministarstvu', en: 'The application to the Ministry' },
+  statute: { me: 'Statut', en: 'The Statute' },
+};
+const GROUP_OF = { org: 'org', short: 'org', seat: 'org', addr: 'org', rep_title: 'rep', rep_name: 'rep', rep_jmb: 'rep', rep_addr: 'rep',
+  date: 'assembly', chair: 'assembly', deputy: 'assembly', recorder: 'assembly', salut: 'assembly', v1: 'assembly', v2: 'assembly', start: 'assembly', end: 'assembly', venue: 'assembly', vote: 'assembly', term: 'assembly',
+  phone: 'filing', email: 'filing', date_app: 'filing',
+  goals: 'statute', activities: 'statute', econ: 'statute', seal_text: 'statute', seal_symbol: 'statute', term_pres: 'statute', term_assembly: 'statute', term_rep: 'statute' };
+for (const n of [1, 2, 3, 4, 5]) for (const part of ['name', 'jmb', 'addr']) GROUP_OF[`f${n}_${part}`] = `f${n}`;
+for (const [id, g] of Object.entries(GROUP_OF)) if (F[id]) F[id].group = g;
+
 // ---------- form 02 ----------
 const en02 = enSegments(read(path.join(R, '02-founding-decision.en.md')), b => b.type === 'h3' && /^Article/.test(b.text));
 const P = (me, en, extra) => Object.assign({ type: 'p', me, en }, extra || {});
@@ -329,7 +345,7 @@ const draftList = [
 const drafts = draftList.map(([id, file, me, en]) => ({ id, title: { me, en }, file: 'santamore-nacrt-' + id, html: draftHtml(read(file)) }));
 const forms = [buildInstructions(), form02, form03, buildStatute(), form05];
 const guide = { title: { me: 'Kako dovršiti paket', en: 'How to complete the pack' }, file: 'santamore-kako-dovrsiti', html: draftHtml(read(path.join(R, 'HOW-TO-COMPLETE.md'))) };
-const pack = { fields: F, forms, drafts, guide, builtAt: new Date().toISOString().slice(0, 10) };
+const pack = { fields: F, groups: GROUPS, forms, drafts, guide, builtAt: new Date().toISOString().slice(0, 10) };
 const out = path.join(ROOT, 'content/legal-pack/pack.json');
 fs.writeFileSync(out, JSON.stringify(pack, null, 0) + '\n');
 console.log('wrote', out, Math.round(fs.statSync(out).size / 1024) + ' KB;', forms.length, 'forms,', drafts.length, 'drafts');

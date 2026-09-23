@@ -167,6 +167,12 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
     if (lang === "me") return f.hint.me;
     return (isSourceLang(lang) ? undefined : labels?.[`f:${id}.h`]) ?? f.hint.en ?? f.hint.me;
   }, [pack.fields, lang, labels]);
+  const groupOf = useCallback((key: string): string => {
+    const g = pack.groups?.[key];
+    if (!g) return key;
+    if (lang === "me") return g.me;
+    return (isSourceLang(lang) ? undefined : labels?.[`g:${key}`]) ?? g.en;
+  }, [pack.groups, lang, labels]);
   const titleOf = useCallback((docKey: string, source: { me: string; en: string }): string => {
     if (lang === "me") return source.me;
     return (isSourceLang(lang) ? undefined : labels?.[`${docKey}.t`]) ?? source.en;
@@ -316,7 +322,12 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   const founderOf = (id: string) => { const m = id.match(/^(f[2-5])_/); return m ? m[1] : null; };
   const founderHasValue = (fid: string) => ["name", "jmb", "addr"].some((part) => (shown[`${fid}_${part}`]?.[lang] ?? "").trim() !== "");
   /** The panel's blanks: an optional founder appears once named, or when added with the button. */
-  const panelIds = useMemo(() => formIds.filter((id) => { const fid = founderOf(id); return !fid || founderHasValue(fid) || revealed.includes(fid); }), [formIds, revealed, shown, lang]); // eslint-disable-line react-hooks/exhaustive-deps
+  const panelIds = useMemo(() => {
+    const visible = formIds.filter((id) => { const fid = founderOf(id); return !fid || founderHasValue(fid) || revealed.includes(fid); });
+    // Sections in the order they first appear in the document; each section's blanks together, in document order.
+    const order = [...new Set(visible.map((id) => pack.fields[id]?.group ?? ""))];
+    return order.flatMap((g) => visible.filter((id) => (pack.fields[id]?.group ?? "") === g));
+  }, [formIds, revealed, shown, lang]); // eslint-disable-line react-hooks/exhaustive-deps
   const nextFounder = FOUNDER_IDS.find((fid) => fid !== "f1" && formIds.some((id) => id.startsWith(`${fid}_`)) && !founderHasValue(fid) && !revealed.includes(fid)) ?? null;
   const panelDone = panelIds.filter((id) => !isIncomplete(shown[id]?.[lang] ?? "") || isOptionalEmpty(id, shown, pack.fields, lang)).length;
   const namedFounders = FOUNDER_IDS.filter((fid) => !isIncomplete(shown[`${fid}_name`]?.[lang] ?? "")).length;
@@ -493,11 +504,16 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-mist px-5 py-5">
             <div className="flex flex-col gap-4">
-              {panelIds.map((id, i) => (
-                <div key={id} className={founderOf(id) && !founderOf(panelIds[i - 1] ?? "") ? "border-t-[0.5px] border-black/20 pt-4" : undefined}>
-                  <CompleteField id={id} lang={lang} pack={pack} fields={shown} raw={fields} label={labelOf(id)} hint={hintOf(id)} onField={setField} onLink={setLink} pickerNone={t("otherPerson")} founderLabel={(n) => t("founderN", { n })} sameAs={t("samePerson")} />
-                </div>
-              ))}
+              {panelIds.map((id, i) => {
+                const group = pack.fields[id]?.group ?? "";
+                const first = i === 0 || (pack.fields[panelIds[i - 1]]?.group ?? "") !== group;
+                return (
+                  <div key={id} className={first && i > 0 ? "mt-2 border-t-[0.5px] border-black/25 pt-5" : undefined}>
+                    {first ? <p className="type-eyebrow mb-3 text-black/60">{groupOf(group)}</p> : null}
+                    <CompleteField id={id} lang={lang} pack={pack} fields={shown} raw={fields} label={labelOf(id)} hint={hintOf(id)} onField={setField} onLink={setLink} pickerNone={t("otherPerson")} founderLabel={(n) => t("founderN", { n })} sameAs={t("samePerson")} />
+                  </div>
+                );
+              })}
               {nextFounder ? (
                 <button type="button" onClick={() => setRevealed((r) => [...r, nextFounder])} className="self-start rounded-brand bg-paper px-3.5 py-2 text-[14px] font-semibold text-sea hover:bg-mist-2">
                   + {t("addFounder")}

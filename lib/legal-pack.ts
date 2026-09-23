@@ -38,6 +38,8 @@ export interface PackField {
   part?: "name" | "jmb" | "addr";
   /** A link field: holds "f1" to "f5" (which founder a person blank follows) or "". Never rendered. */
   isLink?: boolean;
+  /** The section of the Complete panel the blank belongs to (a key of LegalPack.groups). */
+  group?: string;
 }
 
 export type PackBlock =
@@ -67,6 +69,8 @@ export type DocTexts = Record<string, string>;
 
 export interface LegalPack {
   fields: Record<string, PackField>;
+  /** The sections of the Complete panel, by key. */
+  groups?: Record<string, Bilingual>;
   forms: PackForm[];
   drafts: PackDraft[];
   /** The founders' guide: read-only, English, shown in both languages. */
@@ -346,6 +350,7 @@ export function docTexts(pack: LegalPack, docKey: string, draftHtml?: string): D
       if (f.label.en) out[`f:${id}`] = f.label.en;
       if (f.hint?.en) out[`f:${id}.h`] = f.hint.en;
     }
+    for (const [key, g] of Object.entries(pack.groups ?? {})) out[`g:${key}`] = g.en;
     for (const f of pack.forms) out[`form:${f.id}.t`] = f.title.en;
     for (const d of pack.drafts) out[`draft:${d.id}.t`] = d.title.en;
     if (pack.guide) out["guide.t"] = pack.guide.title.en;
