@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { buildRegistrationEmail } from "@/lib/email/registration";
-import { activeTiers, parseTiers } from "@/lib/events";
+import { activeTiers, parseDistances, parseTiers, tiersFor } from "@/lib/events";
 import { sendEmail } from "@/lib/email/send";
 import { generatePaymentReference } from "@/lib/references";
 import { createServiceClient } from "@/lib/supabase/admin";
@@ -85,9 +85,8 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
       return { ok: false, error: "closed" };
     }
 
-    const distances = Array.isArray(event.distances)
-      ? (event.distances as string[])
-      : [];
+    const distanceRows = parseDistances(event.distances);
+    const distances = distanceRows.map((d) => d.name);
     if (data.distance !== null && !distances.includes(data.distance)) {
       return { ok: false, error: "invalid" };
     }
@@ -95,8 +94,9 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
       return { ok: false, error: "invalid" };
     }
     // Free events (no tiers) register at zero; priced events need a tier
-    // that is still on offer today (early-bird dates are enforced here).
-    const tiers = withOrganizer ? [] : activeTiers(parseTiers(event.price_tiers));
+    // that is still on offer today (early-bird dates are enforced here)
+    // and meant for the chosen distance.
+    const tiers = withOrganizer ? [] : tiersFor(activeTiers(parseTiers(event.price_tiers)), data.distance);
     const tier =
       tiers.length === 0
         ? null
@@ -126,6 +126,18 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
         .eq("needs_bib", true)
         .neq("status", "cancelled");
       if ((count ?? 0) >= (event.bib_capacity ?? 0)) return { ok: false, error: "bibsGone" };
+    }
+
+    // A distance with its own number of places fills on its own.
+    const chosen = distanceRows.find((d) => d.name === data.distance);
+    if (chosen && typeof chosen.capacity === "number" && chosen.capacity > 0) {
+      const { count } = await service
+        .from("registrations")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", event.id)
+        .eq("distance", chosen.name)
+        .neq("status", "cancelled");
+      if ((count ?? 0) >= chosen.capacity) return { ok: false, error: "full" };
     }
 
     // Capacity gate (best effort — the tiny race window can only ever
