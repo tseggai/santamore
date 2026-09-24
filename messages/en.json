@@ -98,7 +98,8 @@
     "partnersOfYear": "Partners of {year}",
     "causesHeading": "What we are raising for right now",
     "proposalsHeading": "Your community, your cause.",
-    "testModeBanner": "Test mode — the figures on this site are practice data, not real gifts."
+    "testModeBanner": "Test mode — the figures on this site are practice data, not real gifts.",
+    "partnersTiers": "Partnership tiers"
   },
   "footer": {
     "orgHeading": "Organisation",
@@ -213,8 +214,9 @@
     "pledgeNote": "We keep only your name, email and amount, as our privacy policy describes. A pledge is a promise, not a payment.",
     "confPledgeNote": "We've emailed you a confirmation. As soon as our account opens you'll receive the transfer details, with your reference.",
     "pledgeReference": "Your reference: {reference}",
-    "noOpenCause": "There is no open cause right now. The next one opens soon.",
-    "noOpenCauseLink": "See our causes"
+    "noOpenCause": "There is no open cause right now. Propose one, or back a proposal, and pledge the moment it opens.",
+    "noOpenCauseLink": "See the causes",
+    "noOpenCausePropose": "Propose a cause"
   },
   "runner": {
     "team": "Team",
@@ -274,7 +276,7 @@
     "twoFunds": "Two separate funds",
     "impactFund": "Impact Fund — from donations",
     "impactFundValue": "100% to beneficiaries",
-    "operationsFund": "Operations Fund — from sponsors, entries and grants",
+    "operationsFund": "Operations Fund — from sponsors",
     "fundsNote": "Not one cent of donations goes to salaries or overhead. Sponsors pay for those.",
     "moneyIn": "Money in",
     "moneyOut": "Money out",
@@ -292,7 +294,8 @@
     "downloadIn": "Download CSV — money in",
     "downloadOut": "Download CSV — money out",
     "railRecorded": "RECORDED",
-    "railSponsorship": "SPONSOR"
+    "railSponsorship": "SPONSOR",
+    "railEntry": "ENTRY"
   },
   "dashboard": {
     "title": "My fundraising page",
@@ -553,7 +556,7 @@
       "amount": "Amount",
       "reference": "Reference — required",
       "whatNext": "We match transfers usually within one working day; your place is confirmed the moment we do.",
-      "opsNote": "Entry fees fund the event and our team (Operations Fund) — donations still go 100% to beneficiaries."
+      "opsNote": "Entry fees go to the cause, like donations. Sponsors pay for the event and our team."
     },
     "pledge": {
       "subject": "Your pledge to {campaign}",
@@ -1589,7 +1592,11 @@
     "pledgesNotReadyHint": "They go out once NEXT_PUBLIC_ORG_IBAN holds the real IBAN. A note in that variable does not count.",
     "pledgesSend": "Send transfer details to {count}",
     "pledgesSending": "Sending…",
-    "pledgesSent": "Sent: {sent}. Failed: {failed}."
+    "pledgesSent": "Sent: {sent}. Failed: {failed}.",
+    "evFeeFund": "Entry fees go to",
+    "evFeeFundImpact": "The cause (Impact Fund)",
+    "evFeeFundOperations": "The team (Operations Fund)",
+    "evFeeFundHint": "The rule is the cause. Choose the team only on a Board decision for this event; the money page says so."
   },
   "forms": {
     "nameLabel": "Full name",
@@ -1667,7 +1674,7 @@
     "registeredTitle": "You're registered!",
     "confirmedTitle": "You're in — entry confirmed",
     "payInstructions": "One step left: transfer your entry fee with the reference below and we'll confirm your place, usually within one working day.",
-    "opsNote": "Entry fees fund the event and our team (Operations Fund) — donations still go 100% to beneficiaries.",
+    "opsNote": "Entry fees go to the cause, like donations. Sponsors pay for the event and our team.",
     "paidNote": "Entry fee received. See you at the start line.",
     "noFeeNote": "No entry fee due. See you at the start line.",
     "registrationFull": "The event is full.",
@@ -1710,7 +1717,7 @@
     "rewardsCount": "{count, plural, one {# reward} other {# rewards}}",
     "waysInHeading": "Two ways in",
     "wayRun": "Take part",
-    "wayRunSub": "Register yourself, or someone you bring along. The entry fee funds the event; donations never do.",
+    "wayRunSub": "Register yourself, or someone you bring along. The entry fee goes to the cause, like a donation; sponsors pay for the event.",
     "wayJoin": "Take the challenge",
     "wayJoinSub": "Register, connect Strava, and every qualifying activity counts towards the rewards.",
     "wayGoing": "Come along",
