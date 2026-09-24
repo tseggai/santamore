@@ -27,7 +27,8 @@
       "apply": "Apply for help",
       "contact": "Contact",
       "beneficiaries": "Beneficiaries"
-    }
+    },
+    "pledge": "Pledge"
   },
   "home": {
     "eyebrow": "Montenegrin non-profit · Tivat",
@@ -204,7 +205,16 @@
     "summaryAnonymous": "{name} (anonymous in public)",
     "emailHint": "For the transfer details and your receipt only. Never shown publicly.",
     "confShareFundraiser": "Share this fundraiser",
-    "confShareCause": "Share this cause"
+    "confShareCause": "Share this cause",
+    "pledgeVerb": "Pledge",
+    "pledgeHeading": "Your pledge",
+    "pledgeIntro": "Santamore is being registered as an association and our bank account is on its way. Pledge now and we'll email you the transfer details the moment the account opens. Nothing to pay today.",
+    "pledgeTotal": "Your pledge",
+    "pledgeNote": "We keep only your name, email and amount, as our privacy policy describes. A pledge is a promise, not a payment.",
+    "confPledgeNote": "We've emailed you a confirmation. As soon as our account opens you'll receive the transfer details, with your reference.",
+    "pledgeReference": "Your reference: {reference}",
+    "noOpenCause": "There is no open cause right now. The next one opens soon.",
+    "noOpenCauseLink": "See our causes"
   },
   "runner": {
     "team": "Team",
@@ -544,6 +554,16 @@
       "reference": "Reference — required",
       "whatNext": "We match transfers usually within one working day; your place is confirmed the moment we do.",
       "opsNote": "Entry fees fund the event and our team (Operations Fund) — donations still go 100% to beneficiaries."
+    },
+    "pledge": {
+      "subject": "Your pledge to {campaign}",
+      "greeting": "Hi {name},",
+      "intro": "Thank you for pledging {amount} to {campaign}.",
+      "introMonthly": "Thank you for pledging {amount} a month to {campaign}.",
+      "whatNext": "Santamore is being registered and our bank account is on its way. As soon as it opens we'll email you the transfer details.",
+      "reference": "Your reference: {reference}",
+      "nothingToPay": "There is nothing to pay today. Once your transfer arrives, your gift appears in our public ledger.",
+      "ledgerCta": "The public ledger"
     }
   },
   "admin": {
@@ -1562,7 +1582,14 @@
     "uploadUnreadable": "The browser can't read this picture. Use a JPEG or PNG; a HEIC photo from an iPhone needs converting first (share it as JPEG, or set Camera › Formats to Most Compatible).",
     "uploadTooLarge": "The picture is over the size this storage accepts. Use a smaller one.",
     "uploadForbidden": "The storage refused the upload for this account. Sign out and in again; if it persists, the bucket policy needs checking.",
-    "uploadFailed": "The upload failed: {detail}"
+    "uploadFailed": "The upload failed: {detail}",
+    "pledgesHeading": "Pledges",
+    "pledgesWaiting": "{count, plural, one {# pledge is} other {# pledges are}} waiting for transfer details.",
+    "pledgesReadyHint": "The bank details are set. One click emails every pledger the IBAN and their reference.",
+    "pledgesNotReadyHint": "They go out once NEXT_PUBLIC_ORG_IBAN holds the real IBAN. A note in that variable does not count.",
+    "pledgesSend": "Send transfer details to {count}",
+    "pledgesSending": "Sending…",
+    "pledgesSent": "Sent: {sent}. Failed: {failed}."
   },
   "forms": {
     "nameLabel": "Full name",

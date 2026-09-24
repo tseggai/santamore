@@ -1,9 +1,11 @@
 import { getTranslations } from "next-intl/server";
 
 import { ConfirmCashButton } from "@/components/admin/ConfirmCashButton";
+import { PledgeInstructionsCard } from "@/components/admin/PledgeInstructionsCard";
 import { DonationActions } from "@/components/admin/DonationActions";
 import { ReconciliationTool } from "@/components/admin/ReconciliationTool";
 import { formatCents, parseEurosToCents } from "@/lib/money";
+import { getOrgBankDetails, hasBankDetails } from "@/lib/org";
 import { PAYMENT_REFERENCE_PATTERN } from "@/lib/references";
 import { createClient } from "@/lib/supabase/server";
 import type { PendingTarget } from "@/lib/reconcile";
@@ -108,7 +110,7 @@ export default async function AdminDonationsPage({
   const t = await getTranslations("admin");
   const supabase = await createClient();
 
-  const [{ data: pendingData }, { data: approvedData }, { data: regData }] =
+  const [{ data: pendingData }, { data: approvedData }, { data: regData }, { count: pledgesWaiting }] =
     await Promise.all([
       supabase
         .from("donations")
@@ -132,6 +134,13 @@ export default async function AdminDonationsPage({
         .eq("status", "pending")
         .gt("amount_due_cents", 0)
         .not("payment_reference", "is", null),
+      // Pledges made before the bank account: still owed their transfer details.
+      supabase
+        .from("donations")
+        .select("id", { count: "exact", head: true })
+        .eq("rail", "sepa")
+        .eq("status", "pending")
+        .is("instructions_sent_at", null),
     ]);
 
   const pending = (pendingData ?? []) as unknown as DonationRow[];
@@ -251,6 +260,7 @@ export default async function AdminDonationsPage({
 
   return (
     <div className="py-8">
+      <PledgeInstructionsCard waiting={pledgesWaiting ?? 0} bankReady={hasBankDetails(getOrgBankDetails())} />
       <h2 className="text-[18px] font-bold">{t("donationsTitle")}</h2>
 
       {/* search across every status — refunds and receipt re-sends live here */}
