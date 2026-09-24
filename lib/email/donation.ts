@@ -117,6 +117,45 @@ ${input.isRecurring ? `<p>${escapeHtml(t("standingOrder"))}</p>` : ""}
   };
 }
 
+/**
+ * A pledge made before the bank account exists: thanks, the amount, the
+ * cause, and the promise that the transfer details follow by email once
+ * the account opens. No IBAN, because there is none yet.
+ */
+export async function buildPledgeEmail(input: DonationEmailInput): Promise<EmailMessage> {
+  const t = await getTranslations({ locale: input.locale, namespace: "email.pledge" });
+  const amount = formatCents(input.amountCents, input.locale);
+  const campaign = input.campaignTitle;
+  const ledgerUrl = `${siteUrl()}/${input.locale}/transparentnost`;
+  const intro = input.isRecurring ? t("introMonthly", { campaign, amount }) : t("intro", { campaign, amount });
+
+  const text = [
+    t("greeting", { name: input.donorName }),
+    "",
+    intro,
+    "",
+    t("whatNext"),
+    t("reference", { reference: input.reference }),
+    "",
+    t("nothingToPay"),
+    `${t("ledgerCta")}: ${ledgerUrl}`,
+  ].join("\n");
+
+  const html = shell(
+    escapeHtml(t("subject", { campaign })),
+    `<p>${escapeHtml(t("greeting", { name: input.donorName }))}</p>
+<p>${escapeHtml(intro)}</p>
+<div style="${boxStyle}">
+  <p style="margin:6px 0;">${escapeHtml(t("whatNext"))}</p>
+  <p style="margin:6px 0;${monoStyle}">${escapeHtml(t("reference", { reference: input.reference }))}</p>
+</div>
+<p>${escapeHtml(t("nothingToPay"))}</p>
+<p><a href="${ledgerUrl}" style="color:#0e3a46;">${escapeHtml(t("ledgerCta"))}</a></p>`,
+  );
+
+  return { to: input.donorEmail, subject: t("subject", { campaign }), html, text };
+}
+
 export async function buildReceiptEmail(input: DonationEmailInput): Promise<EmailMessage> {
   const t = await getTranslations({ locale: input.locale, namespace: "email.receipt" });
   const amount = formatCents(input.amountCents, input.locale);

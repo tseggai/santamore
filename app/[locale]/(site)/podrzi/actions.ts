@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { loadDonateTarget } from "@/lib/donate/target";
 import type { DonateTargetData } from "@/lib/donate/types";
-import { buildInstructionsEmail } from "@/lib/email/donation";
+import { buildInstructionsEmail, buildPledgeEmail } from "@/lib/email/donation";
 import { sendEmail } from "@/lib/email/send";
 import { getOrgBankDetails, hasBankDetails } from "@/lib/org";
 import { donationPledgeSchema } from "@/lib/schemas/donation";
@@ -15,8 +15,8 @@ const donateRequestSchema = z.object({
   slug: z.string().trim().min(1).max(100).optional(),
 });
 
-/** What the donate overlay loads when it opens; public data only. */
-export async function fetchDonateTarget(input: unknown): Promise<DonateTargetData | null> {
+/** What the donate overlay loads when it opens; public data only. "none" when no cause is open. */
+export async function fetchDonateTarget(input: unknown): Promise<DonateTargetData | "none" | null> {
   const parsed = donateRequestSchema.safeParse(input);
   if (!parsed.success) return null;
   return loadDonateTarget(parsed.data);
@@ -45,11 +45,9 @@ export async function createSepaPledge(input: unknown): Promise<PledgeResult> {
   }
   const pledge = parsed.data;
 
-  // No bank details, no pledge: a pending row the donor cannot pay (and an
-  // instructions email full of [[PLACEHOLDER]]s) is worse than an error.
-  if (!hasBankDetails(getOrgBankDetails())) {
-    return { ok: false, error: "server" };
-  }
+  // Without a real bank account the gift is a pledge: recorded now, the
+  // transfer details emailed by staff once the account opens.
+  const pledgeOnly = !hasBankDetails(getOrgBankDetails());
 
   try {
     // Service role: the donations table deliberately has no anon grants.
@@ -122,6 +120,7 @@ export async function createSepaPledge(input: unknown): Promise<PledgeResult> {
       rail: "sepa",
       status: "pending",
       donor_locale: pledge.locale,
+      instructions_sent_at: pledgeOnly ? null : new Date().toISOString(),
     });
     if (insertError) {
       console.error("[donate] pending insert failed:", insertError.code);
@@ -130,8 +129,9 @@ export async function createSepaPledge(input: unknown): Promise<PledgeResult> {
 
     // Best effort: a failed email must never lose the pledge.
     try {
+      const build = pledgeOnly ? buildPledgeEmail : buildInstructionsEmail;
       await sendEmail(
-        await buildInstructionsEmail({
+        await build({
           locale: pledge.locale,
           donorName: pledge.name,
           donorEmail: pledge.email,

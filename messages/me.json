@@ -27,7 +27,8 @@
       "apply": "Prijava za pomoć",
       "contact": "Kontakt",
       "beneficiaries": "Korisnici"
-    }
+    },
+    "pledge": "Obećaj donaciju"
   },
   "home": {
     "eyebrow": "Crnogorska neprofitna organizacija · Tivat",
@@ -204,7 +205,16 @@
     "summaryAnonymous": "{name} (javno anonimno)",
     "emailHint": "Samo za podatke o uplati i potvrdu. Nikad se ne prikazuje javno.",
     "confShareFundraiser": "Podijeli ovog prikupljača",
-    "confShareCause": "Podijeli ovaj cilj"
+    "confShareCause": "Podijeli ovaj cilj",
+    "pledgeVerb": "Obećaj",
+    "pledgeHeading": "Tvoje obećanje",
+    "pledgeIntro": "Santamore se registruje kao udruženje i račun u banci je na putu. Obećaj donaciju sada, a podatke za uplatu šaljemo e-poštom čim se račun otvori. Danas se ništa ne plaća.",
+    "pledgeTotal": "Tvoje obećanje",
+    "pledgeNote": "Čuvamo samo ime, e-poštu i iznos, kako opisuje naša politika privatnosti. Obećanje je obećanje, ne uplata.",
+    "confPledgeNote": "Poslali smo ti potvrdu na e-poštu. Čim se račun otvori, stižu podaci za uplatu sa tvojim pozivom na broj.",
+    "pledgeReference": "Tvoj poziv na broj: {reference}",
+    "noOpenCause": "Trenutno nema otvorenog cilja. Sljedeći se otvara uskoro.",
+    "noOpenCauseLink": "Pogledaj naše ciljeve"
   },
   "runner": {
     "team": "Tim",
@@ -544,6 +554,16 @@
       "reference": "Poziv na broj — obavezno",
       "whatNext": "Uplate uparujemo obično u roku od jednog radnog dana; mjesto je potvrđeno čim to uradimo.",
       "opsNote": "Kotizacije finansiraju događaj i naš tim (Operativni fond) — donacije i dalje idu 100% korisnicima."
+    },
+    "pledge": {
+      "subject": "Tvoje obećanje za {campaign}",
+      "greeting": "Zdravo {name},",
+      "intro": "Hvala što si obećao/la {amount} za {campaign}.",
+      "introMonthly": "Hvala što si obećao/la {amount} mjesečno za {campaign}.",
+      "whatNext": "Santamore se registruje i račun u banci je na putu. Čim se otvori, šaljemo ti podatke za uplatu.",
+      "reference": "Tvoj poziv na broj: {reference}",
+      "nothingToPay": "Danas se ništa ne plaća. Kad uplata stigne, tvoja donacija se pojavljuje u javnom registru.",
+      "ledgerCta": "Javni registar"
     }
   },
   "admin": {
@@ -1562,7 +1582,14 @@
     "uploadUnreadable": "Pregledač ne može da pročita ovu sliku. Koristite JPEG ili PNG; HEIC fotografiju sa iPhone-a treba prvo pretvoriti (podijelite je kao JPEG ili u Kameri › Formati izaberite Najkompatibilnije).",
     "uploadTooLarge": "Slika je veća nego što ovo skladište prima. Koristite manju.",
     "uploadForbidden": "Skladište je odbilo otpremanje za ovaj nalog. Odjavite se i prijavite ponovo; ako se ponovi, treba provjeriti pravila skladišta.",
-    "uploadFailed": "Otpremanje nije uspjelo: {detail}"
+    "uploadFailed": "Otpremanje nije uspjelo: {detail}",
+    "pledgesHeading": "Obećane donacije",
+    "pledgesWaiting": "{count, plural, one {# obećanje čeka} few {# obećanja čekaju} other {# obećanja čeka}} podatke za uplatu.",
+    "pledgesReadyHint": "Podaci banke su podešeni. Jedan klik šalje svakom donatoru IBAN i njegov poziv na broj.",
+    "pledgesNotReadyHint": "Šalju se kad NEXT_PUBLIC_ORG_IBAN bude pravi IBAN. Napomena u toj promjenljivoj se ne računa.",
+    "pledgesSend": "Pošalji podatke za uplatu ({count})",
+    "pledgesSending": "Slanje…",
+    "pledgesSent": "Poslato: {sent}. Neuspjelo: {failed}."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

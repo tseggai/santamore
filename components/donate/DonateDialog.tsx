@@ -12,6 +12,7 @@ import {
 } from "react";
 
 import { fetchDonateTarget } from "@/app/[locale]/(site)/podrzi/actions";
+import { Link } from "@/i18n/navigation";
 import { DonateFlow } from "@/components/donate/DonateFlow";
 import type { DonateRequest, DonateTargetData } from "@/lib/donate/types";
 import type { Locale } from "@/i18n/routing";
@@ -31,6 +32,7 @@ type State =
   | { phase: "closed" }
   | { phase: "loading"; request: DonateRequest }
   | { phase: "ready"; request: DonateRequest; data: DonateTargetData }
+  | { phase: "none"; request: DonateRequest }
   | { phase: "error"; request: DonateRequest };
 
 /**
@@ -53,9 +55,11 @@ export function DonateProvider({ children }: { children: ReactNode }) {
     setState((current) =>
       current.phase === "closed" || current.request !== request
         ? current
-        : data
-          ? { phase: "ready", request, data }
-          : { phase: "error", request },
+        : data === "none"
+          ? { phase: "none", request }
+          : data
+            ? { phase: "ready", request, data }
+            : { phase: "error", request },
     );
   }, []);
 
@@ -111,6 +115,13 @@ export function DonateProvider({ children }: { children: ReactNode }) {
                 variant="dialog"
                 onClose={close}
               />
+            ) : state.phase === "none" ? (
+              <div className="px-5 py-10 sm:px-7">
+                <p className="rounded-brand bg-mist px-5 py-4 text-[15px] text-sea">{t("noOpenCause")}</p>
+                <Link href="/kampanje" onClick={close} className="mt-4 inline-block text-[15px] font-semibold text-sea underline underline-offset-2">
+                  {t("noOpenCauseLink")}
+                </Link>
+              </div>
             ) : state.phase === "error" ? (
               <div className="px-5 py-10 sm:px-7">
                 <p

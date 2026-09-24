@@ -23,7 +23,7 @@ export async function generateMetadata({
     getTranslations({ locale, namespace: "nav" }),
   ]);
   return {
-    title: data ? `${t("donate")} — ${data.target.title} — Santamore` : "Santamore",
+    title: data && data !== "none" ? `${t("donate")} — ${data.target.title} — Santamore` : "Santamore",
   };
 }
 
@@ -37,7 +37,7 @@ export default async function FundraiserDonatePage({
   setRequestLocale(locale);
 
   const data = await loadDonateTarget({ kind: "fundraiser", slug });
-  if (!data) notFound();
+  if (!data || data === "none") notFound();
 
   return <DonateFlow locale={locale as Locale} data={data} />;
 }

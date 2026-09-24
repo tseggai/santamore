@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { DonateFlow } from "@/components/donate/DonateFlow";
 import { loadDonateTarget } from "@/lib/donate/target";
+import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 
 // Reads live campaign data on every request; never prerendered at build.
@@ -45,6 +46,15 @@ export default async function DonatePage({
   // /kampanje/<slug> links here with its own campaign; bare /podrzi keeps
   // the flagship one.
   const data = await loadDonateTarget({ kind: "campaign", slug: kampanja });
+  if (data === "none") {
+    return (
+      <div className="mx-auto max-w-3xl px-5 py-20">
+        <h1 className="type-display text-3xl">{t("payVerb")}</h1>
+        <p className="mt-5 rounded-brand bg-mist px-5 py-4 text-[15px] text-sea">{t("noOpenCause")}</p>
+        <Link href="/kampanje" className="mt-5 inline-block text-[15px] font-semibold text-sea underline underline-offset-2">{t("noOpenCauseLink")}</Link>
+      </div>
+    );
+  }
   if (!data) {
     return (
       <div className="mx-auto max-w-3xl px-5 py-20">

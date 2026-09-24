@@ -54,8 +54,8 @@ describe("flagshipCause", () => {
     expect(flagshipCause([done, older, open], NOW)?.slug).toBe("open");
   });
 
-  it("falls back to the most recent cause when none is open", () => {
-    expect(flagshipCause([done, { ...done, slug: "done-2", starts_at: "2024-11-01T00:00:00Z" }], NOW)?.slug).toBe("done");
+  it("has no flagship when every cause is completed", () => {
+    expect(flagshipCause([done, { ...done, slug: "done-2", starts_at: "2024-11-01T00:00:00Z" }], NOW)).toBeNull();
   });
 
   it("is null without causes", () => {
