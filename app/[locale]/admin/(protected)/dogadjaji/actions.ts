@@ -57,6 +57,8 @@ const eventSchema = z
     offersShirts: z.boolean(),
     coverPath: z.string().trim().max(300).nullable().optional(),
     hosting: z.enum(["own", "external"]).default("own"),
+    /** Where the entry fees go: the cause (default) or the team. */
+    feeFund: z.enum(["impact", "operations"]).default("impact"),
     externalUrl: z.string().trim().url().max(300).nullable().default(null),
     registrationMode: z.enum(["organizer", "here"]).default("organizer"),
     organizerName: z.string().trim().max(120).nullable().default(null),
@@ -106,6 +108,7 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
     is_published: data.isPublished,
     // Only a race can be someone else's; only a gathering brings guests.
     hosting: data.kind === "race" ? data.hosting : "own",
+    fee_fund: data.feeFund,
     external_url: data.kind === "race" && data.hosting === "external" ? data.externalUrl : null,
     organizer_name: data.kind === "race" && data.hosting === "external" ? data.organizerName : null,
     // Our own events register here; an external race registers with the

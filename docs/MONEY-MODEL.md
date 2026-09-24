@@ -11,6 +11,7 @@ Money reaches Santamore through three kinds of record, and leaves through two:
 | in | a donation matched in the ledger | `donations` (approved or refunded) + `ledger_adjustments` |
 | in | a gift recorded on a year report, from before the ledger | `year_reports.donors_list` |
 | in | sponsorship cash that went to the beneficiaries | `sponsors` with `fund = 'impact'` |
+| in | a paid entry to an event whose fees go to the cause | `registrations` confirmed, on an event with `fee_fund = 'impact'` (migration 0071; the default) |
 | out | a published hand-over | `disbursements` |
 | out | a hand-over recorded on a year report | `year_reports.beneficiaries_list` |
 
@@ -42,8 +43,10 @@ v_money_out_all     every euro out, every cause    (internal, no grants)
       ├── v_staff_members                            raised and given per account, from the same rows
       ├── v_donors / v_donor_gifts                   the same rows by donor, staff only (Donors tab)
       ├── v_money_in_daily                           the same rows by day, staff only (overview chart)
-      └── v_public_ops_total                         operations-fund cash + entry fees only
+      └── v_public_ops_total                         operations-fund sponsorship + entry fees of 'operations' events only
 ```
+
+**The two funds (decision of 2026-09-24).** The Impact Fund is donations, entry fees and grants; the Operations Fund is sponsorship. Each record says which fund it feeds: `sponsors.fund` per sponsorship (a grant is entered as a sponsorship row from the funder with `fund = 'impact'`), `events.fee_fund` per event. Both default to the rule, and a Board decision for one case is a switch on that record, shown on the public pages, never a rule bent in code. An entry row carries no donor: it is not a gift, so it is not on the donor wall and does not count as a donor.
 
 A correction (`ledger_adjustments`) is a row of the ledger like any other, with `source = 'adjustment'`, the donor or beneficiary of the row it corrects, and a signed amount. Nothing sums adjustments separately any more; the public ledger lists them under the entries with their reason (`v_public_ledger_adjustments`), and the CSV exports do the same.
 

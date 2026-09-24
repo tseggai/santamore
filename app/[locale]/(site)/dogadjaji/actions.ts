@@ -39,7 +39,7 @@ export interface RegisterResult {
  * Register a participant for an event under the signed-in account — the
  * account holder or someone they register (a child, a friend). Waiver
  * recorded where the event needs one, per-registration SEPA reference
- * minted server-side, entry fee owed to the Operations Fund; a free tier
+ * minted server-side, entry fee owed to the fund the event names (the cause, unless the Board says otherwise); a free tier
  * confirms on the spot. Idempotent per (event, account, participant email).
  */
 export async function registerForEvent(input: unknown): Promise<RegisterResult> {
