@@ -89,7 +89,7 @@ export default function Footer() {
             ))}
           </ul>
           <div className="mt-6">
-            <LocaleSwitcher variant="dark" />
+            <LocaleSwitcher variant="dark" direction="up" />
           </div>
         </div>
       </div>

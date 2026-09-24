@@ -39,7 +39,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     heroEyebrow: "Partneri",
     heroTitle: "Vaši sponzori plaćaju naš tim, da donacije ne moraju.",
     heroLead:
-      "Sponzorstva i kotizacije idu u Operativni fond — plate, osiguranje, oprema. Zato 100% svake donacije stiže do korisnika. Partner na svakoj stranici vidi tačno to, svojim imenom.",
+      "Samo sponzorstva idu u Operativni fond — plate, osiguranje, oprema. Zato 100% svake donacije, kotizacije i granta stiže do korisnika. Partner na svakoj stranici vidi tačno to, svojim imenom.",
     taxHeading: "Argument koji stvarno radi: poreska olakšica",
     tax: [
       "Crnogorske kompanije i pojedinci mogu odbiti do 3,5% bruto prihoda za humanitarna, sportska, zdravstvena, kulturna i ekološka davanja. Većina to nikad ne iskoristi.",
@@ -49,23 +49,23 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     tiers: [
       {
         name: "Core Cost partner",
-        price: "€10.000+ / god.",
-        desc: "Finansira naš tim. Imenovan na svakoj stranici: „Operacije Santamore finansira X, pa 100% donacija stiže do cilja.“ Ovo je nivo koji stvara naše plate.",
+        price: "€25.000+ / god.",
+        desc: "Finansira naš tim cijelu godinu, na svakom događaju. Imenovan na svakoj stranici: „Operacije Santamore finansira X, pa 100% donacija stiže do cilja.“ Ovo je nivo koji stvara naše plate; vrijedi više od title partnerstva na svakom događaju u godini.",
         flagship: true,
       },
       {
         name: "Title partner",
-        price: "€5.000 / događaj",
+        price: "€10.000 / događaj",
         desc: "Ime uz događaj, logo na svakom broju i odijelu, brending na startu, vrijeme na bini, 20 prijava, tim zaposlenih uključen.",
       },
       {
         name: "Gold",
-        price: "€2.500",
+        price: "€5.000",
         desc: "Brending staze i prostora, logo na majicama, 10 prijava, objave na mrežama.",
       },
       {
         name: "Silver",
-        price: "€1.000",
+        price: "€2.000",
         desc: "Logo na materijalima, 5 prijava, brendirana stanica na stazi.",
       },
       {
@@ -120,7 +120,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     heroEyebrow: "Partners",
     heroTitle: "Our sponsors pay for our team, so donations don't have to.",
     heroLead:
-      "Sponsorship and entry fees go to the Operations Fund — salaries, insurance, equipment. That is why 100% of every donation reaches beneficiaries. A partner sees exactly that, with their name on it, on every page.",
+      "Sponsorship alone goes to the Operations Fund — salaries, insurance, equipment. That is why 100% of every donation, entry fee and grant reaches beneficiaries. A partner sees exactly that, with their name on it, on every page.",
     taxHeading: "The argument that actually works: the tax allowance",
     tax: [
       "Montenegrin companies and individuals may deduct up to 3.5% of gross income for humanitarian, sport, health, cultural and environmental giving. Most never use it.",
@@ -130,23 +130,23 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     tiers: [
       {
         name: "Core Cost Partner",
-        price: "€10,000+ / yr",
-        desc: "Funds our team. Named on every page: “Santamore's operations are funded by X, so 100% of donations reach the cause.” This is the tier that creates our salaries.",
+        price: "€25,000+ / yr",
+        desc: "Funds our team all year, at every event. Named on every page: “Santamore's operations are funded by X, so 100% of donations reach the cause.” This is the tier that creates our salaries; it stands above a title partnership at every event of the year.",
         flagship: true,
       },
       {
         name: "Title Partner",
-        price: "€5,000 / event",
+        price: "€10,000 / event",
         desc: "Named in association, logo on every bib and suit, start-line branding, stage time, 20 entries, employee team included.",
       },
       {
         name: "Gold",
-        price: "€2,500",
+        price: "€5,000",
         desc: "Course and venue branding, logo on shirts, 10 entries, social features.",
       },
       {
         name: "Silver",
-        price: "€1,000",
+        price: "€2,000",
         desc: "Logo on materials, 5 entries, a branded station on the course.",
       },
       {
@@ -201,7 +201,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     heroEyebrow: "Партнёры",
     heroTitle: "Наши спонсоры оплачивают нашу команду, чтобы пожертвованиям не пришлось.",
     heroLead:
-      "Спонсорство и стартовые взносы идут в Операционный фонд — зарплаты, страховка, оборудование. Именно поэтому 100% каждого пожертвования доходит до получателей. Партнёр видит ровно это, со своим именем, на каждой странице.",
+      "Только спонсорство идёт в Операционный фонд — зарплаты, страховка, оборудование. Именно поэтому 100% каждого пожертвования, взноса и гранта доходит до получателей. Партнёр видит ровно это, со своим именем, на каждой странице.",
     taxHeading: "Аргумент, который действительно работает: налоговый вычет",
     tax: [
       "Черногорские компании и частные лица могут вычесть до 3,5% валового дохода на гуманитарные, спортивные, медицинские, культурные и экологические цели. Большинство этим никогда не пользуется.",
@@ -211,23 +211,23 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     tiers: [
       {
         name: "Core Cost Partner",
-        price: "€10 000+ / год",
-        desc: "Финансирует нашу команду. Имя на каждой странице: «Операции Santamore финансирует X, поэтому 100% пожертвований доходит до цели». Этот уровень создаёт наши зарплаты.",
+        price: "€25 000+ / год",
+        desc: "Финансирует нашу команду весь год, на каждом событии. Имя на каждой странице: «Операции Santamore финансирует X, поэтому 100% пожертвований доходит до цели». Этот уровень создаёт наши зарплаты; он стоит выше титульного партнёрства на каждом событии года.",
         flagship: true,
       },
       {
         name: "Title Partner",
-        price: "€5 000 / событие",
+        price: "€10 000 / событие",
         desc: "Имя рядом с событием, логотип на каждом номере и костюме, брендинг на старте, время на сцене, 20 слотов, команда сотрудников включена.",
       },
       {
         name: "Gold",
-        price: "€2 500",
+        price: "€5 000",
         desc: "Брендинг трассы и площадки, логотип на футболках, 10 слотов, публикации в соцсетях.",
       },
       {
         name: "Silver",
-        price: "€1 000",
+        price: "€2 000",
         desc: "Логотип на материалах, 5 слотов, брендированная станция на трассе.",
       },
       {

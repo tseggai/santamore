@@ -51,7 +51,10 @@ export default async function DonatePage({
       <div className="mx-auto max-w-3xl px-5 py-20">
         <h1 className="type-display text-3xl">{t("payVerb")}</h1>
         <p className="mt-5 rounded-brand bg-mist px-5 py-4 text-[15px] text-sea">{t("noOpenCause")}</p>
-        <Link href="/kampanje" className="mt-5 inline-block text-[15px] font-semibold text-sea underline underline-offset-2">{t("noOpenCauseLink")}</Link>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <Link href="/predlozi" className="inline-flex h-11 items-center rounded-lg bg-red px-5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark">{t("noOpenCausePropose")}</Link>
+          <Link href="/kampanje" className="text-[15px] font-semibold text-sea underline underline-offset-2">{t("noOpenCauseLink")}</Link>
+        </div>
       </div>
     );
   }

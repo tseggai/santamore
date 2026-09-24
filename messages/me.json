@@ -98,7 +98,8 @@
     "partnersOfYear": "Partneri {year}.",
     "causesHeading": "Za šta trenutno prikupljamo",
     "proposalsHeading": "Tvoja zajednica, tvoj cilj.",
-    "testModeBanner": "Test režim — brojke na ovom sajtu su vježba, ne pravi pokloni."
+    "testModeBanner": "Test režim — brojke na ovom sajtu su vježba, ne pravi pokloni.",
+    "partnersTiers": "Nivoi partnerstva"
   },
   "footer": {
     "orgHeading": "Organizacija",
@@ -213,8 +214,9 @@
     "pledgeNote": "Čuvamo samo ime, e-poštu i iznos, kako opisuje naša politika privatnosti. Obećanje je obećanje, ne uplata.",
     "confPledgeNote": "Poslali smo ti potvrdu na e-poštu. Čim se račun otvori, stižu podaci za uplatu sa tvojim pozivom na broj.",
     "pledgeReference": "Tvoj poziv na broj: {reference}",
-    "noOpenCause": "Trenutno nema otvorenog cilja. Sljedeći se otvara uskoro.",
-    "noOpenCauseLink": "Pogledaj naše ciljeve"
+    "noOpenCause": "Trenutno nema otvorenog cilja. Predloži ga, ili podrži neki predlog, i obećaj donaciju čim se otvori.",
+    "noOpenCauseLink": "Pogledaj ciljeve",
+    "noOpenCausePropose": "Predloži cilj"
   },
   "runner": {
     "team": "Tim",
@@ -274,7 +276,7 @@
     "twoFunds": "Dva odvojena fonda",
     "impactFund": "Fond za pomoć — od donacija",
     "impactFundValue": "100% korisnicima",
-    "operationsFund": "Operativni fond — od sponzora, prijava i grantova",
+    "operationsFund": "Operativni fond — od sponzora",
     "fundsNote": "Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori.",
     "moneyIn": "Uplate",
     "moneyOut": "Isplate",
@@ -292,7 +294,8 @@
     "downloadIn": "Preuzmi CSV — uplate",
     "downloadOut": "Preuzmi CSV — isplate",
     "railRecorded": "EVIDENTIRANO",
-    "railSponsorship": "SPONZOR"
+    "railSponsorship": "SPONZOR",
+    "railEntry": "KOTIZACIJA"
   },
   "dashboard": {
     "title": "Moja stranica za prikupljanje",
@@ -553,7 +556,7 @@
       "amount": "Iznos",
       "reference": "Poziv na broj — obavezno",
       "whatNext": "Uplate uparujemo obično u roku od jednog radnog dana; mjesto je potvrđeno čim to uradimo.",
-      "opsNote": "Kotizacije finansiraju događaj i naš tim (Operativni fond) — donacije i dalje idu 100% korisnicima."
+      "opsNote": "Kotizacije idu cilju, kao i donacije. Sponzori plaćaju događaj i naš tim."
     },
     "pledge": {
       "subject": "Tvoje obećanje za {campaign}",
@@ -1589,7 +1592,11 @@
     "pledgesNotReadyHint": "Šalju se kad NEXT_PUBLIC_ORG_IBAN bude pravi IBAN. Napomena u toj promjenljivoj se ne računa.",
     "pledgesSend": "Pošalji podatke za uplatu ({count})",
     "pledgesSending": "Slanje…",
-    "pledgesSent": "Poslato: {sent}. Neuspjelo: {failed}."
+    "pledgesSent": "Poslato: {sent}. Neuspjelo: {failed}.",
+    "evFeeFund": "Kotizacije idu",
+    "evFeeFundImpact": "Cilju (Fond za pomoć)",
+    "evFeeFundOperations": "Timu (Operativni fond)",
+    "evFeeFundHint": "Pravilo je cilj. Tim izaberite samo po odluci Upravnog odbora za ovaj događaj; stranica o novcu to kaže."
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -1667,7 +1674,7 @@
     "registeredTitle": "Prijavljen/a si!",
     "confirmedTitle": "Upisano — prijava potvrđena",
     "payInstructions": "Još jedan korak: uplati kotizaciju sa pozivom na broj ispod i potvrdićemo tvoje mjesto, obično u roku od jednog radnog dana.",
-    "opsNote": "Kotizacije finansiraju događaj i naš tim (Operativni fond) — donacije i dalje idu 100% korisnicima.",
+    "opsNote": "Kotizacije idu cilju, kao i donacije. Sponzori plaćaju događaj i naš tim.",
     "paidNote": "Kotizacija primljena. Vidimo se na startu.",
     "noFeeNote": "Nema kotizacije. Vidimo se na startu.",
     "registrationFull": "Događaj je popunjen.",
@@ -1710,7 +1717,7 @@
     "rewardsCount": "{count, plural, one {# nagrada} few {# nagrade} other {# nagrada}}",
     "waysInHeading": "Dva načina da se uključiš",
     "wayRun": "Učestvuj",
-    "wayRunSub": "Prijavi sebe ili nekoga koga dovodiš. Kotizacija finansira događaj; donacije nikad.",
+    "wayRunSub": "Prijavi sebe ili nekoga koga dovodiš. Kotizacija ide cilju, kao donacija; događaj plaćaju sponzori.",
     "wayJoin": "Prihvati izazov",
     "wayJoinSub": "Prijavi se, poveži Stravu i svaka aktivnost koja ispunjava pravilo računa se za nagrade.",
     "wayGoing": "Dođi",

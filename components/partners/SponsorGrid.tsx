@@ -22,10 +22,13 @@ export function SponsorGrid({
   sponsors,
   inKindLabel,
   size = "md",
+  showAmounts = true,
 }: {
   sponsors: PublicSponsor[];
   inKindLabel: string;
   size?: "md" | "lg";
+  /** The landing page shows who, not how much; the partners and money pages show both. */
+  showAmounts?: boolean;
 }) {
   const t = useTranslations("years");
   const locale = useLocale() as Locale;
@@ -39,7 +42,7 @@ export function SponsorGrid({
       <ul className={`grid gap-3 ${lg ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-3 md:grid-cols-4"}`}>
         {sortSponsors(sponsors).map((su) => {
           const logo = supporterLogoUrl(su.logo_path);
-          const figure = su.cash_cents > 0 ? money(su.cash_cents) : su.in_kind ? inKindLabel : null;
+          const figure = !showAmounts ? null : su.cash_cents > 0 ? money(su.cash_cents) : su.in_kind ? inKindLabel : null;
           const clickable = Boolean(su.gifts && su.gifts.length > 0);
           const body = (
             <>

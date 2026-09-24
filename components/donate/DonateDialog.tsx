@@ -118,9 +118,14 @@ export function DonateProvider({ children }: { children: ReactNode }) {
             ) : state.phase === "none" ? (
               <div className="px-5 py-10 sm:px-7">
                 <p className="rounded-brand bg-mist px-5 py-4 text-[15px] text-sea">{t("noOpenCause")}</p>
-                <Link href="/kampanje" onClick={close} className="mt-4 inline-block text-[15px] font-semibold text-sea underline underline-offset-2">
-                  {t("noOpenCauseLink")}
-                </Link>
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <Link href="/predlozi" onClick={close} className="inline-flex h-11 items-center rounded-lg bg-red px-5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark">
+                    {t("noOpenCausePropose")}
+                  </Link>
+                  <Link href="/kampanje" onClick={close} className="text-[15px] font-semibold text-sea underline underline-offset-2">
+                    {t("noOpenCauseLink")}
+                  </Link>
+                </div>
               </div>
             ) : state.phase === "error" ? (
               <div className="px-5 py-10 sm:px-7">

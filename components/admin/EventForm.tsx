@@ -39,6 +39,7 @@ export interface EventFormValues {
   offers_shirts: boolean;
   cover_path?: string | null;
   hosting?: "own" | "external";
+  fee_fund?: "impact" | "operations";
   external_url?: string | null;
   /** External race: people register with the organiser, or we register the team here. */
   registration_mode?: "organizer" | "here";
@@ -163,6 +164,7 @@ export function EventForm({
   const [tiers, setTiers] = useState<TierRow[]>(tiersFromValue(event?.price_tiers));
   const [offersShirts, setOffersShirts] = useState(event?.offers_shirts ?? false);
   const [hosting, setHosting] = useState<"own" | "external">(event?.hosting ?? "own");
+  const [feeFund, setFeeFund] = useState<"impact" | "operations">(event?.fee_fund ?? "impact");
   const [externalUrl, setExternalUrl] = useState(event?.external_url ?? "");
   const [registrationMode, setRegistrationMode] = useState<"organizer" | "here">(event?.registration_mode ?? "organizer");
   const [organizerName, setOrganizerName] = useState(event?.organizer_name ?? "");
@@ -432,6 +434,16 @@ export function EventForm({
       <div className={`${section} grid gap-4 sm:grid-cols-2`}>
         <DateTimeField id="evRegOpens" label={t("evRegOpens")} value={regOpens} onChange={setRegOpens} />
         <DateTimeField id="evRegCloses" label={t("evRegCloses")} value={regCloses} onChange={setRegCloses} />
+        {kind !== "challenge" ? (
+          <div>
+            <label htmlFor="evFeeFund" className={labelClass}>{t("evFeeFund")}</label>
+            <select id="evFeeFund" value={feeFund} onChange={(e) => setFeeFund(e.target.value as "impact" | "operations")} className={inputClass}>
+              <option value="impact">{t("evFeeFundImpact")}</option>
+              <option value="operations">{t("evFeeFundOperations")}</option>
+            </select>
+            <p className="mt-1 text-[13px] text-black/55">{t("evFeeFundHint")}</p>
+          </div>
+        ) : null}
         {kind === "race" ? (
           <>
             <div>

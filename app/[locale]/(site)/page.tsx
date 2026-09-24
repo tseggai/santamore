@@ -399,18 +399,20 @@ export default async function HomePage({
             t("partnersTitle"),
             t("partnersLead"),
           )}
+          {/* The ask comes first; the logos are the proof. Amounts live on the partners and money pages. */}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/partneri#kontakt" className={primary}>{t("partnersCta")}</Link>
+            <Link href="/partneri" className={secondary}>{t("partnersTiers")} →</Link>
+          </div>
           {data.sponsors.length > 0 ? (
             <div className="mt-8">
-              <SponsorGrid sponsors={data.sponsors} inKindLabel={tYears("inKind")} size="lg" />
+              <SponsorGrid sponsors={data.sponsors} inKindLabel={tYears("inKind")} size="lg" showAmounts={false} />
             </div>
           ) : (
             <div className="mt-8 rounded-brand bg-mist px-5 py-5">
               <p className="text-[14px] text-sea">{t("partnersNote")}</p>
             </div>
           )}
-          <div className="mt-6">
-            <Link href="/partneri" className={secondary}>{t("partnersCta")} →</Link>
-          </div>
         </section>
       </div>
     </div>
