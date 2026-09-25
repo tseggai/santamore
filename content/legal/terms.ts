@@ -9,7 +9,7 @@ export const termsContent: LegalContent = {
       {
         heading: "Ko stoji iza sajta",
         paragraphs: [
-          "Sajt vodi [[PLACEHOLDER: puno registrovano ime organizacije]], nevladino udruženje sa sjedištem u Tivtu. Puni podaci o organizaciji su na stranici Informacije o organizaciji. Kontakt: [[PLACEHOLDER: kontakt e-mail]].",
+          "Sajt vodi SANTAMORE NVU, nevladino udruženje sa sjedištem u Tivtu. Puni podaci o organizaciji su na stranici Informacije o organizaciji. Kontakt: [[PLACEHOLDER: kontakt e-mail]].",
         ],
       },
       {
@@ -81,7 +81,7 @@ export const termsContent: LegalContent = {
       {
         heading: "Who runs the site",
         paragraphs: [
-          "The site is run by [[PLACEHOLDER: full registered organisation name]], a non-governmental association based in Tivat. Full organisation details are on the Organisation details page. Contact: [[PLACEHOLDER: contact email]].",
+          "The site is run by SANTAMORE NVU, a non-governmental association based in Tivat. Full organisation details are on the Organisation details page. Contact: [[PLACEHOLDER: contact email]].",
         ],
       },
       {
@@ -153,7 +153,7 @@ export const termsContent: LegalContent = {
       {
         heading: "Кто ведёт сайт",
         paragraphs: [
-          "Сайт ведёт [[PLACEHOLDER: полное зарегистрированное название организации]] — неправительственная организация из Тивата. Полные сведения — на странице «Информация об организации». Контакт: [[PLACEHOLDER: контактный e-mail]].",
+          "Сайт ведёт SANTAMORE NVU — неправительственная организация из Тивата. Полные сведения — на странице «Информация об организации». Контакт: [[PLACEHOLDER: контактный e-mail]].",
         ],
       },
       {

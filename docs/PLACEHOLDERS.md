@@ -6,12 +6,12 @@ text are never invented — see CLAUDE.md.
 
 | Placeholder | Where | Needed for |
 |---|---|---|
-| Full registered organisation name | `messages/*.json` → `footer.orgName` | Footer, impressum |
-| Registered address (Tivat) | `messages/*.json` → `footer.orgAddress` | Footer, impressum |
-| Registration number + PIB | `messages/*.json` → `footer.orgId` | Footer, impressum, Monri onboarding |
-| IBAN | `messages/*.json` → `footer.iban` | Footer, SEPA rail (Task 3), impressum |
-| Contact email | `messages/*.json` → `footer.email` | Footer, privacy policy contact |
-| Accepted card brand logos | `messages/*.json` → `footer.cards` | Acquirer requirement (Task 6 footer) |
+| ~~Full registered organisation name~~ **SANTAMORE NVU** (2026-09-25) | `messages/*.json` → `footer.orgName`, `content/legal/` | Footer, impressum |
+| ~~Registered address (Tivat)~~ **Teuta 113, Porto Montenegro, 85320 Tivat** (2026-09-25) | `messages/*.json` → `footer.orgAddress`, `content/legal/` | Footer, impressum |
+| Registration number + PIB — footer says "coming soon" until they exist | `messages/*.json` → `footer.orgId`, `content/legal/impressum.ts` | Footer, impressum, Monri onboarding |
+| IBAN — dropped from the footer (owner, 2026-09-25); still a placeholder on the impressum | `content/legal/impressum.ts` | SEPA rail (Task 3), impressum |
+| Contact email — dropped from the footer (owner, 2026-09-25); still a placeholder in the legal pages | `content/legal/*.ts` | Privacy policy contact, impressum |
+| ~~Accepted card brand logos~~ Visa, Mastercard, Maestro, American Express, Diners Club in `public/brand/cards/` (2026-09-25) — confirm the list against the Monri contract | `components/Footer.tsx`, `content/legal/impressum.ts` | Acquirer requirement (Task 6 footer) |
 | Russian copy — native review | all of `messages/ru.json` (see its `_review` key) | Launch decision per brief §15.8 |
 | SVG logo + icon | `public/brand/` has PNG only; header/footer/favicon use PNG for now | Crisp rendering; brief says ask, don't trace |
 | Santa Run 2026 facts: date (seeded 20.12. 11:00), venue, capacity (seeded 500), registration window, price tiers, campaign goal (seeded €30.000), beneficiary summary | `supabase/seed.sql` | Real event details per brief §15.5 |

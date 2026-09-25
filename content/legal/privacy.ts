@@ -9,7 +9,7 @@ export const privacyContent: LegalContent = {
       {
         heading: "Ko smo mi",
         paragraphs: [
-          "Rukovalac podacima je [[PLACEHOLDER: puno registrovano ime organizacije]], nevladino udruženje sa sjedištem u Tivtu, [[PLACEHOLDER: registrovana adresa, Tivat]]. Za sva pitanja o podacima pišite na [[PLACEHOLDER: kontakt e-mail]].",
+          "Rukovalac podacima je SANTAMORE NVU, nevladino udruženje sa sjedištem u Tivtu, Teuta 113, Porto Montenegro, 85320 Tivat. Za sva pitanja o podacima pišite na [[PLACEHOLDER: kontakt e-mail]].",
           "Naša osoba za kontakt u vezi zaštite podataka je [[PLACEHOLDER: ime osobe za kontakt za zaštitu podataka]].",
         ],
       },
@@ -87,7 +87,7 @@ export const privacyContent: LegalContent = {
       {
         heading: "Who we are",
         paragraphs: [
-          "The data controller is [[PLACEHOLDER: full registered organisation name]], a non-governmental association based in Tivat, [[PLACEHOLDER: registered address, Tivat]]. For anything data-related, write to [[PLACEHOLDER: contact email]].",
+          "The data controller is SANTAMORE NVU, a non-governmental association based in Tivat, Teuta 113, Porto Montenegro, 85320 Tivat. For anything data-related, write to [[PLACEHOLDER: contact email]].",
           "Our data protection contact is [[PLACEHOLDER: data protection contact name]].",
         ],
       },
@@ -165,7 +165,7 @@ export const privacyContent: LegalContent = {
       {
         heading: "Кто мы",
         paragraphs: [
-          "Оператор данных — [[PLACEHOLDER: полное зарегистрированное название организации]], неправительственная организация из Тивата, [[PLACEHOLDER: зарегистрированный адрес, Тиват]]. По любым вопросам о данных пишите на [[PLACEHOLDER: контактный e-mail]].",
+          "Оператор данных — SANTAMORE NVU, неправительственная организация из Тивата, Teuta 113, Porto Montenegro, 85320 Tivat. По любым вопросам о данных пишите на [[PLACEHOLDER: контактный e-mail]].",
           "Наше контактное лицо по защите данных — [[PLACEHOLDER: имя контактного лица по защите данных]].",
         ],
       },
