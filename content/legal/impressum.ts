@@ -53,7 +53,7 @@ export const impressumContent: LegalContent = {
       {
         heading: "Kuda ide novac",
         paragraphs: [
-          "Vodimo dva odvojena fonda: donacije idu u Fond za pomoć i 100% se isplaćuje korisnicima, a kotizacije, sponzorstva i grantovi u Operativni fond, iz kojeg se plaća rad organizacije. Svaka uplata i isplata objavljena je u javnom registru na stranici Transparentnost. Uslovi plaćanja i refundacija: Pravila donacija.",
+          "Vodimo dva odvojena fonda: donacije, kotizacije i grantovi idu u Fond za pomoć i isplaćuju se korisnicima, a sponzorstva u Operativni fond, iz kojeg se plaća rad organizacije. Kad kotizacija nekog događaja ide u Operativni fond, to piše na stranici tog događaja. Svaka uplata i isplata objavljena je u javnom registru na stranici Transparentnost. Uslovi plaćanja i refundacija: Pravila donacija.",
         ],
       },
     ],
@@ -110,7 +110,7 @@ export const impressumContent: LegalContent = {
       {
         heading: "Where the money goes",
         paragraphs: [
-          "We keep two separate funds: donations go to the Impact Fund and 100% is paid out to beneficiaries, while entry fees, sponsorships and grants go to the Operations Fund, which pays for the organisation's work. Every payment in and out is published in the public ledger on the Transparency page. Payment and refund terms: the Donation policy.",
+          "We keep two separate funds: donations, entry fees and grants go to the Impact Fund and are paid out to beneficiaries, while sponsorship goes to the Operations Fund, which pays for the organisation's work. When an event's entry fees go to the Operations Fund instead, its page says so. Every payment in and out is published in the public ledger on the Transparency page. Payment and refund terms: the Donation policy.",
         ],
       },
     ],
@@ -167,7 +167,7 @@ export const impressumContent: LegalContent = {
       {
         heading: "Куда идут деньги",
         paragraphs: [
-          "Мы ведём два раздельных фонда: пожертвования идут в Фонд помощи, и 100% выплачивается получателям, а взносы за участие, спонсорство и гранты — в Операционный фонд, из которого оплачивается работа организации. Каждое поступление и каждая выплата опубликованы в открытом реестре на странице «Прозрачность». Условия оплаты и возвратов — в Правилах пожертвований.",
+          "Мы ведём два раздельных фонда: пожертвования, взносы за участие и гранты идут в Фонд помощи и выплачиваются получателям, а спонсорство — в Операционный фонд, из которого оплачивается работа организации. Если взносы какого-то события идут в Операционный фонд, об этом сказано на его странице. Каждое поступление и каждая выплата опубликованы в открытом реестре на странице «Прозрачность». Условия оплаты и возвратов — в Правилах пожертвований.",
         ],
       },
     ],
