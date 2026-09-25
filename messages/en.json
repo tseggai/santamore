@@ -1508,6 +1508,8 @@
     "homePhotoAdd": "Add a photo",
     "homePhotoReplace": "Replace the photo",
     "homePhotoRemove": "Remove",
+    "sharePhotoTitle": "Share picture",
+    "sharePhotoHint": "What Facebook, WhatsApp, LinkedIn and X show when someone shares a page of the site. Landscape, the subject in the middle: networks crop to 1200 × 630. Fundraiser pages and the ledger draw their own cards. Without it the home page photo is used.",
     "dnColSource": "From",
     "dnColGifts": "Gifts",
     "dnColLast": "Last gift",
