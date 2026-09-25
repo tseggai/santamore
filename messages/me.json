@@ -105,11 +105,9 @@
     "orgHeading": "Organizacija",
     "siteHeading": "Sajt",
     "legalHeading": "Pravila i uslovi",
-    "orgName": "[[PLACEHOLDER: puno registrovano ime organizacije]]",
-    "orgAddress": "[[PLACEHOLDER: registrovana adresa, Tivat]]",
-    "orgId": "Registarski broj: [[PLACEHOLDER: registarski broj]] · PIB: [[PLACEHOLDER: PIB]]",
-    "iban": "IBAN: [[PLACEHOLDER: IBAN]]",
-    "email": "[[PLACEHOLDER: kontakt e-mail]]",
+    "orgName": "SANTAMORE NVU",
+    "orgAddress": "Teuta 113, Porto Montenegro, 85320 Tivat, Crna Gora",
+    "orgId": "Registarski broj: uskoro · PIB: uskoro",
     "legal": {
       "privacy": "Pravila privatnosti",
       "cookies": "Kolačići",
@@ -136,7 +134,7 @@
       "challenges": "Izazovi",
       "beneficiaries": "Korisnici"
     },
-    "cards": "[[PLACEHOLDER: logotipi prihvaćenih kartica]]",
+    "cards": "Prihvatamo kartice",
     "note": "Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori."
   },
   "notFound": {
@@ -1618,7 +1616,8 @@
     "sub": "Piši nam o bilo čemu — donacijama, događajima, partnerstvima, ili porodici kojoj treba pomoć.",
     "formHeading": "Pošalji poruku",
     "bankHeading": "Podaci za uplatu",
-    "mapNote": "[[PLACEHOLDER: mapa kad registrovana adresa bude potvrđena]]"
+    "bankPending": "Račun se otvara. Do tada se poklon bilježi kao obećanje, a podatke za uplatu šaljemo e-mailom.",
+    "mapLink": "Otvori na mapi"
   },
   "volunteer": {
     "title": "Volontiraj sa nama",

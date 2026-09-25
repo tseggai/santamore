@@ -105,11 +105,9 @@
     "orgHeading": "Organisation",
     "siteHeading": "Site",
     "legalHeading": "Policies and terms",
-    "orgName": "[[PLACEHOLDER: full registered organisation name]]",
-    "orgAddress": "[[PLACEHOLDER: registered address, Tivat]]",
-    "orgId": "Registration number: [[PLACEHOLDER: registration number]] · PIB: [[PLACEHOLDER: PIB]]",
-    "iban": "IBAN: [[PLACEHOLDER: IBAN]]",
-    "email": "[[PLACEHOLDER: contact email]]",
+    "orgName": "SANTAMORE NVU",
+    "orgAddress": "Teuta 113, Porto Montenegro, 85320 Tivat, Montenegro",
+    "orgId": "Registration number: coming soon · PIB: coming soon",
     "legal": {
       "privacy": "Privacy policy",
       "cookies": "Cookies",
@@ -136,7 +134,7 @@
       "challenges": "Challenges",
       "beneficiaries": "Beneficiaries"
     },
-    "cards": "[[PLACEHOLDER: accepted card brand logos]]",
+    "cards": "Cards we accept",
     "note": "Not one cent of donations goes to salaries or overhead. Sponsors pay for those."
   },
   "notFound": {
@@ -1618,7 +1616,8 @@
     "sub": "Write to us about anything — donations, events, partnerships, or a family that needs help.",
     "formHeading": "Send a message",
     "bankHeading": "Bank details",
-    "mapNote": "[[PLACEHOLDER: map embed once the registered address is confirmed]]"
+    "bankPending": "The account is being opened. Until then a gift is recorded as a pledge and we send the transfer details by email.",
+    "mapLink": "Open in maps"
   },
   "volunteer": {
     "title": "Volunteer with us",

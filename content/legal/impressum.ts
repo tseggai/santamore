@@ -10,9 +10,9 @@ export const impressumContent: LegalContent = {
         heading: "Osnovni podaci",
         paragraphs: [],
         bullets: [
-          "Registrovano ime: [[PLACEHOLDER: puno registrovano ime organizacije]]",
+          "Registrovano ime: SANTAMORE NVU",
           "Pravna forma: nevladino udruženje",
-          "Sjedište: [[PLACEHOLDER: registrovana adresa, Tivat]], Crna Gora",
+          "Sjedište: Teuta 113, Porto Montenegro, 85320 Tivat, Crna Gora",
           "Registarski broj: [[PLACEHOLDER: registarski broj]]",
           "PIB: [[PLACEHOLDER: PIB]]",
           "Upis u registar nevladinih organizacija: [[PLACEHOLDER: broj i datum upisa u registar nadležnog ministarstva]]",
@@ -30,7 +30,7 @@ export const impressumContent: LegalContent = {
         bullets: [
           "E-mail: [[PLACEHOLDER: kontakt e-mail]]",
           "Telefon: [[PLACEHOLDER: kontakt telefon]]",
-          "Adresa za poštu: [[PLACEHOLDER: registrovana adresa, Tivat]]",
+          "Adresa za poštu: Teuta 113, Porto Montenegro, 85320 Tivat",
         ],
       },
       {
@@ -47,7 +47,7 @@ export const impressumContent: LegalContent = {
         heading: "Plaćanje karticama",
         paragraphs: [
           "Kartična plaćanja obrađuje Monri (Hrvatska), kada budu aktivna. Kartična plaćanja štiti 3-D Secure provjera, a podaci o kartici nikada ne prolaze kroz naše servere.",
-          "Prihvatamo kartice: [[PLACEHOLDER: prihvaćeni brendovi kartica — na ovom mjestu prikazati i logotipe]].",
+          "Prihvatamo kartice: Visa, Mastercard, Maestro, American Express i Diners Club.",
         ],
       },
       {
@@ -67,9 +67,9 @@ export const impressumContent: LegalContent = {
         heading: "Basic details",
         paragraphs: [],
         bullets: [
-          "Registered name: [[PLACEHOLDER: full registered organisation name]]",
+          "Registered name: SANTAMORE NVU",
           "Legal form: non-governmental association (nevladino udruženje)",
-          "Registered office: [[PLACEHOLDER: registered address, Tivat]], Montenegro",
+          "Registered office: Teuta 113, Porto Montenegro, 85320 Tivat, Montenegro",
           "Registration number: [[PLACEHOLDER: registration number]]",
           "Tax ID (PIB): [[PLACEHOLDER: PIB]]",
           "Entry in the register of non-governmental organisations: [[PLACEHOLDER: number and date of the entry in the competent ministry's register]]",
@@ -87,7 +87,7 @@ export const impressumContent: LegalContent = {
         bullets: [
           "Email: [[PLACEHOLDER: contact email]]",
           "Phone: [[PLACEHOLDER: contact phone]]",
-          "Postal address: [[PLACEHOLDER: registered address, Tivat]]",
+          "Postal address: Teuta 113, Porto Montenegro, 85320 Tivat",
         ],
       },
       {
@@ -104,7 +104,7 @@ export const impressumContent: LegalContent = {
         heading: "Card payments",
         paragraphs: [
           "Card payments are processed by Monri (Croatia), once live. Card payments are protected by the 3-D Secure check, and card data never passes through our servers.",
-          "We accept: [[PLACEHOLDER: accepted card brands — display the brand logos here]].",
+          "We accept: Visa, Mastercard, Maestro, American Express and Diners Club.",
         ],
       },
       {
@@ -124,9 +124,9 @@ export const impressumContent: LegalContent = {
         heading: "Основные сведения",
         paragraphs: [],
         bullets: [
-          "Зарегистрированное название: [[PLACEHOLDER: полное зарегистрированное название организации]]",
+          "Зарегистрированное название: SANTAMORE NVU",
           "Правовая форма: неправительственное объединение (nevladino udruženje)",
-          "Юридический адрес: [[PLACEHOLDER: зарегистрированный адрес, Тиват]], Черногория",
+          "Юридический адрес: Teuta 113, Porto Montenegro, 85320 Tivat, Черногория",
           "Регистрационный номер: [[PLACEHOLDER: регистрационный номер]]",
           "Налоговый номер (PIB): [[PLACEHOLDER: PIB]]",
           "Запись в реестре неправительственных организаций: [[PLACEHOLDER: номер и дата записи в реестре профильного министерства]]",
@@ -144,7 +144,7 @@ export const impressumContent: LegalContent = {
         bullets: [
           "E-mail: [[PLACEHOLDER: контактный e-mail]]",
           "Телефон: [[PLACEHOLDER: контактный телефон]]",
-          "Почтовый адрес: [[PLACEHOLDER: зарегистрированный адрес, Тиват]]",
+          "Почтовый адрес: Teuta 113, Porto Montenegro, 85320 Tivat",
         ],
       },
       {
@@ -161,7 +161,7 @@ export const impressumContent: LegalContent = {
         heading: "Оплата картами",
         paragraphs: [
           "Карточные платежи обрабатывает Monri (Хорватия) — когда они заработают. Карточные платежи защищены проверкой 3-D Secure, данные карты никогда не проходят через наши серверы.",
-          "Принимаем карты: [[PLACEHOLDER: принимаемые бренды карт — здесь показать и логотипы]].",
+          "Принимаем карты: Visa, Mastercard, Maestro, American Express и Diners Club.",
         ],
       },
       {

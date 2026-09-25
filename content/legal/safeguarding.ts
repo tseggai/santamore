@@ -49,7 +49,7 @@ export const safeguardingContent: LegalContent = {
         ],
         bullets: [
           "na događaju: odgovornoj osobi za zaštitu djece ili bilo kom označenom članu tima;",
-          "pisanim putem: [[PLACEHOLDER: kontakt e-mail]] ili poštom na [[PLACEHOLDER: registrovana adresa, Tivat]];",
+          "pisanim putem: [[PLACEHOLDER: kontakt e-mail]] ili poštom na Teuta 113, Porto Montenegro, 85320 Tivat;",
           "ako je dijete u neposrednoj opasnosti, prvo pozovite policiju ili hitne službe, pa onda nas.",
         ],
       },
@@ -115,7 +115,7 @@ export const safeguardingContent: LegalContent = {
         ],
         bullets: [
           "at the event: to the safeguarding lead or any identified team member;",
-          "in writing: [[PLACEHOLDER: contact email]] or by post to [[PLACEHOLDER: registered address, Tivat]];",
+          "in writing: [[PLACEHOLDER: contact email]] or by post to Teuta 113, Porto Montenegro, 85320 Tivat;",
           "if a child is in immediate danger, call the police or emergency services first, then us.",
         ],
       },
@@ -181,7 +181,7 @@ export const safeguardingContent: LegalContent = {
         ],
         bullets: [
           "на событии: ответственному за защиту детей или любому обозначенному члену команды;",
-          "письменно: [[PLACEHOLDER: контактный e-mail]] или почтой на [[PLACEHOLDER: зарегистрированный адрес, Тиват]];",
+          "письменно: [[PLACEHOLDER: контактный e-mail]] или почтой на Teuta 113, Porto Montenegro, 85320 Tivat;",
           "если ребёнок в непосредственной опасности, сначала позвоните в полицию или экстренные службы, потом нам.",
         ],
       },

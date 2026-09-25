@@ -53,7 +53,14 @@ export default async function ContactPage({
             <p className="mt-2">{tFooter("orgName")}</p>
             <p>{tFooter("orgAddress")}</p>
             <p className="text-black/70">{tFooter("orgId")}</p>
-            <p className="mt-1">{tFooter("email")}</p>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(tFooter("orgAddress"))}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-block font-semibold text-sea underline-offset-4 hover:underline"
+            >
+              {t("mapLink")}
+            </a>
           </div>
           <div>
             <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
@@ -66,12 +73,9 @@ export default async function ContactPage({
                 {bank.bic ? <p className="font-mono">{bank.bic}</p> : null}
               </>
             ) : (
-              <p className="mt-2 text-black/70">{tFooter("iban")}</p>
+              <p className="mt-2 text-black/70">{t("bankPending")}</p>
             )}
           </div>
-          <p className="rounded-brand bg-mist px-4 py-3 text-[13.5px] text-sea">
-            {t("mapNote")}
-          </p>
         </div>
       </div>
     </div>
