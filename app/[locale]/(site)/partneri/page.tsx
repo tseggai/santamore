@@ -102,7 +102,6 @@ export default async function PartnersPage({
         offerLinks: offers.filter((o) => o.supporter_slug === su.slug).map((o) => ({ href: `/izazovi/${o.slug}`, label: o.reward_label })),
       };
     });
-  const cashTotal = shown.reduce((sum, su) => sum + su.cash_cents, 0);
   const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
 
   return (
@@ -134,17 +133,10 @@ export default async function PartnersPage({
         {shown.length === 0 ? (
           <p className="mt-4 text-[15px] text-black/60">{content.supportersEmpty}</p>
         ) : (
-          <>
-            {cashTotal > 0 ? (
-              <p className="mt-4 text-[15px]">
-                <span className="font-mono text-[20px] font-extrabold tabular-nums text-sea">{money(cashTotal)}</span>
-                <span className="ml-2 text-black/60">{content.cashTotalLabel}</span>
-              </p>
-            ) : null}
-            <div className="mt-6">
-              <SponsorGrid sponsors={shown} inKindLabel={content.inKindLabel} size="lg" />
-            </div>
-          </>
+          /* Who, not how much: the amounts live on the money page, under the year they belong to. */
+          <div className="mt-6">
+            <SponsorGrid sponsors={shown} inKindLabel={content.inKindLabel} size="lg" showAmounts={false} />
+          </div>
         )}
       </section>
 
