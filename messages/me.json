@@ -1508,6 +1508,8 @@
     "homePhotoAdd": "Dodaj fotografiju",
     "homePhotoReplace": "Zamijeni fotografiju",
     "homePhotoRemove": "Ukloni",
+    "sharePhotoTitle": "Slika za dijeljenje",
+    "sharePhotoHint": "Ono što Facebook, WhatsApp, LinkedIn i X prikažu kad neko podijeli stranicu sajta. Vodoravna, sa motivom u sredini: mreže isijecaju na 1200 × 630. Stranice trkača i knjiga imaju svoje kartice. Bez nje se koristi fotografija početne strane.",
     "dnColSource": "Izvor",
     "dnColGifts": "Pokloni",
     "dnColLast": "Zadnji poklon",

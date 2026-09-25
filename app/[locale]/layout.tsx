@@ -20,6 +20,11 @@ export const metadata: Metadata = {
     siteName: "Santamore",
     type: "website",
   },
+  // The share card (opengraph-image.tsx beside this file) is a full-width
+  // picture; without this X/Twitter shows it as a thumbnail.
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 // schema.org Organization — only facts that exist; registry details join the

@@ -251,14 +251,23 @@ export async function savePostGroup(input: unknown): Promise<PostGroupResult> {
   return { ok: true, ids };
 }
 
-/** The landing page's opening picture (site setting home_photo, migration 0065): a path in the gallery bucket, or none. */
-export async function setHomePhoto(input: unknown): Promise<ActionResult> {
-  const parsed = z.object({ path: z.string().trim().min(1).max(300).regex(/^home\/[\w.-]+$/).nullable() }).safeParse(input);
+/** Site photos named in site_settings: the landing slide and the social share card. Both live in the gallery bucket. */
+const SITE_PHOTOS = {
+  home_photo: /^home\/[\w.-]+$/,
+  share_photo: /^share\/[\w.-]+$/,
+} as const;
+export type SitePhotoKey = keyof typeof SITE_PHOTOS;
+
+export async function setSitePhoto(input: unknown): Promise<ActionResult> {
+  const parsed = z
+    .object({ key: z.enum(["home_photo", "share_photo"]), path: z.string().trim().min(1).max(300).nullable() })
+    .refine((v) => v.path === null || SITE_PHOTOS[v.key].test(v.path))
+    .safeParse(input);
   if (!parsed.success) return { ok: false };
   const supabase = await createClient();
-  const { error } = await supabase.rpc("set_site_setting", { p_key: "home_photo", p_value: parsed.data.path });
+  const { error } = await supabase.rpc("set_site_setting", { p_key: parsed.data.key, p_value: parsed.data.path });
   if (error) return { ok: false, detail: `${error.code}: ${error.message}` };
   revalidatePath("/[locale]/admin/podesavanja", "layout");
-  revalidatePath("/[locale]", "page");
+  revalidatePath("/[locale]", parsed.data.key === "home_photo" ? "page" : "layout");
   return { ok: true };
 }

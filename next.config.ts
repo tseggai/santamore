@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   // The share-card routes read the brand fonts from disk (lib/og-fonts.ts);
   // make sure the deployed functions carry them.
   outputFileTracingIncludes: {
+    "/[locale]/opengraph-image": ["./assets/fonts/**"],
     "/[locale]/(site)/transparentnost/opengraph-image": ["./assets/fonts/**"],
     "/[locale]/(site)/f/[slug]/opengraph-image": ["./assets/fonts/**"],
   },
