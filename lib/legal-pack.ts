@@ -43,8 +43,9 @@ export interface PackField {
 }
 
 export type PackBlock =
-  | { type: "p" | "h" | "h2" | "h3"; me: string; en: string }
-  | { type: "list"; me: string[]; en: string[] }
+  /** meOnly: the text exists in Montenegrin only (the English side of a merged article is a summary on its first paragraph). */
+  | { type: "p" | "h" | "h2" | "h3"; me: string; en: string; meOnly?: boolean }
+  | { type: "list"; me: string[]; en: string[]; meOnly?: boolean }
   | { type: "check"; id: string; me: string; en: string }
   | { type: "sigrow"; items: { me: string; en: string; lbl: Bilingual }[] };
 
@@ -252,6 +253,7 @@ export function initialFields(pack: LegalPack): Record<string, FieldState> {
     : { me: f.value.me, en: f.value.en, ru: "", tr: "", stale: f.meOnly ? [] : ["ru", "tr"] }]));
 }
 
+export const FORM_KEY = /^form:([0-9]{2}[a-z]?)$/;
 export const DRAFT_KEY = /^draft:([a-z0-9-]{1,60})$/;
 export const I18N_KEY = /^i18n:(labels|guide|form:[0-9]{2}|draft:[a-z0-9-]{1,60}):(ru|tr)$/;
 
@@ -301,7 +303,16 @@ export function savePackSchema(pack: LegalPack) {
   const formIds = new Set(pack.forms.map((f) => f.id));
   const text = z.string().max(20_000);
   const fieldState = z.object({ me: text, en: text, ru: text, tr: text, stale: z.array(z.enum(PACK_LANGS)).max(4) });
+  const bilingual = z.object({ me: text, en: text });
+  const block = z.union([
+    z.object({ type: z.enum(["p", "h", "h2", "h3"]), me: text, en: text, meOnly: z.boolean().optional() }),
+    z.object({ type: z.literal("list"), me: z.array(text).max(200), en: z.array(text).max(200), meOnly: z.boolean().optional() }),
+    z.object({ type: z.literal("check"), id: z.string().regex(/^s\d_\d{1,3}$/).refine((id) => checkIds.has(id)), me: text, en: text }),
+    z.object({ type: z.literal("sigrow"), items: z.array(z.object({ me: text, en: text, lbl: bilingual })).max(20) }),
+  ]);
   return z.union([
+    // The edited text of one form (every block, both languages), or null to return to the template.
+    z.object({ key: z.string().regex(FORM_KEY).refine((k) => formIds.has(k.slice("form:".length))), value: z.object({ blocks: z.array(block).max(1_000).nullable() }).refine((v) => v.blocks === null || (JSON.stringify(v.blocks).length <= 800_000 && v.blocks.every((b) => templatesOf(b as PackBlock).every((tpl) => [...placeholderIds(tpl.me), ...placeholderIds(tpl.en)].every((id) => fieldIds.has(id)))))) }),
     z.object({ key: z.literal("fields"), value: z.record(z.string().regex(/^[a-z0-9_]{1,40}$/), fieldState).refine((v) => Object.keys(v).every((id) => fieldIds.has(id))) }),
     z.object({ key: z.literal("checks"), value: z.record(z.string().regex(/^s\d_\d{1,3}$/), z.boolean()).refine((v) => Object.keys(v).every((id) => checkIds.has(id))) }),
     z.object({ key: z.string().regex(DRAFT_KEY).refine((k) => draftIds.has(k.slice("draft:".length))), value: z.object({ html: z.string().max(400_000) }) }),
@@ -351,7 +362,7 @@ export const i18nKey = (docKey: string, lang: PackLang) => `i18n:${docKey}:${lan
  * draft's top-level elements that carry English (the Montenegrin twins
  * are left out); the labels and hints of every blank plus every title.
  */
-export function docTexts(pack: LegalPack, docKey: string, draftHtml?: string): DocTexts {
+export function docTexts(pack: LegalPack, docKey: string, draftHtml?: string, formBlocks?: PackBlock[]): DocTexts {
   const out: DocTexts = {};
   if (docKey === "labels") {
     for (const [id, f] of Object.entries(pack.fields)) {
@@ -369,7 +380,7 @@ export function docTexts(pack: LegalPack, docKey: string, draftHtml?: string): D
     const form = pack.forms.find((f) => f.id === docKey.slice(5));
     if (!form) return out;
     out.t = form.title.en; out.s = form.subtitle.en; out.n = form.note.en;
-    form.blocks.forEach((b, i) => {
+    (formBlocks ?? form.blocks).forEach((b, i) => {
       if (b.type === "list") b.en.forEach((item, j) => { out[`b${i}.${j}`] = item; });
       else if (b.type === "sigrow") b.items.forEach((item, j) => { out[`b${i}.s${j}`] = item.en || item.me; out[`b${i}.s${j}.l`] = item.lbl.en || item.lbl.me; });
       else out[`b${i}`] = b.en || b.me;
@@ -391,4 +402,18 @@ export function keepsPlaceholders(source: string, translated: string): boolean {
   const a = placeholderIds(source).sort().join(",");
   const b = placeholderIds(translated).sort().join(",");
   return a === b && (source.match(/\{\{sig\}\}/g) ?? []).length === (translated.match(/\{\{sig\}\}/g) ?? []).length;
+}
+
+/** The text of an edited block keeps <b>, </b> and <br> (the tags the templates use) and loses every other tag. */
+export function sanitizeBlockText(text: string): string {
+  return text.replace(/<(?!\/?b>|br\s*\/?>)[^>]*>/gi, "");
+}
+
+/** A form's blocks with every text passed through sanitizeBlockText. */
+export function sanitizeBlocks(blocks: PackBlock[]): PackBlock[] {
+  return blocks.map((b) => {
+    if (b.type === "list") return { ...b, me: b.me.map(sanitizeBlockText), en: b.en.map(sanitizeBlockText) };
+    if (b.type === "sigrow") return { ...b, items: b.items.map((item) => ({ ...item, me: sanitizeBlockText(item.me), en: sanitizeBlockText(item.en) })) };
+    return { ...b, me: sanitizeBlockText(b.me), en: sanitizeBlockText(b.en) };
+  });
 }

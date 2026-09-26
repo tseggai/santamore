@@ -4,13 +4,14 @@ import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 
 import packJson from "@/content/legal-pack/pack.json";
-import { PACK_LANGS, sanitizeDraftHtml, savePackSchema, type LegalPack } from "@/lib/legal-pack";
+import { FORM_KEY, PACK_LANGS, sanitizeBlocks, sanitizeDraftHtml, savePackSchema, type LegalPack, type PackBlock } from "@/lib/legal-pack";
 import { isStaffRole } from "@/lib/roles";
 import { TRANSLATE_MODEL, describeError, translateFieldsWithClaude } from "@/lib/server/translate";
 import { createClient } from "@/lib/supabase/server";
 
 // Staff-only: save one part of the legal pack (the shared blanks, the
-// founding checklist, an edited draft or a cached translation), and
+// founding checklist, an edited draft, a form's edited text or a cached
+// translation), and
 // translate its texts between the pack's four languages.
 
 const pack = packJson as unknown as LegalPack;
@@ -33,6 +34,9 @@ export async function saveLegalPack(input: unknown): Promise<SaveLegalPackResult
     const html = sanitizeDraftHtml((parsed.data.value as { html: string }).html);
     if (html === null) return { ok: false, error: "invalid" };
     value = { html };
+  } else if (FORM_KEY.test(parsed.data.key)) {
+    const blocks = (parsed.data.value as { blocks: PackBlock[] | null }).blocks;
+    value = { blocks: blocks === null ? null : sanitizeBlocks(blocks) };
   }
   const updatedAt = new Date().toISOString();
   const { error } = await supabase
