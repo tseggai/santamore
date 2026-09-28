@@ -887,10 +887,10 @@ const CSS = `
 .lp-pick:focus-visible { outline: 2px solid #0E3A46; outline-offset: 1px; }
 .lp-pick option { color: #000; }
 .lp-opt-empty { display: none; }
-/* Text the additions brought in: red on screen, black on paper, typed into directly like a blank. */
-.lp-added { color: #D93B3B; }
+/* Text the additions brought in: pink on screen, the colour of everything we supplied (a blank has a tinted background as well), black on paper, typed into directly like a blank. */
+.lp-added { color: #B0246B; }
 .lp-added-text { outline: none; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-.lp-added-text:focus { background: rgba(217,59,59,.07); box-shadow: 0 0 0 2px rgba(217,59,59,.3); }
+.lp-added-text:focus { background: rgba(176,36,107,.07); box-shadow: 0 0 0 2px rgba(176,36,107,.35); }
 .lp-added-text:empty::before { content: attr(data-placeholder); font-style: italic; color: rgba(0,0,0,.4); }
 .lp-chip { display: inline; padding: 0 .15em; border-radius: 3px; color: #B0246B; background: rgba(176,36,107,.10); user-select: all; -webkit-user-select: all; }
 .lp-guide p.en { color: #000; }
