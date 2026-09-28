@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { saveLegalPack, translatePackTexts } from "@/app/[locale]/admin/(protected)/registracija/actions";
-import { useDialog } from "@/components/console/useDialog";
 import {
   FORM_KEY, FOUNDER_IDS, LANG_LABELS, PACK_LANGS, docHash, docTexts, formFieldIds, i18nKey, incompleteFields, initialFields, isEmptyOptional, isIncomplete, isOptionalEmpty,
   isAlignedDraft, isMeTwin, isSourceLang, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, sanitizeDraftHtml, segments, splitTopLevel,
@@ -138,10 +137,6 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   const [checks, setChecks] = useState(() => readSavedChecks(saved));
   const draftsRef = useRef(readSavedDrafts(pack, saved));
   const [overrides, setOverrides] = useState<Record<string, PackBlock[]>>(() => readSavedForms(pack, saved));
-  const [editing, setEditing] = useState(false);
-  // Bumped when blocks are added or removed, so the editable blocks mount afresh in their new places.
-  const [editVersion, setEditVersion] = useState(0);
-  const dialog = useDialog();
   const [i18n, setI18n] = useState<Record<string, DocTexts>>(() => readSavedI18n(saved));
   const jobsRef = useRef<Set<string>>(new Set());
   const [job, setJob] = useState<Job | null>(null);
@@ -262,33 +257,18 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
     markDirty("fields");
   };
 
-  // ---- editing the text of a form --------------------------------------------------
-  const editBlocks = (fn: (blocks: PackBlock[]) => PackBlock[], structural = false) => {
+  // ---- editing the text the additions brought in -----------------------------------
+  /** The text of one added block (or one item of an added list) in the language on screen; saved as the form's edited text. */
+  const setBlockText = (i: number, text: string, item?: number) => {
     if (!template) return;
     const id = template.id;
-    setOverrides((prev) => ({ ...prev, [id]: fn(prev[id] ?? template.blocks) }));
+    setOverrides((prev) => ({ ...prev, [id]: (prev[id] ?? template.blocks).map((b, k) => {
+      if (k !== i) return b;
+      if (b.type === "list") return item === undefined ? b : { ...b, [src]: b[src].map((x, j) => (j === item ? text : x)) };
+      if (b.type === "sigrow" || b.type === "check") return b;
+      return { ...b, [src]: text };
+    }) }));
     markDirty(`form:${id}`);
-    if (structural) setEditVersion((v) => v + 1);
-  };
-  /** The text of one block (or one list item) in the language on screen. */
-  const setBlockText = (i: number, text: string, item?: number) => editBlocks((blocks) => blocks.map((b, k) => {
-    if (k !== i) return b;
-    if (b.type === "list") return item === undefined ? b : { ...b, [src]: b[src].map((x, j) => (j === item ? text : x)) };
-    if (b.type === "sigrow" || b.type === "check") return b;
-    return { ...b, [src]: text };
-  }));
-  const insertAfter = (i: number, kind: "p" | "article") => editBlocks((blocks) => {
-    const added: PackBlock[] = kind === "p" ? [{ type: "p", me: "", en: "", added: true }] : [{ type: "h3", me: "Član", en: "Article", added: true }, { type: "p", me: "", en: "", added: true }];
-    return [...blocks.slice(0, i + 1), ...added, ...blocks.slice(i + 1)];
-  }, true);
-  const removeBlock = (i: number) => editBlocks((blocks) => blocks.filter((_, k) => k !== i), true);
-  const resetForm = async () => {
-    if (!template || !overrides[template.id]) return;
-    if (!(await dialog.confirm(t("resetConfirm"), { confirmLabel: t("resetForm") }))) return;
-    const id = template.id;
-    setOverrides((prev) => { const rest = { ...prev }; delete rest[id]; return rest; });
-    markDirty(`form:${id}`);
-    setEditVersion((v) => v + 1);
   };
 
   /** Bring every blank whose `to` value is out of date up to date from a language that is current. */
@@ -354,7 +334,6 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
 
   const doPrint = () => {
     setPrintWarn(null);
-    setEditing(false);
     const title = document.title;
     document.title = `${form?.file ?? draft?.file ?? guide?.file ?? "santamore"}-${lang}`;
     // Let the dialog close before the print dialog takes over.
@@ -391,6 +370,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
     onCheck: (id: string, on: boolean) => { setChecks((c) => ({ ...c, [id]: on })); markDirty("checks"); },
     placeholderHint: t("fieldEmpty"), staleHint: t("staleHint"), pickerLabel: t("samePerson"), pickerNone: t("otherPerson"),
     founderLabel: (n: number) => t("founderN", { n }), labelOf,
+    onBlockText: setBlockText, chipHint: t("chipHint"), emptyHint: t("emptyBlock"),
   };
 
   return (
@@ -452,16 +432,6 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
               {t("both")}
             </label>
           ) : null}
-          {form && isSourceLang(lang) ? (
-            <button type="button" aria-pressed={editing} onClick={() => setEditing((e) => !e)} className={`rounded-brand px-3 py-1.5 text-[14px] font-semibold ${editing ? "bg-sea text-paper hover:bg-sea-2" : "bg-paper text-black/80 hover:bg-mist-2"}`}>
-              {editing ? t("editDone") : t("editText")}
-            </button>
-          ) : null}
-          {form && editing && isSourceLang(lang) && overrides[form.id] ? (
-            <button type="button" onClick={() => void resetForm()} className="rounded-brand bg-paper px-3 py-1.5 text-[14px] font-semibold text-red-dark hover:bg-mist-2">
-              {t("resetForm")}
-            </button>
-          ) : null}
           {staleNow.length > 0 && !busy ? (
             <button type="button" onClick={() => void translateStale(lang)} className="rounded-brand bg-paper px-3 py-1.5 text-[14px] font-semibold text-red-dark hover:bg-mist-2">
               {t("translateNow", { n: staleNow.length })}
@@ -483,8 +453,6 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
         <p role="status" aria-live="polite" className={`mt-3 min-h-5 text-[13.5px] ${notice?.tone === "warn" ? "text-red-dark" : "text-black/60"}`}>
           {job ? t("translatingDoc", { lang: LANG_LABELS[lang], done: job.done, total: job.total }) : notice?.text ?? (savedLabel ? t("lastSaved", { when: savedLabel }) : t("neverSaved"))}
         </p>
-        {form && editing && isSourceLang(lang) ? <p className="lp-screen mt-2 rounded-brand bg-sand px-4 py-3 text-[14px] leading-relaxed text-black/70">{t("editHint")}</p> : null}
-        {dialog.element}
 
         {printWarn ? (
           <div role="alertdialog" aria-modal="true" aria-labelledby="lp-print-title" className="lp-screen fixed inset-0 z-50 flex items-center justify-center bg-ink/55 px-4">
@@ -525,13 +493,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
                 <p className="lp-note" dangerouslySetInnerHTML={{ __html: tx(docKey, "n", form.note[src]) }} />
               </div>
               {form.blocks.map((block, i) => (
-                editing && isSourceLang(lang) && (block.type === "p" || block.type === "h" || block.type === "h2" || block.type === "h3" || block.type === "list") ? (
-                  <EditBlock key={`${editVersion}-${i}`} block={block} lang={lang} src={src} pack={pack} fields={shown} labelOf={labelOf} chipHint={t("chipHint")} emptyHint={t("emptyBlock")}
-                    onText={(text, item) => setBlockText(i, text, item)} onInsert={(kind) => insertAfter(i, kind)} onRemove={() => removeBlock(i)}
-                    labels={{ paragraph: t("addParagraph"), article: t("addArticle"), remove: t("deleteBlock") }} />
-                ) : (
-                  <Block key={i} block={block} index={i} docKey={docKey} tx={tx} {...blockProps} />
-                )
+                <Block key={i} block={block} index={i} docKey={docKey} tx={tx} {...blockProps} />
               ))}
             </>
           ) : draft ? (
@@ -648,6 +610,10 @@ interface BlockProps {
   pickerNone: string;
   founderLabel: (n: number) => string;
   labelOf: (id: string) => string;
+  /** Typing into an added block (red text) changes the form's own text. */
+  onBlockText: (index: number, text: string, item?: number) => void;
+  chipHint: string;
+  emptyHint: string;
 }
 
 function Block(props: BlockProps & { block: PackBlock; index: number; docKey: string; tx: (docKey: string, path: string, source: string) => string }) {
@@ -655,8 +621,20 @@ function Block(props: BlockProps & { block: PackBlock; index: number; docKey: st
   const text = (path: string, source: string) => tx(docKey, path, source);
   // A Montenegrin-only block (a merged article's later paragraphs) has nothing to show on the English side.
   if ("meOnly" in block && block.meOnly && src === "en" && isSourceLang(props.lang)) return null;
-  // Text that the additions brought in, or the team typed: red on screen, black on paper.
+  // Text that the additions brought in: red on screen, black on paper, and typed into directly, like a blank.
   const added = "added" in block && block.added ? " lp-added" : "";
+  if (added && isSourceLang(props.lang) && (block.type === "p" || block.type === "h" || block.type === "h2" || block.type === "h3" || block.type === "list")) {
+    const html = (text: string) => editHtml(text, props.pack, props.fields, props.lang, props.labelOf, props.chipHint);
+    if (block.type === "list") {
+      return (
+        <ol className={`lp-list${added}`}>
+          {block[src].map((item, j) => <EditableText key={`${props.lang}-${j}`} tag="li" className="lp-added-text" html={html(item)} placeholder={props.emptyHint} singleLine={false} onText={(text) => props.onBlockText(i, text, j)} />)}
+        </ol>
+      );
+    }
+    const cls = block.type === "h" ? "lp-h" : block.type === "h2" ? "lp-h2" : block.type === "h3" ? "lp-h3" : "lp-p";
+    return <EditableText key={props.lang} tag={block.type === "p" ? "p" : block.type === "h" ? "h3" : block.type === "h2" ? "h4" : "h5"} className={`${cls}${added} lp-added-text`} html={html(block[src])} placeholder={props.emptyHint} singleLine={block.type !== "p"} onText={(text) => props.onBlockText(i, text)} />;
+  }
   switch (block.type) {
     case "h":
       return <h3 className={`lp-h${added}`}>{text(`b${i}`, block[src] || block.me)}</h3>;
@@ -728,7 +706,7 @@ function serializeEdit(node: Node): string {
 }
 
 /** An element whose HTML is set once, on mount: the browser owns it from then on, so typing never fights a re-render. */
-function EditableText({ tag, className, html, placeholder, singleLine, onText }: { tag: "p" | "h5" | "li"; className: string; html: string; placeholder: string; singleLine: boolean; onText: (text: string) => void }) {
+function EditableText({ tag, className, html, placeholder, singleLine, onText }: { tag: "p" | "h3" | "h4" | "h5" | "li"; className: string; html: string; placeholder: string; singleLine: boolean; onText: (text: string) => void }) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => {
     const el = ref.current;
@@ -742,37 +720,12 @@ function EditableText({ tag, className, html, placeholder, singleLine, onText }:
       contentEditable
       suppressContentEditableWarning
       spellCheck={false}
+      role="textbox"
+      aria-multiline={!singleLine}
       data-placeholder={placeholder}
       onInput={(e: React.FormEvent<HTMLElement>) => onText(serializeEdit(e.currentTarget))}
       onKeyDown={singleLine ? (e: React.KeyboardEvent) => { if (e.key === "Enter") e.preventDefault(); } : undefined}
     />
-  );
-}
-
-/** One block of a form while its text is being edited: the text is typed in place, the blanks sit in it as chips. */
-function EditBlock({ block, lang, src, pack, fields, labelOf, chipHint, emptyHint, onText, onInsert, onRemove, labels }: {
-  block: Extract<PackBlock, { type: "p" | "h" | "h2" | "h3" | "list" }>; lang: PackLang; src: SourceLang; pack: LegalPack; fields: Record<string, FieldState>;
-  labelOf: (id: string) => string; chipHint: string; emptyHint: string;
-  onText: (text: string, item?: number) => void; onInsert: (kind: "p" | "article") => void; onRemove: () => void;
-  labels: { paragraph: string; article: string; remove: string };
-}) {
-  const [html] = useState(() => (block.type === "list" ? block[src] : [block[src]]).map((text) => editHtml(text, pack, fields, lang, labelOf, chipHint)));
-  const cls = (block.type === "h" ? "lp-h" : block.type === "h2" ? "lp-h2" : block.type === "h3" ? "lp-h3" : "lp-p") + (block.added ? " lp-added" : "");
-  return (
-    <div className="lp-edit">
-      {block.type === "list" ? (
-        <ol className="lp-list">
-          {html.map((h, i) => <EditableText key={i} tag="li" className={`lp-edit-text${block.added ? " lp-added" : ""}`} html={h} placeholder={emptyHint} singleLine={false} onText={(text) => onText(text, i)} />)}
-        </ol>
-      ) : (
-        <EditableText tag={block.type === "p" ? "p" : "h5"} className={`${cls} lp-edit-text`} html={html[0] ?? ""} placeholder={emptyHint} singleLine={block.type !== "p"} onText={(text) => onText(text)} />
-      )}
-      <div className="lp-edit-actions lp-screen">
-        <button type="button" onClick={() => onInsert("p")}>{labels.paragraph}</button>
-        <button type="button" onClick={() => onInsert("article")}>{labels.article}</button>
-        <button type="button" onClick={onRemove} className="lp-edit-remove">{labels.remove}</button>
-      </div>
-    </div>
   );
 }
 
@@ -934,18 +887,12 @@ const CSS = `
 .lp-pick:focus-visible { outline: 2px solid #0E3A46; outline-offset: 1px; }
 .lp-pick option { color: #000; }
 .lp-opt-empty { display: none; }
-/* Text the additions brought in, or the team typed: red on screen, black on paper. */
-.lp-added, .lp-added .lp-edit-text { color: #D93B3B; }
-/* Editing the text of a form: every block a dashed box, its blanks read-only chips. */
-.lp-edit { border-radius: 6px; outline: 1px dashed rgba(14,58,70,.35); padding: .15rem .5rem .1rem; margin: .35rem -.5rem; }
-.lp-edit:focus-within { outline: 2px solid rgba(14,58,70,.55); }
-.lp-edit-text { outline: none; min-height: 1.5em; }
-.lp-edit-text:empty::before { content: attr(data-placeholder); font-style: italic; color: rgba(0,0,0,.4); }
+/* Text the additions brought in: red on screen, black on paper, typed into directly like a blank. */
+.lp-added { color: #D93B3B; }
+.lp-added-text { outline: none; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.lp-added-text:focus { background: rgba(217,59,59,.07); box-shadow: 0 0 0 2px rgba(217,59,59,.3); }
+.lp-added-text:empty::before { content: attr(data-placeholder); font-style: italic; color: rgba(0,0,0,.4); }
 .lp-chip { display: inline; padding: 0 .15em; border-radius: 3px; color: #B0246B; background: rgba(176,36,107,.10); user-select: all; -webkit-user-select: all; }
-.lp-edit-actions { display: flex; flex-wrap: wrap; gap: .35rem; margin: .2rem 0 .4rem; }
-.lp-edit-actions button { font-size: 12.5px; font-weight: 600; padding: .1rem .55rem; border-radius: 4px; background: #F1F5F6; color: rgba(0,0,0,.7); }
-.lp-edit-actions button:hover { background: #E3EBED; }
-.lp-edit-actions .lp-edit-remove { color: #D93B3B; }
 .lp-guide p.en { color: #000; }
 .lp-guide li { margin: .25rem 0; }
 .lp-prose { outline: none; }
@@ -1003,7 +950,8 @@ const CSS = `
   .lp-check input { -webkit-appearance: checkbox; }
   .lp-sigrow { break-inside: avoid; margin-top: 2rem; }
   .lp-h, .lp-h2, .lp-h3 { break-after: avoid; }
-  .lp-added, .lp-added .lp-edit-text { color: #000; }
+  .lp-added { color: #000; }
+  .lp-added-text { background: none; box-shadow: none; }
   .lp-prose p.en, .lp-prose h2, .lp-prose h3 { color: #000; }
 }
 `;
