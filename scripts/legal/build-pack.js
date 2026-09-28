@@ -307,7 +307,117 @@ function buildStatute() {
     void firstOfArticle;
   }
   return { id: '04', title: { me: 'Statut', en: 'Statute' }, subtitle: { me: 'Usvaja Osnivačka skupština po članu 12 Zakona o NVO', en: 'Adopted by the Founding Assembly under Article 12 of the Law on NGOs' }, file: 'santamore-04-statut',
-    note: { me: 'Obrazac CRNVO sa primijenjenim izmjenama iz uputstva: skraćeni naziv (čl. 2), uklonjena praznina (čl. 5), ispravljeno upućivanje (čl. 22), naziv funkcije Izvršni direktor (čl. 27 do 31), ponovni izbor i ostanak na dužnosti do izbora nasljednika (čl. 27), drugi stav u čl. 35, ko vodi registar članova (čl. 36), pravo na prigovor (čl. 37), „sa sjedištem u Crnoj Gori“ (čl. 40). <b>Opcija 1</b> (Upravni odbor, Komisija za dodjelu sredstava, ogranci, punomoćja) je u nacrtu „Dopune statuta“; ako se usvoji, članovi se prenumerišu pri potpisivanju.', en: 'The CRNVO template with the guide\'s edits applied: short name (Art. 2), the removed blank (Art. 5), the corrected cross-reference (Art. 22), the title Executive Director (Arts. 27 to 31), re-election and staying on until a successor is elected (Art. 27), a second paragraph in Art. 35, who keeps the register of members (Art. 36), the right to object (Art. 37), "with its seat in Montenegro" (Art. 40). <b>Option 1</b> (Board, Grants Committee, chapters, proxies) is in the draft "Statute additions"; if adopted, articles are renumbered at signing.' },
+    note: { me: 'Obrazac CRNVO sa primijenjenim izmjenama iz uputstva: skraćeni naziv (čl. 2), uklonjena praznina (čl. 5), ispravljeno upućivanje (čl. 22), naziv funkcije Izvršni direktor (čl. 27 do 31), ponovni izbor i ostanak na dužnosti do izbora nasljednika (čl. 27), drugi stav u čl. 35, ko vodi registar članova (čl. 36), pravo na prigovor (čl. 37), „sa sjedištem u Crnoj Gori“ (čl. 40). <b>Opcija 1</b> (Upravni odbor, Komisija za dodjelu sredstava, ogranci, punomoćja) je u nacrtu „Dopune statuta“ i, već unesena, u obrascu 04a.', en: 'The CRNVO template with the guide\'s edits applied: short name (Art. 2), the removed blank (Art. 5), the corrected cross-reference (Art. 22), the title Executive Director (Arts. 27 to 31), re-election and staying on until a successor is elected (Art. 27), a second paragraph in Art. 35, who keeps the register of members (Art. 36), the right to object (Art. 37), "with its seat in Montenegro" (Art. 40). <b>Option 1</b> (Board, Grants Committee, chapters, proxies) is in the draft "Statute additions" and, already merged, in form 04a.' },
+    blocks };
+}
+
+// ---------- form 04a: the statute with the additions merged in ----------
+// Option 1 of the guide: the statute template with statute-additions.md applied. The
+// consequential edits change existing articles by their wording (not by index), the
+// proxy chapter goes after Article 17 as 17a to 17f, the three new chapters go after
+// Article 31 as 32 to 44, and the template's old 32 to 42 become 45 to 55. The additions'
+// two references to the old dissolution and assets articles (39, 40) follow the renumbering.
+// English side of a new article: the draft's summary paragraph, on the article's first
+// paragraph; the other paragraphs exist in Montenegrin only (meOnly).
+function additionsChapters() {
+  const md = read(path.join(R, 'statute-additions.md'));
+  const chapters = []; let chapter = null, article = null;
+  for (const b of parseBlocks(md)) {
+    if (b.type === 'h2') {
+      const m = b.text.match(/^\d+\. New chapter: (.+?) \/ (.+)$/);
+      chapter = m ? { me: m[1].trim(), en: m[2].trim(), articles: [] } : null;
+      if (chapter) chapters.push(chapter);
+      article = null;
+      continue;
+    }
+    if (!chapter) continue;
+    if (b.type === 'h3') {
+      const m = b.text.match(/^Član (\d+[a-z]?)/);
+      article = m ? { n: m[1], blocks: [] } : null;
+      if (article) chapter.articles.push(article);
+      continue;
+    }
+    if (!article) continue;
+    if (b.type === 'p') {
+      const text = strip(b.text);
+      if (/^\*\*/.test(b.text)) continue; // notes to the founders, not statute text
+      if (/^\*Article /.test(b.text)) { article.summary = text.replace(/^Article \d+[a-z]?\. /, ''); continue; }
+      article.blocks.push({ type: 'p', me: text, en: '' });
+    } else if (b.type === 'ol') {
+      article.blocks.push({ type: 'list', me: b.items.map(strip), en: [] });
+    }
+  }
+  return chapters;
+}
+function articleBlocks(article) {
+  const [num, letter] = [article.n.replace(/[a-z]$/, ''), article.n.match(/[a-z]$/)?.[0] ?? ''];
+  const out = [{ type: 'h3', me: `Član ${num}${letter}`, en: `Article ${num}${letter}` }];
+  let first = true;
+  for (const b of article.blocks) {
+    if (b.type === 'p' && first) { out.push({ type: 'p', me: b.me, en: article.summary || '' }); first = false; continue; }
+    out.push(Object.assign({}, b, { meOnly: true }));
+  }
+  return out;
+}
+function buildStatuteWithAdditions() {
+  const base = buildStatute();
+  const blocks = JSON.parse(JSON.stringify(base.blocks));
+  const headIndex = n => blocks.findIndex(b => b.type === 'h3' && b.me === `Član ${n}`);
+  const chapterIndex = title => blocks.findIndex(b => b.type === 'h2' && b.me === title);
+  const inArticle = (n, test) => { const start = headIndex(n); for (let i = start + 1; i < blocks.length && blocks[i].type === 'p'; i++) if (test(blocks[i].me)) return i; throw new Error(`04a: Article ${n}: paragraph not found`); };
+  const articleEnd = n => { const start = headIndex(n); let i = start + 1; while (i < blocks.length && blocks[i].type === 'p') i++; return i; };
+  const P = (me, en) => ({ type: 'p', me, en });
+  const ensure = (cond, what) => { if (!cond) throw new Error(`04a: ${what}`); };
+
+  // 1. Consequential edits (section 1 of the additions), by wording.
+  blocks[inArticle(9, t => /^Organi udruženja su/.test(t))] = P('Organi udruženja su Skupština, Upravni odbor, Komisija za dodjelu sredstava i lice ovlašćeno za zastupanje (Izvršni direktor).', 'The bodies of the association are the Assembly, the Board, the Grants Committee and the person authorised for representation (Executive Director).');
+  const other = inArticle(12, t => /^bir[aа] i r[aа]zrješ[aа]v[aа] druge organe/.test(t));
+  blocks.splice(other, 1, P('bira i razrješava članove Upravnog odbora i Komisije za dodjelu sredstava;', 'elects and dismisses the members of the Board and of the Grants Committee;'));
+  blocks.splice(inArticle(12, t => /^usvaja plan rada/.test(t)) + 1, 0, P('usvaja godišnji budžet udruženja;', 'adopts the annual budget of the association;'));
+  blocks[inArticle(14, t => /opunomoćeni predstavnici preko 50 posto/.test(t))] = P('Članovi koje predstavljaju opunomoćeni predstavnici u skladu sa članovima 17a do 17f ovog statuta računaju se kao prisutni.', 'Members represented by proxies under Articles 17a to 17f count as present.');
+  blocks.splice(articleEnd(22), 0, P('Odredbe ovog člana shodno se primjenjuju na članove svih organa udruženja.', 'The provisions of this Article apply accordingly to the members of all bodies of the association.'));
+  blocks.splice(inArticle(28, t => /^vodi poslove udruženja/.test(t)) + 1, 0,
+    P('sprovodi odluke Upravnog odbora i Komisije za dodjelu sredstava;', 'implements the decisions of the Board and of the Grants Committee;'),
+    P('rukovodi radom ogranaka;', 'directs the work of the chapters;'));
+  blocks.splice(articleEnd(28), 0, P('Izvršni direktor ne odlučuje o tome kojim korisnicima se dodjeljuju sredstva.', 'The Executive Director does not decide which beneficiaries receive funds.'));
+  const acc = inArticle(29, t => /odgovara za svoj rad Skupštini/.test(t));
+  ensure(/Skupštini i periodično joj podnosi/.test(blocks[acc].me) && /to the Assembly and periodically submits reports on their work to it/.test(blocks[acc].en), 'Article 29 wording');
+  blocks[acc] = P(blocks[acc].me.replace('Skupštini i periodično joj podnosi', 'Skupštini i Upravnom odboru i periodično im podnosi'), blocks[acc].en.replace('to the Assembly and periodically submits reports on their work to it', 'to the Assembly and to the Board and periodically submits reports on their work to them'));
+  const staff = inArticle(32, t => /koji donosi Skupština udruženja/.test(t));
+  blocks[staff] = P(blocks[staff].me.replace('koji donosi Skupština udruženja', 'koji donosi Upravni odbor'), blocks[staff].en.replace('adopted by the Assembly of the association', 'adopted by the Board'));
+  ensure(/Upravni odbor/.test(blocks[staff].me) && /by the Board/.test(blocks[staff].en), 'Article 32 wording');
+  blocks.splice(articleEnd(34), 0, P('Dobrovoljni prilozi i donacije prikupljeni za korisnike u cjelini se dodjeljuju korisnicima. Troškovi rada udruženja pokrivaju se iz sponzorstava, kotizacija, članarina, grantova, prihoda od privredne djelatnosti i drugih prihoda, osim ako je donator izričito odredio drugačije.', 'Voluntary contributions and donations collected for beneficiaries are allocated to beneficiaries in full. The costs of the association\'s work are covered from sponsorship, entry fees, membership fees, grants, income from economic activity and other income, unless the donor has expressly specified otherwise.'));
+
+  // 2. The template's Articles 32 to 42 become 45 to 55 (nothing in the template refers to them by number).
+  for (const b of blocks) {
+    const m = b.type === 'h3' && b.me.match(/^Član (\d+)$/);
+    if (m && +m[1] >= 32) { b.me = `Član ${+m[1] + 13}`; b.en = `Article ${+m[1] + 13}`; }
+  }
+
+  // 3. The new chapters.
+  const chapters = additionsChapters();
+  ensure(chapters.length === 4, `four chapters in the additions, found ${chapters.length}`);
+  const [board, grants, local, proxies] = chapters;
+  ensure(/^UPRAVNI ODBOR/.test(board.me) && /^KOMISIJA/.test(grants.me) && /^OGRANCI/.test(local.me) && /^NAČIN PREDSTAVLJANJA/.test(proxies.me), 'chapter order');
+  const chapterBlocks = ch => [{ type: 'h2', me: ch.me, en: ch.en }, ...ch.articles.flatMap(articleBlocks)];
+  const proxyBlocks = chapterBlocks(proxies).map(b => {
+    // The proxy chapter names the dissolution and assets articles by their old numbers.
+    const fix = t => t.replace('članova 16, 17 i 39 ovog statuta', 'članova 16, 17 i 52 ovog statuta').replace('prestanku rada udruženja iz člana 39 ovog statuta', 'prestanku rada udruženja iz člana 52 ovog statuta').replace('raspodjeli imovine iz člana 40 ovog statuta', 'raspodjeli imovine iz člana 53 ovog statuta')
+      .replace('Articles 16, 17 and 39', 'Articles 16, 17 and 52').replace('dissolve the association (Article 39)', 'dissolve the association (Article 52)').replace('distribute its assets (Article 40)', 'distribute its assets (Article 53)');
+    return b.type === 'list' ? Object.assign({}, b, { me: b.me.map(fix), en: b.en.map(fix) }) : Object.assign({}, b, { me: fix(b.me), en: fix(b.en) });
+  });
+  ensure(proxyBlocks.some(b => b.type === 'p' && /člana 52 ovog statuta/.test(b.me)), 'proxy cross-references renumbered');
+  blocks.splice(headIndex(18), 0, ...proxyBlocks);
+  blocks.splice(chapterIndex('SLUŽBENICI (OSOBLJE)'), 0, ...chapterBlocks(board), ...chapterBlocks(grants), ...chapterBlocks(local));
+
+  // Every article once, in order.
+  const heads = blocks.filter(b => b.type === 'h3').map(b => b.me.replace('Član ', ''));
+  const expected = [];
+  for (let n = 1; n <= 55; n++) { expected.push(String(n)); if (n === 17) for (const l of 'abcdef') expected.push(`17${l}`); }
+  ensure(heads.join(',') === expected.join(','), `article sequence: ${heads.join(',')}`);
+
+  return { id: '04a', title: { me: 'Statut sa dopunama (Opcija 1)', en: 'Statute with additions (Option 1)' }, subtitle: base.subtitle, file: 'santamore-04a-statut-dopunjen',
+    note: { me: 'Obrazac 04 sa unesenim nacrtom „Dopune statuta“: Upravni odbor, Komisija za dodjelu sredstava i ogranci (čl. 32 do 44), punomoćja (čl. 17a do 17f), izmjene postojećih članova (čl. 9, 12, 14, 22, 28, 29, 45 i 47), a dosadašnji čl. 32 do 42 postali su čl. 45 do 55. Engleska strana novih članova je sažetak iz nacrta; crnogorski tekst je mjerodavan. Tekst se može mijenjati dugmetom „Uredi tekst“; advokat pregleda crnogorsku stranu prije potpisivanja. Uglaste zagrade u čl. 17f su napomena za advokata.', en: 'Form 04 with the draft "Statute additions" merged in: the Board, the Grants Committee and chapters (Arts. 32 to 44), proxies (Arts. 17a to 17f), the edits to existing articles (Arts. 9, 12, 14, 22, 28, 29, 45 and 47), and the former Arts. 32 to 42 renumbered 45 to 55. The English side of a new article is the draft\'s summary; the Montenegrin text is the operative one. Change the text with "Edit text"; the lawyer reviews the Montenegrin side before signing. The square brackets in Art. 17f are a note for the lawyer.' },
     blocks };
 }
 
@@ -352,7 +462,7 @@ const draftList = [
   ['beneficiary-application-form', path.join(G, 'beneficiary-application-form.md'), 'Prijava za pomoć', 'Beneficiary application'],
 ];
 const drafts = draftList.map(([id, file, me, en]) => ({ id, title: { me, en }, file: 'santamore-nacrt-' + id, html: draftHtml(read(file)) }));
-const forms = [buildInstructions(), form02, form03, buildStatute(), form05];
+const forms = [buildInstructions(), form02, form03, buildStatute(), buildStatuteWithAdditions(), form05];
 const guide = { title: { me: 'Kako dovršiti paket', en: 'How to complete the pack' }, file: 'santamore-kako-dovrsiti', html: draftHtml(read(path.join(R, 'HOW-TO-COMPLETE.md'))) };
 const pack = { fields: F, groups: GROUPS, forms, drafts, guide, builtAt: new Date().toISOString().slice(0, 10) };
 const out = path.join(ROOT, 'content/legal-pack/pack.json');

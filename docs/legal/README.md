@@ -13,7 +13,7 @@ translation for founders who do not read it.
 | `registration/statute-additions.md` | Draft statute chapters for the Board, Grants Committee, chapters and proxy voting |
 | `governance/*.md` | The policies and agreements the Board adopts and the public pages are regenerated from |
 | `dist/*.docx` | Word renders: A4, Montenegrin left, English right, one row per article; the completion guide as a single column |
-| `../../content/legal-pack/pack.json` | The registration pack the console serves at `/admin/registracija`: the five filing documents with pre-filled blanks, the founding checklist and the drafts, in both languages |
+| `../../content/legal-pack/pack.json` | The registration pack the console serves at `/admin/registracija`: the five filing documents with pre-filled blanks, the statute with the additions merged in (04a), the founding checklist and the drafts, in both languages |
 
 ## Rebuilding the Word files
 
@@ -36,9 +36,13 @@ node scripts/legal/build-pack.js
 `scripts/legal/build-pack.js` turns the Ministry's originals into templates whose blanks are
 pre-filled from the completion guide (unknown facts stay as bracketed placeholders), attaches
 the English translations per article, and embeds the drafts, into `content/legal-pack/pack.json`.
+`buildStatuteWithAdditions` applies `statute-additions.md` to the statute template (the
+consequential edits by wording, the proxy chapter after Article 17, the three new chapters
+after Article 31, the old Articles 32 to 42 renumbered 45 to 55) as form 04a.
 The console page `/admin/registracija` (staff only) renders it: one language on screen
 (Montenegrin, English, Russian or Turkish), editable blanks shared by every form (blue until
-completed, pink after), a Complete panel that lists a form's blanks with a hint each, the
+completed, pink after), the text of every form editable in place ("Edit text": paragraphs and
+articles added, changed or removed, saved as `form:<id>` rows), a Complete panel that lists a form's blanks with a hint each, the
 checklist, the drafts editable in place, Print / PDF, and Save for the whole team. The
 templates exist in Montenegrin and English; Russian and Turkish are translated on first use,
 document by document, through the same Claude helper and cached in `legal_pack` under

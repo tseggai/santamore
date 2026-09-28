@@ -1,14 +1,37 @@
 import { describe, expect, it } from "vitest";
 
 import packJson from "@/content/legal-pack/pack.json";
-import { docTexts, incompleteFields, initialFields, isIncomplete, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, splitTopLevel, packProblems, placeholderIds, sanitizeDraftHtml, savePackSchema, segments, type LegalPack } from "./legal-pack";
+import { docTexts, incompleteFields, initialFields, isIncomplete, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, sanitizeBlockText, splitTopLevel, packProblems, placeholderIds, sanitizeDraftHtml, savePackSchema, segments, type LegalPack } from "./legal-pack";
 
 const pack = packJson as unknown as LegalPack;
 
 describe("legal pack", () => {
-  it("has five forms and every draft", () => {
-    expect(pack.forms.map((f) => f.id)).toEqual(["01", "02", "03", "04", "05"]);
+  it("has the five filing forms, the statute with additions, and every draft", () => {
+    expect(pack.forms.map((f) => f.id)).toEqual(["01", "02", "03", "04", "04a", "05"]);
     expect(pack.drafts.length).toBeGreaterThanOrEqual(14);
+  });
+
+  it("merges the additions into form 04a: every article once, the edits applied, the old numbers shifted", () => {
+    const merged = pack.forms.find((f) => f.id === "04a")!;
+    const heads = merged.blocks.flatMap((b) => (b.type === "h3" ? [b.me] : []));
+    const expected: string[] = [];
+    for (let n = 1; n <= 55; n++) { expected.push(`Član ${n}`); if (n === 17) for (const l of "abcdef") expected.push(`Član 17${l}`); }
+    expect(heads).toEqual(expected);
+    const texts = merged.blocks.flatMap((b) => (b.type === "p" ? [b.me] : b.type === "list" ? b.me : []));
+    expect(texts).toContain("Organi udruženja su Skupština, Upravni odbor, Komisija za dodjelu sredstava i lice ovlašćeno za zastupanje (Izvršni direktor).");
+    expect(texts).toContain("usvaja godišnji budžet udruženja;");
+    expect(texts.some((t) => t.startsWith("Članovi koje predstavljaju opunomoćeni predstavnici u skladu sa članovima 17a do 17f"))).toBe(true);
+    expect(texts.some((t) => /prestanku rada udruženja iz člana 52 ovog statuta/.test(t))).toBe(true);
+    expect(texts.some((t) => /iz člana 39 ovog statuta/.test(t))).toBe(false);
+    // The chapters sit where the additions say: proxies before Article 18, the three new ones before the staff chapter.
+    const idx = (me: string) => merged.blocks.findIndex((b) => (b.type === "h2" || b.type === "h3") && b.me === me);
+    expect(idx("Član 17f")).toBeLessThan(idx("Član 18"));
+    expect(idx("UPRAVNI ODBOR")).toBeLessThan(idx("KOMISIJA ZA DODJELU SREDSTAVA"));
+    expect(idx("OGRANCI")).toBeLessThan(idx("SLUŽBENICI (OSOBLJE)"));
+    // The English side of a merged article is the summary on its first paragraph; the rest is Montenegrin only.
+    const first = merged.blocks[idx("Član 32") + 1];
+    expect(first.type === "p" && first.en.startsWith("Position and composition.")).toBe(true);
+    expect(merged.blocks[idx("Član 32") + 2]).toMatchObject({ meOnly: true });
   });
 
   it("refers only to defined blanks, the same ones in both languages", () => {
@@ -78,6 +101,11 @@ describe("savePackSchema", () => {
     expect(schema.safeParse({ key: "checks", value: { s9_999: true } }).success).toBe(false);
     expect(schema.safeParse({ key: "draft:impressum", value: { html: "<p>x</p>" } }).success).toBe(true);
     expect(schema.safeParse({ key: "draft:unknown", value: { html: "<p>x</p>" } }).success).toBe(false);
+    expect(schema.safeParse({ key: "form:04a", value: { blocks: [{ type: "h3", me: "Član 1", en: "Article 1" }, { type: "p", me: "{{org}} je udruženje.", en: "{{org}} is an association.", meOnly: false }, { type: "list", me: ["a"], en: [] }] } }).success).toBe(true);
+    expect(schema.safeParse({ key: "form:04a", value: { blocks: null } }).success).toBe(true);
+    expect(schema.safeParse({ key: "form:09", value: { blocks: [] } }).success).toBe(false);
+    expect(schema.safeParse({ key: "form:04", value: { blocks: [{ type: "p", me: "{{nope}}", en: "" }] } }).success).toBe(false);
+    expect(schema.safeParse({ key: "form:01", value: { blocks: [{ type: "check", id: "s9_999", me: "x", en: "y" }] } }).success).toBe(false);
     expect(schema.safeParse({ key: "other", value: {} }).success).toBe(false);
   });
 
@@ -151,5 +179,11 @@ describe("four languages", () => {
     expect(splitTopLevel('<h2>A</h2>\n<p class="en">x<br>y</p><div class="tablewrap"><table><tr><td>1</td></tr></table></div>')).toHaveLength(3);
     expect(keepsPlaceholders("Osnivač {{f1_name}} {{sig}}", "Kurucu {{f1_name}} {{sig}}")).toBe(true);
     expect(keepsPlaceholders("Osnivač {{f1_name}} {{sig}}", "Kurucu {{f1name}} {{sig}}")).toBe(false);
+  });
+});
+
+describe("sanitizeBlockText", () => {
+  it("keeps the template tags and drops the rest", () => {
+    expect(sanitizeBlockText('a <b>b</b><br>c <script>x</script><span onclick="y">d</span> {{org}}')).toBe("a <b>b</b><br>c xd {{org}}");
   });
 });
