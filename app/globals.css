@@ -241,6 +241,13 @@
     border-radius: 3px;
   }
   /* Side by side in the console: the English twin under each Montenegrin block, or one language alone. */
+  /* In the console a [[PLACEHOLDER]] is a blank still to complete: blue, as in the registration forms. */
+  .prose-legal .todo {
+    color: #0b57d0;
+    background: rgba(11, 87, 208, 0.07);
+    border-radius: 3px;
+    padding: 0 0.15em;
+  }
   .prose-legal .en {
     color: rgba(0, 0, 0, 0.6);
   }

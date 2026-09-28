@@ -20,6 +20,8 @@ export interface LegalDocEntry {
   html: Partial<Record<LegalDocLang, string>>;
   publicHtml: Partial<Record<LegalDocLang, string>> | null;
   bilingualHtml: string;
+  /** The bilingual HTML with every [[PLACEHOLDER]] marked, for the Rules section. */
+  rulesHtml: string;
   notesHtml: string | null;
 }
 

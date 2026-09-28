@@ -418,6 +418,43 @@ export function isMeTwin(part: string, aligned: boolean): boolean {
   return aligned ? /^<(p|h[1-6]|ul|ol|div|table)\b/.test(part) : /^<p\b/.test(part);
 }
 
+const PLACEHOLDER_MARK = /\[\[PLACEHOLDER[^\]]*\]\]/g;
+
+/** The text of an HTML fragment, whitespace collapsed: what a draft paragraph says, whatever its markup. */
+export function htmlText(html: string): string {
+  return html.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+}
+
+/**
+ * The on-screen marks of a draft, never saved: every [[PLACEHOLDER]] wrapped
+ * as a blank still to complete (blue), and every top-level element whose text
+ * is not in the shipped draft marked as text we supplied (pink).
+ */
+export function decorateDraft(html: string, originals: Set<string>): string {
+  return splitTopLevel(stripDraftMarks(html)).map((part) => {
+    const withTodo = part.replace(PLACEHOLDER_MARK, (m) => `<span class="todo">${m}</span>`);
+    if (originals.has(htmlText(part))) return withTodo;
+    return withTodo.replace(/^<([a-z0-9]+)((?:\s[^>]*)?)>/i, (_m, tag: string, attrs: string) => {
+      const cls = attrs.match(/\sclass="([^"]*)"/);
+      return cls ? `<${tag}${attrs.replace(cls[0], ` class="${cls[1]} changed"`)}>` : `<${tag}${attrs} class="changed">`;
+    });
+  }).join("\n");
+}
+
+/** A draft's HTML without the on-screen marks: what is saved and translated. */
+export function stripDraftMarks(html: string): string {
+  return html
+    .replace(/<span class="todo">([^<]*)<\/span>/g, "$1")
+    .replace(/ class="changed"/g, "")
+    .replace(/ class="([^"]*?) changed"/g, ' class="$1"')
+    .replace(/ class="changed ([^"]*?)"/g, ' class="$1"');
+}
+
+/** The texts of the shipped draft, to tell the team's edits from it. */
+export function draftOriginals(html: string): Set<string> {
+  return new Set(splitTopLevel(html).map(htmlText));
+}
+
 /** A translated template is used only if it kept every blank of the original. */
 export function keepsPlaceholders(source: string, translated: string): boolean {
   const a = placeholderIds(source).sort().join(",");

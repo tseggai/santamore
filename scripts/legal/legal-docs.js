@@ -25,6 +25,8 @@ function publicBlocks(blocks, publicParts) {
 }
 
 const html = blocks => blocks.map(b => blockHtml(b)).join('\n');
+/** For the console's Rules section only: every [[PLACEHOLDER]] marked as a blank still to complete (blue), as in the forms. */
+const markTodo = h => h.replace(/\[\[PLACEHOLDER[^\]]*\]\]/g, m => `<span class="todo">${m}</span>`);
 /** Montenegrin and English interleaved, every English block marked "en", the title left out. */
 function bilingualHtml(me, en) {
   const a = me.filter(b => b.type !== 'h1'), b = en.filter(x => x.type !== 'h1');
@@ -44,6 +46,7 @@ function loadDoc(id, meta) {
     html: Object.fromEntries(langs.map(l => [l, html(blocks[l].filter(b => b.type !== 'h1'))])),
     publicHtml: meta.route ? Object.fromEntries(langs.map(l => [l, html(publicBlocks(blocks[l], meta.publicParts ?? 1))])) : null,
     bilingualHtml: bilingualHtml(blocks.me, blocks.en),
+    rulesHtml: markTodo(bilingualHtml(blocks.me, blocks.en)),
     notesHtml: notes ? html(parseBlocks(notes).filter(b => b.type !== 'h1')) : null,
   };
 }

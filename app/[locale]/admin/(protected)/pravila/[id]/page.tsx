@@ -44,7 +44,7 @@ export default async function RulesDocPage({ params, searchParams }: { params: P
         </div>
       </div>
       <p className="mt-4 rounded-lg bg-sand px-4 py-3 text-[14px] text-black/70 print:hidden">{t("hint")}</p>
-      <article className="prose-legal mt-6 max-w-3xl" data-show={show === "both" ? undefined : show} dangerouslySetInnerHTML={{ __html: doc.bilingualHtml }} />
+      <article className="prose-legal mt-6 max-w-3xl" data-show={show === "both" ? undefined : show} dangerouslySetInnerHTML={{ __html: doc.rulesHtml }} />
       {doc.notesHtml ? (
         <details className="mt-10 max-w-3xl rounded-lg bg-mist px-5 py-4 print:hidden">
           <summary className="cursor-pointer text-[15px] font-bold">{t("notes")}</summary>
