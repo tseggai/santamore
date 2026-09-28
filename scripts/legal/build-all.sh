@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Rebuilds every Word document in docs/legal/dist from the Markdown sources and the Ministry originals.
+# Rebuilds every Word document in docs/legal/dist from the Markdown sources and the Ministry originals,
+# then content/legal/docs.json (the site's legal pages and the console's Rules section) and the registration pack.
 # Prerequisites: node, python3, and the docx package (npm install --no-save docx).
 set -euo pipefail
 cd "$(dirname "$0")/../.."
@@ -15,5 +16,8 @@ pair 06-uputstvo-osnivacki-akt.docx              06-guidance-founding-act.en.md 
 pair 07-uputstvo-statut.docx                     07-guidance-statute.en.md                 07-guidance-statute.docx                 bullet
 node "$S/build-docx.js" plain     "$R/completion-guide.md"  "$D/completion-guide.docx"
 node "$S/build-docx.js" bilingual "$R/statute-additions.md" "$D/statute-additions.docx"
-for f in "$G"/*.md; do n=$(basename "$f" .md); node "$S/build-docx.js" bilingual "$f" "$D/$n.docx"; done
+node "$S/check-align.js" --all
+for f in "$G"/*.me.md; do n=$(basename "$f" .me.md); node "$S/build-docx.js" pair "$f" "$G/$n.en.md" "$D/$n.docx"; done
+node "$S/build-legal-docs.js"
+node "$S/build-pack.js"
 echo "done: $(ls "$D" | wc -l) documents in $D"

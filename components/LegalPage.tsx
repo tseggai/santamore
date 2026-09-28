@@ -1,37 +1,29 @@
 import type { LegalDoc } from "@/content/legal/types";
-import type { Locale } from "@/i18n/routing";
 
 /**
- * Shared renderer for the eight legal pages. Server component, no client JS.
- * Every draft carries the lawyer-review banner until the texts are approved;
- * the banner strings live here (not in messages/) so they cannot drift apart
- * from the documents they guard.
+ * Shared renderer for the legal pages. Server component, no client JS. A page
+ * is either a document built from docs/legal/governance (HTML, see
+ * lib/legal-docs.ts) or typed content from content/legal (the cookie policy).
  */
-const DRAFT_BANNER: Record<Locale, string> = {
-  me: "NACRT — mora ga pregledati advokat u Crnoj Gori prije objave",
-  en: "DRAFT — must be reviewed by a Montenegrin lawyer before launch",
-  ru: "ЧЕРНОВИК — перед публикацией должен быть проверен юристом в Черногории",
-};
-
-export function LegalPage({ doc, locale }: { doc: LegalDoc; locale: Locale }) {
+export function LegalPage(props: { title: string; html: string } | { doc: LegalDoc }) {
+  if ("html" in props) {
+    return (
+      <div className="mx-auto max-w-3xl px-5 py-14">
+        <h1 className="type-display text-4xl">{props.title}</h1>
+        <article className="prose-legal mt-6" dangerouslySetInnerHTML={{ __html: props.html }} />
+      </div>
+    );
+  }
+  const { doc } = props;
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
-      <p
-        role="note"
-        className="rounded-brand bg-red/8 px-4 py-3 text-[14px] font-semibold text-red-dark"
-      >
-        {DRAFT_BANNER[locale]}
-      </p>
-      <h1 className="type-display mt-8 text-4xl">{doc.title}</h1>
+      <h1 className="type-display text-4xl">{doc.title}</h1>
       <p className="mt-3 text-[15.5px] leading-relaxed text-black/80">{doc.intro}</p>
       {doc.sections.map((section) => (
         <section key={section.heading}>
           <h2 className="type-display mt-8 text-2xl">{section.heading}</h2>
           {section.paragraphs.map((paragraph) => (
-            <p
-              key={paragraph}
-              className="mt-3 text-[15.5px] leading-relaxed text-black/80"
-            >
+            <p key={paragraph} className="mt-3 text-[15.5px] leading-relaxed text-black/80">
               {paragraph}
             </p>
           ))}

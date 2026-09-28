@@ -5,7 +5,6 @@ import { setRequestLocale } from "next-intl/server";
 import { InboundForm } from "@/components/forms/InboundForm";
 import { SponsorGrid, type PublicSponsor } from "@/components/partners/SponsorGrid";
 import { partnersContent } from "@/content/site/partners";
-import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
 import { routing, type Locale } from "@/i18n/routing";
 
@@ -102,7 +101,6 @@ export default async function PartnersPage({
         offerLinks: offers.filter((o) => o.supporter_slug === su.slug).map((o) => ({ href: `/izazovi/${o.slug}`, label: o.reward_label })),
       };
     });
-  const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">

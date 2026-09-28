@@ -3,29 +3,22 @@ import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
 import { LegalPage } from "@/components/LegalPage";
-import { impressumContent } from "@/content/legal/impressum";
+import { publicLegalDoc } from "@/lib/legal-docs";
 import { routing } from "@/i18n/routing";
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+const DOC = "impressum";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const doc =
-    impressumContent[
-      hasLocale(routing.locales, locale) ? locale : routing.defaultLocale
-    ];
-  return { title: `${doc.title} — Santamore` };
+  const doc = publicLegalDoc(DOC, hasLocale(routing.locales, locale) ? locale : routing.defaultLocale);
+  return { title: doc ? `${doc.title} — Santamore` : "Santamore" };
 }
 
-export default async function ImpressumPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
+export default async function ImpressumPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  return <LegalPage doc={impressumContent[locale]} locale={locale} />;
+  const doc = publicLegalDoc(DOC, locale);
+  if (!doc) notFound();
+  return <LegalPage title={doc.title} html={doc.html} />;
 }

@@ -7,7 +7,7 @@ import { saveLegalPack, translatePackTexts } from "@/app/[locale]/admin/(protect
 import { useDialog } from "@/components/console/useDialog";
 import {
   FORM_KEY, FOUNDER_IDS, LANG_LABELS, PACK_LANGS, docHash, docTexts, formFieldIds, i18nKey, incompleteFields, initialFields, isEmptyOptional, isIncomplete, isOptionalEmpty,
-  isSourceLang, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, sanitizeDraftHtml, segments, splitTopLevel,
+  isAlignedDraft, isMeTwin, isSourceLang, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, sanitizeDraftHtml, segments, splitTopLevel,
   type DocTexts, type FieldState, type LegalPack, type PackBlock, type PackLang, type SourceLang,
 } from "@/lib/legal-pack";
 import type { Locale } from "@/i18n/routing";
@@ -613,10 +613,11 @@ function displayValue(f: FieldState, lang: PackLang): string {
 /** A draft or the guide in a translated language: each top-level element replaced by its translation where one exists. */
 function translatedHtml(html: string, texts: DocTexts | undefined, dropMe = false): string {
   const parts = splitTopLevel(html);
+  const aligned = isAlignedDraft(html);
   return parts.map((part, i) => {
     const key = `e${i}`;
     if (texts?.[key]) return texts[key];
-    if (dropMe && /^<p(?![^>]*class="[^"]*\ben\b)/.test(part)) return "";
+    if (dropMe && isMeTwin(part, aligned)) return "";
     return part;
   }).filter(Boolean).join("\n");
 }
@@ -956,10 +957,11 @@ const CSS = `
 .lp-prose table { border-collapse: collapse; font-size: 14px; min-width: 100%; }
 .lp-prose th, .lp-prose td { border: 0.5px solid rgba(0,0,0,.3); padding: .3rem .5rem; text-align: left; vertical-align: top; }
 .lp-prose th { background: #F1F5F6; }
-.lp-doc[data-lang="me"]:not(.lp-both) .lp-prose p.en { display: none; }
-.lp-doc[data-lang="en"]:not(.lp-both) .lp-prose p:not(.en) { display: none; }
-.lp-doc.lp-both .lp-prose p.en { color: rgba(0,0,0,.6); }
-.lp-doc[data-lang="ru"] .lp-prose p.en, .lp-doc[data-lang="tr"] .lp-prose p.en { color: #000; }
+.lp-prose .en { color: rgba(0,0,0,.6); }
+.lp-doc[data-lang="me"]:not(.lp-both) .lp-prose > .en { display: none; }
+.lp-doc[data-lang="en"]:not(.lp-both) .lp-prose > :not(.en) { display: none; }
+.lp-doc[data-lang="en"] .lp-prose .en { color: #000; }
+.lp-doc[data-lang="ru"] .lp-prose .en, .lp-doc[data-lang="tr"] .lp-prose .en { color: #000; }
 @media (prefers-reduced-motion: no-preference) { .lp-field { transition: background-color .15s; } }
 @media print {
   /* No page margin: the browser then prints no header or footer of its own. The margins come from the page table's repeating rows. */

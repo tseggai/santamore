@@ -389,12 +389,30 @@ export function docTexts(pack: LegalPack, docKey: string, draftHtml?: string, fo
   }
   const html = docKey === "guide" ? pack.guide?.html : draftHtml ?? pack.drafts.find((d) => `draft:${d.id}` === docKey)?.html;
   if (!html) return out;
+  const aligned = isAlignedDraft(html);
   splitTopLevel(html).forEach((part, i) => {
-    // A draft paragraph without the "en" class is the Montenegrin twin of the English one after it: not translated again.
-    if (docKey !== "guide" && /^<p(?![^>]*class="[^"]*\ben\b)/.test(part)) return;
+    // A Montenegrin block has its English twin right after it: not translated again.
+    if (docKey !== "guide" && isMeTwin(part, aligned)) return;
     out[`e${i}`] = part;
   });
   return out;
+}
+
+/**
+ * A draft built from per-language files has an English twin (class "en") for
+ * every block, headings included; an older bilingual draft (the statute
+ * additions) marks only its English paragraphs, and its headings carry both
+ * languages.
+ */
+export function isAlignedDraft(html: string): boolean {
+  return /<h[23] class="en">/.test(html);
+}
+
+/** Whether a top-level element of a draft is Montenegrin text with an English twin after it. */
+export function isMeTwin(part: string, aligned: boolean): boolean {
+  const hasEn = /^<[a-z0-9]+[^>]*class="[^"]*\ben\b/.test(part);
+  if (hasEn) return false;
+  return aligned ? /^<(p|h[1-6]|ul|ol|div|table)\b/.test(part) : /^<p\b/.test(part);
 }
 
 /** A translated template is used only if it kept every blank of the original. */

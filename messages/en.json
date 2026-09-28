@@ -1526,6 +1526,7 @@
     "yearFilterLabel": "Year",
     "yearFilterAll": "All years",
     "navRegistration": "Registration",
+    "navRules": "Rules",
     "legalPack": {
       "title": "NGO Registration",
       "loadFailed": "The saved state could not be loaded; the recommended values are shown. If the legal_pack table does not exist yet, apply migration 20260921000069.",
@@ -1607,7 +1608,27 @@
     "evFeeFund": "Entry fees go to",
     "evFeeFundImpact": "The cause (Impact Fund)",
     "evFeeFundOperations": "The team (Operations Fund)",
-    "evFeeFundHint": "The rule is the cause. Choose the team only on a Board decision for this event; the money page says so."
+    "evFeeFundHint": "The rule is the cause. Choose the team only on a Board decision for this event; the money page says so.",
+    "rules": {
+      "title": "Rules and templates",
+      "intro": "The association's rules, the policies published on the site, and the agreement templates, in Montenegrin and English, for the team to read and refer to. Montenegrin is the operative text; the English is a full translation. Staff only.",
+      "catBoard": "Rules the Board adopts",
+      "catBoardHint": "Adopted at the Board's first session after registration; the statute refers to them by name.",
+      "catPublic": "Policies published on the site",
+      "catPublicHint": "The public part of each is live on the site; the internal part is here only.",
+      "catTemplates": "Templates",
+      "catTemplatesHint": "Signed case by case with a volunteer, a sponsor or an applicant.",
+      "onSite": "on the site at {path}",
+      "open": "Open",
+      "openOnSite": "Open on the site",
+      "language": "Language",
+      "showMe": "Crnogorski",
+      "showEn": "English",
+      "showBoth": "Both",
+      "hint": "Read here; change the text in NGO Registration › Drafts, or send the change to be folded into the source files. Items in [[PLACEHOLDER]] are decisions or facts still to be supplied.",
+      "notes": "Working notes",
+      "notesHint": "What the document hangs on, the decisions embedded in it, the checks and parameters for the Board, and points for the lawyer. English only, not part of the document."
+    }
   },
   "forms": {
     "nameLabel": "Full name",

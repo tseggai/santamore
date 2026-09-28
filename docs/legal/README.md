@@ -11,8 +11,10 @@ translation for founders who do not read it.
 | `registration/HOW-TO-COMPLETE.md` | The founders' working guide: what to collect, what to decide, where each fact goes, what every draft is for and who reviews it; also the first entry of the console page |
 | `registration/completion-guide.md` | Field-by-field guide to completing the four filing documents, bilingual in table columns |
 | `registration/statute-additions.md` | Draft statute chapters for the Board, Grants Committee, chapters and proxy voting |
-| `governance/*.md` | The policies and agreements the Board adopts and the public pages are regenerated from |
-| `dist/*.docx` | Word renders: A4, Montenegrin left, English right, one row per article; the completion guide as a single column |
+| `governance/<id>.me.md`, `<id>.en.md`, `<id>.ru.md` | The policies, rules and agreement templates, one file per language, aligned block for block (`manifest.json` names them; `scripts/legal/check-align.js` checks the alignment). Montenegrin is the operative text; English is a full translation; Russian exists for the seven public documents |
+| `governance/<id>.notes.md` | Working notes per document (English): what it hangs on, the decisions embedded, the checks and parameters for the Board, points for the lawyer, corrections made to the Montenegrin |
+| `../../content/legal/docs.json` | Built by `scripts/legal/build-legal-docs.js`: the public part of each document for the site's legal pages (`/pravila-privatnosti` and the rest, `lib/legal-docs.ts`) and the whole documents, Montenegrin and English side by side, for the console's Rules section (`/admin/pravila`, staff only) |
+| `dist/*.docx` | Word renders: A4, Montenegrin left, English right, one row per block; the completion guide as a single column |
 | `../../content/legal-pack/pack.json` | The registration pack the console serves at `/admin/registracija`: the five filing documents with pre-filled blanks, the statute with the additions merged in (04a), the founding checklist and the drafts, in both languages |
 
 ## Rebuilding the Word files
@@ -22,10 +24,12 @@ npm install --no-save docx
 ./scripts/legal/build-all.sh
 ```
 
-`scripts/legal/build-docx.js` lays out the interleaved drafts (`bilingual`), pairs each
+`scripts/legal/build-docx.js` lays out a governance document from its two language files
+(`pair`), the statute additions from their interleaved file (`bilingual`), pairs each
 Ministry template with its translation by article number, step or bullet (`paired`), and
-renders the completion guide as it is (`plain`). Edit the Markdown, rerun the script,
-commit both.
+renders the completion guide as it is (`plain`). Edit the Markdown, run `check-align.js`,
+rerun the script, commit both. `build-all.sh` also rebuilds `content/legal/docs.json` and
+the registration pack.
 
 ## Rebuilding the registration pack
 

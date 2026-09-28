@@ -27,5 +27,5 @@ export default async function CookiePolicyPage({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  return <LegalPage doc={cookiesContent[locale]} locale={locale} />;
+  return <LegalPage doc={cookiesContent[locale]} />;
 }
