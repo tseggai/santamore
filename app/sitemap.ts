@@ -26,6 +26,7 @@ const STATIC_PATHS = [
   "/kolacici",
   "/uslovi-koriscenja",
   "/pravila-donacija",
+  "/kriterijumi-za-pomoc",
   "/uslovi-ucesca",
   "/zastita-djece",
   "/kodeks",

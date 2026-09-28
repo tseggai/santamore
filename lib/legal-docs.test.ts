@@ -18,7 +18,7 @@ describe("legal documents", () => {
 
   it("publishes the public documents in all three languages", () => {
     const published = LEGAL_DOC_IDS.map((id) => legalDoc(id)!).filter((doc) => doc.route);
-    expect(published.map((doc) => doc.id).sort()).toEqual(["child-safeguarding-policy", "code-of-conduct", "donation-policy", "event-terms-and-waiver", "impressum", "privacy-policy", "terms-of-use"]);
+    expect(published.map((doc) => doc.id).sort()).toEqual(["child-safeguarding-policy", "code-of-conduct", "donation-policy", "event-terms-and-waiver", "grants-criteria", "impressum", "privacy-policy", "terms-of-use"]);
     for (const doc of published) {
       expect(doc.langs, doc.id).toEqual(["me", "en", "ru"]);
       for (const locale of ["me", "en", "ru"] as const) {
