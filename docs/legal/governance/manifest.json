@@ -8,7 +8,7 @@
     "code-of-conduct": { "category": "public", "route": "kodeks", "publicParts": 1 },
     "impressum": { "category": "public", "route": "informacije-o-organizaciji", "publicParts": "all" },
     "child-safeguarding-policy": { "category": "board", "route": "zastita-djece", "publicParts": "all" },
-    "grants-criteria": { "category": "board" },
+    "grants-criteria": { "category": "board", "route": "kriterijumi-za-pomoc", "publicParts": "all" },
     "chapter-rules": { "category": "board" },
     "conflict-of-interest-policy": { "category": "board" },
     "volunteer-agreement": { "category": "template" },

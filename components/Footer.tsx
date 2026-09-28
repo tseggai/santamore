@@ -43,6 +43,7 @@ const LEGAL_LINKS = [
   { href: "/kolacici", key: "cookies" },
   { href: "/uslovi-koriscenja", key: "terms" },
   { href: "/pravila-donacija", key: "donations" },
+  { href: "/kriterijumi-za-pomoc", key: "grants" },
   { href: "/uslovi-ucesca", key: "eventTerms" },
   { href: "/zastita-djece", key: "safeguarding" },
   { href: "/kodeks", key: "codeOfConduct" },

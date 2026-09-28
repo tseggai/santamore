@@ -38,8 +38,8 @@ export const faqContent: Record<Locale, FaqContent> = {
       },
       {
         q: "Ko odlučuje ko dobija pomoć?",
-        a: "Nezavisni odbor za dodjelu — tri do pet ljudi, većina nezaposlena kod nas — po objavljenim kriterijumima. Sukobi interesa se prijavljuju i izuzimaju. Ni osnivač ni direktor ne odlučuju o primaocima.",
-        link: { href: "/o-nama", label: "O strukturi" },
+        a: "Nezavisna Komisija za dodjelu sredstava — tri do pet ljudi, većina nezaposlena kod nas — po objavljenim kriterijumima. Sukobi interesa se prijavljuju i izuzimaju. Ni osnivač ni direktor ne odlučuju o primaocima.",
+        link: { href: "/kriterijumi-za-pomoc", label: "Pročitaj kriterijume" },
       },
       {
         q: "Mogu li dobiti povraćaj donacije?",
@@ -104,7 +104,7 @@ export const faqContent: Record<Locale, FaqContent> = {
       {
         q: "Who decides who receives support?",
         a: "An independent Grants Committee — three to five people, majority not employed by us — deciding against published criteria. Conflicts are declared and recused. Neither the founder nor the director decides on recipients.",
-        link: { href: "/o-nama", label: "About the structure" },
+        link: { href: "/kriterijumi-za-pomoc", label: "Read the criteria" },
       },
       {
         q: "Can I get a refund on a donation?",
@@ -169,7 +169,7 @@ export const faqContent: Record<Locale, FaqContent> = {
       {
         q: "Кто решает, кто получит помощь?",
         a: "Независимый комитет по грантам — три–пять человек, большинство не работает у нас — по опубликованным критериям. Конфликты интересов декларируются, участники отводятся. Ни основатель, ни директор не решают, кто получит средства.",
-        link: { href: "/o-nama", label: "О структуре" },
+        link: { href: "/kriterijumi-za-pomoc", label: "Читать критерии" },
       },
       {
         q: "Можно ли вернуть пожертвование?",
