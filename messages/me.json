@@ -1526,6 +1526,7 @@
     "yearFilterLabel": "Godina",
     "yearFilterAll": "Sve godine",
     "navRegistration": "Registracija",
+    "navRules": "Pravila",
     "legalPack": {
       "title": "Registracija NVO",
       "loadFailed": "Sačuvano stanje nije moglo da se učita; prikazane su preporučene vrijednosti. Ako tabela legal_pack ne postoji, primijenite migraciju 20260921000069.",
@@ -1607,7 +1608,27 @@
     "evFeeFund": "Kotizacije idu",
     "evFeeFundImpact": "Cilju (Fond za pomoć)",
     "evFeeFundOperations": "Timu (Operativni fond)",
-    "evFeeFundHint": "Pravilo je cilj. Tim izaberite samo po odluci Upravnog odbora za ovaj događaj; stranica o novcu to kaže."
+    "evFeeFundHint": "Pravilo je cilj. Tim izaberite samo po odluci Upravnog odbora za ovaj događaj; stranica o novcu to kaže.",
+    "rules": {
+      "title": "Pravila i obrasci",
+      "intro": "Pravila udruženja, politike objavljene na sajtu i obrasci ugovora, na crnogorskom i engleskom, da ih tim čita i ima pri ruci. Crnogorski je mjerodavan tekst; engleski je potpun prevod. Samo za osoblje.",
+      "catBoard": "Pravila koja usvaja Upravni odbor",
+      "catBoardHint": "Usvajaju se na prvoj sjednici Upravnog odbora poslije registracije; statut ih pominje po imenu.",
+      "catPublic": "Politike objavljene na sajtu",
+      "catPublicHint": "Javni dio svake je na sajtu; interni dio je samo ovdje.",
+      "catTemplates": "Obrasci",
+      "catTemplatesHint": "Potpisuju se od slučaja do slučaja sa volonterom, sponzorom ili podnosiocem prijave.",
+      "onSite": "na sajtu na {path}",
+      "open": "Otvori",
+      "openOnSite": "Otvori na sajtu",
+      "language": "Jezik",
+      "showMe": "Crnogorski",
+      "showEn": "English",
+      "showBoth": "Oba",
+      "hint": "Ovdje se čita; tekst se mijenja u Registracija NVO › Nacrti, ili pošalji izmjenu da se unese u izvorne fajlove. Stavke u [[PLACEHOLDER]] su odluke ili podaci koji tek treba da se unesu.",
+      "notes": "Radne bilješke",
+      "notesHint": "Na šta se dokument oslanja, odluke ugrađene u njega, provjere i parametri za Upravni odbor i pitanja za advokata. Samo na engleskom, nije dio dokumenta."
+    }
   },
   "forms": {
     "nameLabel": "Ime i prezime",
