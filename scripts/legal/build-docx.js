@@ -5,8 +5,11 @@
  * so a reader of either language stays aligned with the other.
  *
  *   node scripts/legal/build-docx.js bilingual <draft.md> <out.docx>
- *       For drafts written with Montenegrin operative text followed by an English translation
- *       (docs/legal/governance/*.md, docs/legal/registration/statute-additions.md).
+ *       For a draft written with Montenegrin operative text followed by an English translation
+ *       (docs/legal/registration/statute-additions.md).
+ *   node scripts/legal/build-docx.js pair <doc.me.md> <doc.en.md> <out.docx>
+ *       For the governance documents kept as one file per language, aligned block for block
+ *       (docs/legal/governance/<id>.{me,en}.md; scripts/legal/check-align.js checks the alignment).
  *   node scripts/legal/build-docx.js paired <original-paragraphs.json> <translation.md> <out.docx> [--anchor clan|step|bullet|none]
  *       For the Ministry's templates: the Montenegrin original (extracted with
  *       scripts/legal/extract_docx_paragraphs.py) on the left, the English translation on the right,
@@ -180,6 +183,20 @@ function bilingualRows(blocks) {
   return rows;
 }
 
+// ---------- mode: pair (one file per language, aligned block for block) ----------
+function pairRows(me, en) {
+  const a = me.filter(b => b.type !== 'h1'), b = en.filter(x => x.type !== 'h1');
+  if (a.length !== b.length) { console.error(`  ${a.length} Montenegrin blocks vs ${b.length} English: run scripts/legal/check-align.js`); process.exit(1); }
+  const rows = [];
+  a.forEach((l, i) => {
+    const r = b[i];
+    if (l.type === 'h2' || l.type === 'h3') { rows.push(headingRow(l.text, r.text, l.type)); return; }
+    if (l.type === 'table') { rows.push(new TableRow({ children: [cell([nestedTable(l, HALF - 200)], HALF), cell([nestedTable(r, HALF - 200)], HALF)] })); return; }
+    const row = twoColRow([l], [r], 18); if (row) rows.push(row);
+  });
+  return rows;
+}
+
 // ---------- mode: paired (original ME paragraphs + EN translation) ----------
 function segment(items, isAnchor) {
   const segs = [[]];
@@ -252,12 +269,16 @@ function plainDoc(blocks, title) {
   if (mode === 'bilingual') {
     const [md, o] = args; out = o; const blocks = parseBlocks(fs.readFileSync(md, 'utf8'));
     doc = buildDoc(bilingualRows(blocks), titleOf(blocks), ['Crnogorski (mjerodavan tekst)', 'English (translation)']);
+  } else if (mode === 'pair') {
+    const [meMd, enMd, o] = args; out = o;
+    const me = parseBlocks(fs.readFileSync(meMd, 'utf8')), en = parseBlocks(fs.readFileSync(enMd, 'utf8'));
+    doc = buildDoc(pairRows(me, en), titleOf(me) + ' / ' + titleOf(en), ['Crnogorski (mjerodavan tekst)', 'English (translation)']);
   } else if (mode === 'paired') {
     const [json, md, o] = args; out = o; const anchor = (args.indexOf('--anchor') >= 0) ? args[args.indexOf('--anchor') + 1] : 'none';
     const blocks = parseBlocks(fs.readFileSync(md, 'utf8')); const orig = JSON.parse(fs.readFileSync(json, 'utf8'));
     doc = buildDoc(pairedRows(orig, blocks, anchor), titleOf(blocks), ['Crnogorski (original obrasca)', 'English (translation)']);
   } else if (mode === 'plain') {
     const [md, o] = args; out = o; const blocks = parseBlocks(fs.readFileSync(md, 'utf8')); doc = plainDoc(blocks, titleOf(blocks));
-  } else { console.error('usage: build-docx.js bilingual|paired|plain ...'); process.exit(2); }
+  } else { console.error('usage: build-docx.js bilingual|pair|paired|plain ...'); process.exit(2); }
   fs.writeFileSync(out, await Packer.toBuffer(doc)); console.log('wrote', out);
 })();

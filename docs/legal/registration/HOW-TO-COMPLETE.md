@@ -39,7 +39,7 @@ Goals, activities, economic activities, the seal's rim text and the four-year te
 
 ## 4. The drafts: what each is, what it hangs on, what to add
 
-Every draft is bilingual: Montenegrin paragraph, then its English translation. Edit either side in the console; the drafts do not auto-translate, so change both. Items in `[[PLACEHOLDER: …]]` are unknown facts or Board decisions. "Reviews" says who must read it before adoption.
+Every draft is bilingual: Montenegrin paragraph, then its full English translation (the source files are `docs/legal/governance/<id>.me.md` and `<id>.en.md`). Edit either side in the console for review; the drafts do not auto-translate, so change both, and send the final wording to be folded into the source files, because the public pages of the site and the console's Rules section are built from those files, not from the console's copy. Items in `[[PLACEHOLDER: …]]` are unknown facts or Board decisions. "Reviews" says who must read it before adoption.
 
 | Draft | What it is | Linked to | What to add | Reviews |
 |---|---|---|---|---|

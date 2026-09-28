@@ -1,0 +1,18 @@
+{
+  "_comment": "Every governance document: its category, the site route it is published on (public ones), and how many of its leading parts (## headings) are public. Language files: <id>.me.md (operative), <id>.en.md, <id>.ru.md (public documents), <id>.notes.md (working notes, English).",
+  "docs": {
+    "privacy-policy": { "category": "public", "route": "pravila-privatnosti", "publicParts": 1 },
+    "terms-of-use": { "category": "public", "route": "uslovi-koriscenja", "publicParts": 1 },
+    "donation-policy": { "category": "public", "route": "pravila-donacija", "publicParts": 1 },
+    "event-terms-and-waiver": { "category": "public", "route": "uslovi-ucesca", "publicParts": 2 },
+    "code-of-conduct": { "category": "public", "route": "kodeks", "publicParts": 1 },
+    "impressum": { "category": "public", "route": "informacije-o-organizaciji", "publicParts": "all" },
+    "child-safeguarding-policy": { "category": "board", "route": "zastita-djece", "publicParts": "all" },
+    "grants-criteria": { "category": "board" },
+    "chapter-rules": { "category": "board" },
+    "conflict-of-interest-policy": { "category": "board" },
+    "volunteer-agreement": { "category": "template" },
+    "sponsorship-agreement": { "category": "template" },
+    "beneficiary-application-form": { "category": "template" }
+  }
+}

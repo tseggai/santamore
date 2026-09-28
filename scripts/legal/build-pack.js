@@ -5,40 +5,17 @@
  * completion-guide.md, unknown facts as bracketed placeholders), and the drafts as HTML.
  *   node scripts/legal/build-pack.js
  * Sources: docs/legal/registration/originals (Montenegrin), docs/legal/registration/*.en.md (English),
- * docs/legal/registration/statute-additions.md and docs/legal/governance/*.md (drafts).
+ * docs/legal/registration/statute-additions.md and docs/legal/governance/<id>.{me,en}.md (drafts).
  */
 const fs = require('fs'), path = require('path'), { execFileSync } = require('child_process');
 const ROOT = path.join(__dirname, '..', '..'), R = path.join(ROOT, 'docs/legal/registration'), G = path.join(ROOT, 'docs/legal/governance');
 const read = p => fs.readFileSync(p, 'utf8');
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const orig = n => JSON.parse(execFileSync('python3', [path.join(__dirname, 'extract_docx_paragraphs.py'), path.join(R, 'originals', fs.readdirSync(path.join(R, 'originals')).find(f => f.startsWith(n + '-')))], { encoding: 'utf8' }));
 
-// ---------- markdown helpers ----------
-function parseBlocks(md) {
-  const lines = md.split('\n'); const blocks = []; let i = 0;
-  while (i < lines.length) {
-    const line = lines[i];
-    if (!line.trim()) { i++; continue; }
-    if (/^#{1,3} /.test(line)) { blocks.push({ type: 'h' + line.match(/^(#+) /)[1].length, text: line.replace(/^#+ /, '') }); i++; continue; }
-    if (line.startsWith('|')) { const rows = []; while (i < lines.length && lines[i].startsWith('|')) { rows.push(lines[i]); i++; } blocks.push({ type: 'table', rows: rows.filter(r => !/^\|\s*-+/.test(r)).map(r => r.replace(/^\|/, '').replace(/\|\s*$/, '').split('|').map(c => c.trim())) }); continue; }
-    if (/^- /.test(line)) { const items = []; while (i < lines.length && /^- /.test(lines[i])) { items.push(lines[i].slice(2)); i++; } blocks.push({ type: 'ul', items }); continue; }
-    if (/^\d+\. /.test(line)) { const items = []; while (i < lines.length && /^\d+\. /.test(lines[i])) { items.push(lines[i].replace(/^\d+\. /, '')); i++; } blocks.push({ type: 'ol', items }); continue; }
-    const buf = []; while (i < lines.length && lines[i].trim() && !/^(#|\||- |\d+\. )/.test(lines[i])) { buf.push(lines[i].trim()); i++; }
-    blocks.push({ type: 'p', text: buf.join(' ') });
-  }
-  return blocks;
-}
-const strip = t => t.replace(/\*\*([^*]+)\*\*/g, '$1').replace(/\*(?=\S)([^*]+?)(?<=\S)\*/g, '$1').replace(/`([^`]+)`/g, '$1');
-const inline = t => esc(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\*(?=\S)([^*]+?)(?<=\S)\*/g, '<i>$1</i>').replace(/`([^`]+)`/g, '<code>$1</code>');
+// ---------- markdown helpers (scripts/legal/md.js) ----------
+const { esc, parseBlocks, strip, inline, blockHtml } = require('./md');
+const { buildDocs } = require('./legal-docs');
 function lang(text) { const en = (text.match(/\b(the|and|of|to|with|for|is|are|or|by|not|that|this|from)\b/gi) || []).length; const me = (text.match(/[čćšžđČĆŠŽĐ]|\b(je|se|su|na|za|od|ili|koji|koje|koja|kada|ako|može|udruženja|udruženje|sa|do|po|u|i)\b/g) || []).length; return me > en ? 'me' : 'en'; }
-function blockHtml(b, cls) {
-  const c = cls ? ` class="${cls}"` : '';
-  if (b.type === 'p') return `<p${c}>${inline(b.text)}</p>`;
-  if (b.type === 'ul') return `<ul${c}>${b.items.map(t => `<li>${inline(t)}</li>`).join('')}</ul>`;
-  if (b.type === 'ol') return `<ol${c}>${b.items.map(t => `<li>${inline(t)}</li>`).join('')}</ol>`;
-  if (b.type === 'table') return `<div class="tablewrap"><table>${b.rows.map((r, i) => `<tr>${r.map(x => i ? `<td>${inline(x)}</td>` : `<th>${inline(x)}</th>`).join('')}</tr>`).join('')}</table></div>`;
-  return '';
-}
 function draftParts(md) {
   const out = []; let sawH2 = false;
   for (const b of parseBlocks(md)) {
@@ -445,23 +422,14 @@ function buildInstructions() {
 }
 
 // ---------- drafts ----------
-const draftList = [
-  ['statute-additions', path.join(R, 'statute-additions.md'), 'Dopune statuta', 'Statute additions'],
-  ['grants-criteria', path.join(G, 'grants-criteria.md'), 'Kriterijumi za dodjelu sredstava', 'Grants Committee criteria'],
-  ['chapter-rules', path.join(G, 'chapter-rules.md'), 'Pravila o ograncima', 'Chapter Rules'],
-  ['conflict-of-interest-policy', path.join(G, 'conflict-of-interest-policy.md'), 'Pravila o sukobu interesa', 'Conflict of interest policy'],
-  ['child-safeguarding-policy', path.join(G, 'child-safeguarding-policy.md'), 'Politika zaštite djece', 'Child safeguarding policy'],
-  ['event-terms-and-waiver', path.join(G, 'event-terms-and-waiver.md'), 'Uslovi učešća i izjava', 'Event terms and waiver'],
-  ['donation-policy', path.join(G, 'donation-policy.md'), 'Pravila donacija', 'Donation policy'],
-  ['privacy-policy', path.join(G, 'privacy-policy.md'), 'Politika privatnosti', 'Privacy policy'],
-  ['impressum', path.join(G, 'impressum.md'), 'Impressum', 'Impressum'],
-  ['terms-of-use', path.join(G, 'terms-of-use.md'), 'Uslovi korišćenja', 'Terms of use'],
-  ['code-of-conduct', path.join(G, 'code-of-conduct.md'), 'Kodeks ponašanja', 'Code of conduct'],
-  ['volunteer-agreement', path.join(G, 'volunteer-agreement.md'), 'Ugovor o volontiranju', 'Volunteer agreement'],
-  ['sponsorship-agreement', path.join(G, 'sponsorship-agreement.md'), 'Ugovor o sponzorstvu', 'Sponsorship agreement'],
-  ['beneficiary-application-form', path.join(G, 'beneficiary-application-form.md'), 'Prijava za pomoć', 'Beneficiary application'],
+// The statute additions stay one bilingual file (a registration document); the governance
+// documents come from their per-language files, Montenegrin and English interleaved.
+const governance = buildDocs();
+if (governance.missing.length) console.warn('drafts without language files (skipped):', governance.missing.join(', '));
+const drafts = [
+  { id: 'statute-additions', title: { me: 'Dopune statuta', en: 'Statute additions' }, file: 'santamore-nacrt-statute-additions', html: draftHtml(read(path.join(R, 'statute-additions.md'))) },
+  ...governance.order.filter(id => governance.docs[id]).map(id => { const d = governance.docs[id]; return { id, title: { me: d.title.me, en: d.title.en }, file: 'santamore-nacrt-' + id, html: d.bilingualHtml }; }),
 ];
-const drafts = draftList.map(([id, file, me, en]) => ({ id, title: { me, en }, file: 'santamore-nacrt-' + id, html: draftHtml(read(file)) }));
 const forms = [buildInstructions(), form02, form03, buildStatute(), buildStatuteWithAdditions(), form05];
 const guide = { title: { me: 'Kako dovršiti paket', en: 'How to complete the pack' }, file: 'santamore-kako-dovrsiti', html: draftHtml(read(path.join(R, 'HOW-TO-COMPLETE.md'))) };
 const pack = { fields: F, groups: GROUPS, forms, drafts, guide, builtAt: new Date().toISOString().slice(0, 10) };
