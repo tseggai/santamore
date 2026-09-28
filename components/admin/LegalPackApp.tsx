@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { saveLegalPack, translatePackTexts } from "@/app/[locale]/admin/(protected)/registracija/actions";
 import {
   FORM_KEY, FOUNDER_IDS, LANG_LABELS, PACK_LANGS, docHash, docTexts, formFieldIds, i18nKey, incompleteFields, initialFields, isEmptyOptional, isIncomplete, isOptionalEmpty,
-  isAlignedDraft, isMeTwin, isSourceLang, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, sanitizeDraftHtml, segments, splitTopLevel,
+  decorateDraft, draftOriginals, htmlText, isAlignedDraft, isMeTwin, isSourceLang, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, sanitizeDraftHtml, segments, splitTopLevel, stripDraftMarks,
   type DocTexts, type FieldState, type LegalPack, type PackBlock, type PackLang, type SourceLang,
 } from "@/lib/legal-pack";
 import type { Locale } from "@/i18n/routing";
@@ -196,7 +196,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
     const key = i18nKey(docKey, to);
     if (isSourceLang(to) || jobsRef.current.has(key)) return;
     const draftId = docKey.startsWith("draft:") ? docKey.slice(6) : null;
-    const source = docTexts(pack, docKey, draftId ? draftsRef.current[draftId] : undefined, docKey.startsWith("form:") ? overrides[docKey.slice(5)] : undefined);
+    const source = docTexts(pack, docKey, draftId ? stripDraftMarks(draftsRef.current[draftId] ?? "") || undefined : undefined, docKey.startsWith("form:") ? overrides[docKey.slice(5)] : undefined);
     // A cached translation made from an older template is translated again.
     if (i18n[key] && i18n[key].v === docHash(source)) return;
     const parts = chunk(source);
@@ -317,7 +317,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
     let failed: string | null = null;
     let last: string | null = null;
     for (const key of Object.keys(dirty)) {
-      const value = key === "fields" ? fields : key === "checks" ? checks : FORM_KEY.test(key) ? { blocks: overrides[key.slice("form:".length)] ?? null } : { html: sanitizeDraftHtml(draftsRef.current[key.slice("draft:".length)] ?? "") ?? "" };
+      const value = key === "fields" ? fields : key === "checks" ? checks : FORM_KEY.test(key) ? { blocks: overrides[key.slice("form:".length)] ?? null } : { html: sanitizeDraftHtml(stripDraftMarks(draftsRef.current[key.slice("draft:".length)] ?? "")) ?? "" };
       const result = await saveLegalPack({ key, value }).catch(() => ({ ok: false as const, error: "server" as const }));
       if (result.ok) {
         last = result.updatedAt;
@@ -504,18 +504,10 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
                 <p className="lp-subtitle lp-screen">{isSourceLang(lang) ? t("draftHint") : t("draftReadOnly")}</p>
               </div>
               {isSourceLang(lang) ? (
-                <div
-                  key={draft.id}
-                  className="lp-prose"
-                  contentEditable
-                  suppressContentEditableWarning
-                  spellCheck={false}
-                  aria-label={draft.title[src]}
-                  dangerouslySetInnerHTML={{ __html: draftsRef.current[draft.id] ?? draft.html }}
-                  onInput={(e) => { draftsRef.current[draft.id] = e.currentTarget.innerHTML; markDirty(`draft:${draft.id}`); }}
-                />
+                <DraftEditor key={`${draft.id}-${lang}`} label={draft.title[src]} original={draft.html} html={draftsRef.current[draft.id] ?? draft.html}
+                  onInput={(html) => { draftsRef.current[draft.id] = html; markDirty(`draft:${draft.id}`); }} />
               ) : (
-                <div key={`${draft.id}-${lang}`} className="lp-prose" dangerouslySetInnerHTML={{ __html: translatedHtml(draftsRef.current[draft.id] ?? draft.html, i18n[i18nKey(docKey, lang)], true) }} />
+                <div key={`${draft.id}-${lang}`} className="lp-prose" dangerouslySetInnerHTML={{ __html: translatedHtml(stripDraftMarks(draftsRef.current[draft.id] ?? draft.html), i18n[i18nKey(docKey, lang)], true) }} />
               )}
             </>
           ) : null}
@@ -705,6 +697,38 @@ function serializeEdit(node: Node): string {
   return out;
 }
 
+/**
+ * A draft, edited in place. The same blue and pink as the forms: a
+ * [[PLACEHOLDER]] is a blank still to complete, a paragraph whose text is not
+ * in the shipped draft is text we supplied. The marks live in the DOM only;
+ * what is saved and translated is the HTML without them. The HTML is set
+ * once, on mount, so typing never fights a re-render.
+ */
+function DraftEditor({ label, original, html, onInput }: { label: string; original: string; html: string; onInput: (html: string) => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const originals = useMemo(() => draftOriginals(original), [original]);
+  useEffect(() => {
+    const el = ref.current;
+    if (el && el.dataset.ready !== "1") { el.innerHTML = decorateDraft(html, originals); el.dataset.ready = "1"; }
+  }, [html, originals]);
+  const refresh = (root: HTMLElement) => {
+    // A placeholder that was written over is a blank no more; a paragraph that now says what the draft said is not an edit.
+    root.querySelectorAll("span.todo").forEach((span) => { if (!/\[\[PLACEHOLDER/.test(span.textContent ?? "")) span.replaceWith(document.createTextNode(span.textContent ?? "")); });
+    for (const child of Array.from(root.children)) child.classList.toggle("changed", !originals.has(htmlText(child.innerHTML)));
+  };
+  return (
+    <div
+      ref={ref}
+      className="lp-prose"
+      contentEditable
+      suppressContentEditableWarning
+      spellCheck={false}
+      aria-label={label}
+      onInput={(e) => { refresh(e.currentTarget); onInput(e.currentTarget.innerHTML); }}
+    />
+  );
+}
+
 /** An element whose HTML is set once, on mount: the browser owns it from then on, so typing never fights a re-render. */
 function EditableText({ tag, className, html, placeholder, singleLine, onText }: { tag: "p" | "h3" | "h4" | "h5" | "li"; className: string; html: string; placeholder: string; singleLine: boolean; onText: (text: string) => void }) {
   const ref = useRef<HTMLElement>(null);
@@ -887,15 +911,19 @@ const CSS = `
 .lp-pick:focus-visible { outline: 2px solid #0E3A46; outline-offset: 1px; }
 .lp-pick option { color: #000; }
 .lp-opt-empty { display: none; }
-/* Text the additions brought in: red on screen, black on paper, typed into directly like a blank. */
-.lp-added { color: #D93B3B; }
+/* Text the additions brought in: pink on screen, the colour of everything we supplied (a blank has a tinted background as well), black on paper, typed into directly like a blank. */
+.lp-added { color: #B0246B; }
 .lp-added-text { outline: none; border-radius: 3px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
-.lp-added-text:focus { background: rgba(217,59,59,.07); box-shadow: 0 0 0 2px rgba(217,59,59,.3); }
+.lp-added-text:focus { background: rgba(176,36,107,.07); box-shadow: 0 0 0 2px rgba(176,36,107,.35); }
 .lp-added-text:empty::before { content: attr(data-placeholder); font-style: italic; color: rgba(0,0,0,.4); }
 .lp-chip { display: inline; padding: 0 .15em; border-radius: 3px; color: #B0246B; background: rgba(176,36,107,.10); user-select: all; -webkit-user-select: all; }
 .lp-guide p.en { color: #000; }
 .lp-guide li { margin: .25rem 0; }
 .lp-prose { outline: none; }
+/* The same rule as the forms: a blank still to complete is blue, text we supplied is pink. */
+.lp-prose .todo { color: #0B57D0; background: rgba(11,87,208,.07); border-radius: 3px; padding: 0 .15em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.lp-prose > .changed, .lp-prose > .changed.en { color: #B0246B; }
+.lp-prose > .changed .todo { color: #0B57D0; }
 .lp-prose:focus { box-shadow: 0 0 0 2px rgba(14,58,70,.25); border-radius: 4px; }
 .lp-prose h2 { font-weight: 800; font-size: 16px; margin: 1.75rem 0 .6rem; }
 .lp-prose h3 { font-weight: 700; font-size: 15px; margin: 1.25rem 0 .4rem; }
@@ -953,5 +981,6 @@ const CSS = `
   .lp-added { color: #000; }
   .lp-added-text { background: none; box-shadow: none; }
   .lp-prose p.en, .lp-prose h2, .lp-prose h3 { color: #000; }
+  .lp-prose .todo, .lp-prose > .changed, .lp-prose > .changed.en { color: #000; background: none; }
 }
 `;

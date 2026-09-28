@@ -187,3 +187,19 @@ describe("sanitizeBlockText", () => {
     expect(sanitizeBlockText('a <b>b</b><br>c <script>x</script><span onclick="y">d</span> {{org}}')).toBe("a <b>b</b><br>c xd {{org}}");
   });
 });
+
+describe("draft marks", () => {
+  it("marks placeholders blue and edited paragraphs pink, and strips both for saving", async () => {
+    const { decorateDraft, draftOriginals, stripDraftMarks } = await import("./legal-pack");
+    const shipped = '<h2>1. Svrha</h2>\n<p>Rok je [[PLACEHOLDER: broj]] dana.</p>\n<p class="en">The deadline is [[PLACEHOLDER: number]] days.</p>';
+    const originals = draftOriginals(shipped);
+    const decorated = decorateDraft(shipped, originals);
+    expect(decorated).toContain('<p>Rok je <span class="todo">[[PLACEHOLDER: broj]]</span> dana.</p>');
+    expect(decorated).not.toContain("changed");
+    const edited = decorateDraft(shipped.replace("Rok je [[PLACEHOLDER: broj]] dana.", "Rok je 30 dana."), originals);
+    expect(edited).toContain('<p class="changed">Rok je 30 dana.</p>');
+    expect(edited).toContain('<p class="en">The deadline is <span class="todo">');
+    expect(stripDraftMarks(edited)).toBe(shipped.replace("Rok je [[PLACEHOLDER: broj]] dana.", "Rok je 30 dana."));
+    expect(stripDraftMarks(decorateDraft(decorated, originals))).toBe(shipped);
+  });
+});

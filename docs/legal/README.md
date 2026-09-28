@@ -45,7 +45,7 @@ consequential edits by wording, the proxy chapter after Article 17, the three ne
 after Article 31, the old Articles 32 to 42 renumbered 45 to 55) as form 04a.
 The console page `/admin/registracija` (staff only) renders it: one language on screen
 (Montenegrin, English, Russian or Turkish), editable blanks shared by every form (blue until
-completed, pink after), the text the additions brought into form 04a editable in place (red on screen,
+completed, pink after), the text the additions brought into form 04a editable in place (pink on screen, like a completed blank,
 saved as `form:<id>` rows), a Complete panel that lists a form's blanks with a hint each, the
 checklist, the drafts editable in place, Print / PDF, and Save for the whole team. The
 templates exist in Montenegrin and English; Russian and Turkish are translated on first use,
