@@ -343,7 +343,8 @@ function buildStatuteWithAdditions() {
   const chapterIndex = title => blocks.findIndex(b => b.type === 'h2' && b.me === title);
   const inArticle = (n, test) => { const start = headIndex(n); for (let i = start + 1; i < blocks.length && blocks[i].type === 'p'; i++) if (test(blocks[i].me)) return i; throw new Error(`04a: Article ${n}: paragraph not found`); };
   const articleEnd = n => { const start = headIndex(n); let i = start + 1; while (i < blocks.length && blocks[i].type === 'p') i++; return i; };
-  const P = (me, en) => ({ type: 'p', me, en });
+  // Everything the additions bring in is marked `added`: the console shows it in red, so it can be found and changed.
+  const P = (me, en) => ({ type: 'p', me, en, added: true });
   const ensure = (cond, what) => { if (!cond) throw new Error(`04a: ${what}`); };
 
   // 1. Consequential edits (section 1 of the additions), by wording.
@@ -376,7 +377,7 @@ function buildStatuteWithAdditions() {
   ensure(chapters.length === 4, `four chapters in the additions, found ${chapters.length}`);
   const [board, grants, local, proxies] = chapters;
   ensure(/^UPRAVNI ODBOR/.test(board.me) && /^KOMISIJA/.test(grants.me) && /^OGRANCI/.test(local.me) && /^NAČIN PREDSTAVLJANJA/.test(proxies.me), 'chapter order');
-  const chapterBlocks = ch => [{ type: 'h2', me: ch.me, en: ch.en }, ...ch.articles.flatMap(articleBlocks)];
+  const chapterBlocks = ch => [{ type: 'h2', me: ch.me, en: ch.en }, ...ch.articles.flatMap(articleBlocks)].map(b => Object.assign({}, b, { added: true }));
   const proxyBlocks = chapterBlocks(proxies).map(b => {
     // The proxy chapter names the dissolution and assets articles by their old numbers.
     const fix = t => t.replace('članova 16, 17 i 39 ovog statuta', 'članova 16, 17 i 52 ovog statuta').replace('prestanku rada udruženja iz člana 39 ovog statuta', 'prestanku rada udruženja iz člana 52 ovog statuta').replace('raspodjeli imovine iz člana 40 ovog statuta', 'raspodjeli imovine iz člana 53 ovog statuta')
@@ -394,7 +395,7 @@ function buildStatuteWithAdditions() {
   ensure(heads.join(',') === expected.join(','), `article sequence: ${heads.join(',')}`);
 
   return { id: '04a', title: { me: 'Statut sa dopunama (Opcija 1)', en: 'Statute with additions (Option 1)' }, subtitle: base.subtitle, file: 'santamore-04a-statut-dopunjen',
-    note: { me: 'Obrazac 04 sa unesenim nacrtom „Dopune statuta“: Upravni odbor, Komisija za dodjelu sredstava i ogranci (čl. 32 do 44), punomoćja (čl. 17a do 17f), izmjene postojećih članova (čl. 9, 12, 14, 22, 28, 29, 45 i 47), a dosadašnji čl. 32 do 42 postali su čl. 45 do 55. Engleska strana novih članova je sažetak iz nacrta; crnogorski tekst je mjerodavan. Tekst se može mijenjati dugmetom „Uredi tekst“; advokat pregleda crnogorsku stranu prije potpisivanja. Uglaste zagrade u čl. 17f su napomena za advokata.', en: 'Form 04 with the draft "Statute additions" merged in: the Board, the Grants Committee and chapters (Arts. 32 to 44), proxies (Arts. 17a to 17f), the edits to existing articles (Arts. 9, 12, 14, 22, 28, 29, 45 and 47), and the former Arts. 32 to 42 renumbered 45 to 55. The English side of a new article is the draft\'s summary; the Montenegrin text is the operative one. Change the text with "Edit text"; the lawyer reviews the Montenegrin side before signing. The square brackets in Art. 17f are a note for the lawyer.' },
+    note: { me: 'Obrazac 04 sa unesenim nacrtom „Dopune statuta“: Upravni odbor, Komisija za dodjelu sredstava i ogranci (čl. 32 do 44), punomoćja (čl. 17a do 17f), izmjene postojećih članova (čl. 9, 12, 14, 22, 28, 29, 45 i 47), a dosadašnji čl. 32 do 42 postali su čl. 45 do 55. Engleska strana novih članova je sažetak iz nacrta; crnogorski tekst je mjerodavan. Sve što je došlo iz dopuna prikazano je crveno na ekranu (na papiru je crno) i mijenja se dugmetom „Uredi tekst“; advokat pregleda crnogorsku stranu prije potpisivanja. Uglaste zagrade u čl. 17f su napomena za advokata.', en: 'Form 04 with the draft "Statute additions" merged in: the Board, the Grants Committee and chapters (Arts. 32 to 44), proxies (Arts. 17a to 17f), the edits to existing articles (Arts. 9, 12, 14, 22, 28, 29, 45 and 47), and the former Arts. 32 to 42 renumbered 45 to 55. The English side of a new article is the draft\'s summary; the Montenegrin text is the operative one. Everything the additions brought in shows in red on screen (black on paper) and is changed with "Edit text"; the lawyer reviews the Montenegrin side before signing. The square brackets in Art. 17f are a note for the lawyer.' },
     blocks };
 }
 
