@@ -278,7 +278,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
     return { ...b, [src]: text };
   }));
   const insertAfter = (i: number, kind: "p" | "article") => editBlocks((blocks) => {
-    const added: PackBlock[] = kind === "p" ? [{ type: "p", me: "", en: "" }] : [{ type: "h3", me: "Član", en: "Article" }, { type: "p", me: "", en: "" }];
+    const added: PackBlock[] = kind === "p" ? [{ type: "p", me: "", en: "", added: true }] : [{ type: "h3", me: "Član", en: "Article", added: true }, { type: "p", me: "", en: "", added: true }];
     return [...blocks.slice(0, i + 1), ...added, ...blocks.slice(i + 1)];
   }, true);
   const removeBlock = (i: number) => editBlocks((blocks) => blocks.filter((_, k) => k !== i), true);
@@ -655,18 +655,20 @@ function Block(props: BlockProps & { block: PackBlock; index: number; docKey: st
   const text = (path: string, source: string) => tx(docKey, path, source);
   // A Montenegrin-only block (a merged article's later paragraphs) has nothing to show on the English side.
   if ("meOnly" in block && block.meOnly && src === "en" && isSourceLang(props.lang)) return null;
+  // Text that the additions brought in, or the team typed: red on screen, black on paper.
+  const added = "added" in block && block.added ? " lp-added" : "";
   switch (block.type) {
     case "h":
-      return <h3 className="lp-h">{text(`b${i}`, block[src] || block.me)}</h3>;
+      return <h3 className={`lp-h${added}`}>{text(`b${i}`, block[src] || block.me)}</h3>;
     case "h2":
-      return <h4 className="lp-h2">{text(`b${i}`, block[src] || block.me)}</h4>;
+      return <h4 className={`lp-h2${added}`}>{text(`b${i}`, block[src] || block.me)}</h4>;
     case "h3":
-      return <h5 className="lp-h3">{text(`b${i}`, block[src] || block.me)}</h5>;
+      return <h5 className={`lp-h3${added}`}>{text(`b${i}`, block[src] || block.me)}</h5>;
     case "p":
-      return <p className="lp-p"><Template text={text(`b${i}`, block[src] || block.me)} {...props} /></p>;
+      return <p className={`lp-p${added}`}><Template text={text(`b${i}`, block[src] || block.me)} {...props} /></p>;
     case "list":
       return (
-        <ol className="lp-list">
+        <ol className={`lp-list${added}`}>
           {block[src].map((item, j) => <li key={j} className={isEmptyOptional(item, props.fields, props.pack.fields) ? "lp-opt-empty" : undefined}><Template text={text(`b${i}.${j}`, item)} {...props} /></li>)}
         </ol>
       );
@@ -755,12 +757,12 @@ function EditBlock({ block, lang, src, pack, fields, labelOf, chipHint, emptyHin
   labels: { paragraph: string; article: string; remove: string };
 }) {
   const [html] = useState(() => (block.type === "list" ? block[src] : [block[src]]).map((text) => editHtml(text, pack, fields, lang, labelOf, chipHint)));
-  const cls = block.type === "h" ? "lp-h" : block.type === "h2" ? "lp-h2" : block.type === "h3" ? "lp-h3" : "lp-p";
+  const cls = (block.type === "h" ? "lp-h" : block.type === "h2" ? "lp-h2" : block.type === "h3" ? "lp-h3" : "lp-p") + (block.added ? " lp-added" : "");
   return (
     <div className="lp-edit">
       {block.type === "list" ? (
         <ol className="lp-list">
-          {html.map((h, i) => <EditableText key={i} tag="li" className="lp-edit-text" html={h} placeholder={emptyHint} singleLine={false} onText={(text) => onText(text, i)} />)}
+          {html.map((h, i) => <EditableText key={i} tag="li" className={`lp-edit-text${block.added ? " lp-added" : ""}`} html={h} placeholder={emptyHint} singleLine={false} onText={(text) => onText(text, i)} />)}
         </ol>
       ) : (
         <EditableText tag={block.type === "p" ? "p" : "h5"} className={`${cls} lp-edit-text`} html={html[0] ?? ""} placeholder={emptyHint} singleLine={block.type !== "p"} onText={(text) => onText(text)} />
@@ -932,6 +934,8 @@ const CSS = `
 .lp-pick:focus-visible { outline: 2px solid #0E3A46; outline-offset: 1px; }
 .lp-pick option { color: #000; }
 .lp-opt-empty { display: none; }
+/* Text the additions brought in, or the team typed: red on screen, black on paper. */
+.lp-added, .lp-added .lp-edit-text { color: #D93B3B; }
 /* Editing the text of a form: every block a dashed box, its blanks read-only chips. */
 .lp-edit { border-radius: 6px; outline: 1px dashed rgba(14,58,70,.35); padding: .15rem .5rem .1rem; margin: .35rem -.5rem; }
 .lp-edit:focus-within { outline: 2px solid rgba(14,58,70,.55); }
@@ -999,6 +1003,7 @@ const CSS = `
   .lp-check input { -webkit-appearance: checkbox; }
   .lp-sigrow { break-inside: avoid; margin-top: 2rem; }
   .lp-h, .lp-h2, .lp-h3 { break-after: avoid; }
+  .lp-added, .lp-added .lp-edit-text { color: #000; }
   .lp-prose p.en, .lp-prose h2, .lp-prose h3 { color: #000; }
 }
 `;

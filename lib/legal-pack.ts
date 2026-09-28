@@ -43,9 +43,12 @@ export interface PackField {
 }
 
 export type PackBlock =
-  /** meOnly: the text exists in Montenegrin only (the English side of a merged article is a summary on its first paragraph). */
-  | { type: "p" | "h" | "h2" | "h3"; me: string; en: string; meOnly?: boolean }
-  | { type: "list"; me: string[]; en: string[]; meOnly?: boolean }
+  /**
+   * meOnly: the text exists in Montenegrin only (the English side of a merged article is a summary on its first paragraph).
+   * added: the block came from the statute additions or was typed in by the team; shown in red on screen.
+   */
+  | { type: "p" | "h" | "h2" | "h3"; me: string; en: string; meOnly?: boolean; added?: boolean }
+  | { type: "list"; me: string[]; en: string[]; meOnly?: boolean; added?: boolean }
   | { type: "check"; id: string; me: string; en: string }
   | { type: "sigrow"; items: { me: string; en: string; lbl: Bilingual }[] };
 
@@ -305,8 +308,8 @@ export function savePackSchema(pack: LegalPack) {
   const fieldState = z.object({ me: text, en: text, ru: text, tr: text, stale: z.array(z.enum(PACK_LANGS)).max(4) });
   const bilingual = z.object({ me: text, en: text });
   const block = z.union([
-    z.object({ type: z.enum(["p", "h", "h2", "h3"]), me: text, en: text, meOnly: z.boolean().optional() }),
-    z.object({ type: z.literal("list"), me: z.array(text).max(200), en: z.array(text).max(200), meOnly: z.boolean().optional() }),
+    z.object({ type: z.enum(["p", "h", "h2", "h3"]), me: text, en: text, meOnly: z.boolean().optional(), added: z.boolean().optional() }),
+    z.object({ type: z.literal("list"), me: z.array(text).max(200), en: z.array(text).max(200), meOnly: z.boolean().optional(), added: z.boolean().optional() }),
     z.object({ type: z.literal("check"), id: z.string().regex(/^s\d_\d{1,3}$/).refine((id) => checkIds.has(id)), me: text, en: text }),
     z.object({ type: z.literal("sigrow"), items: z.array(z.object({ me: text, en: text, lbl: bilingual })).max(20) }),
   ]);
