@@ -415,6 +415,8 @@ function buildInstructions() {
   for (const p of paras) {
     if (/^\d$/.test(p.text)) { flush(); step = +p.text; blocks.push({ type: 'h3', me: `Korak ${step}: ${titles[step][0]}`, en: `Step ${step}: ${titles[step][1]}` }); continue; }
     if (step === 0) continue;
+    // A line that only repeats the step's title (step 4 opens with "Otvaranje računa u banci") is a heading, not an item.
+    if (!p.list && p.text.trim() === titles[step][0]) continue;
     meItems.push(p.text);
   }
   flush();

@@ -332,6 +332,8 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
     setNotice(failed ? { tone: "warn", text: failed } : { tone: "ok", text: t("saved") });
   };
 
+  /** The document's name for the running head on paper: the title in the language on screen. */
+  const printTitle = form ? tx(docKeyOf(doc), "t", form.title[src]) : draft ? titleOf(docKeyOf(doc), draft.title) : guide ? titleOf("guide", guide.title) : "Santamore";
   const doPrint = () => {
     setPrintWarn(null);
     const title = document.title;
@@ -376,6 +378,8 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
   return (
     <div className="lp-app md:grid md:grid-cols-[14rem_minmax(0,1fr)] md:gap-10">
       <style>{CSS}</style>
+      {/* On paper, from the second page on, the document's name top right and the page number bottom centre. */}
+      <style>{`@media print { @page { @top-right { content: "${printTitle.replace(/[\\"]/g, "\\$&")}"; } } @page :first { @top-right { content: none; } } }`}</style>
 
       {/* Document list: a select on the phone, a list on desktop. */}
       <nav aria-label={t("documents")} className="lp-nav">
@@ -472,7 +476,7 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
 
         {/* The document */}
         <div id="legal-doc" className={`lp-doc mt-8 ${(draft && both) || guide || !isSourceLang(lang) ? "lp-both" : ""}`} lang={guide ? "en" : lang === "me" ? "sr-Latn-ME" : lang} data-lang={lang}>
-          {/* On paper the page is a table: its header and footer rows repeat on every printed page and carry the margins, so the browser prints no URL or date of its own. */}
+          {/* On paper the margins come from @page; the running head and the page number sit in its margin boxes. */}
           <table className="lp-page"><thead><tr><td className="lp-pgtop" aria-hidden="true" /></tr></thead><tbody><tr><td className="lp-pgbody">
           {waitingForDoc && job ? <p className="lp-screen mb-4 rounded-brand bg-sand px-4 py-3 text-[14px] text-black/70">{t("translatingDoc", { lang: LANG_LABELS[lang], done: job.done, total: job.total })}</p> : null}
           {guide ? (
@@ -943,8 +947,9 @@ const CSS = `
 .lp-doc[data-lang="ru"] .lp-prose .en, .lp-doc[data-lang="tr"] .lp-prose .en { color: #000; }
 @media (prefers-reduced-motion: no-preference) { .lp-field { transition: background-color .15s; } }
 @media print {
-  /* No page margin: the browser then prints no header or footer of its own. The margins come from the page table's repeating rows. */
-  @page { size: A4; margin: 0; }
+  /* Page margin boxes carry the running head and the page number; a browser that draws them prints no header or footer of its own (Chrome 131, Safari 18.2 and later). */
+  @page { size: A4; margin: 18mm; @top-right { font: 9pt sans-serif; color: rgba(0,0,0,.55); vertical-align: bottom; padding-bottom: 4mm; } @bottom-center { content: counter(page) " / " counter(pages); font: 9pt sans-serif; color: rgba(0,0,0,.55); vertical-align: top; padding-top: 4mm; } }
+  @page :first { @top-right { content: none; } }
   html, body { margin: 0; padding: 0; background: #fff; }
   body * { visibility: hidden; }
   #legal-doc, #legal-doc * { visibility: visible; }
@@ -955,9 +960,8 @@ const CSS = `
   .lp-page > tfoot { display: table-footer-group; }
   .lp-page > * > tr { display: table-row; }
   .lp-page > * > tr > td { display: table-cell; vertical-align: top; }
-  .lp-page > thead > tr > td.lp-pgtop { display: table-cell; height: 18mm; padding: 0; }
-  .lp-page > tbody > tr > td.lp-pgbody { padding: 0 18mm; }
-  .lp-page > tfoot > tr > td.lp-pgbot { display: table-cell; height: 18mm; padding: 0; }
+  .lp-page > thead > tr > td.lp-pgtop, .lp-page > tfoot > tr > td.lp-pgbot { display: none; }
+  .lp-page > tbody > tr > td.lp-pgbody { padding: 0; }
   .lp-file { display: none; }
   .lp-head { padding-bottom: 4mm; margin-bottom: 6mm; }
   .lp-note, .lp-screen { display: none !important; }
