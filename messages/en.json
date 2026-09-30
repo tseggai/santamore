@@ -136,7 +136,7 @@
       "beneficiaries": "Beneficiaries"
     },
     "cards": "Cards we accept",
-    "note": "Not one cent of donations goes to salaries or overhead. Sponsors pay for those."
+    "note": "Every donation reaches the beneficiaries in full. Sponsors fund the platform and the events that raise it."
   },
   "notFound": {
     "title": "Page not found",
@@ -276,7 +276,7 @@
     "impactFund": "Impact Fund — from donations",
     "impactFundValue": "100% to beneficiaries",
     "operationsFund": "Operations Fund — from sponsors",
-    "fundsNote": "Not one cent of donations goes to salaries or overhead. Sponsors pay for those.",
+    "fundsNote": "Every donation reaches the beneficiaries in full. Sponsors fund the platform and the events that raise it.",
     "moneyIn": "Money in",
     "moneyOut": "Money out",
     "national": "NATIONAL",

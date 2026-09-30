@@ -136,7 +136,7 @@
       "beneficiaries": "Korisnici"
     },
     "cards": "Prihvatamo kartice",
-    "note": "Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori."
+    "note": "Svaka donacija u cjelini stiže do korisnika. Sponzori finansiraju platformu i događaje kojima je prikupljamo."
   },
   "notFound": {
     "title": "Stranica nije pronađena",
@@ -276,7 +276,7 @@
     "impactFund": "Fond za pomoć — od donacija",
     "impactFundValue": "100% korisnicima",
     "operationsFund": "Operativni fond — od sponzora",
-    "fundsNote": "Nijedan cent iz donacija ne ide na plate ili režije. To plaćaju sponzori.",
+    "fundsNote": "Svaka donacija u cjelini stiže do korisnika. Sponzori finansiraju platformu i događaje kojima je prikupljamo.",
     "moneyIn": "Uplate",
     "moneyOut": "Isplate",
     "national": "NACIONALNO",

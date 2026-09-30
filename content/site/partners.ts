@@ -19,8 +19,8 @@ export interface PartnersContent {
   heroEyebrow: string;
   heroTitle: string;
   heroLead: string;
-  taxHeading: string;
-  tax: string[];
+  /** One line on the 3.5% allowance, set in italics under the lead. */
+  taxNote: string;
   tiersHeading: string;
   tiersLead: string;
   preferredBadge: string;
@@ -56,11 +56,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     heroTitle: "Budite sponzor",
     heroLead:
       "Sponzorstva finansiraju rad Santamorea: platformu, događaje i takmičenja kojima prikupljamo novac za ciljeve. Zato 100% svake donacije, kotizacije i granta stiže do korisnika. Ime sponzora stoji uz sve što to omogućava, na svakoj stranici.",
-    taxHeading: "Argument koji stvarno radi: poreska olakšica",
-    tax: [
-      "Crnogorske kompanije i pojedinci mogu odbiti do 3,5% bruto prihoda za humanitarna, sportska, zdravstvena, kulturna i ekološka davanja. Većina to nikad ne iskoristi.",
-      "Nudimo način da iskoristite olakšicu koju već imate — lokalno, vidljivo, uz papirologiju koju će vaš računovođa prihvatiti.",
-    ],
+    taxNote: "Crnogorske kompanije i pojedinci mogu odbiti do 3,5% bruto prihoda za humanitarna, sportska, zdravstvena, kulturna i ekološka davanja. Većina to nikad ne iskoristi.",
     tiersHeading: "Nivoi partnerstva",
     tiersLead: "Izaberite nivo i ostavite kontakt; javljamo se u roku od dva radna dana sa kalendarom i primjerom izvještaja.",
     preferredBadge: "Najvažniji nivo",
@@ -143,11 +139,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     heroTitle: "Be a sponsor",
     heroLead:
       "Sponsorship funds Santamore's operations: the platform, the events and the contests we run to raise money for the causes. That is why 100% of every donation, entry fee and grant reaches the beneficiaries. A sponsor's name stands on the work that makes it possible, on every page.",
-    taxHeading: "The argument that actually works: the tax allowance",
-    tax: [
-      "Montenegrin companies and individuals may deduct up to 3.5% of gross income for humanitarian, sport, health, cultural and environmental giving. Most never use it.",
-      "We are offering a way to use an allowance you already have — locally, visibly, with paperwork your accountant will accept.",
-    ],
+    taxNote: "Montenegrin companies and individuals may deduct up to 3.5% of gross income for humanitarian, sport, health, cultural and environmental giving. Most never use it.",
     tiersHeading: "Partnership tiers",
     tiersLead: "Pick a tier and leave your details; we reply within two working days with the calendar and a sample report.",
     preferredBadge: "The tier that matters most",
@@ -220,11 +212,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     heroTitle: "Станьте спонсором",
     heroLead:
       "Спонсорство финансирует работу Santamore: платформу, события и соревнования, с помощью которых мы собираем деньги на цели. Поэтому 100% каждого пожертвования, взноса за участие и гранта доходит до получателей. Имя спонсора стоит на всём, что делает это возможным, на каждой странице.",
-    taxHeading: "Аргумент, который действительно работает: налоговая льгота",
-    tax: [
-      "Черногорские компании и физические лица могут вычесть до 3,5% валового дохода на гуманитарные, спортивные, медицинские, культурные и экологические пожертвования. Большинство этим никогда не пользуется.",
-      "Мы предлагаем способ использовать льготу, которая у вас уже есть, — локально, заметно, с документами, которые примет ваш бухгалтер.",
-    ],
+    taxNote: "Черногорские компании и физические лица могут вычесть до 3,5% валового дохода на гуманитарные, спортивные, медицинские, культурные и экологические пожертвования. Большинство этим никогда не пользуется.",
     tiersHeading: "Уровни партнёрства",
     tiersLead: "Выберите уровень и оставьте контакты; мы ответим в течение двух рабочих дней с календарём и примером отчёта.",
     preferredBadge: "Самый важный уровень",
