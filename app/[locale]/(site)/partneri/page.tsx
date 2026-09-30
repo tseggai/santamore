@@ -101,16 +101,8 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
       <p className={eyebrowClass}>{content.heroEyebrow}</p>
       <h1 className="type-display mt-3 max-w-2xl text-4xl leading-[1.1] sm:text-5xl">{content.heroTitle}</h1>
       <p className="mt-5 max-w-2xl text-[16.5px] leading-relaxed text-black/70">{content.heroLead}</p>
-
-      {/* the 3.5% argument: a highlight, in the same tint as the preferred tier */}
-      <section className="mt-10 rounded-lg bg-red/8 px-6 py-5">
-        <p className={eyebrowClass}>{content.taxHeading}</p>
-        <div className="mt-3 space-y-3">
-          {content.tax.map((paragraph) => (
-            <p key={paragraph} className="max-w-2xl text-[15.5px] leading-relaxed">{paragraph}</p>
-          ))}
-        </div>
-      </section>
+      {/* the 3.5% allowance, one line */}
+      <p className="mt-4 max-w-2xl text-[15.5px] italic leading-relaxed text-black/70">{content.taxNote}</p>
 
       {/* tier sheet: every tier opens the pledge */}
       <section id="nivoi" className="mt-12 scroll-mt-24 border-t-[0.5px] border-line pt-10">

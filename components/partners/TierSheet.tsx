@@ -27,11 +27,9 @@ export function TierSheet({ tiers, copy }: { tiers: PartnerTier[]; copy: Copy })
             type="button"
             onClick={() => setSelected(tier)}
             aria-haspopup="dialog"
-            className={`group text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea ${
-              tier.preferred ? "rounded-lg bg-red/8 px-5 py-5 hover:bg-red/12 sm:col-span-2" : "rounded-lg bg-mist px-5 py-5 hover:bg-mist-2"
-            }`}
+            className={`group rounded-lg bg-mist px-5 py-5 text-left transition-colors hover:bg-mist-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea ${tier.preferred ? "sm:col-span-2" : ""}`}
           >
-            {tier.preferred ? <p className="mb-2 inline-block rounded-md bg-red px-2 py-0.5 text-[12px] font-bold uppercase tracking-[0.08em] text-paper">{copy.preferredBadge}</p> : null}
+            {tier.preferred ? <p className="mb-2 inline-block rounded-md bg-sea px-2 py-0.5 text-[12px] font-bold uppercase tracking-[0.08em] text-paper">{copy.preferredBadge}</p> : null}
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <p className={`type-display ${tier.preferred ? "text-2xl" : "text-xl"}`}>{tier.name}</p>
               <p className="font-mono text-[14px] tabular-nums text-sea">{tier.price}</p>
