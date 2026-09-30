@@ -62,7 +62,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
   me: {
     heroEyebrow: "Sponzori",
     heroTitle: "Budite sponzor",
-    heroLead: "Sponzorstva finansiraju rad Santamorea, pa 100% svake donacije, kotizacije i granta stiže do korisnika.",
+    heroLead: "Santamore je lokalni pokret sa sjedištem u Porto Montenegru koji organizuje događaje u duhu zdravog, aktivnog i veselog načina života, za humanitarne ciljeve u Crnoj Gori. Organizujemo i učestvujemo u trkama, vožnjama, izazovima, drugim sportskim takmičenjima i događajima kako bismo prikupili novac za ciljeve koje predlaže zajednica u Crnoj Gori. Sponzorstva finansiraju naš rad, pa 100% svake donacije, kotizacije i granta stiže do korisnika.",
     taxNote: "Crnogorske kompanije i pojedinci mogu odbiti do 3,5% bruto prihoda za humanitarne svrhe. Ali većina to nikad ne iskoristi.",
     tabSponsor: "Budite sponzor",
     tabSponsors: "Naši sponzori",
@@ -171,7 +171,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
   en: {
     heroEyebrow: "Sponsors",
     heroTitle: "Be a sponsor",
-    heroLead: "Sponsorship funds Santamore's operations so that 100% of every donation, entry fee and grant reaches the beneficiaries.",
+    heroLead: "Santamore is a local movement based in Porto Montenegro that organises events around a wellness-focused, active and festive lifestyle, for charitable causes in Montenegro. We organise and take part in races, rides, challenges, other fitness competitions and events to raise money for crowdsourced causes within Montenegro. Sponsorships fund our operations so that 100% of every donation, entry fee and grant reaches the beneficiaries.",
     taxNote: "Montenegrin companies and individuals may deduct up to 3.5% of gross income for a humanitarian cause. But most never use it.",
     tabSponsor: "Be a sponsor",
     tabSponsors: "Our sponsors",
@@ -280,7 +280,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
   ru: {
     heroEyebrow: "Спонсоры",
     heroTitle: "Станьте спонсором",
-    heroLead: "Спонсорство финансирует работу Santamore, чтобы 100% каждого пожертвования, взноса за участие и гранта доходило до получателей.",
+    heroLead: "Santamore — местное движение из Порто-Монтенегро, которое организует события в духе здорового, активного и праздничного образа жизни ради благотворительных целей в Черногории. Мы организуем и участвуем в забегах, велозаездах, челленджах, других спортивных соревнованиях и событиях, чтобы собирать деньги на цели, предложенные сообществом в Черногории. Спонсорство финансирует нашу работу, чтобы 100% каждого пожертвования, взноса за участие и гранта доходило до получателей.",
     taxNote: "Черногорские компании и физические лица могут вычесть до 3,5% валового дохода на гуманитарные цели. Но большинство этим никогда не пользуется.",
     tabSponsor: "Станьте спонсором",
     tabSponsors: "Наши спонсоры",
