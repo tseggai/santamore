@@ -18,9 +18,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 /**
- * "Propose a cause" as a page to send around: what happens to a proposal,
- * the questions it must pass, and the form. The same form opens as a pane
- * on the causes page; this is the link you share.
+ * "Propose a cause" as a page to send around: who we are and how a cause
+ * is chosen, the questions a proposal must pass, and the proposal itself,
+ * three steps in one form. The same form opens as a pane on the causes
+ * page; this is the link you share.
  */
 export default async function ProposePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -46,8 +47,6 @@ export default async function ProposePage({ params }: { params: Promise<{ locale
     criteria = [];
   }
 
-  const steps = ["pageStep1", "pageStep2", "pageStep3"] as const;
-
   return (
     <div className="mx-auto max-w-3xl px-5 py-14">
       <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">{t("eyebrow")}</p>
@@ -55,36 +54,13 @@ export default async function ProposePage({ params }: { params: Promise<{ locale
         <h1 className="type-display text-4xl">{t("title")}</h1>
         <ShareButton title={t("title")} path={`/${locale}/predlozi`} label={t("sharePage")} copiedLabel={tDonate("copied")} variant="ghost" text={t("shareText")} className="inline-flex h-10 items-center gap-2 rounded-lg bg-mist px-4 text-[14.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea" />
       </div>
-      <p className="mt-3 max-w-xl text-[16px] leading-relaxed text-black/70">{t("sub")}</p>
 
-      <ol className="mt-8 grid gap-3 sm:grid-cols-3">
-        {steps.map((key, index) => (
-          <li key={key} className="rounded-lg bg-mist px-4 py-4">
-            <span className="font-mono text-[12px] text-red">{String(index + 1).padStart(2, "0")}</span>
-            <p className="mt-1.5 text-[15px] leading-relaxed">{t(key)}</p>
-          </li>
-        ))}
-      </ol>
-
-      {criteria.length > 0 ? (
-        <section className="mt-8">
-          <h2 className="type-eyebrow text-sea/80">{t("pageCriteriaHeading")}</h2>
-          <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("pageCriteriaSub")}</p>
-          <ul className="mt-3 overflow-hidden rounded-lg bg-mist">
-            {criteria.map((criterion) => (
-              <li key={criterion.id} className="border-t-[0.5px] border-line px-4 py-2.5 text-[14.5px] first:border-t-0">{criterion.question}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      <section className="mt-10">
-        <h2 className="type-display text-2xl">{t("detailsHeading")}</h2>
-        <div className="mt-4">
-          {signedIn ? (
-            <ProposeForm criteria={criteria} />
-          ) : (
-            <div className="rounded-lg bg-mist px-5 py-5">
+      {/* The three steps: who we are and how a cause is chosen, the questions, the proposal. The cards sit on mist, so the form's paper boxes read on this page. */}
+      <section className="mt-8 rounded-lg bg-mist px-5 py-5 sm:px-6">
+        <ProposeForm
+          criteria={criteria}
+          signIn={signedIn ? null : (
+            <div className="rounded-lg bg-paper px-5 py-5">
               <h3 className="text-[16px] font-bold">{t("signInTitle")}</h3>
               <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("signInSub")}</p>
               <div className="mt-4">
@@ -92,7 +68,7 @@ export default async function ProposePage({ params }: { params: Promise<{ locale
               </div>
             </div>
           )}
-        </div>
+        />
       </section>
 
       <p className="mt-8 text-[14px] text-black/60">

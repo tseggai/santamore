@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useRef, useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { deleteProposal, proposeCause, updateProposal } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
 import { useDialog } from "@/components/console/useDialog";
@@ -39,12 +39,15 @@ export interface ProposalDraft {
 
 export function ProposeForm({
   criteria,
+  signIn = null,
   edit = null,
   onSaved,
   onCancel,
   onDeleted,
 }: {
   criteria: PublicCriterion[];
+  /** Shown in place of the questions when the visitor is not signed in: the introduction is for everyone, the proposal for members. */
+  signIn?: ReactNode;
   /** Editing an existing proposal: the screening is behind it, only the wording changes. */
   edit?: ProposalDraft | null;
   onSaved?: () => void;
@@ -88,9 +91,9 @@ export function ProposeForm({
   };
   const [state, setState] = useState<"idle" | "busy" | "error" | "done" | "rejected" | "locked">("idle");
   const [reasons, setReasons] = useState<string[]>([]);
-  // Two screens: the questions, then — only once they pass — the proposal.
-  // An edit starts on the second: the questions were answered already.
-  const [step, setStep] = useState<1 | 2>(edit ? 2 : 1);
+  // Three screens: who we are and how a cause is chosen, the questions, then — only once they pass — the proposal.
+  // An edit starts on the last: the questions were answered already.
+  const [step, setStep] = useState<1 | 2 | 3>(edit ? 3 : 1);
   const dialog = useDialog();
 
   const withdraw = async () => {
@@ -163,7 +166,7 @@ export function ProposeForm({
     setAnswers({});
     setReasons([]);
     setState("idle");
-    setStep(1);
+    setStep(2);
   };
 
   const fieldClass = "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-3 text-[16px] outline-none focus:border-sea";
@@ -216,11 +219,48 @@ export function ProposeForm({
 
   const stepLine = (
     <p className="font-mono text-[12px] text-red">
-      {String(step).padStart(2, "0")} / 02
+      {String(step).padStart(2, "0")} / 03
     </p>
   );
 
   if (step === 1) {
+    const year = new Date().getFullYear();
+    return (
+      <div className="space-y-5">
+        {stepLine}
+        <section className="space-y-3 text-[15.5px] leading-relaxed text-black/80">
+          <p>{t("introAbout")}</p>
+          <p>{t("introHow")}</p>
+          <p className="font-semibold">{t("introOpen", { year })}</p>
+        </section>
+        <ol className="grid gap-3 sm:grid-cols-3">
+          {(["introStep1", "introStep2", "introStep3"] as const).map((key, index) => (
+            <li key={key} className="rounded-lg bg-paper px-4 py-4">
+              <span className="font-mono text-[12px] text-red">{String(index + 1).padStart(2, "0")}</span>
+              <p className="mt-1.5 text-[15px] leading-relaxed">{t(key)}</p>
+            </li>
+          ))}
+        </ol>
+        <button type="button" onClick={() => setStep(2)} className="w-full rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark sm:w-auto">
+          {t("proposeCta")} →
+        </button>
+      </div>
+    );
+  }
+
+  if (step === 2 && signIn) {
+    return (
+      <div className="space-y-5">
+        {stepLine}
+        {signIn}
+        <button type="button" onClick={() => setStep(1)} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
+          ← {t("backToIntro")}
+        </button>
+      </div>
+    );
+  }
+
+  if (step === 2) {
     return (
       <div className="space-y-5">
         {stepLine}
@@ -246,14 +286,19 @@ export function ProposeForm({
             ))}
           </ol>
         </section>
-        <button
-          type="button"
-          disabled={!answered}
-          onClick={() => setStep(2)}
-          className="w-full rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60 sm:w-auto"
-        >
-          {t("continue")} →
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={!answered}
+            onClick={() => setStep(3)}
+            className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
+          >
+            {t("continue")} →
+          </button>
+          <button type="button" onClick={() => setStep(1)} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
+            ← {t("backToIntro")}
+          </button>
+        </div>
       </div>
     );
   }
@@ -330,7 +375,7 @@ export function ProposeForm({
             </button>
           </>
         ) : (
-          <button type="button" onClick={() => setStep(1)} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
+          <button type="button" onClick={() => setStep(2)} className="rounded-lg bg-paper px-5 py-3.5 text-[15px] font-semibold transition-colors hover:bg-mist-2">
             ← {t("back")}
           </button>
         )}

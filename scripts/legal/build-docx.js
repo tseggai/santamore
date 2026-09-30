@@ -20,7 +20,7 @@
  * Needs the `docx` package: npm install --no-save docx
  */
 const fs = require('fs');
-const { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType,
+const { Document, Packer, Paragraph, TextRun, HeadingLevel, Table, TableRow, TableCell, WidthType, Header, Footer, PageNumber,
   AlignmentType, LevelFormat, ShadingType, BorderStyle } = require('docx');
 
 const FONT = 'Arial';
@@ -134,7 +134,15 @@ function splitHeading(text) {
   return lang(text) === 'me' ? [text, ''] : ['', text];
 }
 
-function buildDoc(rows, title, columnHeader) {
+// Page furniture: the document's name top right from the second page on, "n / total" bottom centre on every page.
+function furniture(head) {
+  const grey = { size: 16, color: '5A6A72', font: FONT };
+  const running = new Header({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [new TextRun({ text: head, ...grey })] })] });
+  const numbers = () => new Footer({ children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ children: [PageNumber.CURRENT, ' / ', PageNumber.TOTAL_PAGES], ...grey })] })] });
+  return { headers: { default: running, first: new Header({ children: [] }) }, footers: { default: numbers(), first: numbers() } };
+}
+
+function buildDoc(rows, title, columnHeader, runningHead = title) {
   const table = new Table({ columnWidths: [HALF, HALF], width: { size: CONTENT_W, type: WidthType.DXA }, borders: BORDERS, rows });
   const head = columnHeader ? [new TableRow({ tableHeader: true, children: [
     cell([new Paragraph({ children: [new TextRun({ text: columnHeader[0], bold: true, size: 18, font: FONT, color: '36434B' })] })], HALF, { fill: 'F6F3EE' }),
@@ -148,7 +156,7 @@ function buildDoc(rows, title, columnHeader) {
     numbering: { config: [
       { reference: 'bullets', levels: [{ level: 0, format: LevelFormat.BULLET, text: '•', alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 360, hanging: 200 } } } }] },
       { reference: 'numbers', levels: [{ level: 0, format: LevelFormat.DECIMAL, text: '%1.', alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 400, hanging: 280 } } } }] } ] },
-    sections: [{ properties: { page: { margin: { top: MARGIN, bottom: MARGIN, left: MARGIN, right: MARGIN } } },
+    sections: [{ properties: { titlePage: true, page: { margin: { top: MARGIN, bottom: MARGIN, left: MARGIN, right: MARGIN } } }, ...furniture(runningHead),
       children: [ new Paragraph({ heading: HeadingLevel.TITLE, children: runs(title) }), tableWithHead ] }],
   });
 }
@@ -257,7 +265,7 @@ function plainDoc(blocks, title) {
     numbering: { config: [
       { reference: 'bullets', levels: [{ level: 0, format: LevelFormat.BULLET, text: '•', alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 540, hanging: 270 } } } }] },
       { reference: 'numbers', levels: [{ level: 0, format: LevelFormat.DECIMAL, text: '%1.', alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 540, hanging: 360 } } } }] } ] },
-    sections: [{ properties: { page: { margin: { top: MARGIN, bottom: MARGIN, left: MARGIN, right: MARGIN } } }, children: [new Paragraph({ heading: HeadingLevel.TITLE, children: runs(title) }), ...children] }],
+    sections: [{ properties: { titlePage: true, page: { margin: { top: MARGIN, bottom: MARGIN, left: MARGIN, right: MARGIN } } }, ...furniture(title), children: [new Paragraph({ heading: HeadingLevel.TITLE, children: runs(title) }), ...children] }],
   });
 }
 
@@ -272,7 +280,7 @@ function plainDoc(blocks, title) {
   } else if (mode === 'pair') {
     const [meMd, enMd, o] = args; out = o;
     const me = parseBlocks(fs.readFileSync(meMd, 'utf8')), en = parseBlocks(fs.readFileSync(enMd, 'utf8'));
-    doc = buildDoc(pairRows(me, en), titleOf(me) + ' / ' + titleOf(en), ['Crnogorski (mjerodavan tekst)', 'English (translation)']);
+    doc = buildDoc(pairRows(me, en), titleOf(me) + ' / ' + titleOf(en), ['Crnogorski (mjerodavan tekst)', 'English (translation)'], titleOf(me));
   } else if (mode === 'paired') {
     const [json, md, o] = args; out = o; const anchor = (args.indexOf('--anchor') >= 0) ? args[args.indexOf('--anchor') + 1] : 'none';
     const blocks = parseBlocks(fs.readFileSync(md, 'utf8')); const orig = JSON.parse(fs.readFileSync(json, 'utf8'));

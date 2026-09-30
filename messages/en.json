@@ -2107,7 +2107,7 @@
   "proposals": {
     "title": "Propose a cause",
     "eyebrow": "Causes from the community",
-    "sub": "Know a need we should take on? Tell us. A few questions first, then the proposal — what passes is listed for members to vote up, and we choose from the top five.",
+    "sub": "Know a need in Montenegro that deserves support? Propose it, members vote, and we take on one or two of the winners for the year.",
     "listHeading": "Proposed by the community",
     "listSub": "Members vote a proposal up; the five with most votes are on the shortlist we choose from.",
     "shortlist": "Shortlist",
@@ -2145,12 +2145,7 @@
     "back": "Back to the questions",
     "openPage": "Open as a page",
     "sharePage": "Share",
-    "shareText": "Know a need Santamore should take on? Propose it here — members vote, and we choose from the top five.",
-    "pageStep1": "You propose a need in Montenegro: who has it, where, and roughly what it would take.",
-    "pageStep2": "Members vote proposals up. The five with most votes are the shortlist.",
-    "pageStep3": "We take one on, raise for it with events and pages, and publish every euro.",
-    "pageCriteriaHeading": "What we can take on",
-    "pageCriteriaSub": "A proposal first answers these questions. A “no” on any of them means it is not one for us — the form says so right away.",
+    "shareText": "Know a need Santamore should take on? Propose it here — members vote, and we choose one or two from the top five.",
     "edit": "Edit",
     "editUntilVote": "This is your proposal. You can change the wording until the first vote lands; after that the text stays as people voted for it.",
     "editSave": "Save changes",
@@ -2173,7 +2168,14 @@
     "photoReplace": "Replace the photo",
     "photoRemove": "Remove",
     "photoHint": "One picture of the need or the people behind it. Never someone's photo without their say.",
-    "openLink": "Read more at the link"
+    "openLink": "Read more at the link",
+    "introAbout": "Santamore is a local movement based in Porto Montenegro that uses an active, healthy and joyful way of life, and events, to raise money for causes in Montenegro.",
+    "introHow": "The causes are proposed and voted on by the community. Santamore then raises money for the one or two winning causes for the year.",
+    "introOpen": "Proposals for the {year} cause are open.",
+    "introStep1": "You propose a cause that needs financial support.",
+    "introStep2": "You and others vote on the list of proposals.",
+    "introStep3": "From the top five we choose one or two and raise for them.",
+    "backToIntro": "Back"
   },
   "beneficiaries": {
     "eyebrow": "Beneficiaries",
