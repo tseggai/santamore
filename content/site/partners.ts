@@ -10,7 +10,10 @@ export interface PartnerTier {
   id: string;
   name: string;
   price: string;
+  /** One line: what the tier is. */
   desc: string;
+  /** What the sponsor gets. */
+  perks: string[];
   /** The tier we ask for first: shown before the others, marked as preferred. */
   preferred?: boolean;
 }
@@ -22,7 +25,6 @@ export interface PartnersContent {
   /** One line on the 3.5% allowance, set in italics under the lead. */
   taxNote: string;
   tiersHeading: string;
-  tiersLead: string;
   preferredBadge: string;
   selectTier: string;
   tiers: PartnerTier[];
@@ -58,52 +60,78 @@ export const partnersContent: Record<Locale, PartnersContent> = {
       "Sponzorstva finansiraju rad Santamorea: platformu, događaje i takmičenja kojima prikupljamo novac za ciljeve. Zato 100% svake donacije, kotizacije i granta stiže do korisnika. Ime sponzora stoji uz sve što to omogućava, na svakoj stranici.",
     taxNote: "Crnogorske kompanije i pojedinci mogu odbiti do 3,5% bruto prihoda za humanitarna, sportska, zdravstvena, kulturna i ekološka davanja. Većina to nikad ne iskoristi.",
     tiersHeading: "Nivoi partnerstva",
-    tiersLead: "Izaberite nivo i ostavite kontakt; javljamo se u roku od dva radna dana sa kalendarom i primjerom izvještaja.",
     preferredBadge: "Najvažniji nivo",
     selectTier: "Izaberi ovaj nivo",
     tiers: [
       {
         id: "core",
         name: "Core Cost partner",
-        price: "€25.000+ / god.",
-        desc: "Finansira rad Santamorea cijelu godinu, na svakom događaju: platformu, tim i opremu iza svake kampanje. Imenovan na svakoj stranici: „Rad Santamorea finansira X, pa 100% donacija stiže do cilja.“ Vrijedi više od title partnerstva na svakom događaju u godini.",
+        price: "€25.000+",
+        desc: "Finansira rad koji stoji iza svakog cilja: platformu, tim i opremu.",
+        perks: [
+          "Imenovan na svakoj stranici sajta kao partner koji finansira rad Santamorea",
+          "Logo na svakom broju, odijelu i događaju u godini",
+          "Vrijeme na bini i tim zaposlenih na svakom događaju",
+          "Izvještaj o svakoj kampanji i poziv na svaku primopredaju",
+        ],
         preferred: true,
       },
       {
         id: "title",
         name: "Title partner",
-        price: "€10.000 / događaj",
-        desc: "Ime uz događaj, logo na svakom broju i odijelu, brending na startu, vrijeme na bini, 20 prijava, tim zaposlenih uključen.",
+        price: "€10.000",
+        desc: "Ime uz jedan događaj.",
+        perks: [
+          "Događaj nosi vaše ime",
+          "Logo na svakom broju i odijelu, brending na startu",
+          "Vrijeme na bini",
+          "20 prijava i tim zaposlenih",
+        ],
       },
       {
         id: "gold",
         name: "Gold",
         price: "€5.000",
-        desc: "Brending staze i prostora, logo na majicama, 10 prijava, objave na mrežama.",
+        desc: "Istaknuto prisustvo na jednom događaju.",
+        perks: [
+          "Brending staze i prostora",
+          "Logo na majicama",
+          "10 prijava",
+          "Objave na mrežama",
+        ],
       },
       {
         id: "silver",
         name: "Silver",
         price: "€2.000",
-        desc: "Logo na materijalima, 5 prijava, brendirana stanica na stazi.",
+        desc: "Vidljivo mjesto na jednom događaju.",
+        perks: [
+          "Logo na materijalima",
+          "Brendirana stanica na stazi",
+          "5 prijava",
+        ],
       },
       {
         id: "local",
         name: "Lokalni biznis",
         price: "€250–500",
-        desc: "Namjerno pristupačno, da se pridruže i pekara i stomatolog. Četrdeset ovakvih je €15.000 — i četrdeset firmi koje pričaju svojim mušterijama o nama.",
-      },
-      {
-        id: "match",
-        name: "Match partner",
-        price: "bilo koji iznos",
-        desc: "Duplira donacije u zadatom periodu. Najkonvertibilnija stvar koju nudimo — svaki donator osjeti da mu euro vrijedi dva.",
+        desc: "Namjerno pristupačno, da se pridruže i pekara i stomatolog.",
+        perks: [
+          "Ime na stranici partnera i stranici događaja",
+          "Pomen na dan događaja",
+          "Četrdeset ovakvih je €15.000 — i četrdeset firmi koje pričaju mušterijama o nama",
+        ],
       },
       {
         id: "inkind",
         name: "In kind",
         price: "procijenjeno",
-        desc: "Voda, voće, štampa, medicinsko obezbjeđenje, ozvučenje, mjerenje vremena, prostor, fotografija, odijela. Vrednujemo, knjižimo i priznajemo tačno kao gotovinu.",
+        desc: "Roba i usluge umjesto novca: voda, voće, štampa, medicinsko obezbjeđenje, ozvučenje, mjerenje vremena, prostor, fotografija, odijela.",
+        perks: [
+          "Vrednujemo i knjižimo tačno kao gotovinu",
+          "Priznanje na nivou kojem vrijednost odgovara",
+          "Imenovan u izvještaju",
+        ],
       },
     ],
     deliverHeading: "Nikome ne treba još jedan logo na baneru",
@@ -141,42 +169,78 @@ export const partnersContent: Record<Locale, PartnersContent> = {
       "Sponsorship funds Santamore's operations: the platform, the events and the contests we run to raise money for the causes. That is why 100% of every donation, entry fee and grant reaches the beneficiaries. A sponsor's name stands on the work that makes it possible, on every page.",
     taxNote: "Montenegrin companies and individuals may deduct up to 3.5% of gross income for humanitarian, sport, health, cultural and environmental giving. Most never use it.",
     tiersHeading: "Partnership tiers",
-    tiersLead: "Pick a tier and leave your details; we reply within two working days with the calendar and a sample report.",
     preferredBadge: "The tier that matters most",
     selectTier: "Select this tier",
     tiers: [
       {
         id: "core",
         name: "Core Cost Partner",
-        price: "€25,000+ / yr",
-        desc: "Funds Santamore's operations for the whole year, at every event: the platform, the team and the equipment behind every campaign. Named on every page: “Santamore's operations are funded by X, so 100% of donations reach the cause.” It stands above a title partnership at every event of the year.",
+        price: "€25,000+",
+        desc: "Funds the work behind every cause: the platform, the team and the equipment.",
+        perks: [
+          "Named on every page of the site as the partner that funds Santamore's operations",
+          "Logo on every bib, suit and event of the year",
+          "Stage time and an employee team at every event",
+          "A report on every campaign and an invitation to every hand-over",
+        ],
         preferred: true,
       },
       {
         id: "title",
         name: "Title Partner",
-        price: "€10,000 / event",
-        desc: "Named in association, logo on every bib and suit, start-line branding, stage time, 20 entries, employee team included.",
+        price: "€10,000",
+        desc: "The name on one event.",
+        perks: [
+          "The event carries your name",
+          "Logo on every bib and suit, start-line branding",
+          "Stage time",
+          "20 entries and an employee team",
+        ],
       },
-      { id: "gold", name: "Gold", price: "€5,000", desc: "Course and venue branding, logo on shirts, 10 entries, social features." },
-      { id: "silver", name: "Silver", price: "€2,000", desc: "Logo on materials, 5 entries, a branded station on the course." },
+      {
+        id: "gold",
+        name: "Gold",
+        price: "€5,000",
+        desc: "A major presence at one event.",
+        perks: [
+          "Course and venue branding",
+          "Logo on shirts",
+          "10 entries",
+          "Social features",
+        ],
+      },
+      {
+        id: "silver",
+        name: "Silver",
+        price: "€2,000",
+        desc: "A visible place at one event.",
+        perks: [
+          "Logo on materials",
+          "A branded station on the course",
+          "5 entries",
+        ],
+      },
       {
         id: "local",
         name: "Local Business",
         price: "€250–500",
-        desc: "Deliberately affordable, so the bakery and the dentist can join. Forty of these is €15,000 — and forty businesses telling their customers about us.",
-      },
-      {
-        id: "match",
-        name: "Match Partner",
-        price: "any amount",
-        desc: "Doubles donations in a set window. The most convertible thing we offer — every donor feels their euro is worth two.",
+        desc: "Deliberately affordable, so the bakery and the dentist can join.",
+        perks: [
+          "Name on the partners page and the event page",
+          "A mention on the day",
+          "Forty of these is €15,000 — and forty businesses telling their customers about us",
+        ],
       },
       {
         id: "inkind",
         name: "In kind",
         price: "valued",
-        desc: "Water, fruit, printing, medical cover, sound, timing, venue, photography, suits. Valued, booked and credited exactly like cash.",
+        desc: "Goods and services instead of cash: water, fruit, printing, medical cover, sound, timing, venue, photography, suits.",
+        perks: [
+          "Valued and booked exactly like cash",
+          "Credited at the tier the value matches",
+          "Named in the report",
+        ],
       },
     ],
     deliverHeading: "Nobody needs another logo on a banner",
@@ -214,42 +278,78 @@ export const partnersContent: Record<Locale, PartnersContent> = {
       "Спонсорство финансирует работу Santamore: платформу, события и соревнования, с помощью которых мы собираем деньги на цели. Поэтому 100% каждого пожертвования, взноса за участие и гранта доходит до получателей. Имя спонсора стоит на всём, что делает это возможным, на каждой странице.",
     taxNote: "Черногорские компании и физические лица могут вычесть до 3,5% валового дохода на гуманитарные, спортивные, медицинские, культурные и экологические пожертвования. Большинство этим никогда не пользуется.",
     tiersHeading: "Уровни партнёрства",
-    tiersLead: "Выберите уровень и оставьте контакты; мы ответим в течение двух рабочих дней с календарём и примером отчёта.",
     preferredBadge: "Самый важный уровень",
     selectTier: "Выбрать этот уровень",
     tiers: [
       {
         id: "core",
         name: "Core Cost Partner",
-        price: "€25 000+ / год",
-        desc: "Финансирует работу Santamore весь год, на каждом событии: платформу, команду и оборудование за каждой кампанией. Назван на каждой странице: «Работу Santamore финансирует X, поэтому 100% пожертвований доходит до цели». Стоит выше титульного партнёрства на каждом событии года.",
+        price: "€25 000+",
+        desc: "Финансирует работу, стоящую за каждой целью: платформу, команду и оборудование.",
+        perks: [
+          "Назван на каждой странице сайта как партнёр, финансирующий работу Santamore",
+          "Логотип на каждом номере, костюме и событии года",
+          "Время на сцене и команда сотрудников на каждом событии",
+          "Отчёт о каждой кампании и приглашение на каждую передачу",
+        ],
         preferred: true,
       },
       {
         id: "title",
         name: "Title Partner",
-        price: "€10 000 / событие",
-        desc: "Имя рядом с событием, логотип на каждом номере и костюме, брендинг на старте, время на сцене, 20 регистраций, команда сотрудников включена.",
+        price: "€10 000",
+        desc: "Имя рядом с одним событием.",
+        perks: [
+          "Событие носит ваше имя",
+          "Логотип на каждом номере и костюме, брендинг на старте",
+          "Время на сцене",
+          "20 регистраций и команда сотрудников",
+        ],
       },
-      { id: "gold", name: "Gold", price: "€5 000", desc: "Брендинг трассы и площадки, логотип на футболках, 10 регистраций, публикации в соцсетях." },
-      { id: "silver", name: "Silver", price: "€2 000", desc: "Логотип на материалах, 5 регистраций, брендированная станция на трассе." },
+      {
+        id: "gold",
+        name: "Gold",
+        price: "€5 000",
+        desc: "Заметное присутствие на одном событии.",
+        perks: [
+          "Брендинг трассы и площадки",
+          "Логотип на футболках",
+          "10 регистраций",
+          "Публикации в соцсетях",
+        ],
+      },
+      {
+        id: "silver",
+        name: "Silver",
+        price: "€2 000",
+        desc: "Видимое место на одном событии.",
+        perks: [
+          "Логотип на материалах",
+          "Брендированная станция на трассе",
+          "5 регистраций",
+        ],
+      },
       {
         id: "local",
         name: "Местный бизнес",
         price: "€250–500",
-        desc: "Намеренно доступно, чтобы присоединились и пекарня, и стоматолог. Сорок таких — это €15 000 и сорок компаний, которые рассказывают о нас своим клиентам.",
-      },
-      {
-        id: "match",
-        name: "Match Partner",
-        price: "любая сумма",
-        desc: "Удваивает пожертвования в заданный период. Самое убедительное, что мы предлагаем: каждый донор чувствует, что его евро стоит два.",
+        desc: "Намеренно доступно, чтобы присоединились и пекарня, и стоматолог.",
+        perks: [
+          "Название на странице партнёров и странице события",
+          "Упоминание в день события",
+          "Сорок таких — это €15 000 и сорок компаний, которые рассказывают о нас своим клиентам",
+        ],
       },
       {
         id: "inkind",
         name: "Натурой",
         price: "по оценке",
-        desc: "Вода, фрукты, печать, медицинское обеспечение, звук, хронометраж, площадка, фотография, костюмы. Оцениваем, учитываем и указываем точно так же, как деньги.",
+        desc: "Товары и услуги вместо денег: вода, фрукты, печать, медицинское обеспечение, звук, хронометраж, площадка, фотография, костюмы.",
+        perks: [
+          "Оцениваем и учитываем точно так же, как деньги",
+          "Указываем на уровне, которому соответствует стоимость",
+          "Называем в отчёте",
+        ],
       },
     ],
     deliverHeading: "Никому не нужен ещё один логотип на баннере",
