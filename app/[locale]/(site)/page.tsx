@@ -401,7 +401,7 @@ export default async function HomePage({
           )}
           {/* The ask comes first; the logos are the proof. Amounts live on the partners and money pages. */}
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="/partneri#kontakt" className={primary}>{t("partnersCta")}</Link>
+            <Link href="/partneri#nivoi" className={primary}>{t("partnersCta")}</Link>
             <Link href="/partneri" className={secondary}>{t("partnersTiers")} →</Link>
           </div>
           {data.sponsors.length > 0 ? (
