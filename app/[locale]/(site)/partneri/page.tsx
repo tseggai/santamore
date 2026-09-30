@@ -3,6 +3,7 @@ import { hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 
 import { SponsorsByYear } from "@/components/partners/SponsorsByYear";
+import { SponsorTabs } from "@/components/partners/SponsorTabs";
 import { TierSheet } from "@/components/partners/TierSheet";
 import type { PublicSponsor } from "@/components/partners/SponsorGrid";
 import { partnersContent } from "@/content/site/partners";
@@ -104,40 +105,20 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
       {/* the 3.5% allowance, one line */}
       <p className="mt-4 max-w-2xl text-[15.5px] italic leading-relaxed text-black/70">{content.taxNote}</p>
 
-      {/* tier sheet: every tier opens the pledge */}
-      <section id="nivoi" className="mt-12 scroll-mt-24 border-t-[0.5px] border-line pt-10">
-        <p className={eyebrowClass}>{content.tiersHeading}</p>
-        <div className="mt-5">
-          <TierSheet tiers={content.tiers} copy={content} />
-        </div>
-      </section>
-
-      {/* sponsors, one year at a time */}
-      <section id="sponzori" className="mt-12 scroll-mt-24 border-t-[0.5px] border-line pt-10">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className={eyebrowClass}>{content.sponsorsHeading}</p>
-            <p className="mt-3 max-w-2xl text-[15.5px] leading-relaxed text-black/70">{content.sponsorsLead}</p>
-          </div>
-        </div>
-        <div className="mt-5">
-          <SponsorsByYear byYear={byYear} currentYear={currentYear} labels={{ year: content.yearLabel, current: content.currentLabel, empty: content.sponsorsEmpty, inKind: content.inKindLabel }} />
-        </div>
-      </section>
-
-      {/* what a sponsor actually gets */}
-      <section className="mt-12 border-t-[0.5px] border-line pt-10">
-        <p className={eyebrowClass}>{content.deliverHeading}</p>
-        <p className="mt-4 max-w-2xl text-[16px] leading-relaxed">{content.deliverLead}</p>
-        <div className="mt-5 grid gap-5 sm:grid-cols-2">
-          {content.deliver.map((item, index) => (
-            <div key={item.title}>
-              <span className="font-mono text-[12px] text-red">0{index + 1}</span>
-              <p className="mt-0.5 text-[15.5px] font-semibold">{item.title}</p>
-              <p className="mt-1 text-[14px] leading-relaxed text-black/65">{item.desc}</p>
+      {/* the two views: the tiers, and who sponsors us */}
+      <section id="nivoi" className="mt-10 scroll-mt-24">
+        <SponsorTabs
+          labels={{ sponsor: content.tabSponsor, sponsors: content.tabSponsors }}
+          tiers={<TierSheet tiers={content.tiers} copy={content} />}
+          sponsors={
+            <div id="sponzori" className="scroll-mt-24">
+              <p className="max-w-2xl text-[15.5px] leading-relaxed text-black/70">{content.sponsorsLead}</p>
+              <div className="mt-5">
+                <SponsorsByYear byYear={byYear} currentYear={currentYear} labels={{ year: content.yearLabel, current: content.currentLabel, empty: content.sponsorsEmpty, inKind: content.inKindLabel }} />
+              </div>
             </div>
-          ))}
-        </div>
+          }
+        />
       </section>
     </div>
   );

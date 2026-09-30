@@ -1,29 +1,33 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
-import { useState, type FormEvent } from "react";
+import { useId, useState, type FormEvent, type ReactNode } from "react";
 
 import { SidePanel } from "@/components/console/SidePanel";
-import type { PartnerTier, PartnersContent } from "@/content/site/partners";
+import type { PartnerTier, PartnersContent, TipKey } from "@/content/site/partners";
 import { submitInbound } from "@/lib/inbound/actions";
 import type { Locale } from "@/i18n/routing";
 
-type Copy = Pick<PartnersContent, "preferredBadge" | "selectTier" | "pledgeTitle" | "pledgeLead" | "tierLabel" | "businessLabel" | "repEmailLabel" | "phoneLabel" | "noteLabel" | "noteHint" | "pledgeButton" | "pledgeSending" | "pledgeDone" | "pledgeDoneSub">;
+type Copy = Pick<PartnersContent, "preferredBadge" | "selectTier" | "tips" | "pledgeTitle" | "pledgeLead" | "tierLabel" | "businessLabel" | "repEmailLabel" | "phoneLabel" | "noteLabel" | "noteHint" | "pledgeButton" | "pledgeSending" | "pledgeDone" | "pledgeDoneSub">;
 
 /**
- * The tier sheet: the preferred tier first and marked, every tier a button
- * that opens the pledge. A pledge is a partner enquiry with the tier on it:
- * business, representative's email, phone, a note; it lands in Messages.
+ * The tier sheet: six cards of the same shape (name and price, one line on
+ * what it is, what the sponsor gets, a button), the preferred one marked by
+ * a badge sitting on its top edge. A pledge is a partner enquiry with the
+ * tier on it: business, representative's email, phone, a note; it lands in
+ * Messages.
  */
 export function TierSheet({ tiers, copy }: { tiers: PartnerTier[]; copy: Copy }) {
   const [selected, setSelected] = useState<PartnerTier | null>(null);
   const ordered = [...tiers].sort((a, b) => Number(Boolean(b.preferred)) - Number(Boolean(a.preferred)));
   return (
     <>
-      <ul className="grid gap-4 sm:grid-cols-2">
+      <ul className="grid gap-4 pt-3 sm:grid-cols-2">
         {ordered.map((tier) => (
-          <li key={tier.id} className="flex flex-col rounded-lg bg-mist px-5 py-5">
-            {tier.preferred ? <p className="mb-2 inline-block self-start rounded-md bg-sea px-2 py-0.5 text-[12px] font-bold uppercase tracking-[0.08em] text-paper">{copy.preferredBadge}</p> : null}
+          <li key={tier.id} className="relative flex flex-col rounded-lg bg-mist px-5 py-5">
+            {tier.preferred ? (
+              <p className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-sea px-2.5 py-1 text-[12px] font-bold uppercase tracking-[0.08em] text-paper">{copy.preferredBadge}</p>
+            ) : null}
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <p className="type-display text-xl">{tier.name}</p>
               <p className="font-mono text-[14px] tabular-nums text-sea">{tier.price}</p>
@@ -31,7 +35,7 @@ export function TierSheet({ tiers, copy }: { tiers: PartnerTier[]; copy: Copy })
             <p className="mt-2 text-[14.5px] leading-relaxed text-black/80">{tier.desc}</p>
             <ul className="mt-3 space-y-1 text-[14px] leading-relaxed text-black/65">
               {tier.perks.map((perk) => (
-                <li key={perk} className="flex gap-2"><span aria-hidden className="text-sea">•</span><span>{perk}</span></li>
+                <li key={perk} className="flex gap-2"><span aria-hidden className="text-sea">•</span><span>{withTips(perk, copy.tips)}</span></li>
               ))}
             </ul>
             <div className="mt-auto pt-4">
@@ -46,6 +50,43 @@ export function TierSheet({ tiers, copy }: { tiers: PartnerTier[]; copy: Copy })
         {selected ? <PledgeForm key={selected.id} tier={selected} copy={copy} /> : null}
       </SidePanel>
     </>
+  );
+}
+
+/** A perk with its [[key|words]] phrases turned into tips. */
+function withTips(perk: string, tips: Record<TipKey, string>): ReactNode[] {
+  return perk.split(/(\[\[[a-z]+\|[^\]]+\]\])/g).filter(Boolean).map((part, i) => {
+    const m = part.match(/^\[\[([a-z]+)\|([^\]]+)\]\]$/);
+    if (!m) return part;
+    const tip = tips[m[1] as TipKey];
+    return tip ? <Tip key={i} text={tip}>{m[2]}</Tip> : m[2];
+  });
+}
+
+/** Words with a note behind them: dotted underline, the note on hover, focus or tap. */
+function Tip({ text, children }: { text: string; children: ReactNode }) {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  return (
+    <span className="group/tip relative inline-block">
+      <button
+        type="button"
+        aria-describedby={id}
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+        onBlur={() => setOpen(false)}
+        className="cursor-help underline decoration-dotted decoration-sea/60 underline-offset-[3px] hover:decoration-sea focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea"
+      >
+        {children}
+      </button>
+      <span
+        id={id}
+        role="tooltip"
+        className={`pointer-events-none absolute left-0 top-full z-20 mt-1.5 w-64 rounded-lg bg-ink px-3 py-2 text-[13px] leading-relaxed text-paper shadow-[0_8px_24px_rgba(14,58,70,0.25)] ${open ? "block" : "hidden group-hover/tip:block"}`}
+      >
+        {text}
+      </span>
+    </span>
   );
 }
 
