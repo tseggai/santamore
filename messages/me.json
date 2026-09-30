@@ -2107,7 +2107,7 @@
   "proposals": {
     "title": "Predloži cilj",
     "eyebrow": "Ciljevi iz zajednice",
-    "sub": "Znaš potrebu koju bi trebalo da preuzmemo? Reci nam. Prvo nekoliko pitanja, pa prijedlog — ono što prođe ide na listu, članovi glasaju, a mi biramo iz prvih pet.",
+    "sub": "Znaš potrebu u Crnoj Gori koja zaslužuje podršku? Predloži je, članovi glasaju, a pobjednički cilj preuzimamo za tu godinu.",
     "listHeading": "Predložila zajednica",
     "listSub": "Članovi glasaju za prijedlog; pet s najviše glasova čini uži izbor iz kojeg biramo.",
     "shortlist": "Uži izbor",
@@ -2146,11 +2146,6 @@
     "openPage": "Otvori kao stranicu",
     "sharePage": "Podijeli",
     "shareText": "Znaš potrebu koju bi Santamore trebalo da preuzme? Predloži je ovdje — članovi glasaju, mi biramo iz prvih pet.",
-    "pageStep1": "Ti predlažeš potrebu u Crnoj Gori: ko je ima, gdje, i otprilike koliko bi trebalo.",
-    "pageStep2": "Članovi glasaju za prijedloge. Pet sa najviše glasova su uži izbor.",
-    "pageStep3": "Mi preuzimamo jedan, prikupljamo za njega događajima i stranicama, i objavljujemo svaki euro.",
-    "pageCriteriaHeading": "Šta možemo preuzeti",
-    "pageCriteriaSub": "Prijedlog prvo odgovara na ova pitanja. „Ne“ na bilo koje znači da nije za nas — formular to odmah kaže.",
     "edit": "Izmijeni",
     "editUntilVote": "Ovo je tvoj prijedlog. Tekst možeš mijenjati dok ne stigne prvi glas; poslije toga ostaje onakav za kakav su ljudi glasali.",
     "editSave": "Sačuvaj izmjene",
@@ -2173,7 +2168,13 @@
     "photoReplace": "Zamijeni fotografiju",
     "photoRemove": "Ukloni",
     "photoHint": "Jedna slika potrebe ili ljudi iza nje. Nikad nečija fotografija bez pristanka.",
-    "openLink": "Pročitaj više na linku"
+    "openLink": "Pročitaj više na linku",
+    "introAbout": "Santamore je lokalni pokret sa sjedištem u Porto Montenegru. Kroz aktivan, zdrav i radostan način života i događaje koji idu uz njega prikupljamo novac za ciljeve u Crnoj Gori koji zaslužuju podršku.",
+    "introHow": "Ciljevi dolaze iz zajednice: svako može da predloži cilj, članovi glasaju, a pobjednički cilj preuzimamo za tu godinu. Prijedlozi za cilj za {year}. su otvoreni.",
+    "introStep1": "Ti predložiš cilj kojem treba finansijska podrška.",
+    "introStep2": "Ti i ostali glasate za prijedloge sa liste.",
+    "introStep3": "Od prvih pet biramo jedan ili dva i za njih prikupljamo.",
+    "backToIntro": "Nazad"
   },
   "beneficiaries": {
     "eyebrow": "Korisnici",

@@ -38,23 +38,23 @@ export function ProposePane({ signedIn, criteria, className }: { signedIn: boole
         {t("proposeCta")}
       </button>
       <SidePanel open={open} title={t("title")} onClose={() => setOpen(false)}>
-        <p className="text-[14.5px] leading-relaxed text-black/65">{t("sub")}</p>
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-[13.5px] font-semibold">
+        <div className="flex flex-wrap items-center gap-2 text-[13.5px] font-semibold">
           <Link href="/predlozi" className="rounded-lg bg-paper px-3 py-1.5 transition-colors hover:bg-mist-2 hover:text-sea">{t("openPage")} ↗</Link>
           <ShareButton title={t("title")} path={`/${locale}/predlozi`} label={t("sharePage")} copiedLabel={tDonate("copied")} variant="ghost" text={t("shareText")} className="rounded-lg bg-paper px-3 py-1.5 text-[13.5px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea" />
         </div>
         <div className="mt-5">
-          {signedIn ? (
-            <ProposeForm criteria={criteria} />
-          ) : (
-            <div className="rounded-lg bg-paper px-5 py-5">
-              <h3 className="text-[16px] font-bold">{t("signInTitle")}</h3>
-              <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("signInSub")}</p>
-              <div className="mt-4">
-                <SignInForm locale={locale} nextPath={`/${locale}/kampanje?predlozi=1`} allowSignup />
+          <ProposeForm
+            criteria={criteria}
+            signIn={signedIn ? null : (
+              <div className="rounded-lg bg-paper px-5 py-5">
+                <h3 className="text-[16px] font-bold">{t("signInTitle")}</h3>
+                <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("signInSub")}</p>
+                <div className="mt-4">
+                  <SignInForm locale={locale} nextPath={`/${locale}/kampanje?predlozi=1`} allowSignup />
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          />
         </div>
       </SidePanel>
     </>
