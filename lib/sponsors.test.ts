@@ -25,6 +25,16 @@ describe("sortSponsors", () => {
     expect(sorted.map((s) => s.id)).toEqual(["big", "small", "alpha-in-kind", "zed-in-kind", "offer-only"]);
   });
 
+  it("puts the higher tier first, whatever the cash", () => {
+    const sorted = sortSponsors([
+      row("local-cash", { cash_cents: 100_000, tiers: ["local"] }),
+      row("gold", { cash_cents: 100_000, tiers: ["gold"] }),
+      row("title-in-kind", { in_kind: true, tiers: ["title partner"] }),
+      row("untiered", { cash_cents: 500_000 }),
+    ]);
+    expect(sorted.map((s) => s.id)).toEqual(["title-in-kind", "gold", "local-cash", "untiered"]);
+  });
+
   it("does not mutate its input", () => {
     const rows = [row("b", { cash_cents: 1 }), row("a", { cash_cents: 2 })];
     sortSponsors(rows);
