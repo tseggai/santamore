@@ -345,18 +345,23 @@ export function EventPageView({
             {event.distances.map((d) => {
               const rows = tiersFor(tiersShown, d.name);
               return (
-                <div key={d.name} className="rounded-lg bg-mist px-5 py-4">
-                  <h3 className="text-[16px] font-bold leading-snug">{d.name}</h3>
-                  {d.capacity != null ? <p className="mt-0.5 text-[13px] text-black/55">{t("placesOnDistance", { count: d.capacity })}</p> : null}
+                // The same shape as a sponsorship tier: name and the price on offer today, one line, then every price as a bullet.
+                <div key={d.name} className="rounded-lg bg-mist px-5 py-5">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h3 className="type-display text-xl">{d.name}</h3>
+                    {rows[0] ? <p className="font-mono text-[14px] tabular-nums text-sea">{rows[0].amount_cents === 0 ? t("free") : formatCents(rows[0].amount_cents, locale, { trimWholeCents: true })}</p> : null}
+                  </div>
+                  {d.capacity != null ? <p className="mt-2 text-[14.5px] leading-relaxed text-black/80">{t("placesOnDistance", { count: d.capacity })}</p> : null}
                   {rows.length > 0 ? (
-                    <ul className="mt-3">
+                    <ul className="mt-3 space-y-1 text-[14px] leading-relaxed text-black/65">
                       {rows.map((tier) => (
-                        <li key={`${tier.distance ?? ""}:${tier.label}`} className="flex items-baseline justify-between gap-3 border-t-[0.5px] border-black/15 py-2 text-[14.5px]">
+                        <li key={`${tier.distance ?? ""}:${tier.label}`} className="flex gap-2">
+                          <span aria-hidden className="text-sea">•</span>
                           <span>
                             {tier.label}
-                            {tier.until ? <span className="ml-2 text-[13px] text-black/55">{t("tierUntil", { date: fmt(tier.until) })}</span> : null}
+                            {tier.until ? <span className="text-black/55"> · {t("tierUntil", { date: fmt(tier.until) })}</span> : null}
+                            <span className="font-mono font-semibold tabular-nums text-black/80"> · {tier.amount_cents === 0 ? t("free") : formatCents(tier.amount_cents, locale, { trimWholeCents: true })}</span>
                           </span>
-                          <span className="font-mono font-semibold tabular-nums">{tier.amount_cents === 0 ? t("free") : formatCents(tier.amount_cents, locale, { trimWholeCents: true })}</span>
                         </li>
                       ))}
                     </ul>
