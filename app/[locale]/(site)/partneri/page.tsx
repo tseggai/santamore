@@ -107,7 +107,6 @@ export default async function PartnersPage({ params }: { params: Promise<{ local
       {/* tier sheet: every tier opens the pledge */}
       <section id="nivoi" className="mt-12 scroll-mt-24 border-t-[0.5px] border-line pt-10">
         <p className={eyebrowClass}>{content.tiersHeading}</p>
-        <p className="mt-3 max-w-2xl text-[15.5px] leading-relaxed text-black/70">{content.tiersLead}</p>
         <div className="mt-5">
           <TierSheet tiers={content.tiers} copy={content} />
         </div>

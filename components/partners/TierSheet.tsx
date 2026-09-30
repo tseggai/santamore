@@ -20,25 +20,28 @@ export function TierSheet({ tiers, copy }: { tiers: PartnerTier[]; copy: Copy })
   const ordered = [...tiers].sort((a, b) => Number(Boolean(b.preferred)) - Number(Boolean(a.preferred)));
   return (
     <>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <ul className="grid gap-4 sm:grid-cols-2">
         {ordered.map((tier) => (
-          <button
-            key={tier.id}
-            type="button"
-            onClick={() => setSelected(tier)}
-            aria-haspopup="dialog"
-            className={`group rounded-lg bg-mist px-5 py-5 text-left transition-colors hover:bg-mist-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sea ${tier.preferred ? "sm:col-span-2" : ""}`}
-          >
-            {tier.preferred ? <p className="mb-2 inline-block rounded-md bg-sea px-2 py-0.5 text-[12px] font-bold uppercase tracking-[0.08em] text-paper">{copy.preferredBadge}</p> : null}
+          <li key={tier.id} className="flex flex-col rounded-lg bg-mist px-5 py-5">
+            {tier.preferred ? <p className="mb-2 inline-block self-start rounded-md bg-sea px-2 py-0.5 text-[12px] font-bold uppercase tracking-[0.08em] text-paper">{copy.preferredBadge}</p> : null}
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <p className={`type-display ${tier.preferred ? "text-2xl" : "text-xl"}`}>{tier.name}</p>
+              <p className="type-display text-xl">{tier.name}</p>
               <p className="font-mono text-[14px] tabular-nums text-sea">{tier.price}</p>
             </div>
-            <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-black/70">{tier.desc}</p>
-            <p className="mt-3 text-[14px] font-semibold text-sea group-hover:underline">{copy.selectTier} →</p>
-          </button>
+            <p className="mt-2 text-[14.5px] leading-relaxed text-black/80">{tier.desc}</p>
+            <ul className="mt-3 space-y-1 text-[14px] leading-relaxed text-black/65">
+              {tier.perks.map((perk) => (
+                <li key={perk} className="flex gap-2"><span aria-hidden className="text-sea">•</span><span>{perk}</span></li>
+              ))}
+            </ul>
+            <div className="mt-auto pt-4">
+              <button type="button" onClick={() => setSelected(tier)} aria-haspopup="dialog" className="w-full rounded-lg bg-sea px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-sea-2 sm:w-auto">
+                {copy.selectTier}
+              </button>
+            </div>
+          </li>
         ))}
-      </div>
+      </ul>
       <SidePanel open={selected !== null} title={copy.pledgeTitle} onClose={() => setSelected(null)}>
         {selected ? <PledgeForm key={selected.id} tier={selected} copy={copy} /> : null}
       </SidePanel>
