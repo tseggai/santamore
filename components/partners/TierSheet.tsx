@@ -26,7 +26,7 @@ export function TierSheet({ tiers, copy }: { tiers: PartnerTier[]; copy: Copy })
         {ordered.map((tier) => (
           <li key={tier.id} className="relative flex flex-col rounded-lg bg-mist px-5 py-5">
             {tier.preferred ? (
-              <p className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-sea px-2.5 py-1 text-[12px] font-bold uppercase tracking-[0.08em] text-paper">{copy.preferredBadge}</p>
+              <p className="absolute -top-3 left-5 whitespace-nowrap rounded-md bg-sea px-2.5 py-1 text-[12px] font-bold uppercase tracking-[0.08em] text-paper">{copy.preferredBadge}</p>
             ) : null}
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <p className="type-display text-xl">{tier.name}</p>

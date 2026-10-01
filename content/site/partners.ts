@@ -67,7 +67,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     tabSponsor: "Budite sponzor",
     tabSponsors: "Naši sponzori",
     tiersHeading: "Nivoi sponzorstva",
-    preferredBadge: "Najvažniji nivo",
+    preferredBadge: "Napravi razliku",
     selectTier: "Izaberi ovaj nivo",
     tips: {
       report: "Fotografije sa vašim timom, broj učesnika, medijska pokrivenost, prikupljena sredstva i tačno gdje je novac otišao. Poslato u roku od 30 dana, bez traženja.",
@@ -176,7 +176,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     tabSponsor: "Be a sponsor",
     tabSponsors: "Our sponsors",
     tiersHeading: "Sponsorship tiers",
-    preferredBadge: "The tier that matters most",
+    preferredBadge: "Make an impact",
     selectTier: "Select this tier",
     tips: {
       report: "Photos with your team, participant numbers, media coverage, funds raised, and exactly where the money went. Sent within 30 days, unprompted.",
@@ -285,7 +285,7 @@ export const partnersContent: Record<Locale, PartnersContent> = {
     tabSponsor: "Станьте спонсором",
     tabSponsors: "Наши спонсоры",
     tiersHeading: "Уровни спонсорства",
-    preferredBadge: "Самый важный уровень",
+    preferredBadge: "Внесите вклад",
     selectTier: "Выбрать этот уровень",
     tips: {
       report: "Фотографии с вашей командой, число участников, освещение в СМИ, собранные средства и точно, куда ушли деньги. Отправляется в течение 30 дней, без запроса.",

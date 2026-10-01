@@ -29,11 +29,13 @@ export function SponsorTabs({ labels, tiers, sponsors }: { labels: { sponsor: st
   );
   return (
     <div>
-      <div role="tablist" className="inline-flex gap-1 rounded-lg bg-mist p-1">
-        {tab("tiers", labels.sponsor, "#nivoi")}
-        {tab("sponsors", labels.sponsors, "#sponzori")}
+      <div className="flex justify-center">
+        <div role="tablist" className="inline-flex gap-1 rounded-lg bg-mist p-1">
+          {tab("tiers", labels.sponsor, "#nivoi")}
+          {tab("sponsors", labels.sponsors, "#sponzori")}
+        </div>
       </div>
-      <div role="tabpanel" className="mt-6">{view === "tiers" ? tiers : sponsors}</div>
+      <div role="tabpanel" className="mt-10">{view === "tiers" ? tiers : sponsors}</div>
     </div>
   );
 }
