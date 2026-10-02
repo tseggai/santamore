@@ -16,6 +16,8 @@ export interface TierOption {
   amountCents: Cents;
   /** Last day offered (YYYY-MM-DD) — shown so early birds know the deadline. */
   until?: string | null;
+  /** The distance this price is for; null for every distance. */
+  distance?: string | null;
 }
 
 interface GuestRow {
@@ -67,7 +69,14 @@ export function RegistrationForm({
   const [phone, setPhone] = useState("");
   const [distance, setDistance] = useState(distances[0] ?? "");
   const [shirtSize, setShirtSize] = useState<(typeof SIZES)[number]>("M");
-  const [tierLabel, setTierLabel] = useState(tiers[0]?.label ?? "");
+  // The prices on offer for the chosen distance (a price without a distance is for all).
+  const tiersHere = tiers.filter((tier) => !tier.distance || tier.distance === (distance || null));
+  const [tierLabel, setTierLabel] = useState(tiersHere[0]?.label ?? "");
+  const chooseDistance = (next: string) => {
+    setDistance(next);
+    const offered = tiers.filter((tier) => !tier.distance || tier.distance === next);
+    if (!offered.some((tier) => tier.label === tierLabel)) setTierLabel(offered[0]?.label ?? "");
+  };
   const [accepted, setAccepted] = useState(false);
   const [needsBib, setNeedsBib] = useState(false);
   const [guests, setGuests] = useState<GuestRow[]>([]);
@@ -131,7 +140,7 @@ export function RegistrationForm({
       {distances.length > 0 ? (
         <div>
           <label htmlFor="regDistance" className={labelClass}>{t("distanceLabel")}</label>
-          <select id="regDistance" value={distance} onChange={(event) => setDistance(event.target.value)} className={fieldClass}>
+          <select id="regDistance" value={distance} onChange={(event) => chooseDistance(event.target.value)} className={fieldClass}>
             {distances.map((value) => (
               <option key={value} value={value}>{value}</option>
             ))}
@@ -139,11 +148,11 @@ export function RegistrationForm({
         </div>
       ) : null}
 
-      {tiers.length > 0 ? (
+      {tiersHere.length > 0 ? (
         <div>
           <label htmlFor="regTier" className={labelClass}>{t("tierLabel")}</label>
           <select id="regTier" value={tierLabel} onChange={(event) => setTierLabel(event.target.value)} className={fieldClass}>
-            {tiers.map((tier) => (
+            {tiersHere.map((tier) => (
               <option key={tier.label} value={tier.label}>
                 {tierText(tier)}
               </option>

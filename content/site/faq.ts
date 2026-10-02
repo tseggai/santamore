@@ -28,7 +28,7 @@ export const faqContent: Record<Locale, FaqContent> = {
     items: [
       {
         q: "Koliko od moje donacije stvarno stigne do korisnika?",
-        a: "100%. Svaka donacija ide u Fond za pomoć i isplaćuje se korisnicima bez ikakvih odbitaka. Naše troškove — plate, osiguranje, opremu — plaćaju sponzori i kotizacije, kroz odvojeni Operativni fond. Dva fonda se nikad ne miješaju.",
+        a: "100%. Svaka donacija ide u Fond za pomoć i isplaćuje se korisnicima bez ikakvih odbitaka. Naše troškove — plate, osiguranje, opremu — plaćaju sponzori, kroz odvojeni Operativni fond. Dva fonda se nikad ne miješaju.",
         link: { href: "/kako-radimo", label: "Kako radimo" },
       },
       {
@@ -38,8 +38,8 @@ export const faqContent: Record<Locale, FaqContent> = {
       },
       {
         q: "Ko odlučuje ko dobija pomoć?",
-        a: "Nezavisni odbor za dodjelu — tri do pet ljudi, većina nezaposlena kod nas — po objavljenim kriterijumima. Sukobi interesa se prijavljuju i izuzimaju. Ni osnivač ni direktor ne odlučuju o primaocima.",
-        link: { href: "/o-nama", label: "O strukturi" },
+        a: "Nezavisna Komisija za dodjelu sredstava — tri do pet ljudi, većina nezaposlena kod nas — po objavljenim kriterijumima. Sukobi interesa se prijavljuju i izuzimaju. Ni osnivač ni direktor ne odlučuju o primaocima.",
+        link: { href: "/kriterijumi-za-pomoc", label: "Pročitaj kriterijume" },
       },
       {
         q: "Mogu li dobiti povraćaj donacije?",
@@ -71,7 +71,7 @@ export const faqContent: Record<Locale, FaqContent> = {
       },
       {
         q: "Kome ide kotizacija za trku?",
-        a: "Kotizacije idu u Operativni fond — pokrivaju organizaciju događaja — i objavljuju se u registru kao i sve ostalo. Donacije prikupljene kroz događaj idu u Fond za pomoć, netaknute.",
+        a: "Kotizacije idu u Fond za pomoć, kao i donacije, i objavljuju se u registru kao i sve ostalo. Organizaciju događaja plaćaju sponzori, iz Operativnog fonda. Ako Upravni odbor za neki događaj odluči drugačije, to piše uz taj događaj.",
       },
       {
         q: "Kako tražim pomoć za sebe ili nekog drugog?",
@@ -93,7 +93,7 @@ export const faqContent: Record<Locale, FaqContent> = {
     items: [
       {
         q: "How much of my donation actually reaches beneficiaries?",
-        a: "100%. Every donation goes to the Impact Fund and is disbursed to beneficiaries with nothing deducted. Our costs — salaries, insurance, equipment — are paid by sponsors and entry fees, through the separate Operations Fund. The two funds are never mixed.",
+        a: "100%. Every donation goes to the Impact Fund and is disbursed to beneficiaries with nothing deducted. Our costs — salaries, insurance, equipment — are paid by sponsors, through the separate Operations Fund. The two funds are never mixed.",
         link: { href: "/kako-radimo", label: "How we work" },
       },
       {
@@ -104,7 +104,7 @@ export const faqContent: Record<Locale, FaqContent> = {
       {
         q: "Who decides who receives support?",
         a: "An independent Grants Committee — three to five people, majority not employed by us — deciding against published criteria. Conflicts are declared and recused. Neither the founder nor the director decides on recipients.",
-        link: { href: "/o-nama", label: "About the structure" },
+        link: { href: "/kriterijumi-za-pomoc", label: "Read the criteria" },
       },
       {
         q: "Can I get a refund on a donation?",
@@ -136,7 +136,7 @@ export const faqContent: Record<Locale, FaqContent> = {
       },
       {
         q: "Where does my race entry fee go?",
-        a: "Entry fees go to the Operations Fund — they cover putting the event on — and are published in the ledger like everything else. Donations raised through the event go to the Impact Fund, untouched.",
+        a: "Entry fees go to the Impact Fund, like donations, and are published in the ledger like everything else. Putting the event on is paid by sponsors, from the Operations Fund. If the Board decides otherwise for a particular event, it says so on that event.",
       },
       {
         q: "How do I apply for support, for myself or someone else?",
@@ -158,7 +158,7 @@ export const faqContent: Record<Locale, FaqContent> = {
     items: [
       {
         q: "Сколько из моего пожертвования действительно доходит до получателей?",
-        a: "100%. Каждое пожертвование идёт в Фонд помощи и выплачивается получателям без вычетов. Наши расходы — зарплаты, страховка, оборудование — оплачивают спонсоры и стартовые взносы через отдельный Операционный фонд. Два фонда никогда не смешиваются.",
+        a: "100%. Каждое пожертвование идёт в Фонд помощи и выплачивается получателям без вычетов. Наши расходы — зарплаты, страховка, оборудование — оплачивают спонсоры через отдельный Операционный фонд. Два фонда никогда не смешиваются.",
         link: { href: "/kako-radimo", label: "Как мы работаем" },
       },
       {
@@ -169,7 +169,7 @@ export const faqContent: Record<Locale, FaqContent> = {
       {
         q: "Кто решает, кто получит помощь?",
         a: "Независимый комитет по грантам — три–пять человек, большинство не работает у нас — по опубликованным критериям. Конфликты интересов декларируются, участники отводятся. Ни основатель, ни директор не решают, кто получит средства.",
-        link: { href: "/o-nama", label: "О структуре" },
+        link: { href: "/kriterijumi-za-pomoc", label: "Читать критерии" },
       },
       {
         q: "Можно ли вернуть пожертвование?",
@@ -201,7 +201,7 @@ export const faqContent: Record<Locale, FaqContent> = {
       },
       {
         q: "Куда идёт стартовый взнос за забег?",
-        a: "Взносы идут в Операционный фонд — они покрывают организацию события — и публикуются в реестре, как и всё остальное. Пожертвования, собранные через событие, идут в Фонд помощи нетронутыми.",
+        a: "Взносы идут в Фонд помощи, как и пожертвования, и публикуются в реестре, как и всё остальное. Организацию события оплачивают спонсоры из Операционного фонда. Если для какого-то события Правление решит иначе, это указано у события.",
       },
       {
         q: "Как попросить помощь — для себя или для другого?",

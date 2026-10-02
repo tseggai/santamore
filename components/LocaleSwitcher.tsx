@@ -19,10 +19,12 @@ const LABELS: Record<Locale, string> = {
  * closes. Each item is a real link so it works without JS-driven routing.
  */
 export default function LocaleSwitcher({
-  variant = "light",
+  variant = "light", direction = "down",
 }: {
-  /** "dark" sits on the sea footer. */
+  /** "dark" sits on the sea footer and over the hero photo. */
   variant?: "light" | "dark";
+  /** Where the menu opens; the footer, at the page's end, opens upward. */
+  direction?: "down" | "up";
 }) {
   const locale = useLocale() as Locale;
   const pathname = usePathname();
@@ -111,7 +113,7 @@ export default function LocaleSwitcher({
           aria-label={t("languageSwitcher")}
           onKeyDown={onMenuKey}
           className={`absolute z-40 mt-1.5 min-w-[160px] overflow-hidden rounded-lg border-[1.5px] bg-paper py-1 shadow-[0_8px_24px_rgba(54,67,75,0.14)] ${
-            dark ? "bottom-full left-0 mb-1.5 mt-0 border-line" : "right-0 border-line"
+            direction === "up" ? "bottom-full left-0 mb-1.5 mt-0 border-line" : "right-0 border-line"
           }`}
         >
           {routing.locales.map((candidate, index) => {

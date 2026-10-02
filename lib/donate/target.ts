@@ -40,7 +40,7 @@ interface FundraiserRow {
  * public views only (CLAUDE.md); the service role stays confined to the
  * pledge insert. Null when the slug is unknown or not public.
  */
-export async function loadDonateTarget(request: DonateRequest): Promise<DonateTargetData | null> {
+export async function loadDonateTarget(request: DonateRequest): Promise<DonateTargetData | "none" | null> {
   const common = {
     bank: getOrgBankDetails(),
     cardRailEnabled: process.env.NEXT_PUBLIC_CARD_RAIL_ENABLED === "true",
@@ -87,6 +87,8 @@ export async function loadDonateTarget(request: DonateRequest): Promise<DonateTa
     } else {
       const { data } = await supabase.from("v_public_campaigns").select(CAMPAIGN_COLUMNS).order("starts_at", { ascending: false, nullsFirst: false }).limit(20);
       row = flagshipCause((data ?? []) as CampaignRow[]);
+      // No open cause: the checkout says so instead of failing.
+      if (!row) return "none";
     }
     if (!row) return null;
     return {

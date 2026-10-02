@@ -12,7 +12,7 @@ import type { GalleryImage } from "@/components/gallery/GalleryGrid";
 import { PublicGallery } from "@/components/gallery/PublicGallery";
 import { ShareButton } from "@/components/ShareButton";
 import { galleryImageUrl } from "@/lib/storage";
-import { activeTiers, type EventTier } from "@/lib/events";
+import { activeTiers, tiersFor, type EventDistance, type EventTier } from "@/lib/events";
 import { formatCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, type Locale } from "@/i18n/routing";
@@ -53,7 +53,7 @@ export interface EventView {
   venue: string | null;
   registration_opens_at: string | null;
   registration_closes_at: string | null;
-  distances: string[];
+  distances: EventDistance[];
   tiers: EventTier[];
   offers_shirts?: boolean;
   going_count?: number;
@@ -128,6 +128,22 @@ export function EventPageView({
   const sameDay = starts && event.ends_at ? fmt(event.starts_at) === fmt(event.ends_at) : true;
   const daysLeft = starts ? Math.ceil((starts.getTime() - now) / 86_400_000) : null;
 
+  const tierList = (rows: EventTier[]) => (
+    <ul className="mt-2">
+      {rows.map((tier) => (
+        <li key={`${tier.distance ?? ""}:${tier.label}`} className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-2.5 text-[15px] last:border-b-0">
+          <span>
+            {tier.label}
+            {tier.until ? <span className="ml-2 text-[13px] text-black/55">{t("tierUntil", { date: fmt(tier.until) })}</span> : null}
+          </span>
+          <span className="font-mono font-semibold tabular-nums">
+            {tier.amount_cents === 0 ? t("free") : formatCents(tier.amount_cents, locale, { trimWholeCents: true })}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+
   const fact = (label: string, value: ReactNode) => (
     <div className="rounded-lg bg-mist px-4 py-3">
       <p className="type-eyebrow text-black/55">{label}</p>
@@ -179,7 +195,9 @@ export function EventPageView({
   const organizer = event.organizer_name?.trim() || null;
   const bibsLeft = external && !withOrganizer && event.bib_policy === "we_buy" ? Math.max(0, (event.bib_capacity ?? 0) - (event.bibs_claimed ?? 0)) : null;
   // Only tiers still on offer today; early-bird deadlines shown beside the price.
-  const tiersToday = withOrganizer ? [] : activeTiers(event.tiers);
+  // Prices still on offer today. With the organiser taking registrations they are shown for information only, not offered here.
+  const tiersShown = activeTiers(event.tiers);
+  const tiersToday = withOrganizer ? [] : tiersShown;
   const raceCta = external ? (withOrganizer ? t("runForUsCta") : t("registerCta")) : t("registerCta");
   const organizerCta = organizer ? t("registerWithCta", { name: organizer }) : t("organizerLink");
 
@@ -195,8 +213,8 @@ export function EventPageView({
             slug: event.slug,
             name: event.name,
             kind: event.kind,
-            distances: event.distances,
-            tiers: tiersToday.map((tier) => ({ label: tier.label, amountCents: tier.amount_cents, until: tier.until ?? null })),
+            distances: event.distances.map((d) => d.name),
+            tiers: tiersToday.map((tier) => ({ label: tier.label, amountCents: tier.amount_cents, until: tier.until ?? null, distance: tier.distance ?? null })),
             offersShirts: Boolean(event.offers_shirts),
             hosting: external ? "external" : "own",
             externalUrl: event.external_url ?? null,
@@ -242,7 +260,7 @@ export function EventPageView({
             )}
         {event.venue ? fact(t("factWhere"), event.venue) : null}
         {event.kind === "race" && event.distances.length > 0
-          ? fact(t("factDistances"), <span className="font-mono tabular-nums">{event.distances.join(" · ")}</span>)
+          ? fact(t("factDistances"), <a href="#distances" className="underline-offset-2 hover:underline">{t("distancesCount", { count: event.distances.length })}</a>)
           : null}
         {event.kind === "social" && (event.going_count ?? 0) > 0 ? fact(t("factGoing"), t("goingCount", { count: event.going_count ?? 0 })) : null}
         {external && organizer ? fact(t("factOrganizer"), organizer) : null}
@@ -372,22 +390,47 @@ export function EventPageView({
       })() : null}
 
       {/* 4 — the details, by kind */}
-      {event.kind !== "challenge" && tiersToday.length > 0 ? (
+      {event.kind === "race" && event.distances.length > 0 ? (
+        // Each distance is a card: its name, its places, and the prices that apply to it (its own and the general ones).
+        <section id="distances" className="mt-10 scroll-mt-24">
+          <h2 className="type-display text-2xl">{t("distancesHeading")}</h2>
+          {withOrganizer && tiersShown.length > 0 ? <p className="mt-2 text-[14px] text-black/60">{t("tiersOrganizerNote", { organizer: organizer || t("theOrganizer") })}</p> : null}
+          <div className="mt-4 grid items-start gap-3 sm:grid-cols-2">
+            {event.distances.map((d) => {
+              const rows = tiersFor(tiersShown, d.name);
+              return (
+                // The same shape as a sponsorship tier: name and the price on offer today, one line, then every price as a bullet.
+                <div key={d.name} className="rounded-lg bg-mist px-5 py-5">
+                  <div className="flex flex-wrap items-baseline justify-between gap-2">
+                    <h3 className="type-display text-xl">{d.name}</h3>
+                    {rows[0] ? <p className="font-mono text-[14px] tabular-nums text-sea">{rows[0].amount_cents === 0 ? t("free") : formatCents(rows[0].amount_cents, locale, { trimWholeCents: true })}</p> : null}
+                  </div>
+                  {d.capacity != null ? <p className="mt-2 text-[14.5px] leading-relaxed text-black/80">{t("placesOnDistance", { count: d.capacity })}</p> : null}
+                  {rows.length > 0 ? (
+                    <ul className="mt-3 space-y-1 text-[14px] leading-relaxed text-black/65">
+                      {rows.map((tier) => (
+                        <li key={`${tier.distance ?? ""}:${tier.label}`} className="flex gap-2">
+                          <span aria-hidden className="text-sea">•</span>
+                          <span>
+                            {tier.label}
+                            {tier.until ? <span className="text-black/55"> · {t("tierUntil", { date: fmt(tier.until) })}</span> : null}
+                            <span className="font-mono font-semibold tabular-nums text-black/80"> · {tier.amount_cents === 0 ? t("free") : formatCents(tier.amount_cents, locale, { trimWholeCents: true })}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
+          {event.offers_shirts ? <p className="mt-3 text-[14px] text-black/60">{t("shirtsNote")}</p> : null}
+        </section>
+      ) : event.kind !== "challenge" && tiersShown.length > 0 ? (
         <section className="mt-10">
           <h2 className="type-display text-2xl">{event.kind === "social" ? t("ticketsHeading") : t("tiersHeading")}</h2>
-          <ul className="mt-3 max-w-md">
-            {tiersToday.map((tier) => (
-              <li key={tier.label} className="flex items-baseline justify-between gap-3 border-b-[0.5px] border-line py-2.5 text-[15px] last:border-b-0">
-                <span>
-                  {tier.label}
-                  {tier.until ? <span className="ml-2 text-[13px] text-black/55">{t("tierUntil", { date: fmt(tier.until) })}</span> : null}
-                </span>
-                <span className="font-mono font-semibold tabular-nums">
-                  {tier.amount_cents === 0 ? t("free") : formatCents(tier.amount_cents, locale, { trimWholeCents: true })}
-                </span>
-              </li>
-            ))}
-          </ul>
+          {withOrganizer ? <p className="mt-2 text-[14px] text-black/60">{t("tiersOrganizerNote", { organizer: organizer || t("theOrganizer") })}</p> : null}
+          <div className="max-w-md">{tierList(tiersShown)}</div>
           {event.offers_shirts ? <p className="mt-3 text-[14px] text-black/60">{t("shirtsNote")}</p> : null}
         </section>
       ) : null}

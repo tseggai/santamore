@@ -1,281 +1,389 @@
-// /partneri editorial content — the seven-tier sheet, the 3.5% tax argument
-// and the four deliverables, verbatim-adjacent from the team guide. The
-// guide's target-company list is internal and NEVER published here.
-// ru drafted, flagged for native review like messages/ru.json.
+// /partneri editorial content — the sponsorship tiers, the 3.5% tax note and
+// the pledge form, from the team guide. The guide's target-company list is
+// internal and NEVER published here. ru drafted, flagged for native review
+// like messages/ru.json.
 
 import type { Locale } from "@/i18n/routing";
 
+export type TipKey = "report" | "team" | "handover";
+
 export interface PartnerTier {
+  /** Stable key, also what the pledge carries. */
+  id: string;
   name: string;
   price: string;
+  /** One line: what the tier is. */
   desc: string;
-  flagship?: boolean;
+  /**
+   * What the sponsor gets. A phrase written as [[key|words]] carries the tip
+   * named by the key (see PartnersContent.tips).
+   */
+  perks: string[];
+  /** The tier we ask for first: shown before the others, marked as preferred. */
+  preferred?: boolean;
 }
 
 export interface PartnersContent {
   heroEyebrow: string;
   heroTitle: string;
   heroLead: string;
-  taxHeading: string;
-  tax: string[];
+  taxNote: string;
+  /** The two views of the page: the tiers, and who sponsors us. */
+  tabSponsor: string;
+  tabSponsors: string;
   tiersHeading: string;
+  preferredBadge: string;
+  selectTier: string;
+  /** What a report, the entries and the hand-over mean, shown as tips in the perks. */
+  tips: Record<TipKey, string>;
   tiers: PartnerTier[];
-  deliverHeading: string;
-  deliverLead: string;
-  deliver: { title: string; desc: string }[];
-  formHeading: string;
-  formLead: string;
-  supportersHeading: string;
-  supportersLead: string;
-  supportersEmpty: string;
-  sponsorLabel: string;
+  sponsorsHeading: string;
+  sponsorsLead: string;
+  sponsorsEmpty: string;
+  yearLabel: string;
+  currentLabel: string;
   inKindLabel: string;
-  offersLabel: string;
-  cashTotalLabel: string;
+  /** The pledge form, opened from a tier. */
+  pledgeTitle: string;
+  pledgeLead: string;
+  tierLabel: string;
+  businessLabel: string;
+  repEmailLabel: string;
+  phoneLabel: string;
+  noteLabel: string;
+  noteHint: string;
+  pledgeButton: string;
+  pledgeSending: string;
+  pledgeDone: string;
+  pledgeDoneSub: string;
 }
 
 export const partnersContent: Record<Locale, PartnersContent> = {
   me: {
-    heroEyebrow: "Partneri",
-    heroTitle: "Vaši sponzori plaćaju naš tim, da donacije ne moraju.",
-    heroLead:
-      "Sponzorstva i kotizacije idu u Operativni fond — plate, osiguranje, oprema. Zato 100% svake donacije stiže do korisnika. Partner na svakoj stranici vidi tačno to, svojim imenom.",
-    taxHeading: "Argument koji stvarno radi: poreska olakšica",
-    tax: [
-      "Crnogorske kompanije i pojedinci mogu odbiti do 3,5% bruto prihoda za humanitarna, sportska, zdravstvena, kulturna i ekološka davanja. Većina to nikad ne iskoristi.",
-      "Nudimo način da iskoristite olakšicu koju već imate — lokalno, vidljivo, uz papirologiju koju će vaš računovođa prihvatiti.",
-    ],
-    tiersHeading: "Nivoi partnerstva",
+    heroEyebrow: "Sponzori",
+    heroTitle: "Budite sponzor",
+    heroLead: "Santamore je lokalni pokret sa sjedištem u Porto Montenegru koji organizuje događaje u duhu zdravog, aktivnog i veselog načina života, za humanitarne ciljeve u Crnoj Gori. Organizujemo i učestvujemo u trkama, vožnjama, izazovima, drugim sportskim takmičenjima i događajima kako bismo prikupili novac za ciljeve koje predlaže zajednica u Crnoj Gori. Sponzorstva finansiraju naš rad, pa 100% svake donacije, kotizacije i granta stiže do korisnika.",
+    taxNote: "Crnogorske kompanije i pojedinci mogu odbiti do 3,5% bruto prihoda za humanitarne svrhe. Ali većina to nikad ne iskoristi.",
+    tabSponsor: "Budite sponzor",
+    tabSponsors: "Naši sponzori",
+    tiersHeading: "Nivoi sponzorstva",
+    preferredBadge: "Napravi razliku",
+    selectTier: "Izaberi ovaj nivo",
+    tips: {
+      report: "Fotografije sa vašim timom, broj učesnika, medijska pokrivenost, prikupljena sredstva i tačno gdje je novac otišao. Poslato u roku od 30 dana, bez traženja.",
+      team: "Prijave uključuju mjesto za tim zaposlenih na timskoj stranici: vaši ljudi prikupljaju pod vašim imenom.",
+      handover: "Upoznajete ljude do kojih je vaš novac stigao. Ništa što napišemo ne vrijedi više od toga.",
+    },
     tiers: [
       {
-        name: "Core Cost partner",
-        price: "€10.000+ / god.",
-        desc: "Finansira naš tim. Imenovan na svakoj stranici: „Operacije Santamore finansira X, pa 100% donacija stiže do cilja.“ Ovo je nivo koji stvara naše plate.",
-        flagship: true,
+        id: "core",
+        name: "Core Cost sponzor",
+        price: "€25.000+",
+        desc: "Finansira rad koji stoji iza svakog cilja.",
+        perks: [
+          "Imenovan na svakoj stranici događaja i na mrežama kao sponzor",
+          "Premium brending na svim materijalima događaja u godini",
+          "Vrijeme na bini i [[team|20 prijava]] na svakom događaju",
+          "[[report|Izvještaj]] o svakoj kampanji i [[handover|poziv na svaku primopredaju]]",
+        ],
+        preferred: true,
       },
       {
-        name: "Title partner",
-        price: "€5.000 / događaj",
-        desc: "Ime uz događaj, logo na svakom broju i odijelu, brending na startu, vrijeme na bini, 20 prijava, tim zaposlenih uključen.",
+        id: "title",
+        name: "Title sponzor",
+        price: "€10.000",
+        desc: "Vodeće ime iza događaja cilja.",
+        perks: [
+          "Imenovan na svakoj stranici događaja na sajtu kao sponzor",
+          "Logo na materijalima jednog velikog događaja u godini",
+          "Vrijeme na bini i [[team|20 prijava]] na jednom velikom događaju u godini",
+          "[[report|Izvještaj]] o svakoj kampanji u godini",
+        ],
       },
       {
+        id: "gold",
         name: "Gold",
-        price: "€2.500",
-        desc: "Brending staze i prostora, logo na majicama, 10 prijava, objave na mrežama.",
+        price: "€5.000",
+        desc: "Vodeće ime na jednom velikom događaju.",
+        perks: [
+          "Imenovan na stranici jednog velikog događaja kao sponzor",
+          "Logo na materijalima jednog velikog događaja u godini",
+          "[[team|20 prijava]] na jednom velikom događaju u godini",
+          "[[report|Izvještaj]] o svakoj kampanji u godini",
+        ],
       },
       {
+        id: "silver",
         name: "Silver",
-        price: "€1.000",
-        desc: "Logo na materijalima, 5 prijava, brendirana stanica na stazi.",
+        price: "€2.000",
+        desc: "Vidljivo ime na jednom velikom događaju.",
+        perks: [
+          "Imenovan na stranici jednog događaja na sajtu kao sponzor",
+          "Logo na materijalima jednog velikog događaja u godini",
+          "[[team|10 prijava]] na jednom velikom događaju u godini",
+          "[[report|Izvještaj]] o svakoj kampanji u godini",
+        ],
       },
       {
+        id: "local",
         name: "Lokalni biznis",
         price: "€250–500",
-        desc: "Namjerno pristupačno, da se pridruže i pekara i stomatolog. Četrdeset ovakvih je €15.000 — i četrdeset firmi koje pričaju svojim mušterijama o nama.",
+        desc: "Pristupačno, da se pridruže i mali lokalni biznisi.",
+        perks: [
+          "Imenovan na stranici jednog događaja na sajtu kao sponzor",
+          "Logo na materijalima jednog velikog događaja u godini",
+          "[[team|5 prijava]] na jednom velikom događaju u godini",
+          "[[report|Izvještaj]] o jednom događaju u godini",
+        ],
       },
       {
-        name: "Match partner",
-        price: "bilo koji iznos",
-        desc: "Duplira donacije u zadatom periodu. Najkonvertibilnija stvar koju prodajemo — svaki donator osjeti da mu euro vrijedi dva.",
-      },
-      {
+        id: "inkind",
         name: "In kind",
         price: "procijenjeno",
-        desc: "Voda, voće, štampa, medicinsko obezbjeđenje, ozvučenje, mjerenje vremena, prostor, fotografija, odijela. Vrednujemo, knjižimo i priznajemo tačno kao gotovinu.",
+        desc: "Roba i usluge umjesto novca.",
+        perks: [
+          "Vrednujemo i knjižimo tačno kao gotovinu",
+          "Priznanje na nivou kojem vrijednost odgovara",
+          "Ime, logo i prijave srazmjerno novčanoj vrijednosti",
+          "[[report|Izvještaj]] srazmjerno novčanoj vrijednosti",
+        ],
       },
     ],
-    deliverHeading: "Nikome ne treba još jedan logo na baneru",
-    deliverLead:
-      "Ono što sponzor stvarno želi jeste priča koju njegovo rukovodstvo može ispričati, fotografije sa sopstvenim ljudima, nešto za zaposlene, i dokaz šta se desilo. Sve četvoro ugrađujemo u svaki paket — i isporučujemo bez požurivanja.",
-    deliver: [
-      {
-        title: "Izvještaj koji je njihov",
-        desc: "Fotografije sa njihovim timom, broj učesnika, medijska pokrivenost, prikupljena sredstva, i tačno gdje je novac otišao. Poslato u roku od 30 dana, bez traženja.",
-      },
-      {
-        title: "Njihovi zaposleni na timskoj stranici",
-        desc: "Svaki paket uključuje mjesto za tim zaposlenih. Osamnaest njihovih ljudi koji prikupljaju pobjeđuje jedan baner.",
-      },
-      {
-        title: "Poziv na primopredaju",
-        desc: "Upoznaju ljude do kojih je njihov novac stigao. Ništa što napišemo ne vrijedi više od toga.",
-      },
-      {
-        title: "Obnova postaje automatska",
-        desc: "Isporuči ovo četvoro bez požurivanja i sljedeći razgovor je formalnost.",
-      },
-    ],
-    supportersHeading: "Ko nas podržava",
-    supportersLead: "Organizacije iza događaja i izazova — novcem, robom ili ponudom za trkače.",
-    supportersEmpty: "Prvi partneri se objavljuju ovdje čim potpišemo.",
-    sponsorLabel: "Sponzor",
+    sponsorsHeading: "Naši sponzori",
+    sponsorsLead: "Organizacije iza događaja i izazova — novcem, robom ili ponudom za trkače.",
+    sponsorsEmpty: "Sponzori za ovu godinu objavljuju se ovdje čim potpišemo.",
+    yearLabel: "Godina",
+    currentLabel: "Tekuća",
     inKindLabel: "u robi",
-    cashTotalLabel: "u novčanim sponzorstvima do sada",
-    offersLabel: "Ponuda za trkače",
-    formHeading: "Postanite partner",
-    formLead:
-      "Ostavite kontakt i javljamo se u roku od dva radna dana — sa nivoima, kalendarom i primjerom izvještaja.",
+    pledgeTitle: "Obećaj sponzorstvo",
+    pledgeLead: "Ostavite podatke firme i javljamo se u roku od dva radna dana da dogovorimo detalje. Ovo nije obaveza — dogovor potvrđujemo ugovorom.",
+    tierLabel: "Nivo",
+    businessLabel: "Naziv firme",
+    repEmailLabel: "E-pošta predstavnika",
+    phoneLabel: "Telefon",
+    noteLabel: "Kratka poruka",
+    noteHint: "Nije obavezno — događaj koji vas zanima, pitanje, bilo šta.",
+    pledgeButton: "Obećaj sponzorstvo",
+    pledgeSending: "Šaljemo…",
+    pledgeDone: "Hvala — obećanje je stiglo.",
+    pledgeDoneSub: "Javljamo se u roku od dva radna dana sa kalendarom, primjerom izvještaja i nacrtom ugovora.",
   },
   en: {
-    heroEyebrow: "Partners",
-    heroTitle: "Our sponsors pay for our team, so donations don't have to.",
-    heroLead:
-      "Sponsorship and entry fees go to the Operations Fund — salaries, insurance, equipment. That is why 100% of every donation reaches beneficiaries. A partner sees exactly that, with their name on it, on every page.",
-    taxHeading: "The argument that actually works: the tax allowance",
-    tax: [
-      "Montenegrin companies and individuals may deduct up to 3.5% of gross income for humanitarian, sport, health, cultural and environmental giving. Most never use it.",
-      "We are offering a way to use an allowance you already have — locally, visibly, with paperwork your accountant will accept.",
-    ],
-    tiersHeading: "Partnership tiers",
+    heroEyebrow: "Sponsors",
+    heroTitle: "Be a sponsor",
+    heroLead: "Santamore is a local movement based in Porto Montenegro that organises events around a wellness-focused, active and festive lifestyle, for charitable causes in Montenegro. We organise and take part in races, rides, challenges, other fitness competitions and events to raise money for crowdsourced causes within Montenegro. Sponsorships fund our operations so that 100% of every donation, entry fee and grant reaches the beneficiaries.",
+    taxNote: "Montenegrin companies and individuals may deduct up to 3.5% of gross income for a humanitarian cause. But most never use it.",
+    tabSponsor: "Be a sponsor",
+    tabSponsors: "Our sponsors",
+    tiersHeading: "Sponsorship tiers",
+    preferredBadge: "Make an impact",
+    selectTier: "Select this tier",
+    tips: {
+      report: "Photos with your team, participant numbers, media coverage, funds raised, and exactly where the money went. Sent within 30 days, unprompted.",
+      team: "Entries include a slot for an employee team on a team page: your people fundraising under your name.",
+      handover: "You meet the people your money reached. Nothing we write is worth more than that.",
+    },
     tiers: [
       {
-        name: "Core Cost Partner",
-        price: "€10,000+ / yr",
-        desc: "Funds our team. Named on every page: “Santamore's operations are funded by X, so 100% of donations reach the cause.” This is the tier that creates our salaries.",
-        flagship: true,
+        id: "core",
+        name: "Core Cost Sponsor",
+        price: "€25,000+",
+        desc: "Funds the work behind every cause.",
+        perks: [
+          "Named on every event page and social media as the sponsor",
+          "Premium branding on every event material of the year",
+          "Stage time and [[team|20 entries]] at every event",
+          "A [[report|report]] on every campaign and an [[handover|invite to every hand-over]]",
+        ],
+        preferred: true,
       },
       {
-        name: "Title Partner",
-        price: "€5,000 / event",
-        desc: "Named in association, logo on every bib and suit, start-line branding, stage time, 20 entries, employee team included.",
+        id: "title",
+        name: "Title Sponsor",
+        price: "€10,000",
+        desc: "The lead name behind the cause's events.",
+        perks: [
+          "Named on every event page of the site as a sponsor",
+          "Logo on materials of one major event of the year",
+          "Stage time and [[team|20 entries]] at one major event of the year",
+          "A [[report|report]] on every campaign of the year",
+        ],
       },
       {
+        id: "gold",
         name: "Gold",
-        price: "€2,500",
-        desc: "Course and venue branding, logo on shirts, 10 entries, social features.",
+        price: "€5,000",
+        desc: "A leading name at one major event.",
+        perks: [
+          "Named on one major event page as a sponsor",
+          "Logo on materials of one major event of the year",
+          "[[team|20 entries]] at one major event of the year",
+          "A [[report|report]] on every campaign of the year",
+        ],
       },
       {
+        id: "silver",
         name: "Silver",
-        price: "€1,000",
-        desc: "Logo on materials, 5 entries, a branded station on the course.",
+        price: "€2,000",
+        desc: "A visible name at one major event.",
+        perks: [
+          "Named on one event page of the site as a sponsor",
+          "Logo on materials of one major event of the year",
+          "[[team|10 entries]] at one major event of the year",
+          "A [[report|report]] on every campaign of the year",
+        ],
       },
       {
+        id: "local",
         name: "Local Business",
         price: "€250–500",
-        desc: "Deliberately cheap so the bakery and the dentist can join. Forty of these is €15,000 and forty businesses telling their customers about us.",
+        desc: "Affordable, so small local businesses can join.",
+        perks: [
+          "Named on one event page of the site as a sponsor",
+          "Logo on materials of one major event of the year",
+          "[[team|5 entries]] at one major event of the year",
+          "A [[report|report]] on one event of the year",
+        ],
       },
       {
-        name: "Match Partner",
-        price: "any amount",
-        desc: "Matches donations in a set window. The highest-converting thing we can sell — it makes every donor feel their euro is worth two.",
-      },
-      {
+        id: "inkind",
         name: "In kind",
         price: "valued",
-        desc: "Water, fruit, printing, medical cover, sound, timing, venue, photography, suits. We value it, log it and recognise it exactly like cash.",
+        desc: "Goods and services instead of cash.",
+        perks: [
+          "Valued and booked exactly like cash",
+          "Credited at the tier the value matches",
+          "Name, logo and entries commensurate with the cash value",
+          "A [[report|report]] commensurate with the cash value",
+        ],
       },
     ],
-    deliverHeading: "Nobody needs another logo placement",
-    deliverLead:
-      "What a sponsor actually wants is a story their leadership can tell, photographs with their own people in them, something for their staff to do, and proof of what happened. So we build all four into every package — and deliver them without being chased.",
-    deliver: [
-      {
-        title: "A report that's theirs",
-        desc: "Photos featuring their team, participation numbers, media coverage, funds raised, and exactly where the money went. Sent within 30 days, unprompted.",
-      },
-      {
-        title: "Their staff on a team page",
-        desc: "Every package includes an employee team slot. Eighteen of their people fundraising beats one banner.",
-      },
-      {
-        title: "An invitation to the handover",
-        desc: "They meet the people their money reached. Nothing we write is worth more than that.",
-      },
-      {
-        title: "Renewal becomes automatic",
-        desc: "Deliver these four without being asked and next year's conversation is a formality.",
-      },
-    ],
-    supportersHeading: "Who supports us",
-    supportersLead: "The organisations behind the events and challenges — with money, in kind, or an offer for runners.",
-    supportersEmpty: "The first partners appear here as soon as we sign.",
-    sponsorLabel: "Sponsor",
+    sponsorsHeading: "Our sponsors",
+    sponsorsLead: "The organisations behind the events and challenges — with money, goods or an offer for runners.",
+    sponsorsEmpty: "This year's sponsors are published here as soon as we sign.",
+    yearLabel: "Year",
+    currentLabel: "Current",
     inKindLabel: "in kind",
-    cashTotalLabel: "in cash sponsorships so far",
-    offersLabel: "Offer for runners",
-    formHeading: "Become a partner",
-    formLead:
-      "Leave your details and we reply within two working days — with the tiers, the calendar and a sample report.",
+    pledgeTitle: "Pledge a sponsorship",
+    pledgeLead: "Leave your company's details and we reply within two working days to settle the specifics. This is not a commitment — the agreement is confirmed by contract.",
+    tierLabel: "Tier",
+    businessLabel: "Business name",
+    repEmailLabel: "Representative's email",
+    phoneLabel: "Phone",
+    noteLabel: "A short note",
+    noteHint: "Optional — the event you have in mind, a question, anything.",
+    pledgeButton: "Pledge sponsorship",
+    pledgeSending: "Sending…",
+    pledgeDone: "Thank you — your pledge is in.",
+    pledgeDoneSub: "We reply within two working days with the calendar, a sample report and a draft agreement.",
   },
   ru: {
-    heroEyebrow: "Партнёры",
-    heroTitle: "Наши спонсоры оплачивают нашу команду, чтобы пожертвованиям не пришлось.",
-    heroLead:
-      "Спонсорство и стартовые взносы идут в Операционный фонд — зарплаты, страховка, оборудование. Именно поэтому 100% каждого пожертвования доходит до получателей. Партнёр видит ровно это, со своим именем, на каждой странице.",
-    taxHeading: "Аргумент, который действительно работает: налоговый вычет",
-    tax: [
-      "Черногорские компании и частные лица могут вычесть до 3,5% валового дохода на гуманитарные, спортивные, медицинские, культурные и экологические цели. Большинство этим никогда не пользуется.",
-      "Мы предлагаем способ использовать вычет, который у вас уже есть — на месте, заметно, с документами, которые примет ваш бухгалтер.",
-    ],
-    tiersHeading: "Уровни партнёрства",
+    heroEyebrow: "Спонсоры",
+    heroTitle: "Станьте спонсором",
+    heroLead: "Santamore — местное движение из Порто-Монтенегро, которое организует события в духе здорового, активного и праздничного образа жизни ради благотворительных целей в Черногории. Мы организуем и участвуем в забегах, велозаездах, челленджах, других спортивных соревнованиях и событиях, чтобы собирать деньги на цели, предложенные сообществом в Черногории. Спонсорство финансирует нашу работу, чтобы 100% каждого пожертвования, взноса за участие и гранта доходило до получателей.",
+    taxNote: "Черногорские компании и физические лица могут вычесть до 3,5% валового дохода на гуманитарные цели. Но большинство этим никогда не пользуется.",
+    tabSponsor: "Станьте спонсором",
+    tabSponsors: "Наши спонсоры",
+    tiersHeading: "Уровни спонсорства",
+    preferredBadge: "Внесите вклад",
+    selectTier: "Выбрать этот уровень",
+    tips: {
+      report: "Фотографии с вашей командой, число участников, освещение в СМИ, собранные средства и точно, куда ушли деньги. Отправляется в течение 30 дней, без запроса.",
+      team: "Регистрации включают место для команды сотрудников на командной странице: ваши люди собирают средства под вашим именем.",
+      handover: "Вы встречаетесь с людьми, до которых дошли ваши деньги. Ничто из написанного нами не стоит больше.",
+    },
     tiers: [
       {
-        name: "Core Cost Partner",
-        price: "€10 000+ / год",
-        desc: "Финансирует нашу команду. Имя на каждой странице: «Операции Santamore финансирует X, поэтому 100% пожертвований доходит до цели». Этот уровень создаёт наши зарплаты.",
-        flagship: true,
+        id: "core",
+        name: "Core Cost Sponsor",
+        price: "€25 000+",
+        desc: "Финансирует работу, стоящую за каждой целью.",
+        perks: [
+          "Назван на каждой странице события и в соцсетях как спонсор",
+          "Премиальный брендинг на всех материалах событий года",
+          "Время на сцене и [[team|20 регистраций]] на каждом событии",
+          "[[report|Отчёт]] о каждой кампании и [[handover|приглашение на каждую передачу]]",
+        ],
+        preferred: true,
       },
       {
-        name: "Title Partner",
-        price: "€5 000 / событие",
-        desc: "Имя рядом с событием, логотип на каждом номере и костюме, брендинг на старте, время на сцене, 20 слотов, команда сотрудников включена.",
+        id: "title",
+        name: "Title Sponsor",
+        price: "€10 000",
+        desc: "Главное имя за событиями цели.",
+        perks: [
+          "Назван на каждой странице события на сайте как спонсор",
+          "Логотип на материалах одного крупного события года",
+          "Время на сцене и [[team|20 регистраций]] на одном крупном событии года",
+          "[[report|Отчёт]] о каждой кампании года",
+        ],
       },
       {
+        id: "gold",
         name: "Gold",
-        price: "€2 500",
-        desc: "Брендинг трассы и площадки, логотип на футболках, 10 слотов, публикации в соцсетях.",
+        price: "€5 000",
+        desc: "Ведущее имя на одном крупном событии.",
+        perks: [
+          "Назван на странице одного крупного события как спонсор",
+          "Логотип на материалах одного крупного события года",
+          "[[team|20 регистраций]] на одном крупном событии года",
+          "[[report|Отчёт]] о каждой кампании года",
+        ],
       },
       {
+        id: "silver",
         name: "Silver",
-        price: "€1 000",
-        desc: "Логотип на материалах, 5 слотов, брендированная станция на трассе.",
+        price: "€2 000",
+        desc: "Заметное имя на одном крупном событии.",
+        perks: [
+          "Назван на странице одного события на сайте как спонсор",
+          "Логотип на материалах одного крупного события года",
+          "[[team|10 регистраций]] на одном крупном событии года",
+          "[[report|Отчёт]] о каждой кампании года",
+        ],
       },
       {
+        id: "local",
         name: "Местный бизнес",
         price: "€250–500",
-        desc: "Сознательно недорого, чтобы присоединились и пекарня, и стоматолог. Сорок таких — это €15 000 и сорок компаний, рассказывающих о нас своим клиентам.",
+        desc: "Доступно, чтобы присоединился и малый местный бизнес.",
+        perks: [
+          "Назван на странице одного события на сайте как спонсор",
+          "Логотип на материалах одного крупного события года",
+          "[[team|5 регистраций]] на одном крупном событии года",
+          "[[report|Отчёт]] об одном событии года",
+        ],
       },
       {
-        name: "Match Partner",
-        price: "любая сумма",
-        desc: "Удваивает пожертвования в заданном окне. Самое конверсионное, что мы можем предложить — каждый донор чувствует, что его евро стоит два.",
-      },
-      {
-        name: "In kind",
+        id: "inkind",
+        name: "Натурой",
         price: "по оценке",
-        desc: "Вода, фрукты, печать, медицинское обеспечение, звук, хронометраж, площадка, фотография, костюмы. Оцениваем, учитываем и признаём ровно как деньги.",
+        desc: "Товары и услуги вместо денег.",
+        perks: [
+          "Оцениваем и учитываем точно так же, как деньги",
+          "Указываем на уровне, которому соответствует стоимость",
+          "Имя, логотип и регистрации соразмерно денежной стоимости",
+          "[[report|Отчёт]] соразмерно денежной стоимости",
+        ],
       },
     ],
-    deliverHeading: "Никому не нужен ещё один логотип на баннере",
-    deliverLead:
-      "Что спонсор хочет на самом деле: историю, которую может рассказать его руководство, фотографии со своими людьми, занятие для сотрудников и доказательство того, что произошло. Мы встраиваем все четыре в каждый пакет — и доставляем без напоминаний.",
-    deliver: [
-      {
-        title: "Отчёт, который принадлежит им",
-        desc: "Фото с их командой, число участников, освещение в медиа, собранные средства и точно, куда ушли деньги. Отправляется в течение 30 дней, без запроса.",
-      },
-      {
-        title: "Их сотрудники на командной странице",
-        desc: "Каждый пакет включает слот для команды сотрудников. Восемнадцать их людей со сбором побеждают один баннер.",
-      },
-      {
-        title: "Приглашение на передачу",
-        desc: "Они встречают людей, до которых дошли их деньги. Ничто из написанного нами не стоит больше.",
-      },
-      {
-        title: "Продление становится автоматическим",
-        desc: "Доставьте эти четыре без напоминания — и разговор в следующем году будет формальностью.",
-      },
-    ],
-    supportersHeading: "Кто нас поддерживает",
-    supportersLead: "Организации за событиями и челленджами — деньгами, натурой или предложением для бегунов.",
-    supportersEmpty: "Первые партнёры появятся здесь, как только подпишем.",
-    sponsorLabel: "Спонсор",
+    sponsorsHeading: "Наши спонсоры",
+    sponsorsLead: "Организации, стоящие за событиями и челленджами, — деньгами, товарами или предложением для бегунов.",
+    sponsorsEmpty: "Спонсоры этого года появятся здесь, как только мы подпишем договор.",
+    yearLabel: "Год",
+    currentLabel: "Текущий",
     inKindLabel: "натурой",
-    cashTotalLabel: "денежных спонсорств на сегодня",
-    offersLabel: "Предложение для бегунов",
-    formHeading: "Стать партнёром",
-    formLead:
-      "Оставьте контакты — ответим в течение двух рабочих дней: уровни, календарь и пример отчёта.",
+    pledgeTitle: "Обещать спонсорство",
+    pledgeLead: "Оставьте данные компании, и мы ответим в течение двух рабочих дней, чтобы согласовать детали. Это не обязательство — договорённость подтверждается договором.",
+    tierLabel: "Уровень",
+    businessLabel: "Название компании",
+    repEmailLabel: "E-mail представителя",
+    phoneLabel: "Телефон",
+    noteLabel: "Короткое сообщение",
+    noteHint: "Необязательно — событие, которое вас интересует, вопрос, что угодно.",
+    pledgeButton: "Обещать спонсорство",
+    pledgeSending: "Отправляем…",
+    pledgeDone: "Спасибо — обещание получено.",
+    pledgeDoneSub: "Мы ответим в течение двух рабочих дней с календарём, примером отчёта и проектом договора.",
   },
 };

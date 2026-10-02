@@ -10,10 +10,14 @@ import type { Locale } from "@/i18n/routing";
 // Every result lands in an editor for a human to read before it is saved;
 // nothing is published by this module.
 
-export const LANGUAGE_NAMES: Record<Locale, string> = {
+/** The site's locales, plus Turkish for the registration pack. */
+export type TranslateLang = Locale | "tr";
+
+export const LANGUAGE_NAMES: Record<TranslateLang, string> = {
   me: "Montenegrin (Latin script, ijekavian)",
   en: "English",
   ru: "Russian",
+  tr: "Turkish",
 };
 
 const MODEL = process.env.ANTHROPIC_MODEL || "claude-opus-5";
@@ -35,7 +39,7 @@ export function describeError(error: unknown): string {
   return error instanceof Error ? error.message : "unknown";
 }
 
-function prompt(from: Locale, to: Locale, fields: Record<string, string>): string {
+function prompt(from: TranslateLang, to: TranslateLang, fields: Record<string, string>): string {
   const parts = Object.entries(fields).map(([key, text]) => `FIELD ${key}:\n${text || "(empty)"}`);
   return `Translate from ${LANGUAGE_NAMES[from]} to ${LANGUAGE_NAMES[to]}. Return the same field keys.\n\n${parts.join("\n\n")}`;
 }
@@ -44,7 +48,7 @@ function prompt(from: Locale, to: Locale, fields: Record<string, string>): strin
  * Translate a set of named text fields. Structured output first; if the
  * API rejects that shape, plain JSON in the text. Empty fields stay empty.
  */
-export async function translateFieldsWithClaude(from: Locale, to: Locale, fields: Record<string, string>): Promise<Record<string, string>> {
+export async function translateFieldsWithClaude(from: TranslateLang, to: TranslateLang, fields: Record<string, string>): Promise<Record<string, string>> {
   const keys = Object.keys(fields).filter((key) => fields[key].trim() !== "");
   if (keys.length === 0) return {};
   const subset = Object.fromEntries(keys.map((key) => [key, fields[key]]));

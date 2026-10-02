@@ -3,6 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { BeneficiaryForm } from "@/components/forms/BeneficiaryForm";
+import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
 export async function generateMetadata({
@@ -44,6 +45,9 @@ export default async function BeneficiaryApplicationPage({
           </li>
         ))}
       </ol>
+      <p className="mt-4 text-[14.5px] text-black/70">
+        <Link href="/kriterijumi-za-pomoc" className="font-semibold text-sea underline-offset-4 hover:underline">{t("criteriaLink")} →</Link>
+      </p>
 
       <div className="mt-8">
         <BeneficiaryForm />

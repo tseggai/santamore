@@ -178,6 +178,86 @@
     list-style: decimal;
     padding-left: 1.4rem;
   }
+  /* The legal pages and the console's Rules section: documents built from docs/legal/governance. */
+  .prose-legal {
+    font-size: 15.5px;
+    line-height: 1.65;
+    color: rgba(0, 0, 0, 0.85);
+  }
+  .prose-legal h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1.25;
+    margin-top: 2.25rem;
+    color: #000;
+  }
+  .prose-legal h3 {
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: 1.5rem;
+    color: #000;
+  }
+  .prose-legal p,
+  .prose-legal ul,
+  .prose-legal ol,
+  .prose-legal .tablewrap {
+    margin-top: 0.75rem;
+  }
+  .prose-legal ul {
+    list-style: disc;
+    padding-left: 1.4rem;
+  }
+  .prose-legal ol {
+    list-style: decimal;
+    padding-left: 1.6rem;
+  }
+  .prose-legal li {
+    margin-top: 0.35rem;
+  }
+  .prose-legal .tablewrap {
+    overflow-x: auto;
+  }
+  .prose-legal table {
+    border-collapse: collapse;
+    font-size: 14px;
+    min-width: 100%;
+  }
+  .prose-legal th,
+  .prose-legal td {
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.25);
+    padding: 0.4rem 0.6rem;
+    text-align: left;
+    vertical-align: top;
+  }
+  .prose-legal th {
+    background: var(--color-mist);
+    font-weight: 700;
+  }
+  .prose-legal code {
+    font-size: 13px;
+    background: var(--color-mist);
+    padding: 0 0.25em;
+    border-radius: 3px;
+  }
+  /* Side by side in the console: the English twin under each Montenegrin block, or one language alone. */
+  /* In the console a [[PLACEHOLDER]] is a blank still to complete: blue, as in the registration forms. */
+  .prose-legal .todo {
+    color: #0b57d0;
+    background: rgba(11, 87, 208, 0.07);
+    border-radius: 3px;
+    padding: 0 0.15em;
+  }
+  .prose-legal .en {
+    color: rgba(0, 0, 0, 0.6);
+  }
+  .prose-legal[data-show="me"] > .en,
+  .prose-legal[data-show="en"] > :not(.en) {
+    display: none;
+  }
+  .prose-legal[data-show="en"] > .en {
+    color: rgba(0, 0, 0, 0.85);
+  }
   .prose-news a {
     color: var(--color-sea);
     text-decoration: underline;

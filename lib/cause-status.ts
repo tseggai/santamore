@@ -46,10 +46,10 @@ export function openFirst<T extends CauseFigures>(causes: T[], now: number = Dat
 
 /**
  * The cause a bare Donate button gives to: the open one that started
- * most recently, else the most recent cause of all. Rows arrive newest
- * first, so the first open row wins.
+ * most recently. A completed cause takes no more gifts, so with none open
+ * there is no flagship and the button says so.
  */
 export function flagshipCause<T extends CauseFigures & { starts_at: string | null }>(causes: T[], now: number = Date.now()): T | null {
   const newestFirst = [...causes].sort((a, b) => (b.starts_at ?? "").localeCompare(a.starts_at ?? ""));
-  return newestFirst.find((cause) => !causeState(cause, now).completed) ?? newestFirst[0] ?? null;
+  return newestFirst.find((cause) => !causeState(cause, now).completed) ?? null;
 }

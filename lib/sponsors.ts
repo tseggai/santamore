@@ -42,10 +42,18 @@ export interface DonorEntry {
   gifts: GiftDetail[];
 }
 
-/** Biggest cash gift first, then in-kind, then offers only; names break ties. */
+/** The tiers in the order the partners page sells them; anything unnamed sorts last. */
+const TIER_RANK = ["core", "founding", "title", "gold", "silver", "local", "bronze", "match", "in kind", "inkind"];
+export function tierRank(tiers: string[]): number {
+  const ranks = tiers.map((tier) => TIER_RANK.findIndex((key) => tier.toLowerCase().includes(key))).filter((i) => i >= 0);
+  return ranks.length ? Math.min(...ranks) : TIER_RANK.length;
+}
+
+/** Highest tier first, then the biggest cash gift, then in-kind, then offers only; names break ties. */
 export function sortSponsors<T extends PublicSponsor>(rows: T[]): T[] {
   return [...rows].sort(
     (a, b) =>
+      tierRank(a.tiers) - tierRank(b.tiers) ||
       b.cash_cents - a.cash_cents ||
       Number(b.in_kind) - Number(a.in_kind) ||
       b.offers - a.offers ||

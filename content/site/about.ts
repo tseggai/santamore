@@ -90,7 +90,7 @@ export const aboutContent: Record<Locale, AboutContent> = {
     ],
     planHeading: "Plan od 100%",
     plan: [
-      "Svaki euro donacija ide korisnicima. Ništa se ne odbija — ni za plate, ni za opremu, ni za zabavu. Operativne troškove plaćaju sponzori, kotizacije i grantovi, iz odvojenog fonda koji objavljujemo pored prvog.",
+      "Svaki euro donacija ide korisnicima. Ništa se ne odbija — ni za plate, ni za opremu, ni za zabavu. Kotizacije i grantovi idu u isti fond kao donacije. Operativne troškove plaćaju sponzori, iz odvojenog fonda koji objavljujemo pored prvog.",
       "Transparentnost se ne završava prikupljanjem. Sredstva predajemo u roku od dvije do tri nedjelje nakon događaja, da bi stigla tamo gdje su najpotrebnija dok su još potrebna — i svaku predaju objavljujemo u javnoj knjizi, sa dokumentacijom.",
     ],
     teamHeading: "Tim",
@@ -153,7 +153,7 @@ export const aboutContent: Record<Locale, AboutContent> = {
     ],
     planHeading: "The 100% plan",
     plan: [
-      "Every euro donated goes to beneficiaries. Nothing is deducted — not for salaries, not for equipment, not for the party. Operating costs are paid by sponsors, entry fees and grants, from a separate fund we publish beside the first.",
+      "Every euro donated goes to beneficiaries. Nothing is deducted — not for salaries, not for equipment, not for the party. Entry fees and grants go to the same fund as donations. Operating costs are paid by sponsors, from a separate fund we publish beside the first.",
       "Transparency doesn't end with fundraising. We hand funds over within two to three weeks of an event, so they arrive where they are needed while they are still needed — and we publish every hand-over in the public ledger, with the paperwork.",
     ],
     teamHeading: "The team",
@@ -216,7 +216,7 @@ export const aboutContent: Record<Locale, AboutContent> = {
     ],
     planHeading: "План 100%",
     plan: [
-      "Каждый пожертвованный евро идёт получателям. Ничего не вычитается — ни на зарплаты, ни на оборудование, ни на праздник. Операционные расходы оплачивают спонсоры, взносы и гранты — из отдельного фонда, который мы публикуем рядом с первым.",
+      "Каждый пожертвованный евро идёт получателям. Ничего не вычитается — ни на зарплаты, ни на оборудование, ни на праздник. Взносы и гранты идут в тот же фонд, что и пожертвования. Операционные расходы оплачивают спонсоры — из отдельного фонда, который мы публикуем рядом с первым.",
       "Прозрачность не заканчивается сбором. Мы передаём средства в течение двух–трёх недель после события, чтобы они пришли туда, где нужны, пока ещё нужны — и публикуем каждую передачу в открытой книге, с документами.",
     ],
     teamHeading: "Команда",

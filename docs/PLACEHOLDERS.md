@@ -6,23 +6,23 @@ text are never invented — see CLAUDE.md.
 
 | Placeholder | Where | Needed for |
 |---|---|---|
-| Full registered organisation name | `messages/*.json` → `footer.orgName` | Footer, impressum |
-| Registered address (Tivat) | `messages/*.json` → `footer.orgAddress` | Footer, impressum |
-| Registration number + PIB | `messages/*.json` → `footer.orgId` | Footer, impressum, Monri onboarding |
-| IBAN | `messages/*.json` → `footer.iban` | Footer, SEPA rail (Task 3), impressum |
-| Contact email | `messages/*.json` → `footer.email` | Footer, privacy policy contact |
-| Accepted card brand logos | `messages/*.json` → `footer.cards` | Acquirer requirement (Task 6 footer) |
+| ~~Full registered organisation name~~ **SANTAMORE NVU** (2026-09-25) | `messages/*.json` → `footer.orgName`, `content/legal/` | Footer, impressum |
+| ~~Registered address (Tivat)~~ **Teuta 113, Porto Montenegro, 85320 Tivat** (2026-09-25) | `messages/*.json` → `footer.orgAddress`, `content/legal/` | Footer, impressum |
+| Registration number + PIB — footer says "coming soon" until they exist | `messages/*.json` → `footer.orgId`, `content/legal/impressum.ts` | Footer, impressum, Monri onboarding |
+| IBAN — dropped from the footer (owner, 2026-09-25); still a placeholder on the impressum | `content/legal/impressum.ts` | SEPA rail (Task 3), impressum |
+| Contact email — dropped from the footer (owner, 2026-09-25); still a placeholder in the legal pages | `content/legal/*.ts` | Privacy policy contact, impressum |
+| ~~Accepted card brand logos~~ Visa, Mastercard, Maestro, American Express, Diners Club in `public/brand/cards/` (2026-09-25) — confirm the list against the Monri contract | `components/Footer.tsx`, `content/legal/impressum.ts` | Acquirer requirement (Task 6 footer) |
 | Russian copy — native review | all of `messages/ru.json` (see its `_review` key) | Launch decision per brief §15.8 |
 | SVG logo + icon | `public/brand/` has PNG only; header/footer/favicon use PNG for now | Crisp rendering; brief says ask, don't trace |
 | Santa Run 2026 facts: date (seeded 20.12. 11:00), venue, capacity (seeded 500), registration window, price tiers, campaign goal (seeded €30.000), beneficiary summary | `supabase/seed.sql` | Real event details per brief §15.5 |
 | `[[SAMPLE]]` donation + disbursement rows (fixed UUIDs `4000…0001` / `5000…0001`) | `supabase/seed.sql` — exist only for RLS tests | **Delete before launch** with `supabase/cleanup_samples.sql` |
-| Registered org name, IBAN and BIC as env vars | `NEXT_PUBLIC_ORG_NAME` / `NEXT_PUBLIC_ORG_IBAN` / `NEXT_PUBLIC_ORG_BIC` (`.env.example`; also consolidate `footer.iban` / `footer.orgName` once real) | SEPA panel, EPC QR, transfer-instructions email (Task 3) |
+| Registered org name, IBAN and BIC as env vars | `NEXT_PUBLIC_ORG_NAME` / `NEXT_PUBLIC_ORG_IBAN` / `NEXT_PUBLIC_ORG_BIC` (`.env.example`; also consolidate `footer.iban` / `footer.orgName` once real). The IBAN must pass the mod-97 check; anything else (a note, a placeholder) keeps the site in pledge mode: gifts are recorded as pledges and staff send the transfer details from Money › Incoming once the real IBAN is set | SEPA panel, EPC QR, transfer-instructions email (Task 3) |
 | BIC | env var above — brief §15.4 asks for IBAN **and** BIC | EPC QR payload — **required**: Montenegro is non-EEA, so EPC069-12 §2.2 mandates the BIC (no BIC → no QR, manual fallback only); impressum |
 | Resend account + verified sending domain (SPF/DKIM/DMARC) + `EMAIL_FROM` | `.env.example` → `RESEND_API_KEY`, `EMAIL_FROM`; emails no-op until set | Pledge instructions + receipt emails (Task 3) |
 | ~~`docs/vendor/epc-qr.md`~~ **saved** (EPC069-12 v3.1, from the team's copy) and `lib/epc-qr.ts` verified against it — reference kept in the **unstructured** remittance element (brief §8 deviation, flagged); BIC enforced for non-EEA IBANs | `docs/vendor/epc-qr.md` | Remaining: **test the QR in ≥2 real EU banking apps** before launch |
 | Sample bank-statement CSV from our actual bank | admin reconciliation column mapping (`components/admin/ReconciliationTool.tsx`) guesses headers; a real export lets us preset it | Smoother reconciliation (Task 3) |
 | Russian donate/admin/email/dashboard strings — native review | `messages/ru.json` (new `donate.*`, `email.*`, `admin.*`, `dashboard.*`, `leaderboard.*` keys, drafted) | Same `_review` flag as the rest of ru.json |
-| Legal drafts — every `[[PLACEHOLDER]]` inside `content/legal/*.ts` + lawyer review of all 8 | `content/legal/` | Go-live (acquirer inspects these pages) |
+| Legal documents — every `[[PLACEHOLDER]]` inside `docs/legal/governance/<id>.{me,en,ru}.md` (the site's seven legal pages and the console's Rules section are built from them; the open decisions per document are in `<id>.notes.md`) + lawyer review of the Montenegrin | `docs/legal/governance/`, `content/legal/docs.json` | Go-live (acquirer inspects these pages) |
 | Plausible site domain, when analytics is wanted | `.env.example` → `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`; unset = no analytics and no consent banner | Optional analytics (Task 6) |
 | Board, grants-committee and team names + photos with consent | Team: Admin → People → Team ("Show on the About us page"); board/committee wording: Admin → Settings → Pages → About us | `/o-nama` team section |
 | Photos with consent for the landing hero and `/galerija` | `v_public_gallery` is empty; landing + gallery render placeholder notes until staff publish items | Landing §12, gallery |

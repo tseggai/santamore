@@ -3,6 +3,11 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import logoWhite from "@/public/brand/SantamoreLogo-White.png";
+import amex from "@/public/brand/cards/amex.svg";
+import diners from "@/public/brand/cards/diners.svg";
+import maestro from "@/public/brand/cards/maestro.svg";
+import mastercard from "@/public/brand/cards/mastercard.svg";
+import visa from "@/public/brand/cards/visa.svg";
 
 const SITE_LINKS = [
   { href: "/o-nama", key: "about" },
@@ -20,12 +25,25 @@ const SITE_LINKS = [
   { href: "/kontakt", key: "contact" },
 ] as const;
 
+// The card brands Monri accepts, shown as the acquirer requires (brief §5).
+// Logos are the brands' own marks (public/brand/cards), used only to say
+// which cards work.
+const CARD_BRANDS = [
+  { src: visa, name: "Visa", className: "h-4 w-auto" },
+  { src: mastercard, name: "Mastercard", className: "h-4 w-auto" },
+  { src: maestro, name: "Maestro", className: "h-4 w-auto" },
+  // A square mark: taller, or it reads as a dot beside the wordmarks.
+  { src: amex, name: "American Express", className: "h-6 w-auto" },
+  { src: diners, name: "Diners Club", className: "h-4 w-auto" },
+] as const;
+
 // Every legal page the acquirer requires, per docs/BUILD-BRIEF.md §5.
 const LEGAL_LINKS = [
   { href: "/pravila-privatnosti", key: "privacy" },
   { href: "/kolacici", key: "cookies" },
   { href: "/uslovi-koriscenja", key: "terms" },
   { href: "/pravila-donacija", key: "donations" },
+  { href: "/kriterijumi-za-pomoc", key: "grants" },
   { href: "/uslovi-ucesca", key: "eventTerms" },
   { href: "/zastita-djece", key: "safeguarding" },
   { href: "/kodeks", key: "codeOfConduct" },
@@ -48,9 +66,14 @@ export default function Footer() {
             <li>{t("orgName")}</li>
             <li>{t("orgAddress")}</li>
             <li>{t("orgId")}</li>
-            <li className="font-mono">{t("iban")}</li>
-            <li>{t("email")}</li>
-            <li className="pt-2 text-mist/60">{t("cards")}</li>
+          </ul>
+          <p className="mt-5 text-[13px] text-mist/60">{t("cards")}</p>
+          <ul className="mt-2 flex flex-wrap gap-2" aria-label={t("cards")}>
+            {CARD_BRANDS.map((brand) => (
+              <li key={brand.name} className="flex h-8 items-center rounded bg-paper px-2">
+                <Image src={brand.src} alt={brand.name} className={brand.className} />
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -89,7 +112,7 @@ export default function Footer() {
             ))}
           </ul>
           <div className="mt-6">
-            <LocaleSwitcher variant="dark" />
+            <LocaleSwitcher variant="dark" direction="up" />
           </div>
         </div>
       </div>

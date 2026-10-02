@@ -22,7 +22,7 @@ export function isStaffRole(role: string | null | undefined): boolean {
 /** Console sections by role: the nav shows these, the pages check nothing more (RLS does). */
 export const SECTIONS_BY_ROLE: Record<Role, readonly string[]> = {
   member: [],
-  accounting: ["/admin", "/admin/novac", "/admin/podrska"],
-  chapter_lead: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja"],
-  admin: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja"],
+  accounting: ["/admin", "/admin/novac", "/admin/podrska", "/admin/pravila"],
+  chapter_lead: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/registracija", "/admin/pravila"],
+  admin: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/registracija", "/admin/pravila"],
 };

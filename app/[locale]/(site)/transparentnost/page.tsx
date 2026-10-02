@@ -29,6 +29,7 @@ const RAIL_KEYS: Record<string, string> = {
   other: "railMixed",
   recorded: "railRecorded",
   sponsorship: "railSponsorship",
+  entry: "railEntry",
 };
 
 interface InRow {
@@ -41,7 +42,7 @@ interface InRow {
   chapter_slug: string | null;
   rail: string;
   /** Which record the row comes from: the ledger, a correction to it, a year report, or a sponsorship. */
-  source: "ledger" | "adjustment" | "recorded" | "sponsorship";
+  source: "ledger" | "adjustment" | "recorded" | "sponsorship" | "entry";
 }
 interface OutRow {
   id: string;

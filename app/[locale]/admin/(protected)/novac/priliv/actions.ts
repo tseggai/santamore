@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { buildInstructionsEmail } from "@/lib/email/donation";
 import { sendReceiptFor } from "@/lib/email/receipt";
+import { sendEmail } from "@/lib/email/send";
+import { getOrgBankDetails, hasBankDetails } from "@/lib/org";
 import { MAX_CENTS } from "@/lib/money";
 import { PAYMENT_REFERENCE_PATTERN } from "@/lib/references";
 import { createClient } from "@/lib/supabase/server";
@@ -211,4 +214,59 @@ export async function createDonationFromStatement(
 
   revalidatePath("/[locale]/admin/novac", "layout");
   return { ok: true };
+}
+
+export interface SendInstructionsResult {
+  ok: boolean;
+  sent: number;
+  failed: number;
+  error?: "unconfigured";
+}
+
+/**
+ * Pledges made before the bank account existed are still waiting for
+ * their transfer details. Once the real IBAN is set, this sends every one
+ * of them the instructions email and records when. Staff only, through
+ * the admin's own session: the is_staff() policies decide.
+ */
+export async function sendPledgeInstructions(): Promise<SendInstructionsResult> {
+  if (!hasBankDetails(getOrgBankDetails())) return { ok: false, sent: 0, failed: 0, error: "unconfigured" };
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("donations")
+    .select("id, amount_cents, donor_name, donor_email, is_recurring, donor_locale, campaign:campaigns(title, payment_reference), fundraiser:fundraisers(title, payment_reference)")
+    .eq("rail", "sepa")
+    .eq("status", "pending")
+    .is("instructions_sent_at", null)
+    .order("created_at", { ascending: true })
+    .limit(200);
+  if (error) return { ok: false, sent: 0, failed: 0 };
+  let sent = 0;
+  let failed = 0;
+  for (const row of data ?? []) {
+    const one = <T,>(value: T | T[] | null): T | null => (Array.isArray(value) ? value[0] ?? null : value);
+    const target = one(row.fundraiser as { title: string; payment_reference: string } | { title: string; payment_reference: string }[] | null) ?? one(row.campaign as { title: string; payment_reference: string } | { title: string; payment_reference: string }[] | null);
+    if (!target || !row.donor_email) { failed += 1; continue; }
+    try {
+      await sendEmail(
+        await buildInstructionsEmail({
+          locale: (["me", "en", "ru"].includes(row.donor_locale ?? "") ? row.donor_locale : "me") as "me" | "en" | "ru",
+          donorName: row.donor_name ?? "",
+          donorEmail: row.donor_email,
+          campaignTitle: target.title,
+          reference: target.payment_reference,
+          amountCents: row.amount_cents,
+          isRecurring: Boolean(row.is_recurring),
+        }),
+      );
+      const { error: updateError } = await supabase.from("donations").update({ instructions_sent_at: new Date().toISOString() }).eq("id", row.id);
+      if (updateError) failed += 1;
+      else sent += 1;
+    } catch (emailError) {
+      console.error("[pledges] instructions email failed:", emailError);
+      failed += 1;
+    }
+  }
+  revalidatePath("/[locale]/admin/novac/priliv", "page");
+  return { ok: true, sent, failed };
 }

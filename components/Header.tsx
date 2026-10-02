@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 import { DonateButton } from "@/components/donate/DonateButton";
+import { isPledgeMode } from "@/lib/org";
 import LocaleSwitcher from "@/components/LocaleSwitcher";
 import { MobileMenu } from "@/components/MobileMenu";
 import { NavDropdown } from "@/components/NavDropdown";
@@ -102,7 +103,7 @@ export default function Header({ notice = null }: { notice?: string | null }) {
             href="/podrzi"
             className="rounded-lg bg-red px-4 py-2 text-sm font-bold text-paper transition-colors hover:bg-red-dark"
           >
-            {t("nav.donate")}
+            {t(isPledgeMode() ? "nav.pledge" : "nav.donate")}
           </DonateButton>
           {/* phone: everything else behind one button */}
           <MobileMenu

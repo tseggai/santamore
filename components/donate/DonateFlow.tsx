@@ -44,6 +44,8 @@ export function DonateFlow({
   onClose?: () => void;
 }) {
   const { target: campaign, suggested, bank, cardRailEnabled, backPath, photoUrl } = data;
+  // No real bank account yet: the gift is a pledge, paid once the account opens.
+  const pledging = !hasBankDetails(bank);
   const t = useTranslations("donate");
   const tNav = useTranslations("nav");
   const inDialog = variant === "dialog";
@@ -249,7 +251,7 @@ export function DonateFlow({
     )
   ) : (
     <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
-      {tNav("donate")}
+      {pledging ? t("pledgeVerb") : tNav("donate")}
     </p>
   );
 
@@ -265,17 +267,23 @@ export function DonateFlow({
           {t("confTitle", { name: donorName })}
         </Heading>
         <p className="mt-4 text-[16px] leading-relaxed text-black/70">
-          {t("confEmailNote")} {t("confLedgerNote")}
+          {pledging ? t("confPledgeNote") : `${t("confEmailNote")} ${t("confLedgerNote")}`}
         </p>
-        <div className="mt-6">
-          <SepaPanel
-            locale={locale}
-            bank={bank}
-            reference={confirmed.reference}
-            amountCents={confirmed.amountCents}
-            monthly={monthly}
-          />
-        </div>
+        {pledging ? (
+          <p className="mt-4 rounded-brand bg-sand px-4 py-3.5 font-mono text-[14px] tabular-nums text-black/70">
+            {t("pledgeReference", { reference: confirmed.reference })}
+          </p>
+        ) : (
+          <div className="mt-6">
+            <SepaPanel
+              locale={locale}
+              bank={bank}
+              reference={confirmed.reference}
+              amountCents={confirmed.amountCents}
+              monthly={monthly}
+            />
+          </div>
+        )}
         {/* Never a dead-end thank-you (brief §9.8). */}
         <div className="mt-8 flex flex-wrap items-center gap-3">
           <button type="button" onClick={share} className={primaryBtn}>
@@ -517,10 +525,17 @@ export function DonateFlow({
             </dd>
           </dl>
 
-          <p className="mt-6 font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">
+          {pledging ? (
+            /* Pledge: nothing to pay today; the transfer details follow by email. */
+            <div className="mt-6 rounded-brand bg-sand px-4 py-4">
+              <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80">{t("pledgeHeading")}</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-black/75">{t("pledgeIntro")}</p>
+            </div>
+          ) : null}
+          <p className={`mt-6 font-mono text-[12px] uppercase tracking-[0.16em] text-sea/80 ${pledging ? "hidden" : ""}`}>
             {t("paymentMethod")}
           </p>
-          <div className={`mt-3 grid gap-2 ${cardRailEnabled ? "grid-cols-2" : ""}`}>
+          <div className={`mt-3 grid gap-2 ${cardRailEnabled ? "grid-cols-2" : ""} ${pledging ? "hidden" : ""}`}>
             {cardRailEnabled ? (
               <button
                 type="button"
@@ -543,7 +558,7 @@ export function DonateFlow({
           </div>
 
           {/* SEPA panel: IBAN, reference, live EPC QR, copy buttons */}
-          <div className="mt-3">
+          <div className={`mt-3 ${pledging ? "hidden" : ""}`}>
             <SepaPanel
               locale={locale}
               bank={bank}
@@ -554,7 +569,7 @@ export function DonateFlow({
           </div>
 
           <div className="mt-6 flex items-baseline justify-between border-t-[0.5px] border-line pt-4">
-            <span className="text-[14.5px] font-semibold">{t("totalToday")}</span>
+            <span className="text-[14.5px] font-semibold">{pledging ? t("pledgeTotal") : t("totalToday")}</span>
             <span className="font-mono text-[20px] font-medium tabular-nums">
               {formatCents(totalCents, locale)}
               {monthly ? t("perMonth") : null}
@@ -581,26 +596,22 @@ export function DonateFlow({
           </span>
         )}
         {step < 3 ? (
-          <button type="button" onClick={advance} className={primaryBtn}>
+          <button key="continue" type="button" onClick={advance} className={primaryBtn}>
             {t("continue")} →
           </button>
         ) : (
-          /* No pledges before the real bank details exist — the panel above
-             explains why (bankDetailsPending). */
-          <button
-            type="submit"
-            disabled={isSubmitting || !hasBankDetails(bank)}
-            className={primaryBtn}
-          >
+          /* Its own element, never the Continue button with its type changed: a
+             click that advanced to this step must not also submit the form. */
+          <button key="submit" type="submit" disabled={isSubmitting} className={primaryBtn}>
             {isSubmitting
               ? t("sending")
-              : `${t("payVerb")} ${money(totalCents)}${monthly ? t("perMonth") : ""}`}
+              : `${pledging ? t("pledgeVerb") : t("payVerb")} ${money(totalCents)}${monthly ? t("perMonth") : ""}`}
           </button>
         )}
       </div>
       {step === 3 ? (
         <p className="mt-3 text-center text-[13px] leading-relaxed text-black/55">
-          {t("secureNote")}
+          {pledging ? t("pledgeNote") : t("secureNote")}
         </p>
       ) : null}
     </form>

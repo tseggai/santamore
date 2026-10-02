@@ -6,6 +6,9 @@ export const routing = defineRouting({
   locales: ["me", "en", "ru"],
   defaultLocale: "me",
   localePrefix: "always",
+  // Montenegrin is the site's language: a first visit lands on /me whatever
+  // the browser says; a language chosen in the switcher is remembered.
+  localeDetection: false,
 });
 
 export type Locale = (typeof routing.locales)[number];
