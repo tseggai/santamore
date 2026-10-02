@@ -1627,7 +1627,8 @@
       "notes": "Radne bilješke",
       "notesHint": "Na šta se dokument oslanja, odluke ugrađene u njega, provjere i parametri za Upravni odbor i pitanja za advokata. Samo na engleskom, nije dio dokumenta."
     },
-    "memberAccessLevels": "Šta koji nivo može"
+    "memberAccessLevels": "Šta koji nivo može",
+    "memberSchemaStale": "API baze još ne zna za set_member_access: provjeri migraciju 0069 pomoću supabase/status.sql, zatim pokreni ovo u SQL editoru i pokušaj ponovo."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

@@ -442,7 +442,7 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
   const router = useRouter();
   const [fullName, setFullName] = useState(member.full_name ?? "");
   const [role, setRole] = useState<MemberRow["role"]>(member.role);
-  const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "forbidden">("idle");
+  const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "forbidden" | "schema">("idle");
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -453,7 +453,7 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
       setState("saved");
       router.refresh();
     } else {
-      setState(result.error === "forbidden" ? "forbidden" : "error");
+      setState(result.error === "forbidden" ? "forbidden" : result.error === "schema" ? "schema" : "error");
     }
   };
 
@@ -494,6 +494,12 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
       </ul>
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "forbidden" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("memberForbidden")}</p> : null}
+      {state === "schema" ? (
+        <p role="alert" className="mt-3 text-[14px] text-red-dark">
+          <span className="font-semibold">{t("memberSchemaStale")}</span>
+          <code className="mt-1 block font-mono text-[13px] text-black/70">notify pgrst, &apos;reload schema&apos;;</code>
+        </p>
+      ) : null}
       {state === "saved" ? <p role="status" className="mt-3 text-[14px] font-semibold text-sea">{t("memberSaved")}</p> : null}
       {canManage ? (
         <div className="mt-4">

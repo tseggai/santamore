@@ -1627,7 +1627,8 @@
       "notes": "Working notes",
       "notesHint": "What the document hangs on, the decisions embedded in it, the checks and parameters for the Board, and points for the lawyer. English only, not part of the document."
     },
-    "memberAccessLevels": "What each level can do"
+    "memberAccessLevels": "What each level can do",
+    "memberSchemaStale": "The database API does not know set_member_access yet: confirm migration 0069 with supabase/status.sql, then run this in the SQL editor and try again."
   },
   "forms": {
     "nameLabel": "Full name",
