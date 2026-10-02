@@ -127,7 +127,12 @@ export default async function ConsoleEventsPage({
     "inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-paper text-black transition-colors hover:bg-mist-2 hover:text-sea";
   const ghost = "rounded-lg bg-paper px-3.5 py-2 text-[14px] font-semibold transition-colors hover:bg-mist-2";
 
-  const eventCard = (event: EventRow, live: boolean) => {
+  /**
+   * One event, compact enough for a grid. Inside a cause card it sits on
+   * paper; in the loose list it sits on mist. Fundraising is not offered
+   * here — the cause above carries the one button for that.
+   */
+  const eventCard = (event: EventRow, live: boolean, surface: "paper" | "mist") => {
     const reg = regByEvent.get(event.id);
     const rsvp = rsvpByEvent.get(event.id) ?? null;
     const page = pageForEvent(event);
@@ -143,141 +148,137 @@ export default async function ConsoleEventsPage({
       team ? chip(team.name) : null,
       supportedEvents.has(event.id) ? chip(t("evSupported")) : null,
     ].filter(Boolean);
+    const onPaper = surface === "paper";
+    const action = onPaper
+      ? "rounded-lg bg-mist px-3.5 py-2 text-[14px] font-semibold transition-colors hover:bg-mist-2"
+      : ghost;
     return (
-      <li key={event.id} className="rounded-lg bg-mist p-4 sm:p-5">
+      <li key={event.id} className={`flex flex-col rounded-lg p-4 ${onPaper ? "bg-paper" : "bg-mist"}`}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[16px] font-bold">{event.name}</p>
-            <p className="mt-0.5 text-[14px] text-black/60">
+            <p className="text-[15.5px] font-bold leading-snug">{event.name}</p>
+            <p className="mt-0.5 text-[13.5px] text-black/60">
               {fmt(event.starts_at)}
               {event.venue && !event.venue.includes("[[") ? ` · ${event.venue}` : ""}
               {event.going_count > 0 ? ` · ${t("rsvpGoingCount", { count: event.going_count })}` : ""}
             </p>
             {chips.length > 0 ? <div className="mt-2 flex flex-wrap gap-1.5">{chips}</div> : null}
           </div>
-          <Link href={`/dogadjaji/${event.slug}`} aria-label={t("evView")} title={t("evView")} className={iconBtn}>
+          <Link
+            href={`/dogadjaji/${event.slug}`}
+            aria-label={t("evView")}
+            title={t("evView")}
+            className={`${iconBtn} ${onPaper ? "bg-mist" : ""}`}
+          >
             <ExternalIcon />
           </Link>
         </div>
-        {live ? (
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t-[0.5px] border-line pt-3">
+        {live && (!reg || regOpen) ? (
+          <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
             {!reg ? <RsvpSelect eventId={event.id} status={rsvp} /> : null}
             {!reg && regOpen ? (
-              <Link href={`/dogadjaji/${event.slug}`} className={ghost}>
+              <Link href={`/dogadjaji/${event.slug}`} className={action}>
                 {event.kind === "challenge" ? t("evJoin") : t("evRegister")}
               </Link>
             ) : null}
-            <span className="ml-auto flex flex-wrap items-center gap-2 text-[14px]">
-              {page ? (
-                <Link href={`/dashboard/stranice?stranica=${page.slug}`} className={ghost}>
-                  {page.status === "active" ? t("editPage") : t("finishPage")}
-                </Link>
-              ) : event.campaign_slug ? (
-                <>
-                  <span className="text-black/60">{t("evFundraisePrompt")}</span>
-                  <Link href={`/dashboard/prikupljaj?cause=${event.campaign_slug}`} className="rounded-lg bg-ink px-3.5 py-2 text-[14px] font-bold text-paper transition-opacity hover:opacity-90">
-                    {t("evStartFundraising")}
-                  </Link>
-                </>
-              ) : null}
-            </span>
           </div>
         ) : null}
       </li>
     );
   };
 
+  const eventGrid = (rows: EventRow[], live: boolean, surface: "paper" | "mist") => (
+    <ul className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{rows.map((event) => eventCard(event, live, surface))}</ul>
+  );
+
+  const causeFigures = (campaign: CampaignRow) => {
+    const pct =
+      campaign.goal_cents && campaign.goal_cents > 0
+        ? Math.min(100, Math.round((campaign.raised_cents / campaign.goal_cents) * 100))
+        : 0;
+    return (
+      <>
+        <div className="mt-3 flex items-baseline justify-between gap-3">
+          <span className="font-mono text-[15px] tabular-nums">
+            {money(campaign.raised_cents)}
+            {campaign.goal_cents ? <span className="text-[13px] font-medium text-black/50"> / {money(campaign.goal_cents)}</span> : null}
+          </span>
+          <span className="text-[13px] text-black/55">
+            {campaign.donor_count} {t("evDonors")}
+            {campaign.goal_cents ? ` · ${pct}%` : ""}
+          </span>
+        </div>
+        <span className="mt-1.5 block h-[6px] overflow-hidden rounded-[3px] bg-mist-2">
+          <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
+        </span>
+      </>
+    );
+  };
+
+  // Which events sit under which cause; the rest are loose.
+  const currentSlugs = new Set(currentCauses.map((c) => c.slug));
+  const eventsForCause = (slug: string) => upcoming.filter((e) => e.campaign_slug === slug);
+  const looseUpcoming = upcoming.filter((e) => !e.campaign_slug || !currentSlugs.has(e.campaign_slug));
+
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("navEvents")}</h1>
       <p className="mt-2 text-[15px] leading-relaxed text-black/65">{t("evSub")}</p>
 
+      {/* causes first: each with the events that support it and the one fundraising button */}
       <section className="mt-6">
-        <h2 className="type-display text-xl">{t("evEventsHeading")}</h2>
-        <h3 className="type-eyebrow mt-4 text-black/60">{t("evUpcoming")}</h3>
-        {upcoming.length === 0 ? (
-          <p className="mt-2 text-[14.5px] text-black/60">{t("evNoUpcoming")}</p>
-        ) : (
-          <ul className="mt-3 space-y-3">{upcoming.map((event) => eventCard(event, true))}</ul>
-        )}
-      </section>
-
-      {past.length > 0 ? (
-        <details className="mt-6">
-          <summary className="cursor-pointer text-[14.5px] font-semibold text-black/60 hover:text-sea">
-            {t("evPast", { count: past.length })}
-          </summary>
-          <ul className="mt-3 space-y-3">{past.map((event) => eventCard(event, false))}</ul>
-        </details>
-      ) : null}
-
-      <section className="mt-8 border-t-[0.5px] border-line pt-6">
-        <h2 className="type-display text-xl">{t("evCampaigns")}</h2>
-        <h3 className="type-eyebrow mt-4 text-black/60">{t("evCurrentCauses")}</h3>
+        <h2 className="type-eyebrow text-black/60">{t("evCurrentCauses")}</h2>
         {currentCauses.length === 0 ? (
           <p className="mt-2 text-[14.5px] text-black/60">{t("evNoCurrentCauses")}</p>
         ) : (
-          <ul className="mt-3 space-y-3">
+          <ul className="mt-3 space-y-4">
             {currentCauses.map((campaign) => {
-              const pct =
-                campaign.goal_cents && campaign.goal_cents > 0
-                  ? Math.min(100, Math.round((campaign.raised_cents / campaign.goal_cents) * 100))
-                  : 0;
               const chips = [
                 campaignsRaising.has(campaign.slug) ? chip(t("evRaising"), "sea") : null,
                 supportedCampaigns.has(campaign.slug) ? chip(t("evSupported")) : null,
               ].filter(Boolean);
+              const page = pageByCause.get(campaign.id);
+              const causeEvents = eventsForCause(campaign.slug);
               return (
                 <li key={campaign.slug} className="rounded-lg bg-mist p-4 sm:p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <p className="text-[16px] font-bold">{campaign.title}</p>
+                      <p className="text-[18px] font-bold leading-snug">{campaign.title}</p>
                       <p className="mt-0.5 text-[14px] text-black/60">
                         {campaign.starts_at ? fmt(campaign.starts_at) : ""}
                         {campaign.ends_at ? ` — ${fmt(campaign.ends_at)}` : ""}
                       </p>
                       {chips.length > 0 ? <div className="mt-2 flex flex-wrap gap-1.5">{chips}</div> : null}
-                      <div className="mt-3 flex items-baseline justify-between gap-3">
-                        <span className="font-mono text-[15px] tabular-nums">
-                          {money(campaign.raised_cents)}
-                          {campaign.goal_cents ? (
-                            <span className="text-[13px] font-medium text-black/50"> / {money(campaign.goal_cents)}</span>
-                          ) : null}
-                        </span>
-                        <span className="text-[13px] text-black/55">
-                          {campaign.donor_count} {t("evDonors")}
-                          {campaign.goal_cents ? ` · ${pct}%` : ""}
-                        </span>
-                      </div>
-                      <span className="mt-1.5 block h-[6px] overflow-hidden rounded-[3px] bg-mist-2">
-                        <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
-                      </span>
+                      {causeFigures(campaign)}
                     </div>
                     <Link href={`/kampanje/${campaign.slug}`} aria-label={t("evView")} title={t("evView")} className={iconBtn}>
                       <ExternalIcon />
                     </Link>
                   </div>
-                  <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t-[0.5px] border-line pt-3">
-                    <span className="ml-auto flex flex-wrap items-center gap-2 text-[14px]">
-                      {pageByCause.get(campaign.id) ? (
-                        <Link href={`/dashboard/stranice?stranica=${pageByCause.get(campaign.id)!.slug}`} className={ghost}>
-                          {pageByCause.get(campaign.id)!.status === "active" ? t("editPage") : t("finishPage")}
-                        </Link>
-                      ) : (
-                        <>
-                          <span className="text-black/60">{t("evFundraiseCausePrompt")}</span>
-                          <Link href={`/dashboard/prikupljaj?cause=${campaign.slug}`} className="rounded-lg bg-ink px-3.5 py-2 text-[14px] font-bold text-paper transition-opacity hover:opacity-90">
-                            {t("evStartFundraising")}
-                          </Link>
-                        </>
-                      )}
-                    </span>
+
+                  <div className="mt-5 border-t-[0.5px] border-line pt-4">
+                    <h3 className="text-[14.5px] font-bold">{t("evCauseEvents")}</h3>
+                    {causeEvents.length === 0 ? (
+                      <p className="mt-2 text-[14px] text-black/60">{t("evNoCauseEvents")}</p>
+                    ) : (
+                      eventGrid(causeEvents, true, "paper")
+                    )}
                   </div>
-                  <div className="mt-4">
+
+                  <div className="mt-5 flex flex-wrap items-center gap-2 border-t-[0.5px] border-line pt-4">
+                    {page ? (
+                      <Link href={`/dashboard/stranice?stranica=${page.slug}`} className="inline-flex h-11 items-center rounded-lg bg-ink px-5 text-[15px] font-bold text-paper transition-opacity hover:opacity-90">
+                        {page.status === "active" ? t("editPage") : t("finishPage")}
+                      </Link>
+                    ) : (
+                      <Link href={`/dashboard/prikupljaj?cause=${campaign.slug}`} className="inline-flex h-11 items-center rounded-lg bg-ink px-5 text-[15px] font-bold text-paper transition-opacity hover:opacity-90">
+                        {t("evFundraiseCauseCta")}
+                      </Link>
+                    )}
                     <DonateButton
                       request={{ kind: "campaign", slug: campaign.slug }}
                       href={`/podrzi?kampanja=${campaign.slug}`}
-                      className="inline-flex rounded-lg bg-red px-4 py-2 text-[14px] font-bold text-paper transition-colors hover:bg-red-dark"
+                      className="inline-flex h-11 items-center rounded-lg bg-red px-5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark"
                     >
                       {tDonate("payVerb")}
                     </DonateButton>
@@ -288,7 +289,7 @@ export default async function ConsoleEventsPage({
           </ul>
         )}
         {pastCauses.length > 0 ? (
-          <details className="mt-6">
+          <details className="mt-5">
             <summary className="cursor-pointer text-[14.5px] font-semibold text-black/70">{t("evPastCauses", { count: pastCauses.length })}</summary>
             {/* a completed cause takes no more gifts and no new pages: figures and a link, no buttons */}
             <ul className="mt-3 space-y-3">
@@ -327,6 +328,26 @@ export default async function ConsoleEventsPage({
           </details>
         ) : null}
       </section>
+
+      {/* events that support no current cause: partner challenges, gatherings, events of a closed cause */}
+      {looseUpcoming.length > 0 || past.length > 0 ? (
+        <section className="mt-8 border-t-[0.5px] border-line pt-6">
+          <h2 className="type-eyebrow text-black/60">{currentCauses.length === 0 ? t("evUpcoming") : t("evOtherEvents")}</h2>
+          {looseUpcoming.length === 0 ? (
+            <p className="mt-2 text-[14.5px] text-black/60">{t("evNoUpcoming")}</p>
+          ) : (
+            eventGrid(looseUpcoming, true, "mist")
+          )}
+          {past.length > 0 ? (
+            <details className="mt-5">
+              <summary className="cursor-pointer text-[14.5px] font-semibold text-black/60 hover:text-sea">
+                {t("evPast", { count: past.length })}
+              </summary>
+              {eventGrid(past, false, "mist")}
+            </details>
+          ) : null}
+        </section>
+      ) : null}
       <GivingSection locale={locale} />
     </div>
   );
