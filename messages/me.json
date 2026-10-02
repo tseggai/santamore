@@ -1626,7 +1626,8 @@
       "hint": "Ovdje se čita; tekst se mijenja u Registracija NVO › Nacrti, ili pošalji izmjenu da se unese u izvorne fajlove. Stavke u [[PLACEHOLDER]] su odluke ili podaci koji tek treba da se unesu.",
       "notes": "Radne bilješke",
       "notesHint": "Na šta se dokument oslanja, odluke ugrađene u njega, provjere i parametri za Upravni odbor i pitanja za advokata. Samo na engleskom, nije dio dokumenta."
-    }
+    },
+    "memberAccessLevels": "Šta koji nivo može"
   },
   "forms": {
     "nameLabel": "Ime i prezime",
@@ -1803,7 +1804,14 @@
     "placesOnDistance": "Mjesta: {count}",
     "tiersOrganizerNote": "Cijene kako ih je odredio organizator ({organizer}); prijava i plaćanje su kod njih.",
     "distancesHeading": "Distance i kotizacija",
-    "distancesCount": "{count, plural, one {# distanca} few {# distance} other {# distanci}}"
+    "distancesCount": "{count, plural, one {# distanca} few {# distance} other {# distanci}}",
+    "progressToday": "{amount} danas",
+    "progressRaisedFor": "dosad prikupljeno za {cause}",
+    "progressDonors": "{count, plural, one {# donator} few {# donatora} other {# donatora}}",
+    "progressEventDay": "{amount} na dan događaja",
+    "shareMessage": "{name} — dosad {amount} prikupljeno za {cause}. Pridruži se ili daj:",
+    "shareSub": "Link nosi živu karticu: koliko je cilj dosad prikupio, danas i na dan događaja.",
+    "share": "Podijeli ovaj događaj"
   },
   "gallery": {
     "eyebrow": "Galerija",

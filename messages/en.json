@@ -1626,7 +1626,8 @@
       "hint": "Read here; change the text in NGO Registration › Drafts, or send the change to be folded into the source files. Items in [[PLACEHOLDER]] are decisions or facts still to be supplied.",
       "notes": "Working notes",
       "notesHint": "What the document hangs on, the decisions embedded in it, the checks and parameters for the Board, and points for the lawyer. English only, not part of the document."
-    }
+    },
+    "memberAccessLevels": "What each level can do"
   },
   "forms": {
     "nameLabel": "Full name",
@@ -1803,7 +1804,14 @@
     "placesOnDistance": "{count} places",
     "tiersOrganizerNote": "Prices as set by {organizer}; registration and payment are with them.",
     "distancesHeading": "Distances and entry",
-    "distancesCount": "{count, plural, one {# distance} other {# distances}}"
+    "distancesCount": "{count, plural, one {# distance} other {# distances}}",
+    "progressToday": "{amount} today",
+    "progressRaisedFor": "raised so far for {cause}",
+    "progressDonors": "{count, plural, one {# donor} other {# donors}}",
+    "progressEventDay": "{amount} on the event day",
+    "shareMessage": "{name} — {amount} raised so far for {cause}. Join us or give:",
+    "shareSub": "The link carries a live card: what the cause has raised so far, today and on the event day.",
+    "share": "Share this event"
   },
   "gallery": {
     "eyebrow": "Gallery",

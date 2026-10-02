@@ -21,4 +21,11 @@ Staff records (`team_members`: officer, staff, board, committee, volunteer) are
 the public "who we are"; they say nothing about access. Link a record to an
 account only to tie the two, then set the access level on the account.
 
+Where a level shows: the Accounts panel lists every level with what it
+opens and marks the chosen one; the person sees their level as a chip at
+the foot of their own console rail and on My profile, with the way into
+the admin, the moment it is set (the role is read on every request, no
+sign-out needed). Accounts writes through `set_member_access()` (0069),
+which touches the name and the role and nothing else.
+
 `lib/roles.ts` holds the list, the staff test and the sections per role.
