@@ -69,7 +69,7 @@ export function PagesHub({
   /** "Join this team": the new page opens in the full editor with the team preselected. */
   joinTeamId?: string | null;
   title: string;
-  lead: string;
+  lead?: string;
 }) {
   const t = useTranslations("dashboard");
   const tRunner = useTranslations("runner");
@@ -241,8 +241,17 @@ export function PagesHub({
         <section>
           {pages.length === 0 ? (
             <div className="rounded-lg bg-mist px-5 py-6">
-              <p className="text-[15px] leading-relaxed text-black/70">{t("hubEmptySub")}</p>
-              <button type="button" onClick={() => setOpen("new")} className="mt-4 rounded-lg bg-red px-5 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
+              <h2 className="text-[17px] font-bold leading-snug">{t("hubEmptyHeading")}</h2>
+              <p className="mt-2 text-[15px] leading-relaxed text-black/70">{t("hubEmptySub")}</p>
+              <ol className="mt-4 space-y-2">
+                {[1, 2, 3].map((n) => (
+                  <li key={n} className="flex gap-3 text-[15px] leading-relaxed text-black/75">
+                    <span className="font-mono text-[13px] font-bold tabular-nums text-red">{n}</span>
+                    <span>{t(`hubStep${n}`)}</span>
+                  </li>
+                ))}
+              </ol>
+              <button type="button" onClick={() => setOpen("new")} className="mt-5 rounded-lg bg-red px-5 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
                 + {t("newPage")}
               </button>
             </div>

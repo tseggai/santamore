@@ -205,7 +205,7 @@ export default async function PagesHubPage({
     <div className="py-8">
       <PagesHub
         title={t("navPages")}
-        lead={pages.length === 0 ? t("hubEmptySub") : t("pagesSub")}
+        lead={pages.length === 0 ? undefined : t("pagesSub")}
         pages={hubPages}
         teams={myTeams}
         teamEvents={teamEventChoices}

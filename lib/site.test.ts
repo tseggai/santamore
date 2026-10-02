@@ -1,6 +1,20 @@
 import { describe, expect, it } from "vitest";
 
-import { canonicalRedirect, strayAuthCodeRedirect } from "./site";
+import { canonicalRedirect, safeNextPath, strayAuthCodeRedirect } from "./site";
+
+describe("safeNextPath", () => {
+  it("keeps internal paths with their query", () => {
+    expect(safeNextPath("/en/dashboard/prikupljaj?cause=x", "/me/dashboard")).toBe("/en/dashboard/prikupljaj?cause=x");
+  });
+
+  it("falls back for anything that could leave the site", () => {
+    expect(safeNextPath("//evil.example/x", "/me/dashboard")).toBe("/me/dashboard");
+    expect(safeNextPath("https://evil.example", "/me/dashboard")).toBe("/me/dashboard");
+    expect(safeNextPath("/\\evil.example", "/me/dashboard")).toBe("/me/dashboard");
+    expect(safeNextPath(null, "/me/dashboard")).toBe("/me/dashboard");
+    expect(safeNextPath("", "/me/dashboard")).toBe("/me/dashboard");
+  });
+});
 
 describe("canonicalRedirect", () => {
   const base = {
