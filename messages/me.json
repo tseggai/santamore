@@ -1679,7 +1679,14 @@
     "wayMoneyWent": "Gdje je novac otišao",
     "wayMoneyWentFor": "Gdje je otišao novac za: {cause}",
     "wayMoneyWentSub": "Ovaj događaj je završen. Svaki euro koji je prikupio, i kome je predat, stoji na stranici novca za tu godinu.",
-    "moneyWentCta": "Pogledaj gdje je novac otišao"
+    "moneyWentCta": "Pogledaj gdje je novac otišao",
+    "share": "Podijeli ovaj događaj",
+    "shareSub": "Link nosi živu karticu: koliko je cilj dosad prikupio, danas i na dan događaja.",
+    "shareMessage": "{name} — dosad {amount} prikupljeno za {cause}. Pridruži se ili daj:",
+    "progressRaisedFor": "dosad prikupljeno za {cause}",
+    "progressDonors": "{count, plural, one {# donator} few {# donatora} other {# donatora}}",
+    "progressToday": "{amount} danas",
+    "progressEventDay": "{amount} na dan događaja"
   },
   "gallery": {
     "eyebrow": "Galerija",

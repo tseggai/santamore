@@ -1680,7 +1680,14 @@
     "wayMoneyWent": "Куда ушли деньги",
     "wayMoneyWentFor": "Куда ушли деньги для «{cause}»",
     "wayMoneyWentSub": "Это событие завершено. Каждый собранный евро и кому он передан — на странице денег за тот год.",
-    "moneyWentCta": "Посмотреть, куда ушли деньги"
+    "moneyWentCta": "Посмотреть, куда ушли деньги",
+    "share": "Поделиться событием",
+    "shareSub": "Ссылка несёт живую карточку: сколько цель собрала всего, сегодня и в день события.",
+    "shareMessage": "{name} — уже собрано {amount} на {cause}. Присоединяйтесь или пожертвуйте:",
+    "progressRaisedFor": "собрано на {cause}",
+    "progressDonors": "{count, plural, one {# донор} few {# донора} other {# доноров}}",
+    "progressToday": "{amount} сегодня",
+    "progressEventDay": "{amount} в день события"
   },
   "gallery": {
     "eyebrow": "Галерея",

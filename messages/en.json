@@ -1679,7 +1679,14 @@
     "wayMoneyWent": "Where the money went",
     "wayMoneyWentFor": "Where the money for {cause} went",
     "wayMoneyWentSub": "This event is over. Every euro it raised, and where it was handed over, is on the money page for that year.",
-    "moneyWentCta": "See where the money went"
+    "moneyWentCta": "See where the money went",
+    "share": "Share this event",
+    "shareSub": "The link carries a live card: what the cause has raised so far, today and on the event day.",
+    "shareMessage": "{name} — {amount} raised so far for {cause}. Join us or give:",
+    "progressRaisedFor": "raised so far for {cause}",
+    "progressDonors": "{count, plural, one {# donor} other {# donors}}",
+    "progressToday": "{amount} today",
+    "progressEventDay": "{amount} on the event day"
   },
   "gallery": {
     "eyebrow": "Gallery",

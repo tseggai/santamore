@@ -165,6 +165,8 @@ select * from (values
      to_regclass('public.v_donor_years') is not null)
   ,('20260920000069_member_access',
      to_regprocedure('public.set_member_access(uuid, text, text)') is not null)
+  ,('20260920000070_event_progress',
+     to_regclass('public.v_public_event_progress') is not null)
   ,('20260920000067_donors_view',
      to_regclass('public.v_donors') is not null)
   ,('20260920000066_vote_guard',

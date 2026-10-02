@@ -10,6 +10,7 @@ import { RegisterDialog } from "@/components/events/RegisterDialog";
 import { PerkRule, type PerkChallengeFields } from "@/components/perks/PerkRule";
 import type { GalleryImage } from "@/components/gallery/GalleryGrid";
 import { PublicGallery } from "@/components/gallery/PublicGallery";
+import { ShareButton } from "@/components/ShareButton";
 import { galleryImageUrl } from "@/lib/storage";
 import { activeTiers, type EventTier } from "@/lib/events";
 import { formatCents } from "@/lib/money";
@@ -72,6 +73,16 @@ export interface EventView {
   bibs_claimed?: number;
   /** A gathering: guests a member may bring. */
   max_guests?: number;
+  /** Live figures for the cause this event raises for (v_public_event_progress). */
+  progress?: EventProgress | null;
+}
+
+export interface EventProgress {
+  raisedCents: number;
+  goalCents: number | null;
+  donorCount: number;
+  todayCents: number;
+  eventDayCents: number;
 }
 
 const primary =
@@ -98,6 +109,7 @@ export function EventPageView({
 }) {
   const t = useTranslations("events");
   const tPerks = useTranslations("perks");
+  const tDonate = useTranslations("donate");
   const locale = useLocale() as Locale;
   const lang = htmlLang(locale);
   const dateFormat = new Intl.DateTimeFormat(lang, { day: "numeric", month: "long", year: "numeric" });
@@ -316,6 +328,48 @@ export function EventPageView({
           ) : null}
         </div>
       </div>
+
+      {/* share: the link carries a live card with the figures below */}
+      {event.campaign_slug && event.progress && !preview ? (() => {
+        const p = event.progress;
+        const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
+        const pct = p.goalCents && p.goalCents > 0 ? Math.min(100, Math.round((p.raisedCents / p.goalCents) * 100)) : 0;
+        const cause = event.campaign_title ?? "";
+        return (
+          <section className="mt-6 rounded-lg bg-mist p-5 sm:p-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0 flex-1">
+                <p className="type-eyebrow text-sea/80">{t("share")}</p>
+                <p className="mt-2 font-mono text-[22px] font-bold tabular-nums">
+                  {money(p.raisedCents)}
+                  {p.goalCents ? <span className="text-[15px] font-medium text-black/50"> / {money(p.goalCents)}</span> : null}
+                </p>
+                <p className="mt-0.5 text-[14.5px] text-black/70">{t("progressRaisedFor", { cause })}</p>
+                {p.goalCents ? (
+                  <span className="mt-2 block h-[6px] max-w-md overflow-hidden rounded-[3px] bg-mist-2">
+                    <span className="block h-full rounded-[3px] bg-sea" style={{ width: `${Math.max(2, pct)}%` }} />
+                  </span>
+                ) : null}
+                <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[13.5px] tabular-nums text-black/60">
+                  <span>{t("progressDonors", { count: p.donorCount })}</span>
+                  <span>{t("progressToday", { amount: money(p.todayCents) })}</span>
+                  {p.eventDayCents > 0 || finished ? <span>{t("progressEventDay", { amount: money(p.eventDayCents) })}</span> : null}
+                </p>
+                <p className="mt-2 text-[13.5px] leading-relaxed text-black/60">{t("shareSub")}</p>
+              </div>
+              <ShareButton
+                title={event.name}
+                path={`/${locale}/dogadjaji/${event.slug}`}
+                text={t("shareMessage", { name: event.name, amount: money(p.raisedCents), cause })}
+                label={t("share")}
+                copiedLabel={tDonate("copied")}
+                variant="ghost"
+                className={secondary}
+              />
+            </div>
+          </section>
+        );
+      })() : null}
 
       {/* 4 — the details, by kind */}
       {event.kind !== "challenge" && tiersToday.length > 0 ? (
