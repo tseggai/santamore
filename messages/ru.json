@@ -433,7 +433,7 @@
     "fundraiseSignIn": "Войдите, чтобы собирать",
     "fundraiseSignInSub": "Один email — тот же аккаунт ведёт вашу страницу и регистрации.",
     "fundraiseNoEvent": "Сначала выберите цель",
-    "fundraiseNoEventSub": "Страница сбора всегда собирает на одну цель. Выберите её в разделе Цели.",
+    "fundraiseNoEventSub": "Страница сбора всегда собирает на одну цель. Выберите ту, на которую хотите собирать.",
     "fundraiseHave": "Вы уже собираете на эту цель",
     "fundraiseHaveSub": "Ваша страница сбора «{title}» — {status}. Одна страница сбора на цель держит вашу сумму в одном месте.",
     "fundraiseFinished": "Эта цель закрыта",
@@ -507,7 +507,8 @@
     "evCompleted": "Завершена",
     "evGoalMet": "Цель достигнута",
     "evGoalMissed": "Цель не достигнута",
-    "evRaised": "Вы собирали"
+    "evRaised": "Вы собирали",
+    "fundraiseCauseUntil": "сбор до {date}"
   },
   "email": {
     "instructions": {

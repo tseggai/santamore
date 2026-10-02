@@ -432,7 +432,7 @@
     "fundraiseSignIn": "Prijavi se da prikupljaš",
     "fundraiseSignInSub": "Jedan email — isti nalog vodi tvoju stranicu i prijave.",
     "fundraiseNoEvent": "Prvo izaberi cilj",
-    "fundraiseNoEventSub": "Stranica za prikupljanje uvijek prikuplja za jedan cilj. Izaberi ga među Ciljevima.",
+    "fundraiseNoEventSub": "Stranica za prikupljanje uvijek prikuplja za jedan cilj. Izaberi onaj za koji želiš da prikupljaš.",
     "fundraiseHave": "Već prikupljaš za ovaj cilj",
     "fundraiseHaveSub": "Tvoja stranica za prikupljanje „{title}” je {status}. Jedna stranica po cilju drži tvoj iznos na jednom mjestu.",
     "fundraiseFinished": "Ovaj cilj je zatvoren",
@@ -506,7 +506,8 @@
     "evCompleted": "Završen",
     "evGoalMet": "Cilj dostignut",
     "evGoalMissed": "Cilj nije dostignut",
-    "evRaised": "Prikupljao/la si"
+    "evRaised": "Prikupljao/la si",
+    "fundraiseCauseUntil": "prikuplja do {date}"
   },
   "email": {
     "instructions": {

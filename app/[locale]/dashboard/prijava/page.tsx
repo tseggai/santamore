@@ -3,6 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { SignInForm } from "@/components/admin/SignInForm";
+import { safeNextPath } from "@/lib/site";
 import { routing, type Locale } from "@/i18n/routing";
 
 export default async function RunnerSignInPage({
@@ -10,10 +11,10 @@ export default async function RunnerSignInPage({
   searchParams,
 }: {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
   const { locale } = await params;
-  const { error } = await searchParams;
+  const { error, next } = await searchParams;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const [t, tAdmin] = await Promise.all([
@@ -39,7 +40,7 @@ export default async function RunnerSignInPage({
       <div className="mt-6">
         <SignInForm
           locale={locale as Locale}
-          nextPath={`/${locale}/dashboard`}
+          nextPath={safeNextPath(next, `/${locale}/dashboard`)}
           allowSignup
         />
       </div>

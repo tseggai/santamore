@@ -432,7 +432,7 @@
     "fundraiseSignIn": "Sign in to raise money",
     "fundraiseSignInSub": "One email — the same account runs your page and your registrations.",
     "fundraiseNoEvent": "Pick a cause first",
-    "fundraiseNoEventSub": "A fundraising page always raises for one cause. Choose it from Causes.",
+    "fundraiseNoEventSub": "A fundraising page always raises for one cause. Choose the one you want to raise for.",
     "fundraiseHave": "You're already raising for this cause",
     "fundraiseHaveSub": "Your fundraising page “{title}” is {status}. One fundraising page per cause keeps your total in one place.",
     "fundraiseFinished": "This cause has closed",
@@ -506,7 +506,8 @@
     "evCompleted": "Completed",
     "evGoalMet": "Goal met",
     "evGoalMissed": "Goal not met",
-    "evRaised": "You raised"
+    "evRaised": "You raised",
+    "fundraiseCauseUntil": "raising until {date}"
   },
   "email": {
     "instructions": {
