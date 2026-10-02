@@ -368,7 +368,7 @@
     "navOverview": "Pregled",
     "navPages": "Prikupljanje",
     "navTeams": "Moji timovi",
-    "navStrava": "Strava i nagrade",
+    "navStrava": "Izazovi",
     "welcome": "Zdravo {name}",
     "statRaised": "Prikupljeno na mojim stranicama",
     "statGoal": "Ukupan cilj",
@@ -1804,8 +1804,8 @@
     "noPageNeeded": "Stranica za prikupljanje nije potrebna: prijavi se e-mailom, poveži Stravu, pokreni se."
   },
   "strava": {
-    "title": "Strava",
-    "sub": "Poveži Stravu da osvajaš nagrade partnera za svoje aktivnosti — trčanje, plivanje, vožnju — i da se računaju u poretku izazova.",
+    "title": "Izazovi",
+    "sub": "Partnerski izazovi nagrađuju tvoje trčanje, plivanje i vožnju. Izaberi izazov, poveži Stravu i tvoje aktivnosti se računaju same.",
     "connectedHeading": "Strava je povezana",
     "connectedSince": "Povezano od {date}",
     "lastSync": "posljednja sinhronizacija {date}",
@@ -1846,7 +1846,7 @@
     "nurtureCta": "Napravi stranicu",
     "viewOnStrava": "View on Strava",
     "statusCredentials": "Strava je odbila pristupne podatke ove aplikacije. Tim: provjerite STRAVA_CLIENT_ID i STRAVA_CLIENT_SECRET u deploy podešavanjima.",
-    "progressHeading": "Tvoji izazovi",
+    "progressHeading": "Aktivni izazovi",
     "progressEmpty": "Trenutno nema aktivnih partnerskih izazova.",
     "progressDays": "{done} od {needed} dana",
     "progressWindowRolling": "klizni period od {days} dana",
@@ -1882,7 +1882,15 @@
     "autoSyncNote": "Nove aktivnosti stižu same u roku od minuta; stranica se osvježava i pri otvaranju.",
     "trendEmptyDisconnected": "Poveži Stravu da vidiš kilometre po sedmici.",
     "activitiesEmptyDisconnected": "Aktivnosti iz zadnjih 8 sedmica se pojavljuju ovdje nakon povezivanja.",
-    "onStrava": "na Stravi"
+    "onStrava": "na Stravi",
+    "step1Title": "Izaberi izazov",
+    "step1Sub": "{count, plural, =0 {Trenutno nijedan nije aktivan} one {# aktivan izazov ispod} few {# aktivna izazova ispod} other {# aktivnih izazova ispod}}",
+    "step2Title": "Poveži Stravu",
+    "step2Sub": "Čitamo distancu, vrijeme i datum tvojih aktivnosti i provjeravamo ih prema pravilima.",
+    "step2Done": "Povezano",
+    "step3Title": "Kreni",
+    "step3Sub": "Aktivnost koja ispunjava pravila računa se istog dana. Nagrada se pojavljuje ovdje čim je osvojiš.",
+    "progressReward": "Nagrada: {reward} · {partner}"
   },
   "giving": {
     "title": "Moje donacije",

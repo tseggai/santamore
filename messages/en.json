@@ -368,7 +368,7 @@
     "navOverview": "Overview",
     "navPages": "Fundraising",
     "navTeams": "My teams",
-    "navStrava": "Strava & rewards",
+    "navStrava": "Challenges",
     "welcome": "Hi {name}",
     "statRaised": "Raised across my pages",
     "statGoal": "Combined goal",
@@ -1804,8 +1804,8 @@
     "noPageNeeded": "No fundraising page needed: sign in with your email, connect Strava, get moving."
   },
   "strava": {
-    "title": "Strava",
-    "sub": "Connect Strava to earn partner rewards for your activities — runs, swims, rides — and to count them on challenge standings.",
+    "title": "Challenges",
+    "sub": "Partner challenges reward your runs, swims and rides. Pick a challenge, connect Strava, and your activities count on their own.",
     "connectedHeading": "Strava is connected",
     "connectedSince": "Connected since {date}",
     "lastSync": "last sync {date}",
@@ -1846,7 +1846,7 @@
     "nurtureCta": "Start a page",
     "viewOnStrava": "View on Strava",
     "statusCredentials": "Strava rejected this site's app credentials. Staff: check STRAVA_CLIENT_ID and STRAVA_CLIENT_SECRET in the deployment.",
-    "progressHeading": "Your challenges",
+    "progressHeading": "Active challenges",
     "progressEmpty": "No active partner challenges right now.",
     "progressDays": "{done} of {needed} days",
     "progressWindowRolling": "rolling {days}-day window",
@@ -1882,7 +1882,15 @@
     "autoSyncNote": "New activities arrive on their own within a minute; the page also refreshes when you open it.",
     "trendEmptyDisconnected": "Connect Strava to see kilometres per week.",
     "activitiesEmptyDisconnected": "Your activities from the last 8 weeks appear here once connected.",
-    "onStrava": "on Strava"
+    "onStrava": "on Strava",
+    "step1Title": "Pick a challenge",
+    "step1Sub": "{count, plural, =0 {None active right now} one {# active challenge below} other {# active challenges below}}",
+    "step2Title": "Connect Strava",
+    "step2Sub": "We read the distance, time and date of your activities and check them against the rules.",
+    "step2Done": "Connected",
+    "step3Title": "Move",
+    "step3Sub": "A qualifying activity counts the same day. The reward appears here once you earn it.",
+    "progressReward": "Reward: {reward} · {partner}"
   },
   "giving": {
     "title": "My giving",

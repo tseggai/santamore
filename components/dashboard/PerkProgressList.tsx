@@ -71,9 +71,7 @@ export function PerkProgressList({ rows, limit }: { rows: PerkProgressRow[]; lim
         return (
           <li key={row.challenge_id} className="rounded-lg bg-paper px-4 py-3">
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-              <span className="min-w-0 text-[15px] font-semibold">
-                {row.reward_label} · {row.partner_name}
-              </span>
+              <span className="min-w-0 text-[15px] font-semibold">{row.title}</span>
               <span className="font-mono text-[13.5px] tabular-nums text-black/60">
                 {t("progressDays", { done, needed })} · {window}
               </span>
@@ -95,7 +93,7 @@ export function PerkProgressList({ rows, limit }: { rows: PerkProgressRow[]; lim
             </div>
             <p className={`mt-2 text-[14px] font-semibold ${state.tone}`}>{state.text}</p>
             <p className="mt-0.5 text-[13px] text-black/55">
-              {row.title} · {km(row.min_distance_m)}
+              {t("progressReward", { reward: row.reward_label, partner: row.partner_name })} · {km(row.min_distance_m)}
               {row.max_pace_s_per_km ? ` · ${t("progressPace", { pace: pace(row.max_pace_s_per_km) })}` : ""}
               {" · "}
               {row.sport_types.join(", ")}
