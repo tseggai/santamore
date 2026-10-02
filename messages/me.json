@@ -354,7 +354,7 @@
     "storyHint": "Najmanje tri rečenice. Enter za novi red; klikni van polja kad završiš.",
     "teamCreateHeading": "Napravi tim",
     "teamEditHeading": "Uredi svoj tim",
-    "teamCreateSub": "Tim ima svoju stranicu: ime, fotografiju i par redova o tome ko ste. Drugi učesnici mogu da se pridruže, a stranica svakog člana računa se u ukupan iznos tima.",
+    "teamCreateSub": "Tim je zajednička stranica: ime, fotografija i par redova o tome ko ste. Svaka stranica za prikupljanje za isti cilj može mu se pridružiti, a iznos svakog člana računa se timu.",
     "teamPhotoLabel": "Fotografija tima",
     "teamNameLabel": "Ime tima",
     "teamDescriptionLabel": "O timu",
@@ -386,9 +386,9 @@
     "teamsEmpty": "Još ne vodiš nijedan tim.",
     "registrationsHeading": "Moje prijave",
     "registrationsEmpty": "Nisi prijavljen/a ni na jedan događaj.",
-    "pagesSub": "Jedna stranica za prikupljanje po cilju — svaki događaj pod tim ciljem se računa u nju. Otvori red da je urediš.",
+    "pagesSub": "Tvoje stranice za prikupljanje, po jedna za svaki cilj. Otvori stranicu da je urediš, podijeliš ili upišeš prikupljenu gotovinu.",
     "createNoEvents": "Još nema otvorenog cilja za koji se može prikupljati.",
-    "teamsSub": "Timovi koje vodiš. Svako sa stranicom za prikupljanje za isti cilj može se pridružiti iz svog uređivača; stranica svakog člana računa se u ukupan iznos tima.",
+    "teamsSub": "Učestvuješ s prijateljima ili kolegama? Tim okuplja vaše stranice za prikupljanje pod jednim imenom i jednim ukupnim iznosom. Tim praviš kad imaš stranicu za taj cilj; ostali se pridružuju sa svoje stranice.",
     "memberCountShort": "{count, plural, one {# član} few {# člana} other {# članova}}",
     "teamJoinsPage": "Tvoja stranica za prikupljanje za ovaj cilj automatski ulazi u tim.",
     "teamNoPageYet": "Još nemaš stranicu za prikupljanje za ovaj cilj — tim se pravi bez tebe kao člana; napravi je da mu se pridružiš.",
@@ -397,7 +397,7 @@
     "menuClose": "Zatvori meni",
     "finishPage": "Dovrši stranicu za prikupljanje",
     "createAnotherHeading": "Otvori stranicu za prikupljanje za drugi cilj",
-    "hubEmptySub": "Tvoja stranica za prikupljanje je mjesto gdje stižu donacije i ono što dijeliš. Napravi je za cilj za koji prikupljaš.",
+    "hubEmptySub": "Stranica za prikupljanje je tvoja stranica na ovom sajtu: tvoje ime, fotografija, iznos koji ciljaš i par rečenica o tome zašto učestvuješ. Na nju stižu donacije, a njen link je ono što dijeliš. Ništa nije javno dok je ne objaviš.",
     "shareMessageShort": "Prikupljam sredstva za Santamore — {title}. Svaki euro je javno objavljen u registru. Podrži me ovdje:",
     "cashDonorLabel": "Od (opciono)",
     "cashDonorPlaceholder": "Ime na zidu donatora; prazno = anonimno",
@@ -507,7 +507,11 @@
     "evGoalMet": "Cilj dostignut",
     "evGoalMissed": "Cilj nije dostignut",
     "evRaised": "Prikupljao/la si",
-    "fundraiseCauseUntil": "prikuplja do {date}"
+    "fundraiseCauseUntil": "prikuplja do {date}",
+    "hubEmptyHeading": "Prikupljanje za cilj počinje tvojom stranicom za prikupljanje",
+    "hubStep1": "Otvori stranicu: daj joj ime i izaberi cilj za koji prikuplja.",
+    "hubStep2": "Dodaj fotografiju, iznos i svoju priču, pa je objavi.",
+    "hubStep3": "Podijeli link. Svaki euro se vidi na tvojoj stranici i u javnoj knjizi."
   },
   "email": {
     "instructions": {

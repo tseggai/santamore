@@ -354,7 +354,7 @@
     "storyHint": "At least three sentences. Enter for a new line; click outside when done.",
     "teamCreateHeading": "Create a team",
     "teamEditHeading": "Edit your team",
-    "teamCreateSub": "A team has its own page: a name, a photo and a few lines about who you are. Other participants can join it and every member's page counts towards the team total.",
+    "teamCreateSub": "A team is a shared page: a name, a photo and a few lines about who you are. Every fundraising page for the same cause can join it, and every member's total counts towards the team.",
     "teamPhotoLabel": "Team photo",
     "teamNameLabel": "Team name",
     "teamDescriptionLabel": "About the team",
@@ -386,9 +386,9 @@
     "teamsEmpty": "You don't captain a team yet.",
     "registrationsHeading": "My registrations",
     "registrationsEmpty": "Not registered for any event yet.",
-    "pagesSub": "One fundraising page per cause you raise for — every event under that cause counts towards it. Open a row to edit it.",
+    "pagesSub": "Your fundraising pages, one per cause. Open one to edit it, share it or log cash you collected.",
     "createNoEvents": "There is no open cause to raise for yet.",
-    "teamsSub": "Teams you captain. Anyone with a fundraising page for the same cause can join from their editor; every member's page counts towards the team total.",
+    "teamsSub": "Taking part with friends or colleagues? A team gathers your fundraising pages under one name and one total. Create a team once you have a page for the cause; others join from their own page.",
     "memberCountShort": "{count, plural, one {# member} other {# members}}",
     "teamJoinsPage": "Your fundraising page for this cause joins the team automatically.",
     "teamNoPageYet": "You have no fundraising page for this cause yet — the team is created without you as a member; create one to join it.",
@@ -397,7 +397,7 @@
     "menuClose": "Close menu",
     "finishPage": "Finish my fundraising page",
     "createAnotherHeading": "Start a fundraising page for another cause",
-    "hubEmptySub": "Your fundraising page is where donations land and what you share. Create one for the cause you are raising for.",
+    "hubEmptySub": "A fundraising page is your own page on this site: your name, a photo, a goal and a few sentences on why you take part. Donations land on it, and its link is what you share. Nothing is public until you publish it.",
     "shareMessageShort": "I'm fundraising for Santamore — {title}. Every euro is published in a public ledger. Support me here:",
     "cashDonorLabel": "From (optional)",
     "cashDonorPlaceholder": "Name shown on the donor wall; empty = anonymous",
@@ -507,7 +507,11 @@
     "evGoalMet": "Goal met",
     "evGoalMissed": "Goal not met",
     "evRaised": "You raised",
-    "fundraiseCauseUntil": "raising until {date}"
+    "fundraiseCauseUntil": "raising until {date}",
+    "hubEmptyHeading": "To start fundraising for a cause, set up your fundraising page",
+    "hubStep1": "Create the page: give it a name and pick the cause it raises for.",
+    "hubStep2": "Add a photo, a goal and your story, then publish it.",
+    "hubStep3": "Share the link. Every euro shows on your page and in the public ledger."
   },
   "email": {
     "instructions": {
