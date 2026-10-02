@@ -1507,7 +1507,8 @@
       "adjustment": "Correction"
     },
     "yearFilterLabel": "Year",
-    "yearFilterAll": "All years"
+    "yearFilterAll": "All years",
+    "memberAccessLevels": "What each level can do"
   },
   "forms": {
     "nameLabel": "Full name",

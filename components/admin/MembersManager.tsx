@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { deleteFundraiser, saveMemberProfile } from "@/app/[locale]/admin/(protected)/osoblje/actions";
+import { deleteFundraiser, saveMemberAccess } from "@/app/[locale]/admin/(protected)/osoblje/actions";
 
 import { Chip, DataTable, Thumb, bulkButton, type Column } from "@/components/console/DataTable";
 import { formatShortDate } from "@/lib/dates";
@@ -448,16 +448,7 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
     event.preventDefault();
     if (state === "busy") return;
     setState("busy");
-    const result = await saveMemberProfile({
-      id: member.id,
-      fullName,
-      title: null,
-      quote: null,
-      photoPath: null,
-      isTeam: false,
-      teamOrder: 0,
-      role,
-    }).catch(() => ({ ok: false as const, error: "server" as const }));
+    const result = await saveMemberAccess({ id: member.id, fullName, role }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       setState("saved");
       router.refresh();
@@ -486,9 +477,21 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
               <option key={value} value={value}>{t(`memberRole.${value}`)}</option>
             ))}
           </select>
-          <p className="mt-1 text-[13px] text-black/50">{t(`memberAccessHint.${role}`)}</p>
         </div>
       </div>
+      {/* what each level opens — the chosen one marked, so the choice is never a guess */}
+      <p className="mt-4 text-[13px] font-semibold text-black/60">{t("memberAccessLevels")}</p>
+      <ul className="mt-1.5 space-y-1">
+        {ROLES.map((value) => {
+          const chosen = value === role;
+          return (
+            <li key={value} className={`flex gap-3 rounded-lg px-3 py-2 text-[13.5px] leading-snug ${chosen ? "bg-paper" : ""}`}>
+              <span className={`w-24 shrink-0 font-semibold ${chosen ? "text-sea" : "text-black/70"}`}>{t(`memberRole.${value}`)}</span>
+              <span className={chosen ? "text-black/80" : "text-black/55"}>{t(`memberAccessHint.${value}`)}</span>
+            </li>
+          );
+        })}
+      </ul>
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "forbidden" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("memberForbidden")}</p> : null}
       {state === "saved" ? <p role="status" className="mt-3 text-[14px] font-semibold text-sea">{t("memberSaved")}</p> : null}

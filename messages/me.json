@@ -1507,7 +1507,8 @@
       "adjustment": "Ispravka"
     },
     "yearFilterLabel": "Godina",
-    "yearFilterAll": "Sve godine"
+    "yearFilterAll": "Sve godine",
+    "memberAccessLevels": "Šta koji nivo može"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

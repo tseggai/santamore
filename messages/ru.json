@@ -1508,7 +1508,8 @@
       "adjustment": "Исправление"
     },
     "yearFilterLabel": "Год",
-    "yearFilterAll": "Все годы"
+    "yearFilterAll": "Все годы",
+    "memberAccessLevels": "Что может каждый уровень"
   },
   "forms": {
     "nameLabel": "Имя и фамилия",
