@@ -12,7 +12,8 @@ import { createClient } from "@/lib/supabase/server";
 
 export interface MemberActionResult {
   ok: boolean;
-  error?: "invalid" | "forbidden" | "server";
+  /** "schema": the API does not know the function yet — a migration not applied or not reloaded. */
+  error?: "invalid" | "forbidden" | "schema" | "server";
 }
 
 const schema = z.object({
@@ -33,7 +34,7 @@ export async function saveMemberAccess(input: unknown): Promise<MemberActionResu
   });
   if (error) {
     console.error("[admin] member access save failed:", error.code);
-    return { ok: false, error: error.code === "42501" ? "forbidden" : "server" };
+    return { ok: false, error: error.code === "42501" ? "forbidden" : error.code === "PGRST202" ? "schema" : "server" };
   }
   revalidatePath("/[locale]/admin", "layout");
   revalidatePath("/[locale]/o-nama", "page");
