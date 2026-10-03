@@ -642,7 +642,7 @@
       "selectRow": "Select row",
       "colName": "Name",
       "colEmail": "Email",
-      "colRoles": "Roles",
+      "colRoles": "Participation",
       "colRaised": "Raised",
       "colGiven": "Given",
       "colJoined": "Joined",
@@ -1091,16 +1091,18 @@
     "teamKind": "Role",
     "teamKindValue": {
       "officer": "Officer",
-      "staff": "Staff",
       "board": "Board",
       "committee": "Grants committee",
+      "chapter_lead": "Chapter lead",
+      "staff": "Staff",
       "volunteer": "Volunteer"
     },
     "teamKindHint": {
       "officer": "Founders and officers of the organisation.",
-      "staff": "The working team.",
       "board": "The board.",
       "committee": "The independent committee that decides hand-overs.",
+      "chapter_lead": "Leads a chapter and its events on the ground.",
+      "staff": "The working team.",
       "volunteer": "Helps at events; listed by name with the years."
     },
     "teamPrivate": "Private",
@@ -1108,10 +1110,8 @@
     "teamYearsHint": "Comma-separated, e.g. 2025, 2026. A volunteer counts for each year listed.",
     "teamAccount": "Account",
     "teamNoAccount": "No account",
-    "teamAccountHint": "Optional. Link the person's account to tie their access level to this record.",
+    "teamAccountHint": "Optional. Link the person's account to set what they may do in the admin.",
     "teamAccountTaken": "This account is already linked to another person on the team. Open that record instead, or unlink it there first.",
-    "teamAccountLevel": "Access level: {level}.",
-    "teamChangeAccess": "Change on Accounts",
     "teamPublic": "Show on the About us page",
     "teamDeleteConfirm": "Remove “{name}” from the team? Their account, if any, stays.",
     "memberTeamLink": "Their public profile lives on the Staff tab.",
@@ -1127,23 +1127,23 @@
       "team": "Staff"
     },
     "memberRole": {
-      "admin": "Admin",
-      "chapter_lead": "Chapter lead",
-      "member": "Member",
-      "accounting": "Accounting"
+      "member": "None",
+      "accounting": "Accounting",
+      "chapter_lead": "Editor",
+      "admin": "Admin"
     },
     "memberProfileHeading": "Profile and access",
-    "memberProfileHint": "The name and what this account may do in the admin.",
+    "memberProfileHint": "The account's name. What it may do in the admin is set on the person's Staff record.",
     "memberProfileReadOnly": "Only an admin can change a profile or an access level.",
     "memberName": "Name",
     "memberAccess": "Access level",
     "memberAccessHint": {
-      "member": "Runs pages, joins teams and events. No admin access.",
-      "chapter_lead": "Everything in the admin except members' access levels.",
-      "admin": "Everything, including who is admin.",
-      "accounting": "The Money section and the supporters behind it. Nothing else in the console."
+      "member": "No admin access. Runs pages, joins teams and events.",
+      "accounting": "The Money section and the supporters behind it. Nothing else in the console.",
+      "chapter_lead": "Everything in the admin except access levels, deletions and the switches under Settings.",
+      "admin": "Everything, including who is admin."
     },
-    "memberTitle": "Role in the team",
+    "memberTitle": "Title",
     "memberTitleHint": "e.g. co-founder, treasurer, event director",
     "memberOrder": "Order on the page",
     "memberQuote": "In their own words",
@@ -1487,7 +1487,7 @@
     "peekGuestOf": "guest of {name}",
     "pagesDraftSuffix": "{count, plural, one {+# draft} other {+# drafts}}",
     "navPages": "Pages",
-    "navStaff": "Staff",
+    "navStaff": "People",
     "supportersSectionHint": "Everyone the money comes through: the organisations that sponsor us, the people who raise on a page, the donors, the participants, and the teams.",
     "supportersTabSponsors": "Sponsors",
     "supportersTabFundraisers": "Fundraisers",
@@ -1498,7 +1498,7 @@
     "participantsHint": "Everyone registered for an event or who said they are coming, and the athletes with Strava on. Open a row for their registrations and activity.",
     "staffSectionHint": "The staff records that make up the team, and every account with its access level: member, accounting, staff or admin.",
     "staffTabTeam": "Staff",
-    "staffTabAccounts": "Accounts",
+    "staffTabAccounts": "Members",
     "pagesHint": "Every fundraising page: who runs it, which cause and team it raises for, and its state. A fundraiser is a person and may hold several pages.",
     "pagesDeleteConfirm": "{count, plural, one {Delete this page?} other {Delete # pages?}} A page that took gifts is refused.",
     "pgColFundraiser": "Fundraiser",
@@ -1627,8 +1627,13 @@
       "notes": "Working notes",
       "notesHint": "What the document hangs on, the decisions embedded in it, the checks and parameters for the Board, and points for the lawyer. English only, not part of the document."
     },
-    "memberAccessLevels": "What each level can do",
-    "memberSchemaStale": "The database API does not know set_member_access yet: confirm migration 0069 with supabase/status.sql, then run this in the SQL editor and try again."
+    "memberSchemaStale": "The database API does not know set_member_access yet: confirm migration 0069 with supabase/status.sql, then run this in the SQL editor and try again.",
+    "teamAccess": "Access",
+    "teamAccessHint": "What this account may do in the admin. Offered from the role; only an admin can change it.",
+    "teamAccessNeedsAccount": "Link an account to set access.",
+    "teamAccessFailed": "The person was saved, but the access level was not. {reason}",
+    "memberAccessOnStaff": "Change on the Staff record",
+    "memberAccessNone": "To grant admin access, add this person to Staff and link this account."
   },
   "forms": {
     "nameLabel": "Full name",

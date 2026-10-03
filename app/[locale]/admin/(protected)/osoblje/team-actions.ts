@@ -18,7 +18,7 @@ export interface TeamActionResult {
 
 const schema = z.object({
   id: z.string().uuid().optional(),
-  kind: z.enum(["officer", "staff", "board", "committee", "volunteer"]),
+  kind: z.enum(["officer", "staff", "board", "committee", "volunteer", "chapter_lead"]),
   fullName: z.string().trim().min(2).max(120),
   title: z.string().trim().max(120).nullable(),
   quote: z.string().trim().max(600).nullable(),

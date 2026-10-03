@@ -3,11 +3,16 @@
  * through is_staff() and is_admin(); these helpers keep the app's own
  * checks and the console navigation in step with it.
  *
- *   member       runs pages, joins teams and events; no console
+ *   member       "None": runs pages, joins teams and events; no console
  *   accounting   the Money section and the supporters behind it
- *   chapter_lead staff: everything in the console except access levels,
- *                deletes and the switches under Settings
+ *   chapter_lead "Editor": everything in the console except access levels,
+ *                deletes and the switches under Settings (the value is
+ *                historical; the label is Editor, a chapter lead is a team role)
  *   admin        everything
+ *
+ * This is the access level only. A person's role on the team (officer,
+ * board, chapter lead…) and their participation (fundraiser, athlete,
+ * donor…) are other things — see docs/ROLES.md.
  */
 export const ROLES = ["member", "accounting", "chapter_lead", "admin"] as const;
 export type Role = (typeof ROLES)[number];

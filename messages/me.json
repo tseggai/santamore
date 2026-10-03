@@ -642,7 +642,7 @@
       "selectRow": "Izaberi red",
       "colName": "Ime",
       "colEmail": "Email",
-      "colRoles": "Uloge",
+      "colRoles": "Učešće",
       "colRaised": "Prikupljeno",
       "colGiven": "Donirano",
       "colJoined": "Pridružen",
@@ -1091,27 +1091,27 @@
     "teamKind": "Uloga",
     "teamKindValue": {
       "officer": "Rukovodstvo",
-      "staff": "Tim",
       "board": "Odbor",
       "committee": "Komisija za dodjelu",
+      "chapter_lead": "Vođa ogranka",
+      "staff": "Tim",
       "volunteer": "Volonter"
     },
     "teamKindHint": {
-      "officer": "Osnivači i rukovodstvo organizacije.",
-      "staff": "Radni tim.",
+      "officer": "Osnivači i rukovodioci organizacije.",
       "board": "Odbor.",
-      "committee": "Nezavisna komisija koja odlučuje o isplatama.",
-      "volunteer": "Pomaže na događajima; naveden imenom sa godinama."
+      "committee": "Nezavisna komisija koja odlučuje o dodjelama.",
+      "chapter_lead": "Vodi ogranak i njegove događaje na terenu.",
+      "staff": "Radni tim.",
+      "volunteer": "Pomaže na događajima; naveden po imenu uz godine."
     },
     "teamPrivate": "Privatno",
     "teamYears": "Godine aktivnosti",
     "teamYearsHint": "Odvojene zarezom, npr. 2025, 2026. Volonter se računa za svaku navedenu godinu.",
     "teamAccount": "Nalog",
     "teamNoAccount": "Bez naloga",
-    "teamAccountHint": "Nije obavezno. Povežite nalog osobe da vežete nivo pristupa za ovaj zapis.",
+    "teamAccountHint": "Nije obavezno. Poveži nalog osobe da postaviš šta smije u adminu.",
     "teamAccountTaken": "Ovaj nalog je već povezan sa drugom osobom u timu. Otvorite taj zapis ili ga tamo prvo odvežite.",
-    "teamAccountLevel": "Nivo pristupa: {level}.",
-    "teamChangeAccess": "Promijeni u Nalozima",
     "teamPublic": "Prikaži na stranici O nama",
     "teamDeleteConfirm": "Ukloniti „{name}“ iz tima? Nalog, ako postoji, ostaje.",
     "memberTeamLink": "Javni profil je na kartici Osoblje.",
@@ -1127,23 +1127,23 @@
       "team": "Osoblje"
     },
     "memberRole": {
-      "admin": "Admin",
-      "chapter_lead": "Vođa ogranka",
-      "member": "Član",
-      "accounting": "Računovodstvo"
+      "member": "Bez pristupa",
+      "accounting": "Računovodstvo",
+      "chapter_lead": "Urednik",
+      "admin": "Admin"
     },
     "memberProfileHeading": "Profil i pristup",
-    "memberProfileHint": "Ime i šta ovaj nalog smije u administraciji.",
+    "memberProfileHint": "Ime naloga. Šta smije u adminu postavlja se na zapisu osobe u Osoblju.",
     "memberProfileReadOnly": "Samo admin može mijenjati profil ili nivo pristupa.",
     "memberName": "Ime i prezime",
     "memberAccess": "Nivo pristupa",
     "memberAccessHint": {
-      "member": "Vodi stranice, pridružuje se timovima i događajima. Bez pristupa administraciji.",
-      "chapter_lead": "Sve u administraciji osim nivoa pristupa članova.",
-      "admin": "Sve, uključujući ko je admin.",
-      "accounting": "Sekcija Novac i podrška iza nje. Ništa drugo u konzoli."
+      "member": "Bez pristupa adminu. Vodi stranice, pridružuje se timovima i događajima.",
+      "accounting": "Sekcija Novac i podržavaoci iza nje. Ništa drugo u konzoli.",
+      "chapter_lead": "Sve u adminu osim nivoa pristupa, brisanja i prekidača u Podešavanjima.",
+      "admin": "Sve, uključujući ko je admin."
     },
-    "memberTitle": "Uloga u timu",
+    "memberTitle": "Titula",
     "memberTitleHint": "npr. suosnivač, blagajnik, direktor događaja",
     "memberOrder": "Redosljed na stranici",
     "memberQuote": "Njihovim riječima",
@@ -1487,7 +1487,7 @@
     "peekGuestOf": "gost: {name}",
     "pagesDraftSuffix": "{count, plural, one {+# nacrt} few {+# nacrta} other {+# nacrta}}",
     "navPages": "Stranice",
-    "navStaff": "Osoblje",
+    "navStaff": "Ljudi",
     "supportersSectionHint": "Svi kroz koje novac dolazi: organizacije koje nas sponzorišu, ljudi koji prikupljaju na stranici, donatori, učesnici i timovi.",
     "supportersTabSponsors": "Sponzori",
     "supportersTabFundraisers": "Prikupljači",
@@ -1498,7 +1498,7 @@
     "participantsHint": "Svi prijavljeni na događaj ili koji su javili da dolaze, i sportisti sa uključenom Stravom. Otvori red za prijave i aktivnost.",
     "staffSectionHint": "Zapisi osoblja koji čine tim, i svaki nalog sa nivoom pristupa: član, računovodstvo, osoblje ili admin.",
     "staffTabTeam": "Osoblje",
-    "staffTabAccounts": "Nalozi",
+    "staffTabAccounts": "Članovi",
     "pagesHint": "Svaka stranica za prikupljanje: ko je vodi, za koji cilj i tim prikuplja, i u kom je stanju. Prikupljač je osoba i može imati više stranica.",
     "pagesDeleteConfirm": "{count, plural, one {Obrisati ovu stranicu?} few {Obrisati # stranice?} other {Obrisati # stranica?}} Stranica koja je primila poklone se odbija.",
     "pgColFundraiser": "Prikupljač",
@@ -1627,8 +1627,13 @@
       "notes": "Radne bilješke",
       "notesHint": "Na šta se dokument oslanja, odluke ugrađene u njega, provjere i parametri za Upravni odbor i pitanja za advokata. Samo na engleskom, nije dio dokumenta."
     },
-    "memberAccessLevels": "Šta koji nivo može",
-    "memberSchemaStale": "API baze još ne zna za set_member_access: provjeri migraciju 0069 pomoću supabase/status.sql, zatim pokreni ovo u SQL editoru i pokušaj ponovo."
+    "memberSchemaStale": "API baze još ne zna za set_member_access: provjeri migraciju 0069 pomoću supabase/status.sql, zatim pokreni ovo u SQL editoru i pokušaj ponovo.",
+    "teamAccess": "Pristup",
+    "teamAccessHint": "Šta ovaj nalog smije u adminu. Predloženo prema ulozi; mijenja samo admin.",
+    "teamAccessNeedsAccount": "Poveži nalog da postaviš pristup.",
+    "teamAccessFailed": "Osoba je sačuvana, ali nivo pristupa nije. {reason}",
+    "memberAccessOnStaff": "Promijeni na zapisu u Osoblju",
+    "memberAccessNone": "Da daš pristup adminu, dodaj osobu u Osoblje i poveži ovaj nalog."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

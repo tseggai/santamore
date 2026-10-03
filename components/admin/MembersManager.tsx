@@ -16,7 +16,6 @@ import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 import { FundraiserStatusButtons } from "@/components/admin/FundraiserModeration";
 import { RegistrationRowActions } from "@/components/admin/RegistrationRowActions";
 import { formatCents } from "@/lib/money";
-import { ROLES } from "@/lib/roles";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
@@ -441,14 +440,13 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
   const t = useTranslations("admin");
   const router = useRouter();
   const [fullName, setFullName] = useState(member.full_name ?? "");
-  const [role, setRole] = useState<MemberRow["role"]>(member.role);
   const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "forbidden" | "schema">("idle");
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (state === "busy") return;
     setState("busy");
-    const result = await saveMemberAccess({ id: member.id, fullName, role }).catch(() => ({ ok: false as const, error: "server" as const }));
+    const result = await saveMemberAccess({ id: member.id, fullName, role: member.role }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       setState("saved");
       router.refresh();
@@ -471,27 +469,22 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
           <input id="mpName" type="text" required minLength={2} maxLength={120} disabled={disabled} value={fullName} onChange={(e) => setFullName(e.target.value)} className={`${inputClass} disabled:opacity-60`} />
         </div>
         <div>
-          <label htmlFor="mpRole" className={labelClass}>{t("memberAccess")}</label>
-          <select id="mpRole" disabled={disabled} value={role} onChange={(e) => setRole(e.target.value as MemberRow["role"])} className={`${inputClass} disabled:opacity-60`}>
-            {ROLES.map((value) => (
-              <option key={value} value={value}>{t(`memberRole.${value}`)}</option>
-            ))}
-          </select>
+          <p className={labelClass}>{t("memberAccess")}</p>
+          <p className="mt-1 rounded-lg bg-paper px-3.5 py-2.5 text-[15px]">
+            <span className={member.role === "member" ? "text-black/55" : "font-semibold"}>{t(`memberRole.${member.role}`)}</span>
+          </p>
+          <p className="mt-1 text-[13px] text-black/50">
+            {member.team_id ? (
+              <Link href={`/admin/osoblje?uredi=${member.team_id}`} className="font-semibold text-sea underline underline-offset-2">{t("memberAccessOnStaff")}</Link>
+            ) : (
+              <>
+                {t("memberAccessNone")}{" "}
+                <Link href="/admin/osoblje" className="font-semibold text-sea underline underline-offset-2">{t("navStaff")}</Link>
+              </>
+            )}
+          </p>
         </div>
       </div>
-      {/* what each level opens — the chosen one marked, so the choice is never a guess */}
-      <p className="mt-4 text-[13px] font-semibold text-black/60">{t("memberAccessLevels")}</p>
-      <ul className="mt-1.5 space-y-1">
-        {ROLES.map((value) => {
-          const chosen = value === role;
-          return (
-            <li key={value} className={`flex gap-3 rounded-lg px-3 py-2 text-[13.5px] leading-snug ${chosen ? "bg-paper" : ""}`}>
-              <span className={`w-24 shrink-0 font-semibold ${chosen ? "text-sea" : "text-black/70"}`}>{t(`memberRole.${value}`)}</span>
-              <span className={chosen ? "text-black/80" : "text-black/55"}>{t(`memberAccessHint.${value}`)}</span>
-            </li>
-          );
-        })}
-      </ul>
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "forbidden" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("memberForbidden")}</p> : null}
       {state === "schema" ? (

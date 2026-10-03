@@ -167,6 +167,10 @@ select * from (values
      to_regprocedure('public.set_member_access(uuid, text, text)') is not null)
   ,('20260920000070_event_progress',
      to_regclass('public.v_public_event_progress') is not null)
+  ,('20261003000075_chapter_lead_kind',
+     exists (select 1 from pg_constraint
+              where conrelid = 'public.team_members'::regclass
+                and pg_get_constraintdef(oid) like '%chapter_lead%'))
   ,('20260920000067_donors_view',
      to_regclass('public.v_donors') is not null)
   ,('20260920000066_vote_guard',
