@@ -6,6 +6,7 @@ import { useRef, useState, type FormEvent } from "react";
 
 import { saveMemberAccess } from "@/app/[locale]/admin/(protected)/osoblje/actions";
 import { deleteTeamMember, saveTeamMember } from "@/app/[locale]/admin/(protected)/osoblje/team-actions";
+import { AccessSummary } from "@/components/admin/AccessSummary";
 import { Chip, DataTable, Thumb, rowButton, type Column } from "@/components/console/DataTable";
 import { HeaderAction } from "@/components/console/HeaderAction";
 import { SidePanel } from "@/components/console/SidePanel";
@@ -261,6 +262,9 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
           ))}
         </div>
         <p className="mt-1 text-[13px] text-black/50">{t(`teamKindHint.${kind}`)}</p>
+        {/* the access this role usually comes with, and what that opens — before any account is linked */}
+        <p className="mt-2 text-[13px] font-semibold text-black/70">{t("teamKindAccess", { level: t(`memberRole.${DEFAULT_ACCESS_BY_KIND[kind]}`) })}</p>
+        <AccessSummary role={DEFAULT_ACCESS_BY_KIND[kind]} />
       </fieldset>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
@@ -337,17 +341,23 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
           </select>
           <p className="mt-1 text-[13px] text-black/50">{linked ? (canManage ? t("teamAccessHint") : t("memberProfileReadOnly")) : t("teamAccessNeedsAccount")}</p>
           {linked ? (
-            <ul className="mt-2 space-y-1">
-              {ROLES.map((value) => {
-                const chosen = value === access;
-                return (
-                  <li key={value} className={`flex gap-3 rounded-lg px-3 py-1.5 text-[13px] leading-snug ${chosen ? "bg-paper" : ""}`}>
-                    <span className={`w-24 shrink-0 font-semibold ${chosen ? "text-sea" : "text-black/70"}`}>{t(`memberRole.${value}`)}</span>
-                    <span className={chosen ? "text-black/80" : "text-black/55"}>{t(`memberAccessHint.${value}`)}</span>
-                  </li>
-                );
-              })}
-            </ul>
+            <>
+              <AccessSummary role={access} className="mt-2" />
+              <details className="mt-2">
+                <summary className="cursor-pointer text-[13px] font-semibold text-sea underline underline-offset-2">{t("allAccessLevels")}</summary>
+                <ul className="mt-2 space-y-1">
+                  {ROLES.map((value) => {
+                    const chosen = value === access;
+                    return (
+                      <li key={value} className={`rounded-lg px-3 py-1.5 text-[13px] leading-snug ${chosen ? "bg-paper" : ""}`}>
+                        <span className={`font-semibold ${chosen ? "text-sea" : "text-black/70"}`}>{t(`memberRole.${value}`)}</span>
+                        <AccessSummary role={value} />
+                      </li>
+                    );
+                  })}
+                </ul>
+              </details>
+            </>
           ) : null}
         </div>
         <div className="sm:col-span-2">

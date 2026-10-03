@@ -1633,7 +1633,14 @@
     "teamAccessNeedsAccount": "Link an account to set access.",
     "teamAccessFailed": "The person was saved, but the access level was not. {reason}",
     "memberAccessOnStaff": "Change on the Staff record",
-    "memberAccessNone": "To grant admin access, add this person to Staff and link this account."
+    "memberAccessNone": "To grant admin access, add this person to Staff and link this account.",
+    "teamKindAccess": "Usual access: {level}",
+    "accessSections": "Can manage {sections}",
+    "accessAdminExtra": "and who has access, deletions, test mode and purge",
+    "viewAccess": "View access level",
+    "hideAccess": "Hide",
+    "allAccessLevels": "All access levels",
+    "memberNotOnTeam": "Not on the team"
   },
   "forms": {
     "nameLabel": "Full name",
