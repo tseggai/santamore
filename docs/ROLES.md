@@ -1,40 +1,42 @@
-# People: roles, access and participation
+# People: role, title, listing and participation
 
-Three different things used to be called "role". They are kept apart now,
-each with its own word, and each set in one place.
+Four different things used to blur into the word "role". Each has its own
+word now, and each is set in one place.
 
 | | What it is | Values | Who sets it | Where |
 | --- | --- | --- | --- | --- |
-| **Role** | The person's place on the team, shown on About us | Officer, Board, Grants committee, Chapter lead, Staff, Volunteer | admin or editor | People → Staff, on the person's record (`team_members.kind`) |
-| **Title** | Free text under the name, e.g. "Co-founder, Treasurer" | any | admin or editor | the same record (`team_members.title`) |
-| **Access** | What the person's account may do in the admin | None, Accounting, Editor, Admin | admin only | the same record, once an account is linked (`profiles.role`) |
+| **Role** | What the person may do in the admin | None, Accounting, Editor, Admin | admin only | People → Staff, on the person's record (`team_members.access`, applied to `profiles.role`) |
+| **Title** | Free text under the name, e.g. "Co-founder, Treasurer" or "Chapter lead, Boka" | any | admin or editor | the same record (`team_members.title`) |
+| **Listed under** | Where the person appears on About us | Team, Board, Grants committee, Volunteers | admin or editor | the same record (`team_members.kind`) |
 | **Participation** | What a member has done on the site | Fundraiser, Athlete, Participant, Captain, Donor | the member, by acting | derived; never edited (People → Members) |
+
+The role is the access: this is the usual meaning of "role" in access
+control, and it is the one question an admin asks when adding someone.
+Officer, chapter lead, treasurer and the like are titles; they say what a
+person does, and the Role says what the console lets them do. The listing
+is presentation: the About us page has a team, a board, a grants committee
+and a volunteers list, and a person belongs to one of them.
 
 ## Staff
 
-A staff record is a person: role, title, photo, their own words, contact,
-years active, the access granted to them, and optionally the account they
-sign in with. Access is granted to the person, not the login
-(`team_members.access`, 0076): it reaches the account the moment one is
-linked, or when the person signs up with the record's email, so a record
-can carry Editor before its holder has ever signed in. A new record
-follows its role until the admin picks a level by hand:
+A staff record is a person: role, title, listing, photo, their own words,
+contact, years active, and optionally the account they sign in with. The
+role is granted to the person, not the login (`team_members.access`,
+0076): it reaches the account the moment one is linked, or when the person
+signs up with the record's email, so a record can carry Editor before its
+holder has ever signed in. The Staff table shows such a role with "no
+account yet"; the form offers to link an existing account with the
+record's email.
 
-| Role | Usual access |
-| --- | --- |
-| Officer, Chapter lead, Staff | Editor |
-| Board, Grants committee, Volunteer | None |
+Database triggers (0076) enforce who may do what: only an admin may set a
+role above None or move the email or account of a record that has one
+(otherwise an editor could route an admin record to themselves), an admin
+cannot demote themselves, and a linked account takes the record's role
+whenever the record gains an account or changes role. The person sees the
+result at once: a chip with their role at the foot of their own console
+rail and the way into the admin, since it is read on every request.
 
-Admin and Accounting are always chosen on purpose. Database triggers
-(0076) enforce it: only an admin may set a level above None or move the
-email or account of a record that has one, an admin cannot demote
-themselves, and a linked account takes the record's level whenever the
-record gains an account or changes level. The Members panel's name edit
-still goes through `set_member_access()` (0069). The person sees the
-result at once: a chip with their level at the foot of their own console
-rail and the way into the admin, since the role is read on every request.
-
-## Access levels
+## Roles
 
 One `role` per profile (`profiles.role`, migration 0061). Two levels exist
 in the database: `is_staff()` opens the staff policies, `is_admin()` the
@@ -48,10 +50,11 @@ control.
 | `member` | None | none | run pages, join teams, register, vote, propose |
 | `accounting` | Accounting | Overview, Money, Supporters, Rules | record gifts and hand-overs, year reports, sponsorships (staff at the database level) |
 | `chapter_lead` | Editor | everything except what is admin-only | causes, events, beneficiaries, pages, staff records, inbox, content; may delete content records (supporters, beneficiaries, staff records, photos, news) |
-| `admin` | Admin | everything | access levels; deleting causes, events, pages and teams; marking test or live; test mode, purge, demo data |
+| `admin` | Admin | everything | roles; deleting causes, events, pages and teams; marking test or live; test mode, purge, demo data |
 
-The value `chapter_lead` is historical; its label is Editor, because
-"chapter lead" is a role on the team (0075), not a level of access.
+The value `chapter_lead` is historical; its label is Editor. What a role
+opens is summarised in the console from the same table the nav uses
+(`lib/roles.ts`), so the two cannot disagree.
 
 What is admin-only is enforced in SQL (`is_admin()` inside the function or
 policy), and the console shows those buttons only to admins. Deleting a
@@ -63,9 +66,7 @@ People → Members lists every account with its participation: Fundraiser
 (holds a page), Athlete (Strava connected), Participant (registered or
 going), Captain (leads a team), Donor (gave). These are facts about what
 the person did, so nothing here is set by hand. The panel shows the
-account's access level read-only and links to the Staff record where it
-is set, or says how to grant one: add the person to Staff and link the
-account. Anyone with access to the admin is, by definition, on the team.
-
-`lib/roles.ts` holds the access levels, the staff test and the sections
-per level.
+account's role read-only, with "View access level" for what it opens, and
+links to the Staff record where it is set, or says how to grant one: add
+the person to Staff and link the account. Anyone with a role above None
+is, by definition, on the team.

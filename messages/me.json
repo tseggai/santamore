@@ -1088,21 +1088,19 @@
     "teamNew": "Nova osoba",
     "teamCreate": "Dodaj osobu",
     "teamEmpty": "Još niko nije u timu.",
-    "teamKind": "Uloga",
+    "teamKind": "Prikazan pod",
     "teamKindValue": {
-      "officer": "Rukovodstvo",
+      "staff": "Tim",
       "board": "Odbor",
       "committee": "Komisija za dodjelu",
-      "chapter_lead": "Vođa ogranka",
-      "staff": "Tim",
-      "volunteer": "Volonter"
+      "volunteer": "Volonteri",
+      "officer": "Tim",
+      "chapter_lead": "Tim"
     },
     "teamKindHint": {
-      "officer": "Osnivači i rukovodioci organizacije.",
-      "board": "Odbor.",
+      "staff": "Tim na stranici O nama: osnivači, rukovodioci i ljudi koji vode posao. Titula kaže šta ko radi.",
+      "board": "Odbor, u svom odjeljku.",
       "committee": "Nezavisna komisija koja odlučuje o dodjelama.",
-      "chapter_lead": "Vodi ogranak i njegove događaje na terenu.",
-      "staff": "Radni tim.",
       "volunteer": "Pomaže na događajima; naveden po imenu uz godine."
     },
     "teamPrivate": "Privatno",
@@ -1136,7 +1134,7 @@
     "memberProfileHint": "Ime naloga. Šta smije u adminu postavlja se na zapisu osobe u Osoblju.",
     "memberProfileReadOnly": "Samo admin može mijenjati profil ili nivo pristupa.",
     "memberName": "Ime i prezime",
-    "memberAccess": "Nivo pristupa",
+    "memberAccess": "Uloga",
     "memberAccessHint": {
       "member": "Bez pristupa adminu. Vodi stranice, pridružuje se timovima i događajima.",
       "accounting": "Sekcija Novac i podržavaoci iza nje. Ništa drugo u konzoli.",
@@ -1144,7 +1142,7 @@
       "admin": "Sve, uključujući ko je admin."
     },
     "memberTitle": "Titula",
-    "memberTitleHint": "npr. suosnivač, blagajnik, direktor događaja",
+    "memberTitleHint": "npr. suosnivač, finansijski direktor · vođa ogranka, Boka",
     "memberOrder": "Redosljed na stranici",
     "memberQuote": "Njihovim riječima",
     "memberPhotoAdd": "Dodaj fotografiju",
@@ -1628,11 +1626,10 @@
       "notesHint": "Na šta se dokument oslanja, odluke ugrađene u njega, provjere i parametri za Upravni odbor i pitanja za advokata. Samo na engleskom, nije dio dokumenta."
     },
     "memberSchemaStale": "API baze još ne zna za set_member_access: provjeri migraciju 0069 pomoću supabase/status.sql, zatim pokreni ovo u SQL editoru i pokušaj ponovo.",
-    "teamAccess": "Pristup",
-    "teamAccessHint": "Šta ovaj nalog smije u adminu. Mijenja samo admin.",
+    "teamAccess": "Uloga",
+    "teamAccessHint": "Šta ova osoba smije u adminu. Mijenja samo admin.",
     "memberAccessOnStaff": "Promijeni na zapisu u Osoblju",
     "memberAccessNone": "Da daš pristup adminu, dodaj osobu u Osoblje i poveži ovaj nalog.",
-    "teamKindAccess": "Uobičajeni pristup: {level}",
     "accessSections": "Upravlja: {sections}",
     "accessAdminExtra": "i ko ima pristup, brisanja, test režim i čišćenje",
     "viewAccess": "Pogledaj nivo pristupa",

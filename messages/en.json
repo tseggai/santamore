@@ -1088,21 +1088,19 @@
     "teamNew": "New person",
     "teamCreate": "Add person",
     "teamEmpty": "No one on the team yet.",
-    "teamKind": "Role",
+    "teamKind": "Listed under",
     "teamKindValue": {
-      "officer": "Officer",
+      "staff": "Team",
       "board": "Board",
       "committee": "Grants committee",
-      "chapter_lead": "Chapter lead",
-      "staff": "Staff",
-      "volunteer": "Volunteer"
+      "volunteer": "Volunteers",
+      "officer": "Team",
+      "chapter_lead": "Team"
     },
     "teamKindHint": {
-      "officer": "Founders and officers of the organisation.",
-      "board": "The board.",
+      "staff": "The team on About us: founders, officers and the people who run things. The title says what each one does.",
+      "board": "The board, in its own section.",
       "committee": "The independent committee that decides hand-overs.",
-      "chapter_lead": "Leads a chapter and its events on the ground.",
-      "staff": "The working team.",
       "volunteer": "Helps at events; listed by name with the years."
     },
     "teamPrivate": "Private",
@@ -1136,7 +1134,7 @@
     "memberProfileHint": "The account's name. What it may do in the admin is set on the person's Staff record.",
     "memberProfileReadOnly": "Only an admin can change a profile or an access level.",
     "memberName": "Name",
-    "memberAccess": "Access level",
+    "memberAccess": "Role",
     "memberAccessHint": {
       "member": "No admin access. Runs pages, joins teams and events.",
       "accounting": "The Money section and the supporters behind it. Nothing else in the console.",
@@ -1144,7 +1142,7 @@
       "admin": "Everything, including who is admin."
     },
     "memberTitle": "Title",
-    "memberTitleHint": "e.g. co-founder, treasurer, event director",
+    "memberTitleHint": "e.g. Co-founder, Chief Financial Officer · Chapter lead, Boka",
     "memberOrder": "Order on the page",
     "memberQuote": "In their own words",
     "memberPhotoAdd": "Add photo",
@@ -1628,11 +1626,10 @@
       "notesHint": "What the document hangs on, the decisions embedded in it, the checks and parameters for the Board, and points for the lawyer. English only, not part of the document."
     },
     "memberSchemaStale": "The database API does not know set_member_access yet: confirm migration 0069 with supabase/status.sql, then run this in the SQL editor and try again.",
-    "teamAccess": "Access",
-    "teamAccessHint": "What this account may do in the admin. Only an admin can change it.",
+    "teamAccess": "Role",
+    "teamAccessHint": "What this person may do in the admin. Only an admin can change it.",
     "memberAccessOnStaff": "Change on the Staff record",
     "memberAccessNone": "To grant admin access, add this person to Staff and link this account.",
-    "teamKindAccess": "Usual access: {level}",
     "accessSections": "Can manage {sections}",
     "accessAdminExtra": "and who has access, deletions, test mode and purge",
     "viewAccess": "View access level",

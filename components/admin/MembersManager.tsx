@@ -472,15 +472,14 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
           <input id="mpName" type="text" required minLength={2} maxLength={120} disabled={disabled} value={fullName} onChange={(e) => setFullName(e.target.value)} className={`${inputClass} disabled:opacity-60`} />
         </div>
         <div>
-          {/* the role leads, as on the Staff record; the access level sits under it */}
-          <p className={labelClass}>{t("teamKind")}</p>
+          {/* the role is what they may do, as on the Staff record */}
+          <p className={labelClass}>{t("teamAccess")}</p>
           <p className="mt-1 rounded-lg bg-paper px-3.5 py-2.5 text-[15px]">
-            <span className={member.team_kind ? "font-semibold" : "text-black/55"}>{member.team_kind ? t(`teamKindValue.${member.team_kind}`) : t("memberNotOnTeam")}</span>
+            <span className={member.role === "member" ? "text-black/55" : "font-semibold"}>{t(`memberRole.${member.role}`)}</span>
           </p>
           <p className="mt-2 flex flex-wrap items-baseline gap-x-3 text-[13.5px]">
-            <span>
-              <span className="text-black/60">{t("teamAccess")}: </span>
-              <span className={member.role === "member" ? "text-black/55" : "font-semibold"}>{t(`memberRole.${member.role}`)}</span>
+            <span className="text-black/60">
+              {t("teamKind")}: {member.team_kind ? t(`teamKindValue.${member.team_kind}`) : t("memberNotOnTeam")}
             </span>
             <button
               type="button"

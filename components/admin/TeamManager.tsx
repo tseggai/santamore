@@ -15,26 +15,18 @@ import { ROLES, type Role } from "@/lib/roles";
 import { teamPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
 
-export const TEAM_KINDS = ["officer", "board", "committee", "chapter_lead", "staff", "volunteer"] as const;
+/** Where a person is listed on About us; a grouping, not a role (0077). */
+export const TEAM_KINDS = ["staff", "board", "committee", "volunteer"] as const;
 export type TeamKind = (typeof TEAM_KINDS)[number];
+/** Older rows may still say officer or chapter lead: both are the team. */
+const asKind = (kind: string): TeamKind => (TEAM_KINDS.includes(kind as TeamKind) ? (kind as TeamKind) : "staff");
 
-/**
- * The access a role usually comes with, offered when an account is linked
- * (docs/ROLES.md). The admin confirms or changes it; the database enforces
- * whatever is saved.
- */
-const DEFAULT_ACCESS_BY_KIND: Record<TeamKind, Role> = {
-  officer: "chapter_lead",
-  board: "member",
-  committee: "member",
-  chapter_lead: "chapter_lead",
-  staff: "chapter_lead",
-  volunteer: "member",
-};
+/** Chip tone per role, so a glance tells the levels apart. */
+const ROLE_TONE: Record<Role, "red" | "sea" | "ink" | "paper"> = { admin: "red", chapter_lead: "sea", accounting: "ink", member: "paper" };
 
 export interface TeamRow {
   id: string;
-  kind: TeamKind;
+  kind: string;
   full_name: string;
   title: string | null;
   quote: string | null;
@@ -96,11 +88,30 @@ export function TeamManager({ rows, accounts, initialOpenId = "", canManage = fa
       sort: (r) => r.full_name,
     },
     {
+      key: "role",
+      header: t("teamAccess"),
+      cell: (r) => {
+        const account = r.user_id ? accountById.get(r.user_id) : null;
+        // The account's level is the truth once linked; before that, the
+        // level waiting on the record.
+        const level = account ? account.role : r.access;
+        if (level === "member") return <span className="text-black/40">—</span>;
+        return (
+          <span className="flex flex-wrap items-center gap-1.5">
+            <Chip tone={ROLE_TONE[level]}>{t(`memberRole.${level}`)}</Chip>
+            {!account ? <span className="text-[12.5px] text-black/45">{t("teamAccessPending")}</span> : null}
+          </span>
+        );
+      },
+      sort: (r) => ROLES.indexOf((r.user_id ? accountById.get(r.user_id)?.role : null) ?? r.access),
+      filter: { options: ROLES.map((k) => ({ value: k, label: t(`memberRole.${k}`) })), match: (r, value) => ((r.user_id ? accountById.get(r.user_id)?.role : null) ?? r.access) === value },
+    },
+    {
       key: "kind",
       header: t("teamKind"),
-      cell: (r) => <Chip tone={r.kind === "volunteer" ? "paper" : "sea"}>{t(`teamKindValue.${r.kind}`)}</Chip>,
-      sort: (r) => TEAM_KINDS.indexOf(r.kind),
-      filter: { options: TEAM_KINDS.map((k) => ({ value: k, label: t(`teamKindValue.${k}`) })), match: (r, value) => r.kind === value },
+      cell: (r) => <span className="text-[13.5px] text-black/70">{t(`teamKindValue.${asKind(r.kind)}`)}</span>,
+      sort: (r) => TEAM_KINDS.indexOf(asKind(r.kind)),
+      filter: { options: TEAM_KINDS.map((k) => ({ value: k, label: t(`teamKindValue.${k}`) })), match: (r, value) => asKind(r.kind) === value },
     },
     {
       key: "public",
@@ -116,26 +127,6 @@ export function TeamManager({ rows, accounts, initialOpenId = "", canManage = fa
       },
     },
     { key: "years", header: t("teamYears"), cell: (r) => <span className="font-mono text-[13.5px] tabular-nums">{r.years.length ? r.years.join(", ") : "—"}</span> },
-    {
-      key: "account",
-      header: t("teamAccess"),
-      cell: (r) => {
-        const account = r.user_id ? accountById.get(r.user_id) : null;
-        // The account's level is the truth once linked; before that, the
-        // level waiting on the record.
-        if (account) {
-          return <span className={`text-[13.5px] ${account.role === "member" ? "text-black/50" : "font-semibold"}`}>{t(`memberRole.${account.role}`)}</span>;
-        }
-        return r.access !== "member" ? (
-          <span className="text-[13.5px] text-black/60">
-            {t(`memberRole.${r.access}`)} <span className="text-black/40">· {t("teamAccessPending")}</span>
-          </span>
-        ) : (
-          <span className="text-black/40">—</span>
-        );
-      },
-      sort: (r) => (r.user_id ? 1 : 0),
-    },
   ];
 
   return (
@@ -171,7 +162,7 @@ export function TeamManager({ rows, accounts, initialOpenId = "", canManage = fa
 function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; accounts: AccountOption[]; canManage: boolean; onDone: () => void }) {
   const t = useTranslations("admin");
   const router = useRouter();
-  const [kind, setKind] = useState<TeamKind>(row?.kind ?? "staff");
+  const [kind, setKind] = useState<TeamKind>(asKind(row?.kind ?? "staff"));
   const [fullName, setFullName] = useState(row?.full_name ?? "");
   const [title, setTitle] = useState(row?.title ?? "");
   const [quote, setQuote] = useState(row?.quote ?? "");
@@ -182,9 +173,7 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
   const [isPublic, setIsPublic] = useState(row?.is_public ?? false);
   const [sortOrder, setSortOrder] = useState(String(row?.sort_order ?? 0));
   const [userId, setUserId] = useState(row?.user_id ?? "");
-  const [access, setAccess] = useState<Role>(row?.access ?? DEFAULT_ACCESS_BY_KIND[row?.kind ?? "staff"]);
-  // Until the admin picks a level by hand, a new record follows its role.
-  const [accessTouched, setAccessTouched] = useState(Boolean(row));
+  const [access, setAccess] = useState<Role>(row?.access ?? "member");
   const [photoPath, setPhotoPath] = useState<string | null | undefined>(undefined);
   const [photoBusy, setPhotoBusy] = useState(false);
   const photoInput = useRef<HTMLInputElement>(null);
@@ -252,31 +241,48 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
 
   return (
     <form onSubmit={submit}>
-      <fieldset>
-        <legend className={labelClass}>{t("teamKind")}</legend>
-        <div className="mt-1.5 flex flex-wrap gap-2">
-          {TEAM_KINDS.map((value) => (
-            <label key={value} className={`cursor-pointer rounded-lg px-3 py-2 text-[14px] font-semibold ${kind === value ? "bg-ink text-paper" : "bg-paper hover:bg-mist-2"}`}>
-              <input
-                type="radio"
-                name="teamKind"
-                value={value}
-                checked={kind === value}
-                onChange={() => {
-                  setKind(value);
-                  if (!accessTouched) setAccess(DEFAULT_ACCESS_BY_KIND[value]);
-                }}
-                className="sr-only"
-              />
-              {t(`teamKindValue.${value}`)}
-            </label>
+      <div>
+        <label htmlFor="tmAccess" className={labelClass}>{t("teamAccess")}</label>
+        <select
+          id="tmAccess"
+          value={access}
+          disabled={!canManage}
+          onChange={(e) => setAccess(e.target.value as Role)}
+          className={`${inputClass} disabled:opacity-60`}
+        >
+          {ROLES.map((value) => (
+            <option key={value} value={value}>{t(`memberRole.${value}`)}</option>
           ))}
-        </div>
-        <p className="mt-1 text-[13px] text-black/50">{t(`teamKindHint.${kind}`)}</p>
-        {/* the access this role usually comes with, and what that opens — before any account is linked */}
-        <p className="mt-2 text-[13px] font-semibold text-black/70">{t("teamKindAccess", { level: t(`memberRole.${DEFAULT_ACCESS_BY_KIND[kind]}`) })}</p>
-        <AccessSummary role={DEFAULT_ACCESS_BY_KIND[kind]} />
-      </fieldset>
+        </select>
+        <p className="mt-1 text-[13px] text-black/50">
+          {!canManage
+            ? t("memberProfileReadOnly")
+            : linked
+              ? t("teamAccessHint")
+              : email.trim()
+                ? t("teamAccessPendingHint", { email: email.trim() })
+                : t("teamAccessNoEmailHint")}
+        </p>
+        {canManage ? (
+          <>
+            <AccessSummary role={access} className="mt-2" />
+            <details className="mt-2">
+              <summary className="cursor-pointer text-[13px] font-semibold text-sea underline underline-offset-2">{t("allAccessLevels")}</summary>
+              <ul className="mt-2 space-y-1">
+                {ROLES.map((value) => {
+                  const chosen = value === access;
+                  return (
+                    <li key={value} className={`rounded-lg px-3 py-1.5 text-[13px] leading-snug ${chosen ? "bg-paper" : ""}`}>
+                      <span className={`font-semibold ${chosen ? "text-sea" : "text-black/70"}`}>{t(`memberRole.${value}`)}</span>
+                      <AccessSummary role={value} />
+                    </li>
+                  );
+                })}
+              </ul>
+            </details>
+          </>
+        ) : null}
+      </div>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="tmName" className={labelClass}>{t("memberName")}</label>
@@ -286,6 +292,18 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
           <label htmlFor="tmTitle" className={labelClass}>{t("memberTitle")}</label>
           <input id="tmTitle" type="text" maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("memberTitleHint")} className={inputClass} />
         </div>
+        <fieldset className="sm:col-span-2">
+          <legend className={labelClass}>{t("teamKind")}</legend>
+          <div className="mt-1.5 flex flex-wrap gap-2">
+            {TEAM_KINDS.map((value) => (
+              <label key={value} className={`cursor-pointer rounded-lg px-3 py-2 text-[14px] font-semibold ${kind === value ? "bg-ink text-paper" : "bg-paper hover:bg-mist-2"}`}>
+                <input type="radio" name="teamKind" value={value} checked={kind === value} onChange={() => setKind(value)} className="sr-only" />
+                {t(`teamKindValue.${value}`)}
+              </label>
+            ))}
+          </div>
+          <p className="mt-1 text-[13px] text-black/50">{t(`teamKindHint.${kind}`)}</p>
+        </fieldset>
         <div className="sm:col-span-2">
           <label htmlFor="tmQuote" className={labelClass}>{t("memberQuote")}</label>
           <textarea id="tmQuote" rows={3} maxLength={600} value={quote} onChange={(e) => setQuote(e.target.value)} className={inputClass} />
@@ -343,51 +361,6 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
                 {t("teamLinkMatchCta", { email: emailMatch.email ?? "" })}
               </button>
             </p>
-          ) : null}
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="tmAccess" className={labelClass}>{t("teamAccess")}</label>
-          <select
-            id="tmAccess"
-            value={access}
-            disabled={!canManage}
-            onChange={(e) => {
-              setAccess(e.target.value as Role);
-              setAccessTouched(true);
-            }}
-            className={`${inputClass} disabled:opacity-60`}
-          >
-            {ROLES.map((value) => (
-              <option key={value} value={value}>{t(`memberRole.${value}`)}</option>
-            ))}
-          </select>
-          <p className="mt-1 text-[13px] text-black/50">
-            {!canManage
-              ? t("memberProfileReadOnly")
-              : linked
-                ? t("teamAccessHint")
-                : email.trim()
-                  ? t("teamAccessPendingHint", { email: email.trim() })
-                  : t("teamAccessNoEmailHint")}
-          </p>
-          {canManage ? (
-            <>
-              <AccessSummary role={access} className="mt-2" />
-              <details className="mt-2">
-                <summary className="cursor-pointer text-[13px] font-semibold text-sea underline underline-offset-2">{t("allAccessLevels")}</summary>
-                <ul className="mt-2 space-y-1">
-                  {ROLES.map((value) => {
-                    const chosen = value === access;
-                    return (
-                      <li key={value} className={`rounded-lg px-3 py-1.5 text-[13px] leading-snug ${chosen ? "bg-paper" : ""}`}>
-                        <span className={`font-semibold ${chosen ? "text-sea" : "text-black/70"}`}>{t(`memberRole.${value}`)}</span>
-                        <AccessSummary role={value} />
-                      </li>
-                    );
-                  })}
-                </ul>
-              </details>
-            </>
           ) : null}
         </div>
         <div className="sm:col-span-2">
