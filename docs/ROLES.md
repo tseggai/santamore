@@ -13,20 +13,26 @@ each with its own word, and each set in one place.
 ## Staff
 
 A staff record is a person: role, title, photo, their own words, contact,
-years active, and optionally the account they sign in with. Linking the
-account is what makes an access level possible. When an account is linked,
-the role's usual access is offered and the admin confirms or changes it:
+years active, the access granted to them, and optionally the account they
+sign in with. Access is granted to the person, not the login
+(`team_members.access`, 0076): it reaches the account the moment one is
+linked, or when the person signs up with the record's email, so a record
+can carry Editor before its holder has ever signed in. A new record
+follows its role until the admin picks a level by hand:
 
 | Role | Usual access |
 | --- | --- |
 | Officer, Chapter lead, Staff | Editor |
 | Board, Grants committee, Volunteer | None |
 
-Admin and Accounting are always chosen on purpose. The level is written
-through `set_member_access()` (0069), admin only, and an admin cannot
-demote themselves. The person sees the result at once: a chip with their
-level at the foot of their own console rail and the way into the admin,
-since the role is read on every request.
+Admin and Accounting are always chosen on purpose. Database triggers
+(0076) enforce it: only an admin may set a level above None or move the
+email or account of a record that has one, an admin cannot demote
+themselves, and a linked account takes the record's level whenever the
+record gains an account or changes level. The Members panel's name edit
+still goes through `set_member_access()` (0069). The person sees the
+result at once: a chip with their level at the foot of their own console
+rail and the way into the admin, since the role is read on every request.
 
 ## Access levels
 

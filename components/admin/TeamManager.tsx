@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState, type FormEvent } from "react";
 
-import { saveMemberAccess } from "@/app/[locale]/admin/(protected)/osoblje/actions";
 import { deleteTeamMember, saveTeamMember } from "@/app/[locale]/admin/(protected)/osoblje/team-actions";
 import { AccessSummary } from "@/components/admin/AccessSummary";
 import { Chip, DataTable, Thumb, rowButton, type Column } from "@/components/console/DataTable";
@@ -47,6 +46,8 @@ export interface TeamRow {
   is_public: boolean;
   sort_order: number;
   user_id: string | null;
+  /** The access level granted to this person; reaches the account when one is linked. */
+  access: Role;
 }
 
 export interface AccountOption {
@@ -120,8 +121,15 @@ export function TeamManager({ rows, accounts, initialOpenId = "", canManage = fa
       header: t("teamAccess"),
       cell: (r) => {
         const account = r.user_id ? accountById.get(r.user_id) : null;
-        return account ? (
-          <span className={`text-[13.5px] ${account.role === "member" ? "text-black/50" : "font-semibold"}`}>{t(`memberRole.${account.role}`)}</span>
+        // The account's level is the truth once linked; before that, the
+        // level waiting on the record.
+        if (account) {
+          return <span className={`text-[13.5px] ${account.role === "member" ? "text-black/50" : "font-semibold"}`}>{t(`memberRole.${account.role}`)}</span>;
+        }
+        return r.access !== "member" ? (
+          <span className="text-[13.5px] text-black/60">
+            {t(`memberRole.${r.access}`)} <span className="text-black/40">· {t("teamAccessPending")}</span>
+          </span>
         ) : (
           <span className="text-black/40">—</span>
         );
@@ -174,18 +182,20 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
   const [isPublic, setIsPublic] = useState(row?.is_public ?? false);
   const [sortOrder, setSortOrder] = useState(String(row?.sort_order ?? 0));
   const [userId, setUserId] = useState(row?.user_id ?? "");
-  const linkedNow = row?.user_id ? accounts.find((a) => a.id === row.user_id) : null;
-  const [access, setAccess] = useState<Role>(linkedNow?.role ?? "member");
-  const [accessNote, setAccessNote] = useState<string | null>(null);
+  const [access, setAccess] = useState<Role>(row?.access ?? DEFAULT_ACCESS_BY_KIND[row?.kind ?? "staff"]);
+  // Until the admin picks a level by hand, a new record follows its role.
+  const [accessTouched, setAccessTouched] = useState(Boolean(row));
   const [photoPath, setPhotoPath] = useState<string | null | undefined>(undefined);
   const [photoBusy, setPhotoBusy] = useState(false);
   const photoInput = useRef<HTMLInputElement>(null);
   const [folder] = useState(() => row?.id ?? `new-${crypto.randomUUID()}`);
-  const [state, setState] = useState<"idle" | "busy" | "error" | "invalid" | "account_taken" | "access_failed">("idle");
+  const [state, setState] = useState<"idle" | "busy" | "error" | "invalid" | "account_taken" | "forbidden">("idle");
   const [detail, setDetail] = useState<string | null>(null);
   const currentPhoto = photoPath === undefined ? (row?.photo_path ?? null) : photoPath;
   const photo = teamPhotoUrl(currentPhoto);
   const linked = userId ? accounts.find((a) => a.id === userId) : null;
+  // An account already signed up with the record's email: offer to link it.
+  const emailMatch = !userId && email.trim() ? accounts.find((a) => a.email?.toLowerCase() === email.trim().toLowerCase()) : null;
 
   const uploadPhoto = async (file: File) => {
     setPhotoBusy(true);
@@ -228,23 +238,14 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
       isPublic,
       sortOrder: Number.parseInt(sortOrder, 10) || 0,
       userId: userId || null,
+      // Editors cannot grant access: they send the level as it is, and the database checks again.
+      access: canManage ? access : (row?.access ?? "member"),
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
-      // The access level lives on the account; it is saved when it changed
-      // and the person saving is an admin (the database checks again).
-      if (userId && canManage && linked && access !== linked.role) {
-        const accessResult = await saveMemberAccess({ id: userId, fullName: linked.full_name?.trim() || fullName, role: access }).catch(() => ({ ok: false as const, error: "server" as const }));
-        if (!accessResult.ok) {
-          router.refresh();
-          setState("access_failed");
-          setAccessNote(accessResult.error === "forbidden" ? t("memberForbidden") : accessResult.error === "schema" ? t("memberSchemaStale") : t("actionError"));
-          return;
-        }
-      }
       router.refresh();
       onDone();
     } else {
-      setState(result.error === "invalid" ? "invalid" : result.error === "account_taken" ? "account_taken" : "error");
+      setState(result.error === "invalid" ? "invalid" : result.error === "account_taken" ? "account_taken" : result.error === "forbidden" ? "forbidden" : "error");
       setDetail("detail" in result && result.detail ? result.detail : null);
     }
   };
@@ -256,7 +257,17 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
         <div className="mt-1.5 flex flex-wrap gap-2">
           {TEAM_KINDS.map((value) => (
             <label key={value} className={`cursor-pointer rounded-lg px-3 py-2 text-[14px] font-semibold ${kind === value ? "bg-ink text-paper" : "bg-paper hover:bg-mist-2"}`}>
-              <input type="radio" name="teamKind" value={value} checked={kind === value} onChange={() => setKind(value)} className="sr-only" />
+              <input
+                type="radio"
+                name="teamKind"
+                value={value}
+                checked={kind === value}
+                onChange={() => {
+                  setKind(value);
+                  if (!accessTouched) setAccess(DEFAULT_ACCESS_BY_KIND[value]);
+                }}
+                className="sr-only"
+              />
               {t(`teamKindValue.${value}`)}
             </label>
           ))}
@@ -316,13 +327,7 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
           <select
             id="tmAccount"
             value={userId}
-            onChange={(e) => {
-              const next = e.target.value;
-              setUserId(next);
-              // A freshly linked account with no access yet gets the role's usual level offered.
-              const account = accounts.find((a) => a.id === next);
-              setAccess(account ? (account.role === "member" ? DEFAULT_ACCESS_BY_KIND[kind] : account.role) : "member");
-            }}
+            onChange={(e) => setUserId(e.target.value)}
             className={inputClass}
           >
             <option value="">{t("teamNoAccount")}</option>
@@ -331,16 +336,41 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
             ))}
           </select>
           {!linked ? <p className="mt-1 text-[13px] text-black/50">{t("teamAccountHint")}</p> : null}
+          {emailMatch ? (
+            <p className="mt-2 text-[13.5px]">
+              {t("teamLinkMatch")}{" "}
+              <button type="button" onClick={() => setUserId(emailMatch.id)} className="font-semibold text-sea underline underline-offset-2">
+                {t("teamLinkMatchCta", { email: emailMatch.email ?? "" })}
+              </button>
+            </p>
+          ) : null}
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="tmAccess" className={labelClass}>{t("teamAccess")}</label>
-          <select id="tmAccess" value={access} disabled={!linked || !canManage} onChange={(e) => setAccess(e.target.value as Role)} className={`${inputClass} disabled:opacity-60`}>
+          <select
+            id="tmAccess"
+            value={access}
+            disabled={!canManage}
+            onChange={(e) => {
+              setAccess(e.target.value as Role);
+              setAccessTouched(true);
+            }}
+            className={`${inputClass} disabled:opacity-60`}
+          >
             {ROLES.map((value) => (
               <option key={value} value={value}>{t(`memberRole.${value}`)}</option>
             ))}
           </select>
-          <p className="mt-1 text-[13px] text-black/50">{linked ? (canManage ? t("teamAccessHint") : t("memberProfileReadOnly")) : t("teamAccessNeedsAccount")}</p>
-          {linked ? (
+          <p className="mt-1 text-[13px] text-black/50">
+            {!canManage
+              ? t("memberProfileReadOnly")
+              : linked
+                ? t("teamAccessHint")
+                : email.trim()
+                  ? t("teamAccessPendingHint", { email: email.trim() })
+                  : t("teamAccessNoEmailHint")}
+          </p>
+          {canManage ? (
             <>
               <AccessSummary role={access} className="mt-2" />
               <details className="mt-2">
@@ -376,7 +406,7 @@ function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; a
         </p>
       ) : null}
       {state === "account_taken" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("teamAccountTaken")}</p> : null}
-      {state === "access_failed" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("teamAccessFailed", { reason: accessNote ?? "" })}</p> : null}
+      {state === "forbidden" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("memberForbidden")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
       <div className="sticky bottom-0 -mx-5 -mb-5 mt-6 flex gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
         <button type="submit" disabled={state === "busy" || photoBusy} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">

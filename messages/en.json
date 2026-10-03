@@ -1150,7 +1150,7 @@
     "memberPhotoAdd": "Add photo",
     "memberPhotoReplace": "Replace photo",
     "memberPhotoRemove": "Remove photo",
-    "memberForbidden": "Only an admin can do that, and no one can change their own access level.",
+    "memberForbidden": "Only an admin can grant access or move a record that has it, and no one can change their own level.",
     "memberSaved": "Saved.",
     "memberChipCaptain": "Captain",
     "memberChipDonor": "Donor",
@@ -1629,9 +1629,7 @@
     },
     "memberSchemaStale": "The database API does not know set_member_access yet: confirm migration 0069 with supabase/status.sql, then run this in the SQL editor and try again.",
     "teamAccess": "Access",
-    "teamAccessHint": "What this account may do in the admin. Offered from the role; only an admin can change it.",
-    "teamAccessNeedsAccount": "Link an account to set access.",
-    "teamAccessFailed": "The person was saved, but the access level was not. {reason}",
+    "teamAccessHint": "What this account may do in the admin. Only an admin can change it.",
     "memberAccessOnStaff": "Change on the Staff record",
     "memberAccessNone": "To grant admin access, add this person to Staff and link this account.",
     "teamKindAccess": "Usual access: {level}",
@@ -1640,7 +1638,12 @@
     "viewAccess": "View access level",
     "hideAccess": "Hide",
     "allAccessLevels": "All access levels",
-    "memberNotOnTeam": "Not on the team"
+    "memberNotOnTeam": "Not on the team",
+    "teamAccessPending": "no account yet",
+    "teamAccessPendingHint": "Applies the moment an account with {email} signs up, or when you link one.",
+    "teamAccessNoEmailHint": "Add the person's email so the access applies when they sign up, or link an account.",
+    "teamLinkMatch": "An account with this email already exists.",
+    "teamLinkMatchCta": "Link {email}"
   },
   "forms": {
     "nameLabel": "Full name",
