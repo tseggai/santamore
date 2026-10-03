@@ -1151,7 +1151,7 @@
     "memberPhotoAdd": "Добавить фото",
     "memberPhotoReplace": "Заменить фото",
     "memberPhotoRemove": "Убрать фото",
-    "memberForbidden": "Это может только админ, и никто не может менять свой уровень доступа.",
+    "memberForbidden": "Только админ может дать доступ или переместить запись с доступом, и никто не может менять свой уровень.",
     "memberSaved": "Сохранено.",
     "memberChipCaptain": "Капитан",
     "memberChipDonor": "Донор",
@@ -1630,9 +1630,7 @@
     },
     "memberSchemaStale": "API базы ещё не знает set_member_access: проверьте миграцию 0069 через supabase/status.sql, затем выполните это в SQL-редакторе и повторите.",
     "teamAccess": "Доступ",
-    "teamAccessHint": "Что этот аккаунт может в админке. Предложено по роли; менять может только админ.",
-    "teamAccessNeedsAccount": "Привяжите аккаунт, чтобы задать доступ.",
-    "teamAccessFailed": "Человек сохранён, но уровень доступа — нет. {reason}",
+    "teamAccessHint": "Что этот аккаунт может в админке. Менять может только админ.",
     "memberAccessOnStaff": "Изменить в записи Персонала",
     "memberAccessNone": "Чтобы дать доступ к админке, добавьте человека в Персонал и привяжите этот аккаунт.",
     "teamKindAccess": "Обычный доступ: {level}",
@@ -1641,7 +1639,12 @@
     "viewAccess": "Показать уровень доступа",
     "hideAccess": "Скрыть",
     "allAccessLevels": "Все уровни доступа",
-    "memberNotOnTeam": "Не в команде"
+    "memberNotOnTeam": "Не в команде",
+    "teamAccessPending": "аккаунта пока нет",
+    "teamAccessPendingHint": "Применится, как только зарегистрируется аккаунт с {email}, или когда вы его привяжете.",
+    "teamAccessNoEmailHint": "Добавьте email человека, чтобы доступ применился при регистрации, или привяжите аккаунт.",
+    "teamLinkMatch": "Аккаунт с этим email уже существует.",
+    "teamLinkMatchCta": "Привязать {email}"
   },
   "forms": {
     "nameLabel": "Имя и фамилия",

@@ -1150,7 +1150,7 @@
     "memberPhotoAdd": "Dodaj fotografiju",
     "memberPhotoReplace": "Zamijeni fotografiju",
     "memberPhotoRemove": "Ukloni fotografiju",
-    "memberForbidden": "To može samo admin, a niko ne može mijenjati sopstveni nivo pristupa.",
+    "memberForbidden": "Samo admin može dati pristup ili premjestiti zapis koji ga ima, a niko ne može mijenjati sopstveni nivo.",
     "memberSaved": "Sačuvano.",
     "memberChipCaptain": "Kapiten",
     "memberChipDonor": "Donator",
@@ -1629,9 +1629,7 @@
     },
     "memberSchemaStale": "API baze još ne zna za set_member_access: provjeri migraciju 0069 pomoću supabase/status.sql, zatim pokreni ovo u SQL editoru i pokušaj ponovo.",
     "teamAccess": "Pristup",
-    "teamAccessHint": "Šta ovaj nalog smije u adminu. Predloženo prema ulozi; mijenja samo admin.",
-    "teamAccessNeedsAccount": "Poveži nalog da postaviš pristup.",
-    "teamAccessFailed": "Osoba je sačuvana, ali nivo pristupa nije. {reason}",
+    "teamAccessHint": "Šta ovaj nalog smije u adminu. Mijenja samo admin.",
     "memberAccessOnStaff": "Promijeni na zapisu u Osoblju",
     "memberAccessNone": "Da daš pristup adminu, dodaj osobu u Osoblje i poveži ovaj nalog.",
     "teamKindAccess": "Uobičajeni pristup: {level}",
@@ -1640,7 +1638,12 @@
     "viewAccess": "Pogledaj nivo pristupa",
     "hideAccess": "Sakrij",
     "allAccessLevels": "Svi nivoi pristupa",
-    "memberNotOnTeam": "Nije u timu"
+    "memberNotOnTeam": "Nije u timu",
+    "teamAccessPending": "još bez naloga",
+    "teamAccessPendingHint": "Primjenjuje se čim se registruje nalog sa {email}, ili kad ga povežeš.",
+    "teamAccessNoEmailHint": "Dodaj imejl osobe da se pristup primijeni kad se registruje, ili poveži nalog.",
+    "teamLinkMatch": "Nalog s ovim imejlom već postoji.",
+    "teamLinkMatchCta": "Poveži {email}"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

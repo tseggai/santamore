@@ -167,6 +167,10 @@ select * from (values
      to_regprocedure('public.set_member_access(uuid, text, text)') is not null)
   ,('20260920000070_event_progress',
      to_regclass('public.v_public_event_progress') is not null)
+  ,('20261003000076_staff_access',
+     exists (select 1 from information_schema.columns
+              where table_schema = 'public' and table_name = 'team_members' and column_name = 'access')
+     and to_regprocedure('public.team_members_apply_access()') is not null)
   ,('20261003000075_chapter_lead_kind',
      exists (select 1 from pg_constraint
               where conrelid = 'public.team_members'::regclass
