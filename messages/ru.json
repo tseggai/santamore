@@ -1634,7 +1634,14 @@
     "teamAccessNeedsAccount": "Привяжите аккаунт, чтобы задать доступ.",
     "teamAccessFailed": "Человек сохранён, но уровень доступа — нет. {reason}",
     "memberAccessOnStaff": "Изменить в записи Персонала",
-    "memberAccessNone": "Чтобы дать доступ к админке, добавьте человека в Персонал и привяжите этот аккаунт."
+    "memberAccessNone": "Чтобы дать доступ к админке, добавьте человека в Персонал и привяжите этот аккаунт.",
+    "teamKindAccess": "Обычный доступ: {level}",
+    "accessSections": "Управляет: {sections}",
+    "accessAdminExtra": "а также кто имеет доступ, удаления, тестовый режим и очистка",
+    "viewAccess": "Показать уровень доступа",
+    "hideAccess": "Скрыть",
+    "allAccessLevels": "Все уровни доступа",
+    "memberNotOnTeam": "Не в команде"
   },
   "forms": {
     "nameLabel": "Имя и фамилия",

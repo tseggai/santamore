@@ -24,6 +24,22 @@ export function isStaffRole(role: string | null | undefined): boolean {
   return STAFF_ROLES.includes(role as Role);
 }
 
+/** The nav label (admin namespace) of each console section, for summaries of what a level opens. */
+export const SECTION_NAV_KEY: Record<string, string> = {
+  "/admin": "navOverview",
+  "/admin/novac": "navMoney",
+  "/admin/kampanje": "navCampaigns",
+  "/admin/dogadjaji": "navEvents",
+  "/admin/korisnici": "navBeneficiaries",
+  "/admin/podrska": "navSupporters",
+  "/admin/stranice": "navPages",
+  "/admin/osoblje": "navStaff",
+  "/admin/poruke": "navMessages",
+  "/admin/podesavanja": "navSettings",
+  "/admin/registracija": "navRegistration",
+  "/admin/pravila": "navRules",
+};
+
 /** Console sections by role: the nav shows these, the pages check nothing more (RLS does). */
 export const SECTIONS_BY_ROLE: Record<Role, readonly string[]> = {
   member: [],

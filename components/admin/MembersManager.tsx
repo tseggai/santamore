@@ -6,6 +6,7 @@ import { useState, type FormEvent } from "react";
 
 import { deleteFundraiser, saveMemberAccess } from "@/app/[locale]/admin/(protected)/osoblje/actions";
 
+import { AccessSummary } from "@/components/admin/AccessSummary";
 import { Chip, DataTable, Thumb, bulkButton, type Column } from "@/components/console/DataTable";
 import { formatShortDate } from "@/lib/dates";
 import { FocusChip } from "@/components/console/FocusChip";
@@ -440,6 +441,8 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
   const t = useTranslations("admin");
   const router = useRouter();
   const [fullName, setFullName] = useState(member.full_name ?? "");
+  // "View access level": opens on click or hover, closes on click or leaving.
+  const [showAccess, setShowAccess] = useState(false);
   const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "forbidden" | "schema">("idle");
 
   const submit = async (event: FormEvent) => {
@@ -469,11 +472,28 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
           <input id="mpName" type="text" required minLength={2} maxLength={120} disabled={disabled} value={fullName} onChange={(e) => setFullName(e.target.value)} className={`${inputClass} disabled:opacity-60`} />
         </div>
         <div>
-          <p className={labelClass}>{t("memberAccess")}</p>
+          {/* the role leads, as on the Staff record; the access level sits under it */}
+          <p className={labelClass}>{t("teamKind")}</p>
           <p className="mt-1 rounded-lg bg-paper px-3.5 py-2.5 text-[15px]">
-            <span className={member.role === "member" ? "text-black/55" : "font-semibold"}>{t(`memberRole.${member.role}`)}</span>
+            <span className={member.team_kind ? "font-semibold" : "text-black/55"}>{member.team_kind ? t(`teamKindValue.${member.team_kind}`) : t("memberNotOnTeam")}</span>
           </p>
-          <p className="mt-1 text-[13px] text-black/50">
+          <p className="mt-2 flex flex-wrap items-baseline gap-x-3 text-[13.5px]">
+            <span>
+              <span className="text-black/60">{t("teamAccess")}: </span>
+              <span className={member.role === "member" ? "text-black/55" : "font-semibold"}>{t(`memberRole.${member.role}`)}</span>
+            </span>
+            <button
+              type="button"
+              aria-expanded={showAccess}
+              onClick={() => setShowAccess((v) => !v)}
+              onMouseEnter={() => setShowAccess(true)}
+              className="text-[13px] font-semibold text-sea underline underline-offset-2"
+            >
+              {showAccess ? t("hideAccess") : t("viewAccess")}
+            </button>
+          </p>
+          {showAccess ? <AccessSummary role={member.role} className="mt-1 rounded-lg bg-paper px-3 py-2" /> : null}
+          <p className="mt-2 text-[13px] text-black/50">
             {member.team_id ? (
               <Link href={`/admin/osoblje?uredi=${member.team_id}`} className="font-semibold text-sea underline underline-offset-2">{t("memberAccessOnStaff")}</Link>
             ) : (

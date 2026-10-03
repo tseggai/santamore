@@ -1633,7 +1633,14 @@
     "teamAccessNeedsAccount": "Poveži nalog da postaviš pristup.",
     "teamAccessFailed": "Osoba je sačuvana, ali nivo pristupa nije. {reason}",
     "memberAccessOnStaff": "Promijeni na zapisu u Osoblju",
-    "memberAccessNone": "Da daš pristup adminu, dodaj osobu u Osoblje i poveži ovaj nalog."
+    "memberAccessNone": "Da daš pristup adminu, dodaj osobu u Osoblje i poveži ovaj nalog.",
+    "teamKindAccess": "Uobičajeni pristup: {level}",
+    "accessSections": "Upravlja: {sections}",
+    "accessAdminExtra": "i ko ima pristup, brisanja, test režim i čišćenje",
+    "viewAccess": "Pogledaj nivo pristupa",
+    "hideAccess": "Sakrij",
+    "allAccessLevels": "Svi nivoi pristupa",
+    "memberNotOnTeam": "Nije u timu"
   },
   "forms": {
     "nameLabel": "Ime i prezime",
