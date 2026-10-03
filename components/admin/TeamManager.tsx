@@ -4,18 +4,33 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useRef, useState, type FormEvent } from "react";
 
+import { saveMemberAccess } from "@/app/[locale]/admin/(protected)/osoblje/actions";
 import { deleteTeamMember, saveTeamMember } from "@/app/[locale]/admin/(protected)/osoblje/team-actions";
 import { Chip, DataTable, Thumb, rowButton, type Column } from "@/components/console/DataTable";
 import { HeaderAction } from "@/components/console/HeaderAction";
 import { SidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
 import { describeUploadError, downscaleToJpeg } from "@/lib/images";
+import { ROLES, type Role } from "@/lib/roles";
 import { teamPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/client";
-import { Link } from "@/i18n/navigation";
 
-export const TEAM_KINDS = ["officer", "staff", "board", "committee", "volunteer"] as const;
+export const TEAM_KINDS = ["officer", "board", "committee", "chapter_lead", "staff", "volunteer"] as const;
 export type TeamKind = (typeof TEAM_KINDS)[number];
+
+/**
+ * The access a role usually comes with, offered when an account is linked
+ * (docs/ROLES.md). The admin confirms or changes it; the database enforces
+ * whatever is saved.
+ */
+const DEFAULT_ACCESS_BY_KIND: Record<TeamKind, Role> = {
+  officer: "chapter_lead",
+  board: "member",
+  committee: "member",
+  chapter_lead: "chapter_lead",
+  staff: "chapter_lead",
+  volunteer: "member",
+};
 
 export interface TeamRow {
   id: string;
@@ -44,7 +59,7 @@ const labelClass = "text-[13.5px] font-semibold";
 const inputClass = "mt-1 w-full rounded-lg bg-paper px-3.5 py-2.5 text-[15px] outline-none ring-sea/40 focus:ring-2";
 
 /** The team, one row each; the panel holds the person and their link to an account. */
-export function TeamManager({ rows, accounts, initialOpenId = "" }: { rows: TeamRow[]; accounts: AccountOption[]; initialOpenId?: string }) {
+export function TeamManager({ rows, accounts, initialOpenId = "", canManage = false }: { rows: TeamRow[]; accounts: AccountOption[]; initialOpenId?: string; /** Admins set access levels; staff see them. */ canManage?: boolean }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [open, setOpen] = useState<"" | "new" | string>(rows.some((r) => r.id === initialOpenId) ? initialOpenId : "");
@@ -101,10 +116,14 @@ export function TeamManager({ rows, accounts, initialOpenId = "" }: { rows: Team
     { key: "years", header: t("teamYears"), cell: (r) => <span className="font-mono text-[13.5px] tabular-nums">{r.years.length ? r.years.join(", ") : "—"}</span> },
     {
       key: "account",
-      header: t("teamAccount"),
+      header: t("teamAccess"),
       cell: (r) => {
         const account = r.user_id ? accountById.get(r.user_id) : null;
-        return account ? <span className="text-[13.5px]">{t(`memberRole.${account.role}`)}</span> : <span className="text-black/40">—</span>;
+        return account ? (
+          <span className={`text-[13.5px] ${account.role === "member" ? "text-black/50" : "font-semibold"}`}>{t(`memberRole.${account.role}`)}</span>
+        ) : (
+          <span className="text-black/40">—</span>
+        );
       },
       sort: (r) => (r.user_id ? 1 : 0),
     },
@@ -134,13 +153,13 @@ export function TeamManager({ rows, accounts, initialOpenId = "" }: { rows: Team
       </div>
 
       <SidePanel open={open !== ""} title={open === "new" ? t("teamNew") : (current?.full_name ?? "")} onClose={() => setOpen("")} wide>
-        <TeamForm key={open} row={current} accounts={accounts} onDone={() => setOpen("")} />
+        <TeamForm key={open} row={current} accounts={accounts} canManage={canManage} onDone={() => setOpen("")} />
       </SidePanel>
     </>
   );
 }
 
-function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: AccountOption[]; onDone: () => void }) {
+function TeamForm({ row, accounts, canManage, onDone }: { row: TeamRow | null; accounts: AccountOption[]; canManage: boolean; onDone: () => void }) {
   const t = useTranslations("admin");
   const router = useRouter();
   const [kind, setKind] = useState<TeamKind>(row?.kind ?? "staff");
@@ -154,11 +173,14 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
   const [isPublic, setIsPublic] = useState(row?.is_public ?? false);
   const [sortOrder, setSortOrder] = useState(String(row?.sort_order ?? 0));
   const [userId, setUserId] = useState(row?.user_id ?? "");
+  const linkedNow = row?.user_id ? accounts.find((a) => a.id === row.user_id) : null;
+  const [access, setAccess] = useState<Role>(linkedNow?.role ?? "member");
+  const [accessNote, setAccessNote] = useState<string | null>(null);
   const [photoPath, setPhotoPath] = useState<string | null | undefined>(undefined);
   const [photoBusy, setPhotoBusy] = useState(false);
   const photoInput = useRef<HTMLInputElement>(null);
   const [folder] = useState(() => row?.id ?? `new-${crypto.randomUUID()}`);
-  const [state, setState] = useState<"idle" | "busy" | "error" | "invalid" | "account_taken">("idle");
+  const [state, setState] = useState<"idle" | "busy" | "error" | "invalid" | "account_taken" | "access_failed">("idle");
   const [detail, setDetail] = useState<string | null>(null);
   const currentPhoto = photoPath === undefined ? (row?.photo_path ?? null) : photoPath;
   const photo = teamPhotoUrl(currentPhoto);
@@ -207,6 +229,17 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
       userId: userId || null,
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
+      // The access level lives on the account; it is saved when it changed
+      // and the person saving is an admin (the database checks again).
+      if (userId && canManage && linked && access !== linked.role) {
+        const accessResult = await saveMemberAccess({ id: userId, fullName: linked.full_name?.trim() || fullName, role: access }).catch(() => ({ ok: false as const, error: "server" as const }));
+        if (!accessResult.ok) {
+          router.refresh();
+          setState("access_failed");
+          setAccessNote(accessResult.error === "forbidden" ? t("memberForbidden") : accessResult.error === "schema" ? t("memberSchemaStale") : t("actionError"));
+          return;
+        }
+      }
       router.refresh();
       onDone();
     } else {
@@ -276,22 +309,46 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="tmAccount" className={labelClass}>{t("teamAccount")}</label>
-          <select id="tmAccount" value={userId} onChange={(e) => setUserId(e.target.value)} className={inputClass}>
+          <select
+            id="tmAccount"
+            value={userId}
+            onChange={(e) => {
+              const next = e.target.value;
+              setUserId(next);
+              // A freshly linked account with no access yet gets the role's usual level offered.
+              const account = accounts.find((a) => a.id === next);
+              setAccess(account ? (account.role === "member" ? DEFAULT_ACCESS_BY_KIND[kind] : account.role) : "member");
+            }}
+            className={inputClass}
+          >
             <option value="">{t("teamNoAccount")}</option>
             {accounts.map((a) => (
               <option key={a.id} value={a.id}>{a.full_name ?? a.email ?? a.id}{a.email && a.full_name ? ` · ${a.email}` : ""}</option>
             ))}
           </select>
-          <p className="mt-1 text-[13px] text-black/50">
-            {linked ? (
-              <>
-                {t("teamAccountLevel", { level: t(`memberRole.${linked.role}`) })}{" "}
-                <Link href="/admin/osoblje/nalozi" className="font-semibold text-sea underline underline-offset-2">{t("teamChangeAccess")}</Link>
-              </>
-            ) : (
-              t("teamAccountHint")
-            )}
-          </p>
+          {!linked ? <p className="mt-1 text-[13px] text-black/50">{t("teamAccountHint")}</p> : null}
+        </div>
+        <div className="sm:col-span-2">
+          <label htmlFor="tmAccess" className={labelClass}>{t("teamAccess")}</label>
+          <select id="tmAccess" value={access} disabled={!linked || !canManage} onChange={(e) => setAccess(e.target.value as Role)} className={`${inputClass} disabled:opacity-60`}>
+            {ROLES.map((value) => (
+              <option key={value} value={value}>{t(`memberRole.${value}`)}</option>
+            ))}
+          </select>
+          <p className="mt-1 text-[13px] text-black/50">{linked ? (canManage ? t("teamAccessHint") : t("memberProfileReadOnly")) : t("teamAccessNeedsAccount")}</p>
+          {linked ? (
+            <ul className="mt-2 space-y-1">
+              {ROLES.map((value) => {
+                const chosen = value === access;
+                return (
+                  <li key={value} className={`flex gap-3 rounded-lg px-3 py-1.5 text-[13px] leading-snug ${chosen ? "bg-paper" : ""}`}>
+                    <span className={`w-24 shrink-0 font-semibold ${chosen ? "text-sea" : "text-black/70"}`}>{t(`memberRole.${value}`)}</span>
+                    <span className={chosen ? "text-black/80" : "text-black/55"}>{t(`memberAccessHint.${value}`)}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : null}
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="tmNotes" className={labelClass}>{t("suNotes")}</label>
@@ -309,6 +366,7 @@ function TeamForm({ row, accounts, onDone }: { row: TeamRow | null; accounts: Ac
         </p>
       ) : null}
       {state === "account_taken" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("teamAccountTaken")}</p> : null}
+      {state === "access_failed" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("teamAccessFailed", { reason: accessNote ?? "" })}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
       <div className="sticky bottom-0 -mx-5 -mb-5 mt-6 flex gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
         <button type="submit" disabled={state === "busy" || photoBusy} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
