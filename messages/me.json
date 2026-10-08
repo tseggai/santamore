@@ -736,7 +736,6 @@
       "active": "aktivna",
       "hidden": "sakrivena"
     },
-    "pageActivate": "Aktiviraj",
     "pageHide": "Sakrij",
     "wallHeading": "Poruke sa zida donatora",
     "wallHint": "Sakrivene poruke nestaju sa javnog zida; donacija ostaje netaknuta.",
@@ -1640,7 +1639,10 @@
     "teamAccessPendingHint": "Primjenjuje se čim se registruje nalog sa {email}, ili kad ga povežeš.",
     "teamAccessNoEmailHint": "Dodaj imejl osobe da se pristup primijeni kad se registruje, ili poveži nalog.",
     "teamLinkMatch": "Nalog s ovim imejlom već postoji.",
-    "teamLinkMatchCta": "Poveži {email}"
+    "teamLinkMatchCta": "Poveži {email}",
+    "pageReinstate": "Vrati",
+    "pageDraftNote": "Nacrt — vlasnik je objavljuje iz svog uređivača kad dobije fotografiju, iznos i priču.",
+    "pageIncomplete": "Ne može se vratiti: stranici nedostaje fotografija, iznos ili priča."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

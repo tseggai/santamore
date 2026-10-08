@@ -736,7 +736,6 @@
       "active": "active",
       "hidden": "hidden"
     },
-    "pageActivate": "Activate",
     "pageHide": "Hide",
     "wallHeading": "Donor-wall messages",
     "wallHint": "Hidden messages disappear from the public wall; the donation itself is untouched.",
@@ -1640,7 +1639,10 @@
     "teamAccessPendingHint": "Applies the moment an account with {email} signs up, or when you link one.",
     "teamAccessNoEmailHint": "Add the person's email so the access applies when they sign up, or link an account.",
     "teamLinkMatch": "An account with this email already exists.",
-    "teamLinkMatchCta": "Link {email}"
+    "teamLinkMatchCta": "Link {email}",
+    "pageReinstate": "Reinstate",
+    "pageDraftNote": "Draft — the owner publishes it from their editor once it has a photo, a goal and a story.",
+    "pageIncomplete": "Cannot be reinstated: the page lacks a photo, a goal or a story."
   },
   "forms": {
     "nameLabel": "Full name",

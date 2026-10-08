@@ -10,6 +10,8 @@ import { createClient } from "@/lib/supabase/server";
 
 export interface ActionResult {
   ok: boolean;
+  /** "incomplete": the page lacks a photo, a goal or a story, so it cannot be active (trigger). */
+  reason?: "incomplete";
 }
 
 const statusSchema = z.object({
@@ -18,8 +20,9 @@ const statusSchema = z.object({
 });
 
 /**
- * Activate or hide a page. Draft → active is normally the owner's move
- * (through the publish gate); staff use this to reinstate or hide.
+ * Hide a page, or reinstate a hidden one. Publishing is the owner's move
+ * from their editor, where the photo, goal and story gate lives; the
+ * database applies the same gate here, so an incomplete page says why.
  */
 export async function setFundraiserModeration(input: unknown): Promise<ActionResult> {
   const parsed = statusSchema.safeParse(input);
@@ -32,7 +35,7 @@ export async function setFundraiserModeration(input: unknown): Promise<ActionRes
     .eq("id", parsed.data.fundraiserId)
     .select("id")
     .single();
-  if (error) return { ok: false };
+  if (error) return { ok: false, ...(error.message.includes("cannot be active") ? { reason: "incomplete" as const } : {}) };
 
   revalidatePath("/[locale]/admin", "layout");
   revalidatePath("/[locale]/admin/novac", "layout");
