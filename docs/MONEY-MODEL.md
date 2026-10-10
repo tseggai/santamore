@@ -11,7 +11,7 @@ Money reaches Santamore through three kinds of record, and leaves through two:
 | in | a donation matched in the ledger | `donations` (approved or refunded) + `ledger_adjustments` |
 | in | a gift recorded on a year report, from before the ledger | `year_reports.donors_list` |
 | in | sponsorship cash that went to the beneficiaries | `sponsors` with `fund = 'impact'` |
-| in | a paid entry to an event whose fees go to the cause | `registrations` confirmed, on an event with `fee_fund = 'impact'` (migration 0071; the default) |
+| in | an entry contribution received for an event whose contributions go to the cause (entry is by voluntary contribution: the tier is a suggestion, the participant chooses the amount, zero included) | `registrations` confirmed, on an event with `fee_fund = 'impact'` (migration 0071; the default) |
 | out | a published hand-over | `disbursements` |
 | out | a hand-over recorded on a year report | `year_reports.beneficiaries_list` |
 
