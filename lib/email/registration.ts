@@ -27,8 +27,10 @@ function escapeHtml(value: string): string {
 }
 
 /**
- * Entry-fee transfer instructions. Fees are Operations Fund money — the
- * copy says so, keeping the 100%-of-donations promise clean.
+ * Registration confirmation. Entry is by voluntary contribution: when the
+ * participant pledged one, the transfer details follow; when they pledged
+ * nothing, the place is simply confirmed. The copy says where the money
+ * goes, keeping the 100%-to-the-cause promise clean.
  */
 export async function buildRegistrationEmail(
   input: RegistrationEmailInput,
@@ -37,23 +39,29 @@ export async function buildRegistrationEmail(
   const bank = bankLines();
   const amount = formatCents(input.amountDueCents, input.locale);
 
+  const pledged = input.amountDueCents > 0;
   const rows: Array<[string, string]> = [
     [t("event"), input.eventName],
     ...(input.distance ? [[t("distance"), input.distance] as [string, string]] : []),
-    [t("beneficiary"), bank.name],
-    [t("iban"), bank.iban],
-    [t("amount"), amount],
-    [t("reference"), input.reference],
+    ...(pledged
+      ? ([
+          [t("beneficiary"), bank.name],
+          [t("iban"), bank.iban],
+          [t("amount"), amount],
+          [t("reference"), input.reference],
+        ] as Array<[string, string]>)
+      : []),
   ];
+  const intro = pledged ? t("intro", { event: input.eventName }) : t("introFree", { event: input.eventName });
 
   const text = [
     t("greeting", { name: input.name }),
     "",
-    t("intro", { event: input.eventName }),
+    intro,
     "",
     ...rows.map(([label, value]) => `${label}: ${value}`),
     "",
-    t("whatNext"),
+    ...(pledged ? [t("whatNext")] : []),
     t("opsNote"),
   ].join("\n");
 
@@ -61,7 +69,7 @@ export async function buildRegistrationEmail(
   <p style="color:#f35353;font-weight:bold;letter-spacing:0.08em;">SANTAMORE</p>
   <h1 style="font-size:22px;line-height:1.25;">${escapeHtml(t("subject", { event: input.eventName }))}</h1>
   <p>${escapeHtml(t("greeting", { name: input.name }))}</p>
-  <p>${escapeHtml(t("intro", { event: input.eventName }))}</p>
+  <p>${escapeHtml(intro)}</p>
   <div style="background:#f1f5f6;border:1.5px dashed #0e3a46;border-radius:14px;padding:16px 18px;margin:18px 0;">
     ${rows
       .map(
@@ -70,7 +78,7 @@ export async function buildRegistrationEmail(
       )
       .join("\n    ")}
   </div>
-  <p>${escapeHtml(t("whatNext"))}</p>
+  ${pledged ? `<p>${escapeHtml(t("whatNext"))}</p>` : ""}
   <p style="color:rgba(54,67,75,0.75);font-size:13px;">${escapeHtml(t("opsNote"))}</p>
 </div>`;
 

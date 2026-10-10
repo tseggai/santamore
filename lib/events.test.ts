@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { activeTiers, distanceNames, parseDistances, parseTiers, tiersFor } from "@/lib/events";
+import { MAX_CONTRIBUTION_CENTS, activeTiers, distanceNames, isContribution, parseDistances, parseTiers, tiersFor } from "@/lib/events";
 
 describe("price tiers", () => {
   it("keeps a valid until date and drops a malformed one", () => {
@@ -40,5 +40,19 @@ describe("distances", () => {
     ]);
     expect(tiersFor(tiers, "Half").map((t) => t.label)).toEqual(["Half early", "Child"]);
     expect(tiersFor(tiers, null).map((t) => t.label)).toEqual(["Child"]);
+  });
+});
+
+describe("isContribution", () => {
+  it("takes zero, the suggestion, and anything up to the ceiling", () => {
+    expect(isContribution(0)).toBe(true);
+    expect(isContribution(2500)).toBe(true);
+    expect(isContribution(MAX_CONTRIBUTION_CENTS)).toBe(true);
+  });
+  it("refuses negatives, fractions of a cent, and typos above the ceiling", () => {
+    expect(isContribution(-1)).toBe(false);
+    expect(isContribution(25.5)).toBe(false);
+    expect(isContribution(MAX_CONTRIBUTION_CENTS + 1)).toBe(false);
+    expect(isContribution("25")).toBe(false);
   });
 });

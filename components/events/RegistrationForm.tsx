@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 import { registerForEvent } from "@/app/[locale]/(site)/dogadjaji/actions";
-import { formatCents, type Cents } from "@/lib/money";
+import { MAX_CONTRIBUTION_CENTS } from "@/lib/events";
+import { centsToEuros, formatCents, parseEurosToCents, type Cents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
@@ -13,6 +14,7 @@ const SIZES = ["XS", "S", "M", "L", "XL", "XXL"] as const;
 
 export interface TierOption {
   label: string;
+  /** The amount we suggest for this tier; the participant chooses their own. */
   amountCents: Cents;
   /** Last day offered (YYYY-MM-DD) — shown so early birds know the deadline. */
   until?: string | null;
@@ -29,6 +31,10 @@ interface GuestRow {
  * Who is taking part (the account holder by default, or anyone they
  * register), what they chose, and — for races and challenges — the
  * waiver. Shirt size appears only when the event hands out shirts.
+ *
+ * Entry is by voluntary contribution. A tier is the amount we suggest; the
+ * field below it holds what the participant gives, pre-filled with the
+ * suggestion and free to change, zero included. Zero is never an error.
  */
 export function RegistrationForm({
   eventSlug,
@@ -82,19 +88,27 @@ export function RegistrationForm({
   const [guests, setGuests] = useState<GuestRow[]>([]);
   const [state, setState] = useState<"idle" | "busy" | "error" | "closed" | "full" | "bibsGone">("idle");
   const tierPrice = (label: string) => tiers.find((tier) => tier.label === label)?.amountCents ?? 0;
-  const totalCents = tierPrice(tierLabel) + guests.reduce((sum, guest) => sum + tierPrice(guest.tierLabel), 0);
+  // The suggestion for the whole party; the one amount field covers them all.
+  const suggestedCents = tierPrice(tierLabel) + guests.reduce((sum, guest) => sum + tierPrice(guest.tierLabel), 0);
+  // null = "follow the suggestion"; a string once the participant has typed their own amount.
+  const [amountText, setAmountText] = useState<string | null>(null);
+  const amountShown = amountText ?? centsToEuros(suggestedCents).replace(/\.00$/, "");
+  const contributionCents = parseEurosToCents(amountShown);
+  const amountValid = contributionCents !== null && contributionCents <= MAX_CONTRIBUTION_CENTS;
+  const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
   const tierText = (tier: TierOption) =>
-    `${tier.label} — ${formatCents(tier.amountCents, locale, { trimWholeCents: true })}${tier.until ? ` (${t("tierUntil", { date: tier.until })})` : ""}`;
+    `${tier.label} — ${money(tier.amountCents)}${tier.until ? ` (${t("tierUntil", { date: tier.until })})` : ""}`;
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!accepted) return;
+    if (!accepted || !amountValid) return;
     setState("busy");
     const result = await registerForEvent({
       eventSlug,
       distance: distance || null,
       shirtSize: offersShirts ? shirtSize : null,
       tierLabel,
+      contributionCents: tiers.length > 0 ? (contributionCents ?? 0) : 0,
       waiverAccepted: accepted,
       participantName: name,
       participantEmail: email,
@@ -148,7 +162,7 @@ export function RegistrationForm({
         </div>
       ) : null}
 
-      {tiersHere.length > 0 ? (
+      {tiersHere.length > 1 ? (
         <div>
           <label htmlFor="regTier" className={labelClass}>{t("tierLabel")}</label>
           <select id="regTier" value={tierLabel} onChange={(event) => setTierLabel(event.target.value)} className={fieldClass}>
@@ -227,7 +241,7 @@ export function RegistrationForm({
           ) : null}
           {tiers.length > 0 && guests.length > 0 ? (
             <p className="mt-3 text-[14.5px] font-semibold">
-              {t("partyTotal", { count: guests.length + 1 })}: <span className="font-mono tabular-nums">{formatCents(totalCents, locale, { trimWholeCents: true })}</span>
+              {t("partyTotal", { count: guests.length + 1 })}: <span className="font-mono tabular-nums">{money(suggestedCents)}</span>
             </p>
           ) : null}
         </fieldset>
@@ -242,6 +256,33 @@ export function RegistrationForm({
             ))}
           </select>
         </div>
+      ) : null}
+
+      {tiers.length > 0 ? (
+        <fieldset className="rounded-lg bg-mist px-4 py-4">
+          <legend className="px-1 text-[14px] font-semibold">{t("contributionHeading")}</legend>
+          <p className="text-[14.5px] leading-relaxed">
+            <span className="font-mono font-bold tabular-nums">{money(suggestedCents)}</span>
+            <span className="text-black/65"> · {t("mostGive")}</span>
+          </p>
+          <label htmlFor="regAmount" className={`${labelClass} mt-3 block`}>{t("contributionLabel")}</label>
+          <div className="relative mt-1">
+            <span aria-hidden className="pointer-events-none absolute inset-y-0 left-3.5 flex items-center font-mono text-[16px] text-black/50">€</span>
+            <input
+              id="regAmount"
+              type="text"
+              inputMode="decimal"
+              autoComplete="off"
+              value={amountShown}
+              onChange={(event) => setAmountText(event.target.value)}
+              aria-describedby="regAmountHint"
+              aria-invalid={!amountValid}
+              className={`${fieldClass} mt-0 bg-paper pl-8 font-mono tabular-nums`}
+            />
+          </div>
+          <p id="regAmountHint" className="mt-1.5 text-[13.5px] leading-relaxed text-black/60">{t("contributionHint")}</p>
+          {!amountValid ? <p role="alert" className="mt-1 text-[13.5px] font-semibold text-red-dark">{t("contributionInvalid")}</p> : null}
+        </fieldset>
       ) : null}
 
       {needsWaiver ? (
@@ -266,7 +307,7 @@ export function RegistrationForm({
       {state === "full" ? <p role="alert" className="text-[14px] font-semibold text-red-dark">{t("registrationFull")}</p> : null}
       {state === "bibsGone" ? <p role="alert" className="text-[14px] font-semibold text-red-dark">{t("bibsGone")}</p> : null}
 
-      <button type="submit" disabled={state === "busy" || !accepted} className="w-full rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60">
+      <button type="submit" disabled={state === "busy" || !accepted || !amountValid} className="w-full rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60">
         {t("submit")}
       </button>
     </form>

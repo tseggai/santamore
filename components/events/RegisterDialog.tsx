@@ -180,7 +180,7 @@ export function RegisterDialog({ event, label, className }: { event: RegisterEve
                         ) : null}
                         {pendingPayment ? (
                           <>
-                            <p className="mt-3 text-[14.5px] leading-relaxed text-black/70">{t("payInstructions")}</p>
+                            <p className="mt-3 text-[14.5px] leading-relaxed text-black/70">{t("payInstructions", { amount: money(due) })}</p>
                             <div className="mt-3">
                               <SepaPanel locale={locale} bank={state.bank} reference={registration.payment_reference ?? ""} amountCents={due} monthly={false} />
                             </div>

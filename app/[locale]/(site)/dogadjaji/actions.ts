@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { buildRegistrationEmail } from "@/lib/email/registration";
-import { activeTiers, parseDistances, parseTiers, tiersFor } from "@/lib/events";
+import { MAX_CONTRIBUTION_CENTS, activeTiers, parseDistances, parseTiers, tiersFor } from "@/lib/events";
 import { sendEmail } from "@/lib/email/send";
 import { generatePaymentReference } from "@/lib/references";
 import { createServiceClient } from "@/lib/supabase/admin";
@@ -16,8 +16,10 @@ const registerSchema = z.object({
   eventSlug: z.string().trim().min(1).max(100),
   distance: z.string().trim().min(1).max(60).nullable(),
   shirtSize: z.enum(["XS", "S", "M", "L", "XL", "XXL"]).nullable(),
-  /** Empty when the event is free (no price tiers). */
+  /** The suggested amount the participant started from; empty when the event suggests none. */
   tierLabel: z.string().trim().max(100),
+  /** What the participant chose to give, in cents: the suggestion, more, less, or zero. */
+  contributionCents: z.number().int().min(0).max(MAX_CONTRIBUTION_CENTS).default(0),
   /** Required for races and challenges; a gathering has no waiver. */
   waiverAccepted: z.boolean(),
   participantName: z.string().trim().min(2).max(120),
@@ -39,8 +41,11 @@ export interface RegisterResult {
  * Register a participant for an event under the signed-in account — the
  * account holder or someone they register (a child, a friend). Waiver
  * recorded where the event needs one, per-registration SEPA reference
- * minted server-side, entry fee owed to the fund the event names (the cause, unless the Board says otherwise); a free tier
- * confirms on the spot. Idempotent per (event, account, participant email).
+ * minted server-side. Entry is by voluntary contribution: the tiers are
+ * suggestions, the participant pledges what they choose (zero included),
+ * and the pledge is owed to the fund the event names (the cause, unless
+ * the Board says otherwise). A zero pledge confirms on the spot; the place
+ * is theirs either way. Idempotent per (event, account, participant email).
  */
 export async function registerForEvent(input: unknown): Promise<RegisterResult> {
   const parsed = registerSchema.safeParse(input);
@@ -93,9 +98,10 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     if (distances.length > 0 && data.distance === null && event.kind !== "social") {
       return { ok: false, error: "invalid" };
     }
-    // Free events (no tiers) register at zero; priced events need a tier
-    // that is still on offer today (early-bird dates are enforced here)
-    // and meant for the chosen distance.
+    // An event without tiers suggests nothing and takes nothing here; one
+    // with tiers needs a tier that is still on offer today (early-bird
+    // dates are enforced here) and meant for the chosen distance. The tier
+    // is the suggestion the participant saw; what they pledge is theirs.
     const tiers = withOrganizer ? [] : tiersFor(activeTiers(parseTiers(event.price_tiers)), data.distance);
     const tier =
       tiers.length === 0
@@ -104,7 +110,7 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
     if (tiers.length > 0 && !tier) return { ok: false, error: "invalid" };
     const guestTiers = guests.map((guest) => (tiers.length === 0 ? null : tiers.find((candidate) => candidate.label === guest.tierLabel)));
     if (tiers.length > 0 && guestTiers.some((candidate) => !candidate)) return { ok: false, error: "invalid" };
-    const dueCents = (tier?.amount_cents ?? 0) + guestTiers.reduce((sum, candidate) => sum + (candidate?.amount_cents ?? 0), 0);
+    const dueCents = tiers.length === 0 ? 0 : data.contributionCents;
 
     const { data: existing } = await service
       .from("registrations")
@@ -151,7 +157,9 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
       if ((count ?? 0) + guests.length >= event.capacity) return { ok: false, error: "full" };
     }
 
-    // Nothing to pay → the place is confirmed right away.
+    // Nothing pledged → confirmed right away; a pledge stays pending until
+    // the transfer lands, which only tells us whether it arrived, never
+    // whether the person may start.
     const status = dueCents === 0 ? "confirmed" : "pending";
     let primaryId: string | null = null;
     let reference = "";
@@ -165,7 +173,7 @@ export async function registerForEvent(input: unknown): Promise<RegisterResult> 
           distance: data.distance,
           shirt_size: shirtSize,
           tier_label: tier?.label ?? null,
-          // The whole party is owed on the one reference the payer quotes.
+          // The whole party's pledge rides on the one reference the payer quotes.
           amount_due_cents: dueCents,
           payment_reference: reference,
           waiver_signed_at: needsWaiver ? new Date().toISOString() : null,

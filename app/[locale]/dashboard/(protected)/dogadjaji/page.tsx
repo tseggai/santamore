@@ -43,7 +43,7 @@ interface CampaignRow {
 /**
  * Events and campaigns as the member relates to them: going, registered,
  * raising on it, supported it — with RSVP here and the paid registration
- * on the public page (it collects the entry fee).
+ * on the public page (it takes the pledged contribution).
  */
 export default async function ConsoleEventsPage({
   params,
