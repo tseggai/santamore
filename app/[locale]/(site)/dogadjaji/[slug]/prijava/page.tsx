@@ -6,6 +6,7 @@ import { SignInForm } from "@/components/admin/SignInForm";
 import { SepaPanel } from "@/components/donate/SepaPanel";
 import { RegistrationForm, type TierOption } from "@/components/events/RegistrationForm";
 import { activeTiers, parseTiers } from "@/lib/events";
+import { formatCents } from "@/lib/money";
 import { getOrgBankDetails } from "@/lib/org";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
@@ -77,6 +78,7 @@ export default async function EventRegistrationPage({
     supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
   ]);
   const registrations = (rows ?? []) as RegistrationRow[];
+  const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
   const showForm = registrations.length === 0 || nova === "1";
 
   const back = (
@@ -104,7 +106,7 @@ export default async function EventRegistrationPage({
                 </p>
                 {pendingPayment ? (
                   <>
-                    <p className="mt-3 text-[14.5px] leading-relaxed text-black/70">{t("payInstructions")}</p>
+                    <p className="mt-3 text-[14.5px] leading-relaxed text-black/70">{t("payInstructions", { amount: money(due) })}</p>
                     <div className="mt-3">
                       <SepaPanel locale={locale as Locale} bank={getOrgBankDetails()} reference={registration.payment_reference ?? ""} amountCents={due} monthly={false} />
                     </div>

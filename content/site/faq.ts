@@ -70,8 +70,8 @@ export const faqContent: Record<Locale, FaqContent> = {
         a: "Da. Pri doniranju birate ime za prikaz ili „Anonimno“. U javnom registru nikad ne objavljujemo više nego što ste izabrali.",
       },
       {
-        q: "Kome ide kotizacija za trku?",
-        a: "Kotizacije idu u Fond za pomoć, kao i donacije, i objavljuju se u registru kao i sve ostalo. Organizaciju događaja plaćaju sponzori, iz Operativnog fonda. Ako Upravni odbor za neki događaj odluči drugačije, to piše uz taj događaj.",
+        q: "Kome ide moj prilog za učešće na trci?",
+        a: "Učešće na našim događajima je uz dobrovoljni prilog: predlažemo iznos, a vi birate svoj, uključujući 0. Prilozi idu u Fond za pomoć, kao i donacije, i objavljuju se u registru kao i sve ostalo. Organizaciju događaja plaćaju sponzori, iz Operativnog fonda. Ako Upravni odbor za neki događaj odluči drugačije, to piše uz taj događaj.",
       },
       {
         q: "Kako tražim pomoć za sebe ili nekog drugog?",
@@ -135,8 +135,8 @@ export const faqContent: Record<Locale, FaqContent> = {
         a: "Yes. When donating you choose a display name or “Anonymous”. The public ledger never shows more than you chose.",
       },
       {
-        q: "Where does my race entry fee go?",
-        a: "Entry fees go to the Impact Fund, like donations, and are published in the ledger like everything else. Putting the event on is paid by sponsors, from the Operations Fund. If the Board decides otherwise for a particular event, it says so on that event.",
+        q: "Where does my entry contribution go?",
+        a: "Entry to our events is by voluntary contribution: we suggest an amount and you choose yours, 0 included. Contributions go to the Impact Fund, like donations, and are published in the ledger like everything else. Putting the event on is paid by sponsors, from the Operations Fund. If the Board decides otherwise for a particular event, it says so on that event.",
       },
       {
         q: "How do I apply for support, for myself or someone else?",
@@ -200,8 +200,8 @@ export const faqContent: Record<Locale, FaqContent> = {
         a: "Да. При пожертвовании вы выбираете имя для показа или «Аноним». В публичном реестре никогда не появится больше, чем вы выбрали.",
       },
       {
-        q: "Куда идёт стартовый взнос за забег?",
-        a: "Взносы идут в Фонд помощи, как и пожертвования, и публикуются в реестре, как и всё остальное. Организацию события оплачивают спонсоры из Операционного фонда. Если для какого-то события Правление решит иначе, это указано у события.",
+        q: "Куда идёт мой взнос за участие?",
+        a: "Участие в наших событиях — за добровольный взнос: мы рекомендуем сумму, а вы выбираете свою, включая 0. Взносы идут в Фонд помощи, как и пожертвования, и публикуются в реестре, как и всё остальное. Организацию события оплачивают спонсоры из Операционного фонда. Если для какого-то события Правление решит иначе, это указано у события.",
       },
       {
         q: "Как попросить помощь — для себя или для другого?",

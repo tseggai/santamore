@@ -68,3 +68,15 @@ export function parseDistances(value: unknown): EventDistance[] {
 export function distanceNames(value: unknown): string[] {
   return parseDistances(value).map((d) => d.name);
 }
+
+/**
+ * Entry is by voluntary contribution: a tier's amount is what we suggest,
+ * and the participant chooses their own, zero included. Anything above this
+ * is a typo, not a gift (a gift that size goes through the donate flow).
+ */
+export const MAX_CONTRIBUTION_CENTS = 500_000;
+
+/** A contribution a participant may pledge: whole cents, zero or more, within reason. */
+export function isContribution(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= MAX_CONTRIBUTION_CENTS;
+}

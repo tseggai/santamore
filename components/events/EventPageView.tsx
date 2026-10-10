@@ -391,15 +391,16 @@ export function EventPageView({
 
       {/* 4 — the details, by kind */}
       {event.kind === "race" && event.distances.length > 0 ? (
-        // Each distance is a card: its name, its places, and the prices that apply to it (its own and the general ones).
+        // Each distance is a card: its name, its places, and the suggested contributions that apply to it (its own and the general ones).
         <section id="distances" className="mt-10 scroll-mt-24">
           <h2 className="type-display text-2xl">{t("distancesHeading")}</h2>
           {withOrganizer && tiersShown.length > 0 ? <p className="mt-2 text-[14px] text-black/60">{t("tiersOrganizerNote", { organizer: organizer || t("theOrganizer") })}</p> : null}
+          {!withOrganizer && tiersShown.length > 0 ? <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-black/65">{t("contributionNote")}</p> : null}
           <div className="mt-4 grid items-start gap-3 sm:grid-cols-2">
             {event.distances.map((d) => {
               const rows = tiersFor(tiersShown, d.name);
               return (
-                // The same shape as a sponsorship tier: name and the price on offer today, one line, then every price as a bullet.
+                // The same shape as a sponsorship tier: name and the suggestion on offer today, one line, then every suggestion as a bullet.
                 <div key={d.name} className="rounded-lg bg-mist px-5 py-5">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <h3 className="type-display text-xl">{d.name}</h3>
@@ -430,6 +431,7 @@ export function EventPageView({
         <section className="mt-10">
           <h2 className="type-display text-2xl">{event.kind === "social" ? t("ticketsHeading") : t("tiersHeading")}</h2>
           {withOrganizer ? <p className="mt-2 text-[14px] text-black/60">{t("tiersOrganizerNote", { organizer: organizer || t("theOrganizer") })}</p> : null}
+          {!withOrganizer ? <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-black/65">{t("contributionNote")}</p> : null}
           <div className="max-w-md">{tierList(tiersShown)}</div>
           {event.offers_shirts ? <p className="mt-3 text-[14px] text-black/60">{t("shirtsNote")}</p> : null}
         </section>

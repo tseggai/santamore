@@ -12,13 +12,13 @@ Ako je partner (klub, opština, sponzor) suorganizator, na stranici događaja na
 
 ### Član 2 — Prijava
 
-Prijava se podnosi isključivo preko naše internet platforme. Prijava važi kada: popunite obrazac sa tačnim podacima; potpišete Izjavu o učešću (dio B) elektronski, potvrdom na platformi; platite kotizaciju predviđenu za događaj, ako je ima; i primite potvrdu prijave e-poštom.
+Prijava se podnosi isključivo preko naše internet platforme. Prijava važi kada: popunite obrazac sa tačnim podacima; potpišete Izjavu o učešću (dio B) elektronski, potvrdom na platformi; i primite potvrdu prijave e-poštom. Nikakva uplata nije uslov ni za prijavu ni za učešće.
 
 Prijava je lična. Startni broj, čip i sve što uz prijavu dobijete smijete koristiti samo vi. Nastup pod tuđim brojem znači diskvalifikaciju oba učesnika i gubitak prava na osiguranje i medicinsku pomoć po ovim uslovima.
 
 Broj mjesta je ograničen kapacitetom navedenim na stranici događaja. Prijave se zatvaraju kada se kapacitet popuni ili istekom roka navedenog na stranici, šta prije nastupi. Naknadna prijava na dan događaja moguća je samo ako je stranica događaja tako predvidjela.
 
-Kotizacije idu u Operativni fond udruženja: iz njih se plaća organizacija događaja (dozvole, osiguranje, medicinska služba, oprema, staza, majice, medalje), ne donacije. Iznos kotizacije naveden je na stranici događaja sa uračunatim porezima. Na plaćanja kotizacija primjenjuju se i Pravila donacija u dijelu koji se odnosi na način plaćanja, potvrde i povraćaje.
+Učešće je uz dobrovoljni prilog. Na stranici događaja naveden je iznos koji predlažemo; pri prijavi birate svoj iznos, koji može biti i nula, a vaše mjesto je isto šta god izabrali. Prilog je donacija udruženju i ide u Fond za pomoć, na cilj tog događaja, osim ako na stranici događaja piše da ga je Odbor dodijelio Operativnom fondu. Organizaciju događaja plaćaju sponzori. Na priloge se primjenjuju Pravila donacija u dijelu koji se odnosi na način plaćanja, potvrde i povraćaje.
 
 ### Član 3 — Zdravstvena spremnost
 
@@ -72,7 +72,7 @@ Zabranjeno je: učešće pod dejstvom alkohola ili droga na trkama, plivanjima, 
 
 Kostimi i oprema, uključujući odijela Djeda Mraza, moraju biti bezbjedni za aktivnost: bez dijelova koji se mogu zaplesti, bez otvorenog plamena, prilagođeni vremenu i vodi.
 
-Učesnika koji ozbiljno krši ova pravila ili ugrožava bezbjednost možemo udaljiti sa događaja i diskvalifikovati bez povraćaja kotizacije, a u ponovljenom ili teškom slučaju isključiti iz budućih prijava.
+Učesnika koji ozbiljno krši ova pravila ili ugrožava bezbjednost možemo udaljiti sa događaja i diskvalifikovati, a u ponovljenom ili teškom slučaju isključiti iz budućih prijava. Već uplaćeni prilog se ne vraća.
 
 ### Član 9 — Posebna pravila po vrsti događaja
 
@@ -100,7 +100,7 @@ Ime, startni broj, kategoriju i rezultat objavljujemo na listi rezultata, osim a
 
 ### Član 12 — Odustajanje i prenos prijave
 
-Ako odustanete, kotizaciju ne vraćamo: događaj se planira i plaća prema broju prijavljenih. Do zatvaranja prijava možete besplatno prenijeti prijavu na drugu osobu: javite nam se sa podacima nove osobe, koja potom potpisuje svoju Izjavu o učešću i, ako se prijavljuje na drugu distancu, plaća razliku u kotizaciji. Prenos nije moguć na dan događaja.
+Ako odustanete, već uplaćeni prilog ne vraćamo: on je donacija, a događaj se planira prema broju prijavljenih. Do zatvaranja prijava možete besplatno prenijeti prijavu na drugu osobu: javite nam se sa podacima nove osobe, koja potom potpisuje svoju Izjavu o učešću. Prenos nije moguć na dan događaja.
 
 Izuzetno, kod povrede ili bolesti dokazane ljekarskim izvještajem prije zatvaranja prijava, možete izabrati prenos prijave na sljedeće izdanje istog događaja umjesto povraćaja.
 
@@ -108,7 +108,7 @@ Izuzetno, kod povrede ili bolesti dokazane ljekarskim izvještajem prije zatvara
 
 Bezbjednost ide prije programa. Ako vremenski uslovi, stanje mora, odluka nadležnog organa, viša sila ili drugi razlog van naše kontrole događaj učine opasnim ili nemogućim, možemo ga skratiti, izmijeniti trasu ili program, odložiti ili otkazati, i prije i tokom događaja. Odluku objavljujemo na sajtu i šaljemo prijavljenima e-poštom čim je donesemo, a na licu mjesta preko razglasa i redara.
 
-Ako događaj odložimo, prijava važi za novi termin, uz pravo prenosa na drugu osobu do zatvaranja prijava za novi termin. Ako događaj otkažemo mi, birate: povraćaj plaćene kotizacije na isti način plaćanja u roku od 30 dana, ili njeno pretvaranje u donaciju, kako je opisano u Pravilima donacija. Skraćenje, izmjena trase ili prekid već započetog događaja iz bezbjednosnih razloga ne daju pravo na povraćaj.
+Ako događaj odložimo, prijava važi za novi termin, uz pravo prenosa na drugu osobu do zatvaranja prijava za novi termin. Ako događaj otkažemo mi, birate: povraćaj uplaćenog priloga na isti način plaćanja u roku od 30 dana, ili da prilog ostane cilju tog događaja kao donacija; pitamo vas e-poštom, a ako ne odgovorite u roku od 30 dana, prilog vraćamo. Skraćenje, izmjena trase ili prekid već započetog događaja iz bezbjednosnih razloga ne daju pravo na povraćaj.
 
 Ne odgovaramo za vaše putne troškove, smještaj ni druge troškove nastale zbog odlaganja ili otkazivanja.
 
@@ -118,7 +118,7 @@ Rezultate objavljujemo na sajtu u roku navedenom na stranici događaja. Prigovor
 
 ### Član 15 — Prikupljanje sredstava uz učešće
 
-Učesnik može uz prijavu otvoriti stranicu za prikupljanje sredstava na našoj platformi. Prilozi prikupljeni preko te stranice su donacije udruženju namijenjene korisnicima i ne odnose se na kotizaciju; na njih se primjenjuju Pravila donacija. Učesnik ne prima niti prosljeđuje priloge lično; gotovinu koju prikupi predaje udruženju po pravilima o evidenciji gotovine.
+Učesnik može uz prijavu otvoriti stranicu za prikupljanje sredstava na našoj platformi. Prilozi prikupljeni preko te stranice su donacije udruženju namijenjene korisnicima, odvojene od sopstvenog priloga učesnika za učešće; na njih se primjenjuju Pravila donacija. Učesnik ne prima niti prosljeđuje priloge lično; gotovinu koju prikupi predaje udruženju po pravilima o evidenciji gotovine.
 
 ### Član 16 — Lične stvari i garderoba
 
