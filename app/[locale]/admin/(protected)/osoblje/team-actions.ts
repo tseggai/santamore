@@ -11,14 +11,14 @@ import { createClient } from "@/lib/supabase/server";
 
 export interface TeamActionResult {
   ok: boolean;
-  error?: "invalid" | "server" | "account_taken";
+  error?: "invalid" | "server" | "account_taken" | "forbidden";
   /** The database's own words, for staff to act on. */
   detail?: string;
 }
 
 const schema = z.object({
   id: z.string().uuid().optional(),
-  kind: z.enum(["officer", "staff", "board", "committee", "volunteer"]),
+  kind: z.enum(["staff", "board", "committee", "volunteer"]),
   fullName: z.string().trim().min(2).max(120),
   title: z.string().trim().max(120).nullable(),
   quote: z.string().trim().max(600).nullable(),
@@ -31,6 +31,7 @@ const schema = z.object({
   isPublic: z.boolean(),
   sortOrder: z.number().int().min(0).max(999),
   userId: z.string().uuid().nullable(),
+  access: z.enum(["member", "accounting", "chapter_lead", "admin"]),
 });
 
 export async function saveTeamMember(input: unknown): Promise<TeamActionResult> {
@@ -50,6 +51,7 @@ export async function saveTeamMember(input: unknown): Promise<TeamActionResult> 
     is_public: data.isPublic,
     sort_order: data.sortOrder,
     user_id: data.userId,
+    access: data.access,
     updated_at: new Date().toISOString(),
     ...(data.photoPath !== undefined ? { photo_path: data.photoPath } : {}),
   };
@@ -59,6 +61,7 @@ export async function saveTeamMember(input: unknown): Promise<TeamActionResult> 
   if (error) {
     console.error("[admin] team member save failed:", error.code, error.message);
     if (error.code === "23505") return { ok: false, error: "account_taken", detail: `${error.code}: ${error.message}` };
+    if (error.code === "42501") return { ok: false, error: "forbidden" };
     return { ok: false, error: "server", detail: `${error.code}: ${error.message}` };
   }
   revalidatePath("/[locale]/admin", "layout");

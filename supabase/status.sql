@@ -163,6 +163,23 @@ select * from (values
      to_regprocedure('public.update_my_proposal(uuid, text, text, text, text, bigint)') is not null)
   ,('20260920000068_donors_by_year',
      to_regclass('public.v_donor_years') is not null)
+  ,('20260920000069_member_access',
+     to_regprocedure('public.set_member_access(uuid, text, text)') is not null)
+  ,('20260920000070_event_progress',
+     to_regclass('public.v_public_event_progress') is not null)
+  ,('20261003000077_role_is_access',
+     exists (select 1 from pg_constraint
+              where conrelid = 'public.team_members'::regclass
+                and pg_get_constraintdef(oid) like '%committee%'
+                and pg_get_constraintdef(oid) not like '%chapter_lead%'))
+  ,('20261003000076_staff_access',
+     exists (select 1 from information_schema.columns
+              where table_schema = 'public' and table_name = 'team_members' and column_name = 'access')
+     and to_regprocedure('public.team_members_apply_access()') is not null)
+  ,('20261003000075_chapter_lead_kind',
+     exists (select 1 from pg_constraint
+              where conrelid = 'public.team_members'::regclass
+                and pg_get_constraintdef(oid) like '%chapter_lead%'))
   ,('20260920000067_donors_view',
      to_regclass('public.v_donors') is not null)
   ,('20260920000066_vote_guard',

@@ -3,7 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import type { LeaderboardEntry } from "@/components/Leaderboard";
-import { EventPageView, type EventView } from "@/components/events/EventPageView";
+import { EventPageView, type EventProgress, type EventView } from "@/components/events/EventPageView";
 import { parseDistances, parseTiers } from "@/lib/events";
 import { toGalleryImages, type PublicGalleryRow } from "@/lib/gallery";
 import {
@@ -75,12 +75,23 @@ export default async function EventPage({
   const {
     data: { user },
   } = await extras.auth.getUser();
-  const [{ data: perkRows }, { data: sponsorRows }, { data: galleryRows }, { data: stravaRow }] = await Promise.all([
+  const [{ data: perkRows }, { data: sponsorRows }, { data: galleryRows }, { data: stravaRow }, { data: progressRow }] = await Promise.all([
     extras.from("v_public_perk_challenges").select("*").eq("event_slug", slug),
     extras.from("v_public_sponsors").select("id, name, website").eq("event_slug", slug),
     extras.from("v_public_gallery").select("id, storage_path, caption, credit, event_slug, event_name, event_starts_at").eq("event_slug", slug).order("sort_order", { ascending: true }).limit(120),
     user ? extras.from("strava_connections").select("user_id").eq("user_id", user.id).maybeSingle() : Promise.resolve({ data: null }),
+    // the live figures the share card carries (sums over the money views)
+    extras.from("v_public_event_progress").select("raised_cents, goal_cents, donor_count, today_cents, event_day_cents").eq("event_slug", slug).maybeSingle(),
   ]);
+  const progress: EventProgress | null = progressRow
+    ? {
+        raisedCents: Number(progressRow.raised_cents ?? 0),
+        goalCents: progressRow.goal_cents === null ? null : Number(progressRow.goal_cents),
+        donorCount: Number(progressRow.donor_count ?? 0),
+        todayCents: Number(progressRow.today_cents ?? 0),
+        eventDayCents: Number(progressRow.event_day_cents ?? 0),
+      }
+    : null;
 
   // Challenge standings, ranked by the event's declared metric.
   let challengeEntries: LeaderboardEntry[] = [];
@@ -154,6 +165,7 @@ export default async function EventPage({
     bibs_claimed: Number((event as { bibs_claimed?: number }).bibs_claimed ?? 0),
     max_guests: Number((event as { max_guests?: number }).max_guests ?? 0),
     gallery: toGalleryImages((galleryRows ?? []) as PublicGalleryRow[]),
+    progress,
   };
 
   return (

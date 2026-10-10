@@ -10,6 +10,9 @@ const locales = routing.locales.join("|");
 const ADMIN_PATH = new RegExp(`^/(${locales})/admin(/|$)`);
 const DASHBOARD_PATH = new RegExp(`^/(${locales})/dashboard(/|$)`);
 const LOGIN_PATH = new RegExp(`^/(${locales})/(admin|dashboard)/prijava(/|$)`);
+// "Start fundraising" lands here signed out too: the page shows its own
+// sign-in with the cause in context and comes straight back.
+const SELF_GATED_PATH = new RegExp(`^/(${locales})/dashboard/prikupljaj(/|$)`);
 
 /**
  * One production host, i18n routing, Supabase session refresh, and a first
@@ -88,12 +91,16 @@ export default async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (isAdminPath && !LOGIN_PATH.test(pathname) && !user) {
+  if (isAdminPath && !LOGIN_PATH.test(pathname) && !SELF_GATED_PATH.test(pathname) && !user) {
     const locale = pathname.split("/")[1];
     const login = DASHBOARD_PATH.test(pathname)
       ? `/${locale}/dashboard/prijava`
       : `/${locale}/admin/prijava`;
-    return NextResponse.redirect(new URL(login, request.url));
+    // Remember where they were going, so sign-in lands them there and not
+    // on the overview.
+    const target = new URL(login, request.url);
+    target.searchParams.set("next", `${pathname}${search}`);
+    return NextResponse.redirect(target);
   }
 
   return response;

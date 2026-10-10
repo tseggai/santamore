@@ -8,6 +8,7 @@ import { ConsoleIdentity } from "@/components/console/ConsoleIdentity";
 import { ConsoleShell } from "@/components/console/ConsoleShell";
 import { DonateProvider } from "@/components/donate/DonateDialog";
 import { DashboardNav } from "@/components/dashboard/DashboardNav";
+import { isStaffRole, type Role } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
@@ -29,7 +30,7 @@ export default async function DashboardLayout({
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-  const t = await getTranslations("dashboard");
+  const [t, tAdmin] = await Promise.all([getTranslations("dashboard"), getTranslations("admin")]);
 
   const supabase = await createClient();
   const {
@@ -41,8 +42,12 @@ export default async function DashboardLayout({
 
   const [{ data: testMode }, { data: profile }] = await Promise.all([
     supabase.rpc("test_mode"),
-    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle(),
+    supabase.from("profiles").select("full_name, role").eq("id", user.id).maybeSingle(),
   ]);
+  // Staff see their access level on the rail and the way into the admin,
+  // so an assigned level is visible the moment they sign in.
+  const role = (profile?.role ?? "member") as Role;
+  const staff = isStaffRole(role);
 
   return (
     <ConsoleShell
@@ -55,7 +60,21 @@ export default async function DashboardLayout({
       nav={<DashboardNav />}
       footer={
         <>
-          <ConsoleIdentity name={profile?.full_name?.trim() || user.email || "—"} email={user.email ?? null} href="/dashboard/profil" label={t("navProfile")} />
+          <ConsoleIdentity
+            name={profile?.full_name?.trim() || user.email || "—"}
+            email={user.email ?? null}
+            role={staff ? tAdmin(`memberRole.${role}`) : null}
+            href="/dashboard/profil"
+            label={t("navProfile")}
+          />
+          {staff ? (
+            <Link
+              href="/admin"
+              className="whitespace-nowrap rounded-lg px-3.5 py-2 text-[13.5px] font-semibold text-paper/80 transition-colors hover:bg-paper/10 hover:text-paper"
+            >
+              {t("profileAdminLink")} →
+            </Link>
+          ) : null}
           <Link
             href="/"
             className="whitespace-nowrap rounded-lg px-3.5 py-2 text-[13.5px] font-medium text-paper/60 transition-colors hover:bg-paper/10 hover:text-paper"

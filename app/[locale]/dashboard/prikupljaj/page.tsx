@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { SignInForm } from "@/components/admin/SignInForm";
 import { FundraiseWalkthrough } from "@/components/dashboard/FundraiseWalkthrough";
+import { causeState } from "@/lib/cause-status";
 import { formatShortDate } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
@@ -86,13 +87,40 @@ export default async function FundraiseEntryPage({
   }
 
   if (!cause) {
+    // No cause in the link (a generic "Start fundraising" button): offer
+    // the open causes right here instead of sending them off to look.
+    const { data: openRows } = await supabase
+      .from("v_public_campaigns")
+      .select("id, slug, title, goal_cents, raised_cents, ends_at, disbursed_cents, completed_at")
+      .order("starts_at", { ascending: false });
+    const haveCause = new Set(pages.map((page) => page.campaign_id));
+    const open = ((openRows ?? []) as { id: string; slug: string; title: string; goal_cents: number | null; raised_cents: number; ends_at: string | null; disbursed_cents: number; completed_at: string | null }[])
+      .filter((row) => !causeState(row).completed);
     return shell(
       <>
         <h1 className="type-display mt-4 text-3xl">{t("fundraiseNoEvent")}</h1>
-        <p className="mt-3 text-[15px] leading-relaxed text-black/65">{t("fundraiseNoEventSub")}</p>
-        <Link href="/dashboard/stranice" className="mt-6 inline-flex h-12 items-center rounded-lg bg-ink px-6 text-[15.5px] font-bold text-paper hover:opacity-90">
-          {t("navPages")}
-        </Link>
+        <p className="mt-3 text-[15px] leading-relaxed text-black/65">{open.length === 0 ? t("createNoEvents") : t("fundraiseNoEventSub")}</p>
+        {open.length > 0 ? (
+          <ul className="mt-6 space-y-2">
+            {open.map((row) => (
+              <li key={row.id}>
+                <Link
+                  href={`/dashboard/prikupljaj?cause=${encodeURIComponent(row.slug)}`}
+                  className="flex items-center justify-between gap-4 rounded-lg bg-mist px-5 py-4 transition-colors hover:bg-mist-2"
+                >
+                  <span className="min-w-0">
+                    <span className="block text-[16px] font-bold">{row.title}</span>
+                    <span className="block text-[13.5px] text-black/60">
+                      {row.ends_at ? t("fundraiseCauseUntil", { date: formatShortDate(row.ends_at, locale as Locale) }) : ""}
+                      {haveCause.has(row.id) ? `${row.ends_at ? " · " : ""}${t("causeTaken")}` : ""}
+                    </span>
+                  </span>
+                  <span aria-hidden className="shrink-0 text-[18px] text-sea">→</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </>,
     );
   }

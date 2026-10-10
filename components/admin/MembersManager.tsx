@@ -4,8 +4,9 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
-import { deleteFundraiser, saveMemberProfile } from "@/app/[locale]/admin/(protected)/osoblje/actions";
+import { deleteFundraiser, saveMemberAccess } from "@/app/[locale]/admin/(protected)/osoblje/actions";
 
+import { AccessSummary } from "@/components/admin/AccessSummary";
 import { Chip, DataTable, Thumb, bulkButton, type Column } from "@/components/console/DataTable";
 import { formatShortDate } from "@/lib/dates";
 import { FocusChip } from "@/components/console/FocusChip";
@@ -16,7 +17,6 @@ import { TestFlagButtons } from "@/components/admin/TestFlagButtons";
 import { FundraiserStatusButtons } from "@/components/admin/FundraiserModeration";
 import { RegistrationRowActions } from "@/components/admin/RegistrationRowActions";
 import { formatCents } from "@/lib/money";
-import { ROLES } from "@/lib/roles";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
@@ -441,28 +441,20 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
   const t = useTranslations("admin");
   const router = useRouter();
   const [fullName, setFullName] = useState(member.full_name ?? "");
-  const [role, setRole] = useState<MemberRow["role"]>(member.role);
-  const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "forbidden">("idle");
+  // "View access level": opens on click or hover, closes on click or leaving.
+  const [showAccess, setShowAccess] = useState(false);
+  const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "forbidden" | "schema">("idle");
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (state === "busy") return;
     setState("busy");
-    const result = await saveMemberProfile({
-      id: member.id,
-      fullName,
-      title: null,
-      quote: null,
-      photoPath: null,
-      isTeam: false,
-      teamOrder: 0,
-      role,
-    }).catch(() => ({ ok: false as const, error: "server" as const }));
+    const result = await saveMemberAccess({ id: member.id, fullName, role: member.role }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
       setState("saved");
       router.refresh();
     } else {
-      setState(result.error === "forbidden" ? "forbidden" : "error");
+      setState(result.error === "forbidden" ? "forbidden" : result.error === "schema" ? "schema" : "error");
     }
   };
 
@@ -480,17 +472,46 @@ function ProfileForm({ member, canManage }: { member: MemberRow; canManage: bool
           <input id="mpName" type="text" required minLength={2} maxLength={120} disabled={disabled} value={fullName} onChange={(e) => setFullName(e.target.value)} className={`${inputClass} disabled:opacity-60`} />
         </div>
         <div>
-          <label htmlFor="mpRole" className={labelClass}>{t("memberAccess")}</label>
-          <select id="mpRole" disabled={disabled} value={role} onChange={(e) => setRole(e.target.value as MemberRow["role"])} className={`${inputClass} disabled:opacity-60`}>
-            {ROLES.map((value) => (
-              <option key={value} value={value}>{t(`memberRole.${value}`)}</option>
-            ))}
-          </select>
-          <p className="mt-1 text-[13px] text-black/50">{t(`memberAccessHint.${role}`)}</p>
+          {/* the role is what they may do, as on the Staff record */}
+          <p className={labelClass}>{t("teamAccess")}</p>
+          <p className="mt-1 rounded-lg bg-paper px-3.5 py-2.5 text-[15px]">
+            <span className={member.role === "member" ? "text-black/55" : "font-semibold"}>{t(`memberRole.${member.role}`)}</span>
+          </p>
+          <p className="mt-2 flex flex-wrap items-baseline gap-x-3 text-[13.5px]">
+            <span className="text-black/60">
+              {t("teamKind")}: {member.team_kind ? t(`teamKindValue.${member.team_kind}`) : t("memberNotOnTeam")}
+            </span>
+            <button
+              type="button"
+              aria-expanded={showAccess}
+              onClick={() => setShowAccess((v) => !v)}
+              onMouseEnter={() => setShowAccess(true)}
+              className="text-[13px] font-semibold text-sea underline underline-offset-2"
+            >
+              {showAccess ? t("hideAccess") : t("viewAccess")}
+            </button>
+          </p>
+          {showAccess ? <AccessSummary role={member.role} className="mt-1 rounded-lg bg-paper px-3 py-2" /> : null}
+          <p className="mt-2 text-[13px] text-black/50">
+            {member.team_id ? (
+              <Link href={`/admin/osoblje?uredi=${member.team_id}`} className="font-semibold text-sea underline underline-offset-2">{t("memberAccessOnStaff")}</Link>
+            ) : (
+              <>
+                {t("memberAccessNone")}{" "}
+                <Link href="/admin/osoblje" className="font-semibold text-sea underline underline-offset-2">{t("navStaff")}</Link>
+              </>
+            )}
+          </p>
         </div>
       </div>
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "forbidden" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("memberForbidden")}</p> : null}
+      {state === "schema" ? (
+        <p role="alert" className="mt-3 text-[14px] text-red-dark">
+          <span className="font-semibold">{t("memberSchemaStale")}</span>
+          <code className="mt-1 block font-mono text-[13px] text-black/70">notify pgrst, &apos;reload schema&apos;;</code>
+        </p>
+      ) : null}
       {state === "saved" ? <p role="status" className="mt-3 text-[14px] font-semibold text-sea">{t("memberSaved")}</p> : null}
       {canManage ? (
         <div className="mt-4">

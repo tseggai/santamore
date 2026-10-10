@@ -246,12 +246,56 @@ export default async function StravaPage({
     </li>
   );
 
+  // The three things to do, in order, with where the person stands on each.
+  const steps = [
+    { title: t("step1Title"), sub: t("step1Sub", { count: progress.length }), done: progress.length > 0 && Boolean(connection) },
+    {
+      title: t("step2Title"),
+      sub: connection ? `${t("step2Done")}${connection.athleteName ? ` · ${connection.athleteName}` : ""}` : t("step2Sub"),
+      done: Boolean(connection),
+    },
+    { title: t("step3Title"), sub: t("step3Sub"), done: ready.length > 0 || past.length > 0 },
+  ];
+
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("title")}</h1>
       <p className="mt-2 text-[15px] leading-relaxed text-black/65">{t("sub")}</p>
 
-      <div className="mt-6 border-b-[0.5px] border-line pb-6">
+      <ol className="mt-6 grid gap-3 sm:grid-cols-3">
+        {steps.map((step, index) => (
+          <li key={step.title} className="flex gap-3 rounded-brand bg-mist px-4 py-3.5">
+            <span
+              aria-hidden
+              className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full font-mono text-[12px] font-bold text-paper ${step.done ? "bg-sea" : "bg-red"}`}
+            >
+              {step.done ? "✓" : index + 1}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[15px] font-bold">{step.title}</span>
+              <span className="mt-0.5 block text-[13.5px] leading-relaxed text-black/60">{step.sub}</span>
+            </span>
+          </li>
+        ))}
+      </ol>
+
+      {/* step 1: the challenges to pick from, and where the person stands on each */}
+      <section className={`mt-4 ${card}`}>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          {heading(t("progressHeading"), progress.length)}
+          <Link href="/izazovi" className="text-[14px] font-semibold text-sea underline underline-offset-2">
+            {t("browseChallenges")}
+          </Link>
+        </div>
+        {progress.length === 0 ? (
+          <p className="mt-2 text-[14.5px] text-black/60">{t("progressEmpty")}</p>
+        ) : (
+          <PerkProgressList rows={progress} limit={CHALLENGE_LIMIT} />
+        )}
+      </section>
+
+      {/* step 2: the connection */}
+      <div className="mt-6 border-y-[0.5px] border-line py-6">
         <StravaPanel
           locale={loc}
           connection={connection}
@@ -293,20 +337,6 @@ export default async function StravaPage({
                 caption={t("trendCaption", { weeks: WEEKS })}
               />
             </div>
-          )}
-        </section>
-
-        <section className={card}>
-          {heading(t("progressHeading"), progress.length)}
-          {progress.length === 0 ? (
-            <p className="mt-2 text-[14.5px] text-black/60">
-              {t("progressEmpty")}{" "}
-              <Link href="/izazovi" className="font-semibold text-sea underline underline-offset-2">
-                {t("browseChallenges")}
-              </Link>
-            </p>
-          ) : (
-            <PerkProgressList rows={progress} limit={CHALLENGE_LIMIT} />
           )}
         </section>
 

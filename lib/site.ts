@@ -56,6 +56,17 @@ const AUTH_CODE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
  * and leaves "?code=…" on whatever page that is. Recover it: send the code
  * to the exchange route with the runner console as the destination.
  */
+/**
+ * A "next" destination from a query string, kept internal: an absolute
+ * path on this site or the fallback. Protocol-relative ("//evil") and
+ * scheme ("https:") forms are refused, so a sign-in link can never bounce
+ * someone off the site.
+ */
+export function safeNextPath(next: string | null | undefined, fallback: string): string {
+  if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) return fallback;
+  return next;
+}
+
 export function strayAuthCodeRedirect({
   pathname,
   code,
