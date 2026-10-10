@@ -40,7 +40,7 @@ export const howContent: Record<Locale, HowContent> = {
       },
       {
         name: "Operativni fond",
-        inFlows: "Sponzorstva, kotizacije i grantovi.",
+        inFlows: "Sponzorstva i grantovi.",
         outFlows: "Plate, osiguranje, oprema, troškovi događaja.",
         rule: "Naši sponzori plaćaju naš tim, da donacije ne moraju.",
       },
@@ -112,7 +112,7 @@ export const howContent: Record<Locale, HowContent> = {
       },
       {
         name: "Operations Fund",
-        inFlows: "Sponsorship, entry fees and grants.",
+        inFlows: "Sponsorship and grants.",
         outFlows: "Salaries, insurance, equipment, event costs.",
         rule: "Our sponsors pay for our team, so donations don't have to.",
       },
@@ -184,7 +184,7 @@ export const howContent: Record<Locale, HowContent> = {
       },
       {
         name: "Операционный фонд",
-        inFlows: "Спонсорство, стартовые взносы и гранты.",
+        inFlows: "Спонсорство и гранты.",
         outFlows: "Зарплаты, страховка, оборудование, расходы на события.",
         rule: "Наши спонсоры оплачивают нашу команду, чтобы пожертвованиям не пришлось.",
       },

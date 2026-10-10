@@ -6,15 +6,15 @@
 
 Donations are received by the Non-governmental association “Santamore”, Teuta 113, Porto Montenegro, 85320 Tivat, registration number [[PLACEHOLDER]], PIB [[PLACEHOLDER]], email [[PLACEHOLDER: contact email]] (hereinafter: we, the association). These rules govern how we receive donations, what we do with them, what we publish, how we handle refunds and cancellations, and what happens with entry fees. All payments are in euros (EUR).
 
-By donating you accept these rules in the version published at the time of payment. Entry fees for events are also governed by the Event Terms.
+By donating you accept these rules in the version published at the time of payment. Entry contributions for events are donations too, and the Event Terms also apply to them.
 
 ### Article 2 — Two funds
 
 We keep two strictly separate funds.
 
-**The Impact Fund** consists of donations from individuals and companies, money raised by participants on their fundraiser pages, contributions from collection boxes, gifts in memory, voluntary fee cover, entry fees for events and grants. One hundred percent of the net donation amount is paid out to beneficiaries; not a cent goes to salaries, overheads or the platform.
+**The Impact Fund** consists of donations from individuals and companies, money raised by participants on their fundraiser pages, contributions from collection boxes, gifts in memory, voluntary fee cover, voluntary entry contributions for events and grants. One hundred percent of the net donation amount is paid out to beneficiaries; not a cent goes to salaries, overheads or the platform.
 
-**The Operations Fund** consists of sponsorships, membership fees and income from the sale of merchandise. It pays for organising: permits, insurance, medical services, equipment, the platform, salaries. By exception, an event's entry fee goes to the Operations Fund when its page says so.
+**The Operations Fund** consists of sponsorships, membership fees and income from the sale of merchandise. It pays for organising: permits, insurance, medical services, equipment, the platform, salaries. By exception, an event's entry contributions go to the Operations Fund when its page says so.
 
 Which beneficiaries receive Impact Fund money is decided by the independent Grants Committee under published criteria; the founders, the director and sponsors do not decide. Every payment in and every payment out is visible in the public ledger on the Transparency page.
 
@@ -95,9 +95,9 @@ If the donation has already been paid out to the beneficiary before we receive t
 
 On your card statement the payment appears as [[PLACEHOLDER: transaction descriptor agreed with Monri]]. If you see that entry and do not remember the payment, write to us first; it is faster than a dispute with your bank. A bank dispute (chargeback) is handled with the processor; if it proves unfounded, we may decline future payments from that card.
 
-### Article 13 — Entry fees for events
+### Article 13 — Entry contributions for events
 
-An entry fee is a registration for a specific event and goes to the Impact Fund, to that event's cause, unless the event's page says it goes to the Operations Fund. If we postpone the event, the registration is valid for the new date, with the right to transfer it to another person. If we cancel it, you choose a full refund of the entry fee to the same payment method within 30 days or its conversion into a donation to the Impact Fund; we ask you by email, with no hidden default options, and if you do not answer within 30 days, we refund the entry fee. If you withdraw yourself, the entry fee is not refunded, but you may transfer the registration until registration closes. Everything else is governed by the Event Terms.
+Entry to our events is by voluntary contribution: the event page states the amount we suggest, the participant chooses their own, zero included, and the place does not depend on it. A contribution is a donation and goes to the Impact Fund, to that event's cause, unless the event's page says it goes to the Operations Fund. If we postpone the event, the registration is valid for the new date, with the right to transfer it to another person. If we cancel it, you choose a full refund of the contribution to the same payment method within 30 days or leaving it with the cause as a donation; we ask you by email, with no hidden default options, and if you do not answer within 30 days, we refund the contribution. If you withdraw yourself, the contribution is not refunded, but you may transfer the registration until registration closes. Everything else is governed by the Event Terms.
 
 ### Article 14 — What we publish
 

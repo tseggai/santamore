@@ -12,13 +12,13 @@ Where a partner (a club, a municipality, a sponsor) is a co-organiser, the event
 
 ### Article 2 — Registration
 
-Registration is made exclusively through our online platform. A registration stands once you: complete the form with accurate details; sign the Participation Waiver (Part B) electronically, by confirmation on the platform; pay the entry fee set for the event, if there is one; and receive the registration confirmation by email.
+Registration is made exclusively through our online platform. A registration stands once you: complete the form with accurate details; sign the Participation Waiver (Part B) electronically, by confirmation on the platform; and receive the registration confirmation by email. No payment is a condition of registering or of taking part.
 
 Registration is personal. The race number, the timing chip and everything else you receive with your registration may be used only by you. Taking part under someone else's number means disqualification of both participants and loss of the right to insurance and medical assistance under these terms.
 
 The number of places is limited to the capacity stated on the event page. Registration closes when the capacity is full or when the deadline stated on the page expires, whichever comes first. Late registration on the day of the event is possible only if the event page provides for it.
 
-Entry fees go to the association's Operations Fund: they pay for organising the event (permits, insurance, medical service, equipment, course, shirts, medals), not for donations. The amount of the entry fee is stated on the event page with taxes included. The Donation Policy also applies to entry fee payments in the part concerning payment methods, receipts and refunds.
+Entry is by voluntary contribution. The event page states the amount we suggest; at registration you choose your own amount, which may also be zero, and your place is the same whatever you choose. A contribution is a donation to the association and goes to the Impact Fund, to that event's cause, unless the event's page says the Board has assigned it to the Operations Fund. Putting the event on is paid by sponsors. The Donation Policy applies to contributions in the part concerning payment methods, receipts and refunds.
 
 ### Article 3 — Medical fitness
 
@@ -72,7 +72,7 @@ The following is prohibited: taking part under the influence of alcohol or drugs
 
 Costumes and equipment, including Santa suits, must be safe for the activity: no parts that can snag, no open flame, suited to the weather and the water.
 
-A participant who seriously breaches these rules or endangers safety may be removed from the event and disqualified without a refund of the entry fee and, in a repeated or grave case, excluded from future registrations.
+A participant who seriously breaches these rules or endangers safety may be removed from the event and disqualified and, in a repeated or grave case, excluded from future registrations. A contribution already made is not refunded.
 
 ### Article 9 — Special rules by type of event
 
@@ -100,7 +100,7 @@ We publish the name, race number, category and result in the results list, unles
 
 ### Article 12 — Withdrawal and transfer of registration
 
-If you withdraw, we do not refund the entry fee: the event is planned and paid for according to the number of registered participants. Until registration closes you may transfer your registration to another person free of charge: contact us with the new person's details; that person then signs their own Participation Waiver and, if registering for a different distance, pays the difference in the entry fee. No transfer is possible on the day of the event.
+If you withdraw, a contribution already made is not refunded: it is a donation, and the event is planned according to the number of registered participants. Until registration closes you may transfer your registration to another person free of charge: contact us with the new person's details; that person then signs their own Participation Waiver. No transfer is possible on the day of the event.
 
 Exceptionally, in case of injury or illness proven by a medical report before registration closes, you may choose to carry your registration over to the next edition of the same event instead of a refund.
 
@@ -108,7 +108,7 @@ Exceptionally, in case of injury or illness proven by a medical report before re
 
 Safety comes before the programme. If weather conditions, the state of the sea, a decision of a competent authority, force majeure or any other reason beyond our control makes the event dangerous or impossible, we may shorten it, change the course or the programme, postpone it or cancel it, both before and during the event. We publish the decision on the website and send it to registered participants by email as soon as we take it, and on site by public address and through the marshals.
 
-If we postpone the event, your registration stands for the new date, with the right to transfer it to another person until registration for the new date closes. If we cancel the event, you choose: a refund of the entry fee paid, to the same payment method, within 30 days, or its conversion into a donation, as described in the Donation Policy. Shortening, rerouting or stopping an event already under way for safety reasons gives no right to a refund.
+If we postpone the event, your registration stands for the new date, with the right to transfer it to another person until registration for the new date closes. If we cancel the event, you choose: a refund of the contribution you made, to the same payment method, within 30 days, or leaving it with the event's cause as a donation; we ask you by email, and if you do not answer within 30 days, we refund it. Shortening, rerouting or stopping an event already under way for safety reasons gives no right to a refund.
 
 We are not liable for your travel costs, accommodation or other costs incurred because of a postponement or cancellation.
 
@@ -118,7 +118,7 @@ We publish the results on the website within the time stated on the event page. 
 
 ### Article 15 — Fundraising alongside participation
 
-A participant may open a fundraiser page on our platform alongside their registration. Contributions collected through that page are donations to the association intended for beneficiaries and are unrelated to the entry fee; the Donation Policy applies to them. The participant neither receives nor passes on contributions personally; any cash they collect is handed over to the association under the cash-handling rules.
+A participant may open a fundraiser page on our platform alongside their registration. Contributions collected through that page are donations to the association intended for beneficiaries, separate from the participant's own entry contribution; the Donation Policy applies to them. The participant neither receives nor passes on contributions personally; any cash they collect is handed over to the association under the cash-handling rules.
 
 ### Article 16 — Personal belongings and bag drop
 

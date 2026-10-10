@@ -6,15 +6,15 @@
 
 Donacije prima Nevladino udruženje „Santamore“, Teuta 113, Porto Montenegro, 85320 Tivat, registarski broj [[PLACEHOLDER]], PIB [[PLACEHOLDER]], e-pošta [[PLACEHOLDER: kontakt e-mail]] (u daljem tekstu: mi, udruženje). Ova pravila uređuju kako primamo donacije, šta sa njima radimo, šta objavljujemo, kako radimo refundacije i otkazivanja, i šta biva sa kotizacijama. Sve uplate su u eurima (EUR).
 
-Donacijom prihvatate ova pravila u verziji objavljenoj u trenutku uplate. Na kotizacije za događaje primjenjuju se i Uslovi učešća na događajima.
+Donacijom prihvatate ova pravila u verziji objavljenoj u trenutku uplate. Prilozi za učešće na događajima su takođe donacije i na njih se primjenjuju i Uslovi učešća na događajima.
 
 ### Član 2 — Dva fonda
 
 Držimo dva strogo odvojena fonda.
 
-**Fond za pomoć** čine donacije pojedinaca i privrednih društava, sredstva koja učesnici prikupe na svojim stranicama, prilozi iz kutija za priloge, pokloni u sjećanje, dobrovoljno pokriće troškova naplate, kotizacije za događaje i grantovi. Sto posto neto iznosa donacije isplaćuje se korisnicima; ni cent ne ide na zarade, režije ni platformu.
+**Fond za pomoć** čine donacije pojedinaca i privrednih društava, sredstva koja učesnici prikupe na svojim stranicama, prilozi iz kutija za priloge, pokloni u sjećanje, dobrovoljno pokriće troškova naplate, dobrovoljni prilozi za učešće na događajima i grantovi. Sto posto neto iznosa donacije isplaćuje se korisnicima; ni cent ne ide na zarade, režije ni platformu.
 
-**Operativni fond** čine sponzorstva, članarine i prihod od prodaje promotivnih proizvoda. Iz njega se plaća organizacija: dozvole, osiguranje, medicinska služba, oprema, platforma, zarade. Izuzetno, kotizacija nekog događaja ide u Operativni fond ako to piše na stranici tog događaja.
+**Operativni fond** čine sponzorstva, članarine i prihod od prodaje promotivnih proizvoda. Iz njega se plaća organizacija: dozvole, osiguranje, medicinska služba, oprema, platforma, zarade. Izuzetno, prilozi za učešće na nekom događaju idu u Operativni fond ako to piše na stranici tog događaja.
 
 O tome kojim korisnicima se isplaćuju sredstva Fonda za pomoć odlučuje nezavisna Komisija za dodjelu sredstava po objavljenim kriterijumima; ne odlučuju osnivači, direktor ni sponzori. Svaka uplata i isplata vidi se u javnom registru na stranici Transparentnost.
 
@@ -95,9 +95,9 @@ Ako je donacija već isplaćena korisniku prije prijema zahtjeva, povraćaj nije
 
 Na izvodu kartice uplata se prikazuje kao [[PLACEHOLDER: opis transakcije dogovoren sa Monri]]. Ako vidite tu stavku a ne sjećate se uplate, prvo pišite nama; brže je od reklamacije banci. Reklamaciju banci (chargeback) rješavamo sa procesorom; ako se pokaže neosnovanom, možemo odbiti buduće uplate sa te kartice.
 
-### Član 13 — Kotizacije za događaje
+### Član 13 — Prilozi za učešće na događajima
 
-Kotizacija je prijava na konkretan događaj i ide u Fond za pomoć, na cilj tog događaja, osim ako na stranici događaja piše da ide u Operativni fond. Ako događaj odložimo, prijava važi za novi termin, uz pravo prenosa na drugu osobu. Ako ga otkažemo mi, birate povraćaj kotizacije u punom iznosu na isti način plaćanja u roku od 30 dana ili njeno pretvaranje u donaciju Fondu za pomoć; pitamo vas e-poštom, bez skrivenih podrazumijevanih opcija, a ako ne odgovorite u roku od 30 dana, kotizaciju vraćamo. Ako odustanete sami, kotizaciju ne vraćamo, ali prijavu možete prenijeti do zatvaranja prijava. Sve ostalo uređuju Uslovi učešća na događajima.
+Učešće na našim događajima je uz dobrovoljni prilog: na stranici događaja naveden je iznos koji predlažemo, učesnik bira svoj, uključujući nulu, a mjesto od toga ne zavisi. Prilog je donacija i ide u Fond za pomoć, na cilj tog događaja, osim ako na stranici događaja piše da ide u Operativni fond. Ako događaj odložimo, prijava važi za novi termin, uz pravo prenosa na drugu osobu. Ako ga otkažemo mi, birate povraćaj priloga u punom iznosu na isti način plaćanja u roku od 30 dana ili da prilog ostane cilju kao donacija; pitamo vas e-poštom, bez skrivenih podrazumijevanih opcija, a ako ne odgovorite u roku od 30 dana, prilog vraćamo. Ako odustanete sami, prilog ne vraćamo, ali prijavu možete prenijeti do zatvaranja prijava. Sve ostalo uređuju Uslovi učešća na događajima.
 
 ### Član 14 — Šta objavljujemo
 
