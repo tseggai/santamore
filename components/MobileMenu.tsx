@@ -84,11 +84,13 @@ export function MobileMenu({
         onClick={(event) => {
           if (event.target === event.currentTarget) setOpen(false);
         }}
-        className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none justify-end bg-transparent p-0 backdrop:bg-ink/55 open:flex md:hidden"
+        className="fixed inset-0 m-0 h-[100dvh] max-h-none w-full max-w-none justify-end overflow-hidden bg-transparent p-0 backdrop:bg-ink/55 open:flex md:hidden"
       >
         {open ? (
-          <div className="flex h-full w-[min(100%,320px)] flex-col bg-paper px-4 py-4 shadow-[-16px_0_48px_rgba(14,58,70,0.18)] motion-safe:animate-[panel-in_220ms_ease-out]">
-            <div className="flex items-center justify-end">
+          // The panel is the viewport's height and scrolls inside itself, so the white
+          // surface always reaches the bottom; the close button stays put while the list scrolls.
+          <div className="flex h-[100dvh] w-[min(100%,320px)] flex-col overflow-y-auto overscroll-contain bg-paper px-4 pb-4 shadow-[-16px_0_48px_rgba(14,58,70,0.18)] motion-safe:animate-[panel-in_220ms_ease-out]">
+            <div className="sticky top-0 z-10 flex items-center justify-end bg-paper py-4">
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -98,7 +100,7 @@ export function MobileMenu({
                 ×
               </button>
             </div>
-            <nav className="mt-4 flex flex-col gap-0.5">
+            <nav className="flex flex-col gap-0.5">
               {items.map((item) => (
                 <Link key={item.href} href={item.href} className={linkClass}>
                   {item.label}

@@ -35,8 +35,27 @@ which drops the path (so the person lands on the homepage instead of their
 console) and, before this was handled in the middleware, dropped the code as
 well. The allow-list is therefore not optional.
 
-The "Magic Link" email template must contain `{{ .Token }}` so the 6-digit
-code reaches the inbox for people whose mail scanner consumes the link.
+### The "Magic Link" email template (Authentication → Emails)
+
+The link and the code in the email are the same one-time token. Supabase's
+default template links straight to its verify endpoint, which spends the
+token on a plain GET, so Gmail's link scanner, Outlook Safe Links or an iOS
+link preview opening the link in the background makes both the link and the
+code "wrong or expired" before the person has done anything. The fix is a
+link to our own page, which spends the token only when the person presses
+the button:
+
+```html
+<h2>Santamore</h2>
+<p><a href="{{ .SiteURL }}/me/potvrda-prijave?token_hash={{ .TokenHash }}&type=email&redirect_to={{ .RedirectTo }}">Prijavi se · Sign in · Войти</a></p>
+<p>Kod · Code · Код: <strong>{{ .Token }}</strong></p>
+```
+
+Keep `{{ .Token }}` in the template: the code is the fallback when the link
+is opened in another browser. Do not put `{{ .ConfirmationURL }}` anywhere in
+the template, or the scanner problem returns. The page reads the person's
+locale from the redirect, so the `/me/` in the link is only a starting
+point.
 
 ### Custom SMTP (required before real sign-ups)
 

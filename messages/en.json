@@ -583,7 +583,7 @@
     "linkError": "Could not send the link. Try again.",
     "linkFailed": "That sign-in link is invalid or has expired. Request a new one.",
     "codeLabel": "Sign-in code",
-    "codeHint": "If the link doesn't work, enter the 6-digit code from the same email.",
+    "codeHint": "If the link doesn't work, enter the code from the same email. A code works once: if you already opened the link, request a new one.",
     "codeSubmit": "Sign in with code",
     "codeError": "Wrong or expired code. Request a new link.",
     "noAccess": "This account has no staff access.",
@@ -1641,7 +1641,13 @@
     "teamAccessPendingHint": "Applies the moment an account with {email} signs up, or when you link one.",
     "teamAccessNoEmailHint": "Add the person's email so the access applies when they sign up, or link an account.",
     "teamLinkMatch": "An account with this email already exists.",
-    "teamLinkMatchCta": "Link {email}"
+    "teamLinkMatchCta": "Link {email}",
+    "confirmTitle": "Sign in to Santamore",
+    "confirmSub": "Press the button to finish signing in. The link works once, so nothing happens until you press it.",
+    "confirmButton": "Sign in",
+    "confirmFailed": "This link has already been used or has expired. Request a new one from the sign-in page.",
+    "confirmMissing": "This link is incomplete. Open it from the email again, or request a new one.",
+    "confirmAgain": "Go to sign-in"
   },
   "forms": {
     "nameLabel": "Full name",

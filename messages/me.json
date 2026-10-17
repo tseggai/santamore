@@ -583,7 +583,7 @@
     "linkError": "Slanje nije uspjelo. Pokušaj ponovo.",
     "linkFailed": "Link za prijavu je nevažeći ili je istekao. Zatraži novi.",
     "codeLabel": "Kod za prijavu",
-    "codeHint": "Ako link ne radi, unesi šestocifreni kod iz istog e-maila.",
+    "codeHint": "Ako link ne radi, unesi kod iz istog e-maila. Kod važi jednom: ako si link već otvorio/la, zatraži novi.",
     "codeSubmit": "Prijavi se kodom",
     "codeError": "Pogrešan ili istekao kod. Zatraži novi link.",
     "noAccess": "Ovaj nalog nema pristup za tim.",
@@ -1641,7 +1641,13 @@
     "teamAccessPendingHint": "Primjenjuje se čim se registruje nalog sa {email}, ili kad ga povežeš.",
     "teamAccessNoEmailHint": "Dodaj imejl osobe da se pristup primijeni kad se registruje, ili poveži nalog.",
     "teamLinkMatch": "Nalog s ovim imejlom već postoji.",
-    "teamLinkMatchCta": "Poveži {email}"
+    "teamLinkMatchCta": "Poveži {email}",
+    "confirmTitle": "Prijava na Santamore",
+    "confirmSub": "Pritisni dugme da završiš prijavu. Link radi jednom, pa se ništa ne dešava dok ga ne pritisneš.",
+    "confirmButton": "Prijavi se",
+    "confirmFailed": "Ovaj link je već iskorišćen ili je istekao. Zatraži novi na stranici za prijavu.",
+    "confirmMissing": "Ovaj link je nepotpun. Otvori ga ponovo iz e-maila ili zatraži novi.",
+    "confirmAgain": "Na stranicu za prijavu"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

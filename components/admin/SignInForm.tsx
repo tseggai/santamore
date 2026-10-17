@@ -7,11 +7,11 @@ import { createClient } from "@/lib/supabase/client";
 import type { Locale } from "@/i18n/routing";
 
 /**
- * Magic-link sign-in with a 6-digit code fallback. The code path matters:
- * corporate mail scanners prefetch (and thereby consume) one-time links,
- * and the PKCE link only works in the requesting browser — the OTP code
- * has neither problem. The Supabase "Magic Link" email template must
- * include {{ .Token }} for the code to reach the inbox.
+ * Magic-link sign-in with a one-time code fallback. Mail scanners and link
+ * previews prefetch one-time links, and the link and the code are the same
+ * token: a prefetched link kills the code too. So the email must link to
+ * /potvrda-prijave (a page that spends the token only on a button press)
+ * and carry {{ .Token }} for the code; docs/DEPLOY.md has the template.
  */
 export function SignInForm({
   locale,
@@ -38,6 +38,7 @@ export function SignInForm({
   const [pwDetail, setPwDetail] = useState("");
   /** What Supabase actually said — the owner needs it to fix the project. */
   const [detail, setDetail] = useState<{ rateLimited: boolean; message: string } | null>(null);
+  const [codeDetail, setCodeDetail] = useState("");
 
   const inputClass =
     "mt-1 w-full rounded-lg border-[1.5px] border-line px-3.5 py-3 text-[16px] outline-none focus:border-sea";
@@ -76,16 +77,19 @@ export function SignInForm({
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.verifyOtp({
-        email,
-        token: code.trim(),
+        email: email.trim(),
+        // Pasted codes arrive with spaces; the digits are the code.
+        token: code.replace(/\s+/g, ""),
         type: "email",
       });
       if (error) {
+        setCodeDetail(error.message);
         setState("codeError");
         return;
       }
       window.location.href = nextPath ?? `/${locale}/admin`;
-    } catch {
+    } catch (caught) {
+      setCodeDetail(caught instanceof Error ? caught.message : "");
       setState("codeError");
     }
   };
@@ -235,9 +239,10 @@ export function SignInForm({
             />
           </div>
           {state === "codeError" ? (
-            <p role="alert" className="text-[14px] font-semibold text-red-dark">
-              {t("codeError")}
-            </p>
+            <div role="alert" className="text-[14px] text-red-dark">
+              <p className="font-semibold">{t("codeError")}</p>
+              {codeDetail ? <p className="mt-0.5 font-mono text-[12.5px] text-black/55">{codeDetail}</p> : null}
+            </div>
           ) : null}
           <button
             type="submit"
