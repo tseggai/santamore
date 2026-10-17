@@ -45,10 +45,34 @@ code "wrong or expired" before the person has done anything. The fix is a
 link to our own page, which spends the token only when the person presses
 the button:
 
+Subject: `Prijava · Sign in · Вход — Santamore`. Supabase sends one template
+to everyone and does not know the person's language, so the body carries
+all three. "60 minutes" is the default OTP expiry (Authentication →
+Providers → Email); change the sentences if you change it.
+
 ```html
-<h2>Santamore</h2>
-<p><a href="{{ .SiteURL }}/me/potvrda-prijave?token_hash={{ .TokenHash }}&type=email&redirect_to={{ .RedirectTo }}">Prijavi se · Sign in · Войти</a></p>
-<p>Kod · Code · Код: <strong>{{ .Token }}</strong></p>
+<h2 style="margin:0 0 16px">Santamore</h2>
+
+<p><strong>Prijava</strong><br>
+Pritisni dugme da se prijaviš. Link važi jednom, 60 minuta. Ako ne radi, unesi kod ispod na stranici za prijavu.</p>
+
+<p><strong>Sign in</strong><br>
+Press the button to sign in. The link works once, for 60 minutes. If it does not work, enter the code below on the sign-in page.</p>
+
+<p><strong>Вход</strong><br>
+Нажмите кнопку, чтобы войти. Ссылка действует один раз, 60 минут. Если она не работает, введите код ниже на странице входа.</p>
+
+<p style="margin:24px 0">
+  <a href="{{ .SiteURL }}/me/potvrda-prijave?token_hash={{ .TokenHash }}&type=email&redirect_to={{ .RedirectTo }}"
+     style="display:inline-block;background:#0E3A46;color:#ffffff;padding:12px 22px;border-radius:8px;text-decoration:none;font-weight:bold">
+    Prijavi se · Sign in · Войти
+  </a>
+</p>
+
+<p>Kod · Code · Код:<br>
+<strong style="font-size:22px;letter-spacing:0.15em">{{ .Token }}</strong></p>
+
+<p style="color:#666;font-size:13px">Ako nisi tražio/la prijavu, zanemari ovaj e-mail. · If you did not ask to sign in, ignore this email. · Если вы не запрашивали вход, проигнорируйте это письмо.</p>
 ```
 
 Keep `{{ .Token }}` in the template: the code is the fallback when the link
