@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { SignInForm } from "@/components/admin/SignInForm";
 import { ShareButton } from "@/components/ShareButton";
-import { ProposeForm, type PublicCriterion } from "@/components/proposals/ProposeForm";
+import { ProposeForm, type ProposerMember, type PublicCriterion } from "@/components/proposals/ProposeForm";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
@@ -23,20 +23,25 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
  * three steps in one form. The same form opens as a pane on the causes
  * page; this is the link you share.
  */
-export default async function ProposePage({ params }: { params: Promise<{ locale: string }> }) {
-  const { locale } = await params;
+export default async function ProposePage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ korak?: string }> }) {
+  const [{ locale }, { korak }] = await Promise.all([params, searchParams]);
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const t = await getTranslations("proposals");
   const tDonate = await getTranslations("donate");
 
   let signedIn = false;
+  let member: ProposerMember | null = null;
   let criteria: PublicCriterion[] = [];
   try {
     const supabase = await createClient();
     const [{ data: auth }, { data: criteriaRows }] = await Promise.all([supabase.auth.getUser(), supabase.from("v_public_cause_criteria").select("*")]);
     const lang = locale as Locale;
     signedIn = Boolean(auth.user);
+    if (auth.user) {
+      const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", auth.user.id).maybeSingle();
+      member = { email: auth.user.email ?? "", fullName: profile?.full_name ?? "" };
+    }
     criteria = ((criteriaRows ?? []) as { id: string; disqualify_on: boolean; question_me: string; question_en: string; question_ru: string; reason_me: string; reason_en: string; reason_ru: string }[]).map((row) => ({
       id: row.id,
       disqualify_on: row.disqualify_on,
@@ -59,12 +64,14 @@ export default async function ProposePage({ params }: { params: Promise<{ locale
       <section className="mt-8 rounded-lg bg-mist px-5 py-5 sm:px-6">
         <ProposeForm
           criteria={criteria}
+          member={member}
+          initialStep={signedIn && korak === "2" ? 2 : 1}
           signIn={signedIn ? null : (
             <div className="rounded-lg bg-paper px-5 py-5">
               <h3 className="text-[16px] font-bold">{t("signInTitle")}</h3>
               <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("signInSub")}</p>
               <div className="mt-4">
-                <SignInForm locale={locale} nextPath={`/${locale}/predlozi`} allowSignup />
+                <SignInForm locale={locale} nextPath={`/${locale}/predlozi?korak=2`} allowSignup />
               </div>
             </div>
           )}

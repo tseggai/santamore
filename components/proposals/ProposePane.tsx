@@ -8,7 +8,7 @@ import { SignInForm } from "@/components/admin/SignInForm";
 import { SidePanel } from "@/components/console/SidePanel";
 import { ShareButton } from "@/components/ShareButton";
 import { Link } from "@/i18n/navigation";
-import { ProposeForm, type PublicCriterion } from "@/components/proposals/ProposeForm";
+import { ProposeForm, type ProposerMember, type PublicCriterion } from "@/components/proposals/ProposeForm";
 import type { Locale } from "@/i18n/routing";
 
 /**
@@ -16,12 +16,14 @@ import type { Locale } from "@/i18n/routing";
  * and the pane holding the sign-in (when needed) or the proposal form.
  * `?predlozi=1` opens it on load — that is where the sign-in link returns.
  */
-export function ProposePane({ signedIn, criteria, className }: { signedIn: boolean; criteria: PublicCriterion[]; className?: string }) {
+export function ProposePane({ signedIn, member = null, criteria, className }: { signedIn: boolean; member?: ProposerMember | null; criteria: PublicCriterion[]; className?: string }) {
   const t = useTranslations("proposals");
   const tDonate = useTranslations("donate");
   const locale = useLocale() as Locale;
   const params = useSearchParams();
   const [open, setOpen] = useState(false);
+  // Back from the sign-in: the introduction was read before it, so the questions come up.
+  const returning = params.get("predlozi") === "1" && signedIn;
 
   useEffect(() => {
     if (params.get("predlozi") === "1") setOpen(true);
@@ -45,6 +47,8 @@ export function ProposePane({ signedIn, criteria, className }: { signedIn: boole
         <div className="mt-5">
           <ProposeForm
             criteria={criteria}
+            member={member}
+            initialStep={returning ? 2 : 1}
             signIn={signedIn ? null : (
               <div className="rounded-lg bg-paper px-5 py-5">
                 <h3 className="text-[16px] font-bold">{t("signInTitle")}</h3>

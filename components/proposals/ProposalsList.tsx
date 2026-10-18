@@ -60,6 +60,8 @@ export function ProposalsList({
   const [editing, setEditing] = useState<string | null>(null);
   // The full list shows one line of each proposal until it is opened.
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  // A proposal opened on its own: everything it carries, in the slide-over.
+  const [detail, setDetail] = useState<string | null>(null);
   const [voteError, setVoteError] = useState<{ id: string; kind: "closed" | "server" } | null>(null);
 
   const vote = async (proposal: PublicProposal) => {
@@ -85,7 +87,18 @@ export function ProposalsList({
 
   if (proposals.length === 0) return <p className="mt-4 text-[15px] text-black/60">{t("empty")}</p>;
   const editingProposal = proposals.find((proposal) => proposal.id === editing) ?? null;
+  const detailProposal = proposals.find((proposal) => proposal.id === detail) ?? null;
   const voteBox = compact ? "h-12 w-12" : "h-14 w-14";
+  const shownCount = (proposal: PublicProposal) => {
+    const mine = voted.has(proposal.id);
+    return proposal.vote_count + (mine && !myVotes.includes(proposal.id) ? 1 : !mine && myVotes.includes(proposal.id) ? -1 : 0);
+  };
+  const statusChip = (proposal: PublicProposal) =>
+    proposal.status === "chosen" ? (
+      <span className="rounded-full bg-red px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("chosen")}</span>
+    ) : proposal.vote_rank <= SHORTLIST_SIZE ? (
+      <span className="rounded-full bg-sea px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("shortlist")}</span>
+    ) : null;
 
   return (
     <>
@@ -124,12 +137,15 @@ export function ProposalsList({
             </div>
             <div className="min-w-0 flex-1">
               <p className="flex flex-wrap items-center gap-2">
-                <span className={compact ? "text-[15px] font-bold leading-snug" : "text-[16px] font-bold"}>{proposal.title}</span>
-                {proposal.status === "chosen" ? (
-                  <span className="rounded-full bg-red px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("chosen")}</span>
-                ) : shortlisted ? (
-                  <span className="rounded-full bg-sea px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-paper">{t("shortlist")}</span>
-                ) : null}
+                {/* the name opens the proposal in full */}
+                <button
+                  type="button"
+                  onClick={() => setDetail(proposal.id)}
+                  className={`text-left hover:text-sea hover:underline hover:underline-offset-2 ${compact ? "text-[15px] font-bold leading-snug" : "text-[16px] font-bold"}`}
+                >
+                  {proposal.title}
+                </button>
+                {shortlisted || proposal.status === "chosen" ? statusChip(proposal) : null}
               </p>
               {/* the facts first: where, who benefits, roughly how much */}
               <p className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-[13.5px] text-black/55">
@@ -162,7 +178,12 @@ export function ProposalsList({
                 <p role="alert" className="mt-2 text-[13.5px] font-semibold text-red-dark">{voteError.kind === "closed" ? t("voteClosed") : t("voteFailed")}</p>
               ) : null}
               <p className={`flex flex-wrap gap-x-3 gap-y-1 text-[13.5px] text-black/55 ${compact ? "mt-1" : "mt-2"}`}>
-                {proposal.proposer_first_name && !compact ? <span>{t("byName", { name: proposal.proposer_first_name })}</span> : null}
+                {proposal.proposer_first_name ? <span>{t("byName", { name: proposal.proposer_first_name })}</span> : null}
+                {compact ? (
+                  <button type="button" onClick={() => setDetail(proposal.id)} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">
+                    {t("openProposal")}
+                  </button>
+                ) : null}
                 {proposal.campaign_slug ? (
                   <Link href={`/kampanje/${proposal.campaign_slug}`} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">→ {t("chosen")}</Link>
                 ) : null}
@@ -178,6 +199,62 @@ export function ProposalsList({
         );
       })}
     </ul>
+    {/* one proposal in full: the picture, the text as written, the facts, who proposed it, and the vote */}
+    <SidePanel open={detailProposal !== null} title={detailProposal?.title ?? ""} onClose={() => setDetail(null)}>
+      {detailProposal ? (
+        <div className="space-y-4">
+          <p className="flex flex-wrap items-center gap-2 text-[13.5px] text-black/60">
+            {statusChip(detailProposal)}
+            <span>{t("votes", { count: shownCount(detailProposal) })}</span>
+            {detailProposal.proposer_first_name ? <span>· {t("byName", { name: detailProposal.proposer_first_name })}</span> : null}
+          </p>
+          {detailProposal.photo_path ? (
+            <Image src={proposalPhotoUrl(detailProposal.photo_path) ?? ""} alt="" width={800} height={450} className="aspect-[16/9] w-full rounded-lg bg-paper object-cover" />
+          ) : null}
+          <p className="whitespace-pre-line text-[15px] leading-relaxed text-black/80">{detailProposal.summary}</p>
+          <dl className="grid gap-3 rounded-lg bg-paper px-4 py-4 text-[14.5px] sm:grid-cols-3">
+            {detailProposal.location ? (
+              <div><dt className="text-[12px] font-semibold uppercase tracking-[0.08em] text-black/50">{t("detailWhere")}</dt><dd className="mt-0.5">{detailProposal.location}</dd></div>
+            ) : null}
+            {detailProposal.beneficiary ? (
+              <div><dt className="text-[12px] font-semibold uppercase tracking-[0.08em] text-black/50">{t("detailWho")}</dt><dd className="mt-0.5">{detailProposal.beneficiary}</dd></div>
+            ) : null}
+            {detailProposal.amount_cents ? (
+              <div><dt className="text-[12px] font-semibold uppercase tracking-[0.08em] text-black/50">{t("detailAmount")}</dt><dd className="mt-0.5 font-mono tabular-nums">~{formatCents(detailProposal.amount_cents, locale, { trimWholeCents: true })}</dd></div>
+            ) : null}
+          </dl>
+          {detailProposal.link_url ? (
+            <p className="text-[14px]">
+              <a href={detailProposal.link_url} target="_blank" rel="noopener noreferrer" className="break-all font-semibold text-sea underline underline-offset-2 hover:text-sea-2">{t("openLink")} ↗</a>
+            </p>
+          ) : null}
+          {detailProposal.status !== "chosen" ? (
+            signedIn ? (
+              <button
+                type="button"
+                aria-pressed={voted.has(detailProposal.id)}
+                disabled={busy === detailProposal.id}
+                onClick={() => vote(detailProposal)}
+                className={`inline-flex h-11 items-center gap-2 rounded-lg px-5 text-[15px] font-bold transition-colors disabled:opacity-60 ${voted.has(detailProposal.id) ? "bg-sea text-paper" : "bg-red text-paper hover:bg-red-dark"}`}
+              >
+                <span aria-hidden>▲</span>
+                {voted.has(detailProposal.id) ? t("unvote") : t("vote")}
+              </button>
+            ) : (
+              <Link href="/dashboard/prijava" className="inline-flex h-11 items-center gap-2 rounded-lg bg-red px-5 text-[15px] font-bold text-paper hover:bg-red-dark">
+                <span aria-hidden>▲</span>
+                {t("signInToVote")}
+              </Link>
+            )
+          ) : detailProposal.campaign_slug ? (
+            <Link href={`/kampanje/${detailProposal.campaign_slug}`} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">→ {t("chosen")}</Link>
+          ) : null}
+          {voteError?.id === detailProposal.id ? (
+            <p role="alert" className="text-[13.5px] font-semibold text-red-dark">{voteError.kind === "closed" ? t("voteClosed") : t("voteFailed")}</p>
+          ) : null}
+        </div>
+      ) : null}
+    </SidePanel>
     {/* the proposer's edit, in the same slide-over every form on the site uses */}
     <SidePanel open={editingProposal !== null} title={editingProposal?.title ?? ""} onClose={() => setEditing(null)}>
       {editingProposal ? (
