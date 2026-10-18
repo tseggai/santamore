@@ -12,6 +12,8 @@ import { createClient } from "@/lib/supabase/server";
 // against the live criteria — the form's early warning is a courtesy.
 
 const proposeSchema = z.object({
+  /** The name the proposal wears; saved on the member's profile, the public view shows the first name. */
+  proposerName: z.string().trim().min(2).max(120),
   title: z.string().trim().min(4).max(120),
   summary: z.string().trim().min(40).max(2000),
   location: z.string().trim().max(120).nullable(),
@@ -57,6 +59,12 @@ export async function proposeCause(input: unknown): Promise<ProposeResult> {
   const reasons = failed.map((criterion) => criterion[`reason_${data.locale}` as const]);
 
   if (data.photoPath && !data.photoPath.startsWith(`${user.id}/`)) return { ok: false, error: "invalid" };
+  // The name travels with the proposal through the profile (profiles_update_own, own row only).
+  const { error: nameError } = await supabase.from("profiles").update({ full_name: data.proposerName }).eq("id", user.id);
+  if (nameError) {
+    console.error("[proposals] name update failed:", nameError.code);
+    return { ok: false, error: "server" };
+  }
   const { data: row, error } = await supabase
     .from("cause_proposals")
     .insert({
@@ -124,7 +132,7 @@ export interface EditProposalResult {
  */
 export async function updateProposal(input: unknown): Promise<EditProposalResult> {
   const parsed = proposeSchema
-    .omit({ answers: true, locale: true })
+    .omit({ answers: true, locale: true, proposerName: true })
     .extend({ proposalId: z.string().uuid() })
     .safeParse(input);
   if (!parsed.success) return { ok: false, error: "invalid" };

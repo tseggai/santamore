@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { ProposalsList, type PublicProposal } from "@/components/proposals/ProposalsList";
 import { ProposePane } from "@/components/proposals/ProposePane";
-import type { PublicCriterion } from "@/components/proposals/ProposeForm";
+import type { ProposerMember, PublicCriterion } from "@/components/proposals/ProposeForm";
 import { SHORTLIST_SIZE } from "@/lib/proposals";
 import { CauseStatus } from "@/components/campaigns/CauseStatus";
 import { openFirst } from "@/lib/cause-status";
@@ -55,6 +55,7 @@ export default async function CampaignsIndexPage({
   let proposals: PublicProposal[] = [];
   let myVotes: string[] = [];
   let signedIn = false;
+  let member: ProposerMember | null = null;
   let criteria: PublicCriterion[] = [];
   try {
     const supabase = await createClient();
@@ -74,6 +75,10 @@ export default async function CampaignsIndexPage({
     proposals = ((proposalRows ?? []) as PublicProposal[]).sort((a, b) => (a.status === "chosen" ? 1 : 0) - (b.status === "chosen" ? 1 : 0) || a.vote_rank - b.vote_rank);
     myVotes = (voteRows ?? []).map((row) => row.proposal_id as string);
     signedIn = Boolean(auth.user);
+    if (auth.user) {
+      const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", auth.user.id).maybeSingle();
+      member = { email: auth.user.email ?? "", fullName: profile?.full_name ?? "" };
+    }
     const { data } = await supabase
       .from("v_public_campaigns")
       .select("*")
@@ -164,7 +169,7 @@ export default async function CampaignsIndexPage({
           <h2 className="mt-2 text-[20px] font-bold leading-snug">{tProposals("listHeading")}</h2>
           <p className="mt-2 text-[14px] leading-relaxed text-black/65">{tProposals("listSub")}</p>
           <div className="mt-4">
-            <ProposePane signedIn={signedIn} criteria={criteria} />
+            <ProposePane signedIn={signedIn} member={member} criteria={criteria} />
           </div>
         </div>
         {/* the five in the running; the full list, with the text, is a page of its own */}

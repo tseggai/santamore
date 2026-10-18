@@ -2223,7 +2223,14 @@
     "introStep1": "You propose a cause that needs financial support.",
     "introStep2": "You and others vote on the list of proposals.",
     "introStep3": "From the top five we choose one or two and raise for them.",
-    "backToIntro": "Back"
+    "backToIntro": "Back",
+    "signedInAs": "Signed in as",
+    "yourName": "Your name",
+    "yourNameHint": "The proposal is listed with your first name.",
+    "openProposal": "See the proposal",
+    "detailWhere": "Where",
+    "detailWho": "Who benefits",
+    "detailAmount": "Roughly"
   },
   "beneficiaries": {
     "eyebrow": "Beneficiaries",

@@ -2223,7 +2223,14 @@
     "introStep1": "Ti predložiš cilj kojem treba finansijska podrška.",
     "introStep2": "Ti i ostali glasate za prijedloge sa liste.",
     "introStep3": "Od prvih pet biramo jedan ili dva i za njih prikupljamo.",
-    "backToIntro": "Nazad"
+    "backToIntro": "Nazad",
+    "signedInAs": "Prijavljen/a kao",
+    "yourName": "Tvoje ime",
+    "yourNameHint": "Prijedlog se objavljuje sa tvojim imenom.",
+    "openProposal": "Pogledaj prijedlog",
+    "detailWhere": "Gdje",
+    "detailWho": "Kome pomaže",
+    "detailAmount": "Okvirno"
   },
   "beneficiaries": {
     "eyebrow": "Korisnici",

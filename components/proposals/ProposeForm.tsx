@@ -37,9 +37,17 @@ export interface ProposalDraft {
   photoPath: string | null;
 }
 
+/** Who is signed in: shown at the questions step, and the name is asked for there. */
+export interface ProposerMember {
+  email: string;
+  fullName: string;
+}
+
 export function ProposeForm({
   criteria,
   signIn = null,
+  member = null,
+  initialStep = 1,
   edit = null,
   onSaved,
   onCancel,
@@ -48,6 +56,10 @@ export function ProposeForm({
   criteria: PublicCriterion[];
   /** Shown in place of the questions when the visitor is not signed in: the introduction is for everyone, the proposal for members. */
   signIn?: ReactNode;
+  /** The signed-in member, so the questions step can say who is proposing and ask for their name. */
+  member?: ProposerMember | null;
+  /** Coming back from the sign-in, the introduction has been read: start on the questions. */
+  initialStep?: 1 | 2;
   /** Editing an existing proposal: the screening is behind it, only the wording changes. */
   edit?: ProposalDraft | null;
   onSaved?: () => void;
@@ -59,6 +71,7 @@ export function ProposeForm({
   const tDonate = useTranslations("donate");
   const locale = useLocale() as Locale;
   const [answers, setAnswers] = useState<Record<string, boolean | undefined>>({});
+  const [name, setName] = useState(member?.fullName ?? "");
   const [title, setTitle] = useState(edit?.title ?? "");
   const [summary, setSummary] = useState(edit?.summary ?? "");
   const [location, setLocation] = useState(edit?.location ?? "");
@@ -93,7 +106,7 @@ export function ProposeForm({
   const [reasons, setReasons] = useState<string[]>([]);
   // Three screens: who we are and how a cause is chosen, the questions, then — only once they pass — the proposal.
   // An edit starts on the last: the questions were answered already.
-  const [step, setStep] = useState<1 | 2 | 3>(edit ? 3 : 1);
+  const [step, setStep] = useState<1 | 2 | 3>(edit ? 3 : initialStep);
   const dialog = useDialog();
 
   const withdraw = async () => {
@@ -109,6 +122,7 @@ export function ProposeForm({
   };
 
   const answered = edit ? true : allAnswered(criteria, answers);
+  const named = edit ? true : name.trim().length >= 2;
   const failed = edit ? [] : failedCriteria(criteria, answers);
   const screenedOut = answered && failed.length > 0;
 
@@ -142,6 +156,7 @@ export function ProposeForm({
       return;
     }
     const result = await proposeCause({
+      proposerName: name.trim(),
       title,
       summary,
       location: location.trim() || null,
@@ -264,6 +279,17 @@ export function ProposeForm({
     return (
       <div className="space-y-5">
         {stepLine}
+        {member ? (
+          // Who is proposing: the email the sign-in carried, and the name the proposal will wear.
+          <section className="rounded-lg bg-paper px-4 py-4">
+            <p className="text-[14px] text-black/60">
+              {t("signedInAs")} <span className="font-semibold text-black">{member.email}</span>
+            </p>
+            <label htmlFor="prName" className={`${labelClass} mt-3 block`}>{t("yourName")}</label>
+            <input id="prName" type="text" required minLength={2} maxLength={120} autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} className={`${fieldClass} bg-mist`} />
+            <p className="mt-1 text-[13px] text-black/55">{t("yourNameHint")}</p>
+          </section>
+        ) : null}
         <section>
           <h2 className="text-[16px] font-bold">{t("screeningHeading")}</h2>
           <p className="mt-1 text-[14px] leading-relaxed text-black/60">{t("screeningSub")}</p>
@@ -289,7 +315,7 @@ export function ProposeForm({
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
-            disabled={!answered}
+            disabled={!answered || !named}
             onClick={() => setStep(3)}
             className="rounded-lg bg-red px-6 py-3.5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
           >
