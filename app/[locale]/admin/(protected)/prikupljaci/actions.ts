@@ -10,6 +10,8 @@ import { createClient } from "@/lib/supabase/server";
 
 export interface ActionResult {
   ok: boolean;
+  /** "incomplete": the publish gate refused a page without a photo, a goal and a story. */
+  error?: "incomplete" | "server";
 }
 
 const statusSchema = z.object({
@@ -32,7 +34,8 @@ export async function setFundraiserModeration(input: unknown): Promise<ActionRes
     .eq("id", parsed.data.fundraiserId)
     .select("id")
     .single();
-  if (error) return { ok: false };
+  // P0001 is the publish gate (migration 0024): no photo, goal or story yet.
+  if (error) return { ok: false, error: error.code === "P0001" ? "incomplete" : "server" };
 
   revalidatePath("/[locale]/admin", "layout");
   revalidatePath("/[locale]/admin/novac", "layout");

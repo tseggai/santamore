@@ -1647,7 +1647,9 @@
     "confirmButton": "Prijavi se",
     "confirmFailed": "Ovaj link je već iskorišćen ili je istekao. Zatraži novi na stranici za prijavu.",
     "confirmMissing": "Ovaj link je nepotpun. Otvori ga ponovo iz e-maila ili zatraži novi.",
-    "confirmAgain": "Na stranicu za prijavu"
+    "confirmAgain": "Na stranicu za prijavu",
+    "pageDraftNote": "Nacrt — vlasnik je objavljuje sa svoje kontrolne table kad dobije fotografiju, cilj i priču.",
+    "pageIncomplete": "Nije moguće: stranica još nema fotografiju, cilj ili priču. Vlasnik je dopunjava i objavljuje."
   },
   "forms": {
     "nameLabel": "Ime i prezime",
