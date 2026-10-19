@@ -9,7 +9,7 @@ import {
   setMessageHidden,
 } from "@/app/[locale]/admin/(protected)/prikupljaci/actions";
 
-type State = "idle" | "busy" | "error";
+type State = "idle" | "busy" | "error" | "incomplete";
 
 export function FundraiserStatusButtons({
   fundraiserId,
@@ -25,15 +25,18 @@ export function FundraiserStatusButtons({
   const set = async (next: "active" | "hidden") => {
     setState("busy");
     const result = await setFundraiserModeration({ fundraiserId, status: next }).catch(
-      () => ({ ok: false }),
+      () => ({ ok: false as const, error: "server" as const }),
     );
-    setState(result.ok ? "idle" : "error");
+    setState(result.ok ? "idle" : "error" in result && result.error === "incomplete" ? "incomplete" : "error");
     if (result.ok) router.refresh();
   };
 
+  // A draft is the owner's to publish, once the page has its photo, goal and
+  // story; staff only reinstate a page they hid, or hide one.
   return (
-    <span className="inline-flex items-center gap-1.5">
-      {status !== "active" ? (
+    <span className="inline-flex flex-wrap items-center gap-1.5">
+      {status === "draft" ? <span className="text-[13px] text-black/55">{t("pageDraftNote")}</span> : null}
+      {status === "hidden" ? (
         <button
           type="button"
           disabled={state === "busy"}
@@ -53,9 +56,9 @@ export function FundraiserStatusButtons({
           {t("pageHide")}
         </button>
       ) : null}
-      {state === "error" ? (
+      {state === "error" || state === "incomplete" ? (
         <span role="alert" className="text-[13px] font-semibold text-red-dark">
-          {t("actionError")}
+          {state === "incomplete" ? t("pageIncomplete") : t("actionError")}
         </span>
       ) : null}
     </span>

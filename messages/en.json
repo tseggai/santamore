@@ -1647,7 +1647,9 @@
     "confirmButton": "Sign in",
     "confirmFailed": "This link has already been used or has expired. Request a new one from the sign-in page.",
     "confirmMissing": "This link is incomplete. Open it from the email again, or request a new one.",
-    "confirmAgain": "Go to sign-in"
+    "confirmAgain": "Go to sign-in",
+    "pageDraftNote": "Draft — the owner publishes it from their dashboard once it has a photo, a goal and a story.",
+    "pageIncomplete": "Not possible: the page has no photo, goal or story yet. The owner completes and publishes it."
   },
   "forms": {
     "nameLabel": "Full name",
