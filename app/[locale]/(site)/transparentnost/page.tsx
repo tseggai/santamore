@@ -235,7 +235,12 @@ export default async function LedgerPage({
   // Organisations are sponsors, shown with their logos; individuals are donors, listed by name.
   const supporters = yearSupporters.filter((su) => su.kind === "sponsor");
   const individualDonors = yearSupporters.filter((su) => su.kind === "donor");
-  const years = yearStats.map((row) => row.year).filter((y) => y >= FOUNDING_YEAR);
+  // The stats view always carries next year so a cause planned ahead has a
+  // place; the picker lists it only once something is in it.
+  const years = yearStats
+    .filter((row) => row.year >= FOUNDING_YEAR)
+    .filter((row) => row.year <= thisYear || row.event_count > 0 || row.received_cents > 0 || row.disbursed_cents > 0 || row.page_count > 0)
+    .map((row) => row.year);
   if (year !== null && !years.includes(year) && yearStats.length > 0) notFound();
   const derived = year !== null ? (yearStats.find((row) => row.year === year) ?? null) : null;
   const report = year !== null ? (yearReports.find((row) => row.year === year) ?? null) : null;
