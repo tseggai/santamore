@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -21,6 +21,7 @@ export function ProposePane({ signedIn, member = null, criteria, className }: { 
   const tDonate = useTranslations("donate");
   const locale = useLocale() as Locale;
   const params = useSearchParams();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   // Back from the sign-in: the introduction was read before it, so the questions come up.
   const returning = params.get("predlozi") === "1" && signedIn;
@@ -49,6 +50,10 @@ export function ProposePane({ signedIn, member = null, criteria, className }: { 
             criteria={criteria}
             member={member}
             initialStep={returning ? 2 : 1}
+            onSaved={() => {
+              setOpen(false);
+              router.refresh();
+            }}
             signIn={signedIn ? null : (
               <div className="rounded-lg bg-paper px-5 py-5">
                 <h3 className="text-[16px] font-bold">{t("signInTitle")}</h3>

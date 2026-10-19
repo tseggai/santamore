@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { deleteProposal, proposeCause, updateProposal } from "@/app/[locale]/(site)/kampanje/predlozi/actions";
+import { useSidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
 import { centsToEuros } from "@/lib/money";
 import { parseEurosToCents } from "@/lib/money";
@@ -54,6 +55,7 @@ export function ProposeForm({
   onDeleted,
 }: {
   criteria: PublicCriterion[];
+  /** Called when the person is finished: an edit saved, or a new proposal submitted and the thank-you dismissed. */
   /** Shown in place of the questions when the visitor is not signed in: the introduction is for everyone, the proposal for members. */
   signIn?: ReactNode;
   /** The signed-in member, so the questions step can say who is proposing and ask for their name. */
@@ -108,6 +110,7 @@ export function ProposeForm({
   // An edit starts on the last: the questions were answered already.
   const [step, setStep] = useState<1 | 2 | 3>(edit ? 3 : initialStep);
   const dialog = useDialog();
+  const panel = useSidePanel();
 
   const withdraw = async () => {
     if (!edit) return;
@@ -170,8 +173,11 @@ export function ProposeForm({
     if (result.ok && result.rejected) {
       setReasons(result.rejected);
       setState("rejected");
+      panel.markClean();
     } else if (result.ok) {
       setState("done");
+      // Saved: closing the panel now has nothing to discard.
+      panel.markClean();
     } else {
       setState("error");
     }
@@ -202,9 +208,16 @@ export function ProposeForm({
       <div className="rounded-lg bg-mist px-5 py-6">
         <h2 className="type-display text-2xl">{t("submitted")}</h2>
         <p className="mt-2 text-[15px] leading-relaxed text-black/70">{t("submittedSub")}</p>
-        <Link href="/kampanje#prijedlozi" className="mt-4 inline-flex h-11 items-center rounded-lg bg-red px-6 text-[15.5px] font-bold text-paper hover:bg-red-dark">
-          {t("viewList")}
-        </Link>
+        {onSaved ? (
+          // In the pane over the list: close it, and the list behind shows the proposal.
+          <button type="button" onClick={onSaved} className="mt-4 inline-flex h-11 items-center rounded-lg bg-red px-6 text-[15.5px] font-bold text-paper hover:bg-red-dark">
+            {t("viewList")}
+          </button>
+        ) : (
+          <Link href="/kampanje#prijedlozi" className="mt-4 inline-flex h-11 items-center rounded-lg bg-red px-6 text-[15.5px] font-bold text-paper hover:bg-red-dark">
+            {t("viewList")}
+          </Link>
+        )}
       </div>
     );
   }
