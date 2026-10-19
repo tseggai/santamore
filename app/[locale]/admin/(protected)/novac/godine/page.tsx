@@ -20,6 +20,8 @@ interface ReportRow {
   headline: string | null;
   summary_md: string | null;
   plan_md: string | null;
+  money_note_md?: string | null;
+  internal_note_md?: string | null;
   venues: string[];
   is_public: boolean;
   is_test: boolean;
@@ -112,6 +114,8 @@ export default async function YearsPage({ params }: { params: Promise<{ locale: 
             headline: report.headline,
             summaryMd: report.summary_md,
             planMd: report.plan_md,
+            moneyNoteMd: report.money_note_md ?? null,
+            internalNoteMd: report.internal_note_md ?? null,
             venues: report.venues ?? [],
             isPublic: report.is_public,
             isTest: Boolean(report.is_test),

@@ -258,7 +258,6 @@ export function ProposeForm({
         {stepLine}
         <section className="space-y-3 text-[15.5px] leading-relaxed text-black/80">
           <p>{t("introAbout")}</p>
-          <p>{t("introHow")}</p>
           <p className="font-semibold">{t("introOpen", { year })}</p>
         </section>
         <ol className="grid gap-3 sm:grid-cols-3">

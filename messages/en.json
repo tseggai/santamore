@@ -1422,7 +1422,7 @@
     "yearEventsHint": "One per line: name · YYYY-MM-DD · venue",
     "yearSponsorsLink": "Manage supporters",
     "yearBeneficiariesList": "Where the money went",
-    "yearBeneficiariesListHint": "One per line: label · euros, e.g. “Family in Tivat, medical costs · 1200”",
+    "yearBeneficiariesListHint": "One per line: label · euros · documents, e.g. “Family in Tivat, medical costs · 1200 · /documents/2026/slip.pdf”. Documents are paths in the disbursement-docs bucket, site files or full links, separated by spaces; they appear as proof on the public ledger.",
     "yearDonorsList": "Donors (donor wall)",
     "yearDonorsHint": "One per line: name · euros. Write Anonymous for anyone who chose not to be named.",
     "yearRecordedCause": "These recorded gifts and hand-overs belong to",
@@ -1649,7 +1649,11 @@
     "confirmMissing": "This link is incomplete. Open it from the email again, or request a new one.",
     "confirmAgain": "Go to sign-in",
     "pageDraftNote": "Draft — the owner publishes it from their dashboard once it has a photo, a goal and a story.",
-    "pageIncomplete": "Not possible: the page has no photo, goal or story yet. The owner completes and publishes it."
+    "pageIncomplete": "Not possible: the page has no photo, goal or story yet. The owner completes and publishes it.",
+    "yearMoneyNote": "Note under the hand-overs (public)",
+    "yearMoneyNoteHint": "How the money moved that year: who paid, from where, what the documents show. Shown on the Transparency page under the beneficiaries. Markdown.",
+    "yearInternalNote": "Internal note (staff only)",
+    "yearInternalNoteHint": "Where the originals are, and anything that stays off the public page. Never shown on the site."
   },
   "forms": {
     "nameLabel": "Full name",
@@ -2219,8 +2223,7 @@
     "photoRemove": "Remove",
     "photoHint": "One picture of the need or the people behind it. Never someone's photo without their say.",
     "openLink": "Read more at the link",
-    "introAbout": "Santamore is a local movement based in Porto Montenegro that organises events around a wellness-focused, active and festive lifestyle, for charitable causes in Montenegro. We organise and take part in races, rides, challenges, other fitness competitions and events to raise money for crowdsourced causes within Montenegro.",
-    "introHow": "The causes are proposed and voted on by the community. Santamore then raises money for the one or two winning causes for the year.",
+    "introAbout": "Santamore is a non-profit based in Porto Montenegro that raises money for charitable causes in Montenegro. Each year the community proposes and votes on the causes, and we raise money for the one or two winners.",
     "introOpen": "Proposals for the {year} cause are open.",
     "introStep1": "You propose a cause that needs financial support.",
     "introStep2": "You and others vote on the list of proposals.",

@@ -15,8 +15,15 @@ export function supporterLogoUrl(path: string | null): string | null {
   return publicStorageUrl("supporter-logos", path);
 }
 
-/** Ledger documentation is public by design (brief §11). */
+/**
+ * Ledger documentation is public by design (brief §11). A path in the
+ * bucket becomes its CDN URL; a site file ("/documents/…") or a full URL
+ * is used as it is, so a recorded hand-over can link a file shipped with
+ * the site.
+ */
 export function disbursementDocUrl(path: string | null): string | null {
+  if (!path) return null;
+  if (/^https?:\/\//.test(path) || path.startsWith("/")) return path;
   return publicStorageUrl("disbursement-docs", path);
 }
 
