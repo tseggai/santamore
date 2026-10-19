@@ -65,10 +65,12 @@ export function CampaignPageView({
   });
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
   const cover = galleryImageUrl(campaign.cover_path ?? null);
-  // A completed cause takes no more money: its buttons lead to where the
-  // money went, on the money page for its year.
+  // A completed cause takes no more money: its button leads to where the
+  // money went, on the money page for its year. The ledger dates a cause's
+  // money by the cause's start, so the year is the start's (a cause that
+  // ran into January still belongs to the year it raised).
   const state = causeState(campaign);
-  const yearOf = campaign.ends_at ?? campaign.starts_at;
+  const yearOf = campaign.starts_at ?? campaign.ends_at;
   const moneyYear = yearOf ? new Date(yearOf).getFullYear() : null;
   const secondaryButton =
     "inline-flex h-12 items-center rounded-lg bg-mist px-5 text-[15px] font-semibold transition-colors hover:bg-mist-2 hover:text-sea";
@@ -152,10 +154,11 @@ export function CampaignPageView({
             className={`${secondaryButton} gap-2`}
           />
         )}
-        {preview ? (
+        {/* while the cause runs, its own rows; once completed, the money page for its year says it all */}
+        {state.completed ? null : preview ? (
           <span className={secondaryButton}>{t("ledgerLink")}</span>
         ) : (
-          <CauseLedgerDialog slug={campaign.slug} className={secondaryButton} />
+          <CauseLedgerDialog slug={campaign.slug} year={moneyYear} className={secondaryButton} />
         )}
       </div>
 
