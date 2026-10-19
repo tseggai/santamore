@@ -155,7 +155,7 @@ export function CampaignPageView({
         {preview ? (
           <span className={secondaryButton}>{t("ledgerLink")}</span>
         ) : (
-          <CauseLedgerDialog slug={campaign.slug} className={secondaryButton} />
+          <CauseLedgerDialog slug={campaign.slug} year={moneyYear} className={secondaryButton} />
         )}
       </div>
 

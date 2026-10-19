@@ -20,7 +20,7 @@ function displayDate(iso: string): string {
  * raised on its events' pages. Money out is decided per chapter, so the
  * overlay says so and points at the full public ledger.
  */
-export function CauseLedgerDialog({ slug, className }: { slug: string; className: string }) {
+export function CauseLedgerDialog({ slug, year = null, className }: { slug: string; /** The cause's year, so the full ledger opens on it rather than on today's. */ year?: number | null; className: string }) {
   const t = useTranslations("campaigns");
   const tLedger = useTranslations("ledger");
   const locale = useLocale() as Locale;
@@ -45,11 +45,12 @@ export function CauseLedgerDialog({ slug, className }: { slug: string; className
   };
   // A correction is a signed line in the same list.
   const money = (cents: number) => formatSignedCents(cents, locale, { trimWholeCents: true });
+  const ledgerPath = year ? `/transparentnost?godina=${year}` : "/transparentnost";
 
   return (
     <>
       <a
-        href={`/${locale}/transparentnost`}
+        href={`/${locale}${ledgerPath}`}
         onClick={(e) => {
           e.preventDefault();
           void show();
@@ -110,7 +111,7 @@ export function CauseLedgerDialog({ slug, className }: { slug: string; className
             )}
             <p className="mt-5 rounded-lg bg-mist px-4 py-3 text-[14px] leading-relaxed text-black/70">
               {t("ledgerOutNote")}{" "}
-              <Link href="/transparentnost" className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">{t("ledgerFull")}</Link>
+              <Link href={ledgerPath} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">{t("ledgerFull")}</Link>
             </p>
           </div>
         </div>
