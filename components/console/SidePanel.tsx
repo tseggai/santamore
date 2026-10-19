@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from "react";
 
 import { useDialog } from "@/components/console/useDialog";
 
@@ -12,8 +12,17 @@ import { useDialog } from "@/components/console/useDialog";
  * `prefers-reduced-motion` turns off). Children mount only while open,
  * so a form always starts fresh. Once something inside has been typed
  * or changed, a click on the backdrop, Escape or the × asks before
- * discarding it; a form that closes itself after saving is not asked.
+ * discarding it; a form that closes itself after saving is not asked, and
+ * a form that stays open after saving calls markClean() so that it is not
+ * asked either.
  */
+const SidePanelContext = createContext<{ markClean: () => void }>({ markClean: () => {} });
+
+/** For forms inside a panel: once saved, nothing is left to discard. A no-op outside a panel. */
+export function useSidePanel() {
+  return useContext(SidePanelContext);
+}
+
 export function SidePanel({
   open,
   title,
@@ -32,6 +41,7 @@ export function SidePanel({
   const dirty = useRef(false);
   const asking = useRef(false);
   const confirmBox = useDialog();
+  const context = useMemo(() => ({ markClean: () => { dirty.current = false; } }), []);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -108,7 +118,7 @@ export function SidePanel({
             </button>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-mist px-5 py-5 sm:px-6">
-            {children}
+            <SidePanelContext.Provider value={context}>{children}</SidePanelContext.Provider>
           </div>
         </div>
       ) : null}
