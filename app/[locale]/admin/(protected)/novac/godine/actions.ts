@@ -25,7 +25,21 @@ const schema = z.object({
   /** Left out for a new report: the database follows the test-mode switch. */
   isTest: z.boolean().optional(),
   events: z.array(z.object({ name: z.string().trim().min(1).max(160), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(), venue: z.string().trim().max(160).nullable() })).max(50).default([]),
-  beneficiariesList: z.array(z.object({ label: z.string().trim().min(1).max(200), amount_cents: z.number().int().min(0).nullable() })).max(100).default([]),
+  beneficiariesList: z
+    .array(
+      z.object({
+        label: z.string().trim().min(1).max(200),
+        amount_cents: z.number().int().min(0).nullable(),
+        /** Proof of the hand-over: paths in the disbursement-docs bucket, site files ("/documents/…") or full URLs. */
+        documents: z.array(z.string().trim().min(1).max(300)).max(10).default([]),
+      }),
+    )
+    .max(100)
+    .default([]),
+  /** Public: how the money moved that year, under the hand-overs on the money page. */
+  moneyNoteMd: z.string().trim().max(4000).nullable().default(null),
+  /** Staff only: where the originals are, and anything not for the public page. */
+  internalNoteMd: z.string().trim().max(4000).nullable().default(null),
   donorsList: z.array(z.object({ name: z.string().trim().min(1).max(120), amount_cents: z.number().int().min(0).nullable() })).max(2000).default([]),
   volunteersList: z.array(z.string().trim().min(1).max(120)).max(500).default([]),
   /** The cause the recorded donor list and hand-overs belong to. */
@@ -57,6 +71,8 @@ export async function saveYearReport(input: unknown): Promise<YearReportResult> 
       donors_list: data.donorsList,
       volunteers_list: data.volunteersList,
       campaign_id: data.campaignId,
+      money_note_md: data.moneyNoteMd,
+      internal_note_md: data.internalNoteMd,
       updated_at: new Date().toISOString(),
     },
     { onConflict: "year" },

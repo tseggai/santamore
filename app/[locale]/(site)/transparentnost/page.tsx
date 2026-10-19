@@ -89,7 +89,8 @@ interface YearReport {
   venues: string[];
   events?: { name: string; date: string | null; venue: string | null }[];
   supporters?: string[];
-  beneficiaries_list?: { label: string; amount_cents: number | null }[];
+  beneficiaries_list?: { label: string; amount_cents: number | null; documents?: string[] }[];
+  money_note_md?: string | null;
   donors_list?: { name: string; amount_cents: number | null }[];
   volunteers_list?: string[];
 }
@@ -585,6 +586,11 @@ export default async function LedgerPage({
               {tYears("beneficiariesHeading")} <span className="font-mono normal-case tracking-normal text-black/45">· {count(stats.beneficiary_count)}</span>
             </h3>
             {handOverList}
+            {report?.money_note_md ? (
+              <div className={`mt-3 rounded-lg bg-mist px-4 py-3 ${prose}`}>
+                <Markdown remarkPlugins={[remarkGfm]}>{report.money_note_md}</Markdown>
+              </div>
+            ) : null}
           </section>
 
           {/* the rest of the year, every section open */}

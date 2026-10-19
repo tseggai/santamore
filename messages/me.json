@@ -1422,7 +1422,7 @@
     "yearEventsHint": "Jedan po redu: naziv · GGGG-MM-DD · lokacija",
     "yearSponsorsLink": "Uredi podržavaoce",
     "yearBeneficiariesList": "Kuda je novac otišao",
-    "yearBeneficiariesListHint": "Jedan po redu: opis · euri, npr. „Porodica u Tivtu, liječenje · 1200”",
+    "yearBeneficiariesListHint": "Jedan po redu: naziv · euri · dokumenti, npr. „Porodica u Tivtu, liječenje · 1200 · /documents/2026/nalog.pdf“. Dokumenti su putanje u bucketu disbursement-docs, fajlovi sajta ili puni linkovi, razdvojeni razmakom; prikazuju se kao dokaz u javnom registru.",
     "yearDonorsList": "Donatori (zid donatora)",
     "yearDonorsHint": "Jedan po redu: ime · euri. Napiši Anonimno za one koji nisu htjeli da budu imenovani.",
     "yearRecordedCause": "Ovi zabilježeni pokloni i isplate pripadaju cilju",
@@ -1649,7 +1649,11 @@
     "confirmMissing": "Ovaj link je nepotpun. Otvori ga ponovo iz e-maila ili zatraži novi.",
     "confirmAgain": "Na stranicu za prijavu",
     "pageDraftNote": "Nacrt — vlasnik je objavljuje sa svoje kontrolne table kad dobije fotografiju, cilj i priču.",
-    "pageIncomplete": "Nije moguće: stranica još nema fotografiju, cilj ili priču. Vlasnik je dopunjava i objavljuje."
+    "pageIncomplete": "Nije moguće: stranica još nema fotografiju, cilj ili priču. Vlasnik je dopunjava i objavljuje.",
+    "yearMoneyNote": "Napomena ispod isplata (javna)",
+    "yearMoneyNoteHint": "Kako se novac kretao te godine: ko je platio, odakle, šta dokumenti pokazuju. Prikazuje se na stranici Transparentnost ispod korisnika. Markdown.",
+    "yearInternalNote": "Interna napomena (samo tim)",
+    "yearInternalNoteHint": "Gdje su originali i sve što ostaje van javne stranice. Nikad se ne prikazuje na sajtu."
   },
   "forms": {
     "nameLabel": "Ime i prezime",

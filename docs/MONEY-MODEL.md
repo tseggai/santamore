@@ -13,7 +13,7 @@ Money reaches Santamore through three kinds of record, and leaves through two:
 | in | sponsorship cash that went to the beneficiaries | `sponsors` with `fund = 'impact'` |
 | in | an entry contribution received for an event whose contributions go to the cause (entry is by voluntary contribution: the tier is a suggestion, the participant chooses the amount, zero included) | `registrations` confirmed, on an event with `fee_fund = 'impact'` (migration 0071; the default) |
 | out | a published hand-over | `disbursements` |
-| out | a hand-over recorded on a year report | `year_reports.beneficiaries_list` |
+| out | a hand-over recorded on a year report (with its `documents`, linked on the public ledger like a disbursement's; migration 0081) | `year_reports.beneficiaries_list` |
 
 Until migration 0054, every surface summed its own mix of these:
 
@@ -94,3 +94,7 @@ Migration 0055 adds a site-wide switch (`site_settings.test_mode`, read through 
 Immutability, precisely: an approved or refunded gift allows approved → refunded, message moderation and the test flag; a published hand-over allows `paid_at` once and the test flag; a correction allows the test flag. Everything else is refused, and a correction is the way to change a figure.
 
 The switch and the purge live under Settings → Test & demo. Every admin list shows a red "Test" chip on test rows and offers "Mark as test data" / "Mark as live" on a selection (a year report has a checkbox in its form), so after a practice run the records worth keeping are qualified and the rest deleted one by one or purged together. The console badge reads "Test mode" and the public site shows a red bar while it is on.
+
+## Paperwork and notes on a year report (migration 0081)
+
+A hand-over recorded on a year report carries `documents` (paths in the `disbursement-docs` bucket, site files under `public/documents/`, or full URLs); the money-out view exposes them as `documentation_paths`, so the public ledger links them exactly as it links a disbursement's. A year report also carries `money_note_md`, shown publicly under the hand-overs of that year, and `internal_note_md`, read only in the console. Both are edited in Money → Years. 2025 uses all three: the two bank slips, with the payer's personal details masked, sit at `public/documents/2025/santamore-25-isplate.pdf`, and the note says how the money moved in a year without a bank account.

@@ -18,7 +18,9 @@ export interface YearReport {
   isPublic: boolean;
   isTest: boolean;
   events: { name: string; date: string | null; venue: string | null }[];
-  beneficiariesList: { label: string; amount_cents: number | null }[];
+  beneficiariesList: { label: string; amount_cents: number | null; documents?: string[] }[];
+  moneyNoteMd: string | null;
+  internalNoteMd: string | null;
   donorsList: { name: string; amount_cents: number | null }[];
   volunteersList: string[];
   /** The cause the recorded donor list and hand-overs belong to. */
@@ -137,7 +139,14 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
   // A new report follows the test-mode switch like every other record; an existing one shows its flag.
   const [isTest, setIsTest] = useState<boolean | undefined>(r?.isTest);
   const [eventsText, setEventsText] = useState((r?.events ?? []).map((e) => [e.name, e.date ?? "", e.venue ?? ""].filter(Boolean).join(" · ")).join("\n"));
-  const [beneficiariesText, setBeneficiariesText] = useState((r?.beneficiariesList ?? []).map((b) => (b.amount_cents != null ? `${b.label} · ${euros(b.amount_cents)}` : b.label)).join("\n"));
+  // label · euros · documents (paths or URLs, space-separated)
+  const [beneficiariesText, setBeneficiariesText] = useState(
+    (r?.beneficiariesList ?? [])
+      .map((b) => [b.label, b.amount_cents != null ? euros(b.amount_cents) : "", (b.documents ?? []).join(" ")].join(" · ").replace(/( · )+$/, ""))
+      .join("\n"),
+  );
+  const [moneyNote, setMoneyNote] = useState(r?.moneyNoteMd ?? "");
+  const [internalNote, setInternalNote] = useState(r?.internalNoteMd ?? "");
   const [donorsText, setDonorsText] = useState((r?.donorsList ?? []).map((d) => (d.amount_cents != null ? `${d.name} · ${euros(d.amount_cents)}` : d.name)).join("\n"));
   const [volunteersText, setVolunteersText] = useState((r?.volunteersList ?? []).join("\n"));
   const [campaignId, setCampaignId] = useState(r?.campaignId ?? "");
@@ -163,9 +172,15 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
         return { name: name ?? "", date: date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null, venue: venue || null };
       }),
       beneficiariesList: lines(beneficiariesText).map((line) => {
-        const [label, amount] = line.split("·").map((part) => part.trim());
-        return { label: label ?? "", amount_cents: amount ? (parseEurosToCents(amount) ?? null) : null };
+        const [label, amount, docs] = line.split("·").map((part) => part.trim());
+        return {
+          label: label ?? "",
+          amount_cents: amount ? (parseEurosToCents(amount) ?? null) : null,
+          documents: docs ? docs.split(/\s+/).filter(Boolean) : [],
+        };
       }),
+      moneyNoteMd: moneyNote.trim() || null,
+      internalNoteMd: internalNote.trim() || null,
       donorsList: lines(donorsText).map((line) => {
         const [name, amount] = line.split("·").map((part) => part.trim());
         return { name: name ?? "", amount_cents: amount ? (parseEurosToCents(amount) ?? null) : null };
@@ -300,6 +315,16 @@ function YearForm({ row, onDone }: { row: YearRow; onDone: () => void }) {
           <label htmlFor="yBeneficiariesList" className={labelClass}>{t("yearBeneficiariesList")}</label>
           <textarea id="yBeneficiariesList" rows={4} value={beneficiariesText} onChange={(e) => setBeneficiariesText(e.target.value)} className={`${inputClass} font-mono text-[14px]`} />
           {hint(t("yearBeneficiariesListHint"))}
+        </div>
+        <div className="mt-4">
+          <label htmlFor="yMoneyNote" className={labelClass}>{t("yearMoneyNote")}</label>
+          <textarea id="yMoneyNote" rows={5} maxLength={4000} value={moneyNote} onChange={(e) => setMoneyNote(e.target.value)} className={inputClass} />
+          {hint(t("yearMoneyNoteHint"))}
+        </div>
+        <div className="mt-4">
+          <label htmlFor="yInternalNote" className={labelClass}>{t("yearInternalNote")}</label>
+          <textarea id="yInternalNote" rows={4} maxLength={4000} value={internalNote} onChange={(e) => setInternalNote(e.target.value)} className={inputClass} />
+          {hint(t("yearInternalNoteHint"))}
         </div>
       </div>
 

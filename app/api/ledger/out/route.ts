@@ -1,4 +1,5 @@
 import { toCsv } from "@/lib/csv";
+import { siteOrigin } from "@/lib/site";
 import { disbursementDocUrl } from "@/lib/storage";
 import { centsToEuros } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
@@ -33,7 +34,8 @@ export async function GET() {
       row.committee_decision_ref,
       (row.documentation_paths as string[])
         .map((path) => disbursementDocUrl(path))
-        .filter(Boolean)
+        .filter((url): url is string => Boolean(url))
+        .map((url) => (url.startsWith("/") ? `${siteOrigin()}${url}` : url))
         .join(" "),
     ]),
     ...(adjustments ?? []).map((row) => [

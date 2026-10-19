@@ -1422,7 +1422,7 @@
     "yearEventsHint": "One per line: name · YYYY-MM-DD · venue",
     "yearSponsorsLink": "Manage supporters",
     "yearBeneficiariesList": "Where the money went",
-    "yearBeneficiariesListHint": "One per line: label · euros, e.g. “Family in Tivat, medical costs · 1200”",
+    "yearBeneficiariesListHint": "One per line: label · euros · documents, e.g. “Family in Tivat, medical costs · 1200 · /documents/2026/slip.pdf”. Documents are paths in the disbursement-docs bucket, site files or full links, separated by spaces; they appear as proof on the public ledger.",
     "yearDonorsList": "Donors (donor wall)",
     "yearDonorsHint": "One per line: name · euros. Write Anonymous for anyone who chose not to be named.",
     "yearRecordedCause": "These recorded gifts and hand-overs belong to",
@@ -1649,7 +1649,11 @@
     "confirmMissing": "This link is incomplete. Open it from the email again, or request a new one.",
     "confirmAgain": "Go to sign-in",
     "pageDraftNote": "Draft — the owner publishes it from their dashboard once it has a photo, a goal and a story.",
-    "pageIncomplete": "Not possible: the page has no photo, goal or story yet. The owner completes and publishes it."
+    "pageIncomplete": "Not possible: the page has no photo, goal or story yet. The owner completes and publishes it.",
+    "yearMoneyNote": "Note under the hand-overs (public)",
+    "yearMoneyNoteHint": "How the money moved that year: who paid, from where, what the documents show. Shown on the Transparency page under the beneficiaries. Markdown.",
+    "yearInternalNote": "Internal note (staff only)",
+    "yearInternalNoteHint": "Where the originals are, and anything that stays off the public page. Never shown on the site."
   },
   "forms": {
     "nameLabel": "Full name",
