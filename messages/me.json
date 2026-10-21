@@ -1750,8 +1750,7 @@
       "printHint": "Štampa samo zapisnik, sa dnevnim redom i listom prisutnih, kao PDF za dijeljenje.",
       "sheetKind": "Zapisnik sa sastanka",
       "agendaSheetTitle": "Dnevni red sastanka",
-      "minutesSheetTitle": "Zapisnik",
-      "sheetMeta": "Santamore · Tivat"
+      "minutesSheetTitle": "Zapisnik"
     }
   },
   "forms": {

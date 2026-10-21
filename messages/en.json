@@ -1750,8 +1750,7 @@
       "printHint": "Prints the minutes alone, with the agenda and the sign-in list, as a PDF to share.",
       "sheetKind": "Minutes of the meeting",
       "agendaSheetTitle": "Meeting agenda",
-      "minutesSheetTitle": "Minutes",
-      "sheetMeta": "Santamore · Tivat"
+      "minutesSheetTitle": "Minutes"
     }
   },
   "forms": {
