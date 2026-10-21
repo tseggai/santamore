@@ -1,9 +1,11 @@
 /**
- * The organisation at a glance, top down: the Assembly elects the Board and
- * the Grants Committee and the Executive Director; the Board governs the
- * Director; the Director directs the team leads, the chapter teams and the
- * staff; those run the volunteer roles. One SVG, Montenegrin or English,
- * drawn from the statute as adopted on 2026-10-21 and the team guide
+ * The organisation at a glance, as the founders drew it: the Assembly on
+ * top; under it the Board, the Executive Director and the Grants Committee
+ * in one row, the Board governing the Director from the left and the
+ * Committee's grant decisions reaching the Director from the right; under
+ * the Director the team leads, the staff and the chapter teams; under
+ * those the volunteer roles. One SVG, Montenegrin or English, drawn from the
+ * statute as adopted on 2026-10-21 and the team guide
  * (docs/legal/governance/organisation-and-roles.*.md says the same in
  * words). Head counts are planning figures.
  */
@@ -21,13 +23,12 @@ interface Strings {
   title: string;
   assembly: Box;
   board: Box;
-  committee: Box;
   director: Box;
+  committee: Box;
   rowC: [Box, Box, Box];
   rowD: [Box, Box, Box];
   elects: string;
   governs: string;
-  reports: string;
   implements: string;
   directs: string;
   runs: string;
@@ -39,14 +40,14 @@ interface Strings {
 const STRINGS: Record<OrgChartLang, Strings> = {
   en: {
     title: "The Assembly elects, the Board governs, the Director runs, the Committee grants",
-    assembly: { name: "Assembly · all members, one vote each", lines: ["Highest body · at least once a year · adopts the statute, budget and reports · a tie: the President's vote decides · unpaid"] },
-    board: { name: "Board · 5–7 people, unpaid", lines: ["Strategy, budget, staffing, pay", "Independent majority · 4 meetings a year", "A tie: the President's vote decides"] },
-    committee: { name: "Grants Committee · 3–5, unpaid", lines: ["Decides who receives funds · final", "No founders, Director or staff", "4 sittings a year"], independent: true },
-    director: { name: "Executive Director · 1", lines: ["The founder · 6-year term, renewable", "Decides everything not reserved", "Removed only by 2/3 of all members", "Paid once the Operations Fund exists"], paid: true },
+    assembly: { name: "Assembly · all members, one vote each", lines: ["Highest body · at least once a year · adopts the statute, budget and reports", "Its President chairs it, checks proxies and the quorum, and decides a tie · unpaid"] },
+    board: { name: "Board · 5–7, unpaid", lines: ["Strategy, budget, staffing, pay", "Independent majority", "4 meetings a year", "A tie: its President decides"] },
+    director: { name: "Executive Director · 1", lines: ["The founder · 6-year term, renewable", "Reports to Assembly and Board", "Decides everything not reserved", "Paid once the fund exists"], paid: true },
+    committee: { name: "Grants Committee · 3–5", lines: ["Decides who receives funds", "Decisions final · unpaid", "No founders, Director or staff", "4 sittings a year"], independent: true },
     rowC: [
       { name: "Team leads · about 5", lines: ["One function each", "4–6 hours a month", "Unpaid"] },
-      { name: "Chapter team · 3 per town", lines: ["Lead, treasurer, coordinator", "Appointed by the Board, 2 years", "Unpaid, lead part-paid later"] },
       { name: "Staff · 0 now, 1–2 by 2027", lines: ["Hired by the Board", "Pay set by independent members", "Paid from sponsorship"], paid: true },
+      { name: "Chapter team · 3 per town", lines: ["Lead, treasurer, coordinator", "Appointed by the Board, 2 years", "Unpaid, lead part-paid later"] },
     ],
     rowD: [
       { name: "Event volunteers · about 40", lines: ["1 day, briefed the week before", "Unpaid"] },
@@ -55,7 +56,6 @@ const STRINGS: Record<OrgChartLang, Strings> = {
     ],
     elects: "elects and recalls",
     governs: "governs",
-    reports: "reports to both",
     implements: "implements",
     directs: "directs",
     runs: "run",
@@ -65,14 +65,14 @@ const STRINGS: Record<OrgChartLang, Strings> = {
   },
   me: {
     title: "Skupština bira, Upravni odbor upravlja, direktor vodi, Komisija dodjeljuje",
-    assembly: { name: "Skupština · svi članovi, po jedan glas", lines: ["Najviši organ · najmanje jednom godišnje · usvaja statut, budžet i izvještaje · neriješeno: glas Predsjednika · neplaćeno"] },
-    board: { name: "Upravni odbor · 5–7, neplaćeno", lines: ["Strategija, budžet, osoblje, zarade", "Nezavisna većina · 4 sjednice godišnje", "Neriješeno: odlučuje glas predsjednika"] },
-    committee: { name: "Komisija za sredstva · 3–5, neplaćeno", lines: ["Odlučuje ko dobija sredstva · konačno", "Bez osnivača, direktora i osoblja", "4 sjednice godišnje"], independent: true },
-    director: { name: "Izvršni direktor · 1", lines: ["Osnivač · mandat 6 g., ponovljiv", "Odlučuje o svemu nerezervisanom", "Razrješenje samo sa 2/3 svih članova", "Plaćeno kad Operativni fond postoji"], paid: true },
+    assembly: { name: "Skupština · svi članovi, po jedan glas", lines: ["Najviši organ · najmanje jednom godišnje · usvaja statut, budžet i izvještaje", "Predsjednik njome rukovodi, provjerava punomoćja i kvorum i odlučuje neriješeno · neplaćeno"] },
+    board: { name: "Upravni odbor · 5–7, neplaćeno", lines: ["Strategija, budžet, osoblje, zarade", "Nezavisna većina", "4 sjednice godišnje", "Neriješeno: odlučuje predsjednik"] },
+    director: { name: "Izvršni direktor · 1", lines: ["Osnivač · mandat 6 g., ponovljiv", "Odgovara Skupštini i Odboru", "Odlučuje o svemu nerezervisanom", "Plaćeno kad fond postoji"], paid: true },
+    committee: { name: "Komisija za sredstva · 3–5", lines: ["Odlučuje ko dobija sredstva", "Odluke konačne · neplaćeno", "Bez osnivača, direktora, osoblja", "4 sjednice godišnje"], independent: true },
     rowC: [
       { name: "Rukovodioci timova · oko 5", lines: ["Po jedna funkcija", "4–6 sati mjesečno", "Neplaćeno"] },
-      { name: "Tim ogranka · 3 po gradu", lines: ["Rukovodilac, blagajnik, koord.", "Imenuje Upravni odbor, 2 g.", "Neplaćeno, kasnije dijelom"] },
       { name: "Osoblje · 0 sada, 1–2 do 2027.", lines: ["Zapošljava Upravni odbor", "Zaradu utvrđuju nezavisni", "Plaćeno iz sponzorstava"], paid: true },
+      { name: "Tim ogranka · 3 po gradu", lines: ["Rukovodilac, blagajnik, koord.", "Imenuje Upravni odbor, 2 g.", "Neplaćeno, kasnije dijelom"] },
     ],
     rowD: [
       { name: "Volonteri događaja · oko 40", lines: ["1 dan, brifing sedmicu prije", "Neplaćeno"] },
@@ -81,7 +81,6 @@ const STRINGS: Record<OrgChartLang, Strings> = {
     ],
     elects: "bira i razrješava",
     governs: "upravlja",
-    reports: "odgovara obojici",
     implements: "sprovodi",
     directs: "rukovodi",
     runs: "vode",
@@ -101,17 +100,15 @@ const PAID_FILL = "#FDE4E4";
 const MIST = "#F1F5F6";
 const QUIET = "rgba(0,0,0,0.62)";
 
-/** Rows, top down: the Assembly, the Board with the Committee beside it, the Director, the team, the volunteers, the key. */
+/** Rows, top down: the Assembly; the Board, the Director and the Committee; the team; the volunteers; the key. */
 const ROW_A = 40;
-const ROW_B = 136;
-const ROW_C = 272;
-const ROW_D = 404;
-const ROW_E = 522;
-const H_A = 56;
-const H_B = 88;
-const H_C = 104;
-const H_D = 88;
-const H_E = 72;
+const ROW_B = 148;
+const ROW_C = 300;
+const ROW_D = 432;
+const H_A = 72;
+const H_B = 104;
+const H_C = 88;
+const H_D = 72;
 
 function BoxShape({ x, y, w, h, box }: { x: number; y: number; w: number; h: number; box: Box }) {
   const last = box.lines.length - 1;
@@ -127,30 +124,20 @@ function BoxShape({ x, y, w, h, box }: { x: number; y: number; w: number; h: num
   );
 }
 
-function Arrow({ x, y1, y2, dashed }: { x: number; y1: number; y2: number; dashed?: boolean }) {
-  return <line x1={x} y1={y1} x2={x} y2={y2} stroke={EDGE} strokeWidth={1.25} strokeDasharray={dashed ? "5 4" : undefined} markerEnd="url(#org-chart-arrow)" />;
-}
-
 function Label({ x, y, text, anchor = "start" }: { x: number; y: number; text: string; anchor?: "start" | "middle" | "end" }) {
   return <text x={x} y={y} fontSize={11} fontStyle="italic" fill={QUIET} textAnchor={anchor}>{text}</text>;
 }
 
 export function OrgChart({ lang, className = "" }: { lang: OrgChartLang; className?: string }) {
   const s = STRINGS[lang];
-  const boardX = 24;
-  const boardW = 340;
-  const boardMid = boardX + boardW / 2;
-  const commX = 396;
-  const commW = 340;
-  const commMid = commX + commW / 2;
-  const dirX = 24;
-  const dirW = 340;
-  const dirMid = dirX + dirW / 2;
+  const busA = ROW_A + H_A + 18;
   const busC = ROW_C + H_C + 16;
-  const busD = ROW_D + H_D + 16;
-  const keyY = ROW_E + H_E + 22;
+  const dirMid = MIDS[1];
+  const midB = ROW_B + H_B / 2;
+  const keyY = ROW_D + H_D + 22;
+  const arrow = "url(#org-chart-arrow)";
   return (
-    <svg viewBox="0 0 760 668" role="img" aria-label={s.title} className={`block h-auto w-full ${className}`} fontSize={12}>
+    <svg viewBox="0 0 760 580" role="img" aria-label={s.title} className={`block h-auto w-full ${className}`} fontSize={12}>
       <defs>
         <marker id="org-chart-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
           <path d="M0 0L10 5L0 10z" fill={EDGE} />
@@ -158,40 +145,37 @@ export function OrgChart({ lang, className = "" }: { lang: OrgChartLang; classNa
       </defs>
       <text x={24} y={22} fontSize={15} fontWeight={700} fill="#000">{s.title}</text>
 
-      {/* The Assembly elects the Board, the Committee and the Director. */}
+      {/* The Assembly elects the Board, the Director and the Committee. */}
       <BoxShape x={24} y={ROW_A} w={712} h={H_A} box={s.assembly} />
-      <Arrow x={boardMid} y1={ROW_A + H_A} y2={ROW_B} />
-      <Arrow x={commMid} y1={ROW_A + H_A} y2={ROW_B} />
-      <Label x={boardMid + 8} y={ROW_A + H_A + 26} text={s.elects} />
-      <Label x={commMid + 8} y={ROW_A + H_A + 26} text={s.elects} />
+      <line x1={dirMid} y1={ROW_A + H_A} x2={dirMid} y2={busA} stroke={EDGE} strokeWidth={1.25} />
+      <line x1={MIDS[0]} y1={busA} x2={MIDS[2]} y2={busA} stroke={EDGE} strokeWidth={1.25} />
+      {MIDS.map((m) => <line key={m} x1={m} y1={busA} x2={m} y2={ROW_B} stroke={EDGE} strokeWidth={1.25} markerEnd={arrow} />)}
+      <Label x={dirMid + 8} y={busA - 6} text={s.elects} />
 
-      <BoxShape x={boardX} y={ROW_B} w={boardW} h={H_B} box={s.board} />
-      <BoxShape x={commX} y={ROW_B} w={commW} h={H_B} box={s.committee} />
+      <BoxShape x={COLS[0]} y={ROW_B} w={W} h={H_B} box={s.board} />
+      <BoxShape x={COLS[1]} y={ROW_B} w={W} h={H_B} box={s.director} />
+      <BoxShape x={COLS[2]} y={ROW_B} w={W} h={H_B} box={s.committee} />
 
-      {/* The Board governs the Director; the Director reports to the Assembly and the Board and implements the Committee's decisions. */}
-      <Arrow x={boardMid} y1={ROW_B + H_B} y2={ROW_C} />
-      <Label x={boardMid + 8} y={ROW_B + H_B + 22} text={s.governs} />
-      <Label x={boardMid + 8} y={ROW_B + H_B + 38} text={s.reports} />
-      <line x1={commMid} y1={ROW_B + H_B} x2={commMid} y2={ROW_C + 44} stroke={EDGE} strokeWidth={1.25} strokeDasharray="5 4" />
-      <line x1={commMid} y1={ROW_C + 44} x2={dirX + dirW + 2} y2={ROW_C + 44} stroke={EDGE} strokeWidth={1.25} strokeDasharray="5 4" markerEnd="url(#org-chart-arrow)" />
-      <Label x={commMid - 8} y={ROW_C + 36} text={s.implements} anchor="end" />
-
-      <BoxShape x={dirX} y={ROW_C} w={dirW} h={H_C} box={s.director} />
+      {/* The Board governs the Director; the Committee's decisions reach the Director, who implements them. */}
+      <line x1={COLS[0] + W} y1={midB} x2={COLS[1] - 2} y2={midB} stroke={EDGE} strokeWidth={1.25} markerEnd={arrow} />
+      <Label x={(COLS[0] + W + COLS[1]) / 2} y={ROW_B - 6} text={s.governs} anchor="middle" />
+      <line x1={COLS[2]} y1={midB} x2={COLS[1] + W + 2} y2={midB} stroke={EDGE} strokeWidth={1.25} strokeDasharray="5 4" markerEnd={arrow} />
+      <Label x={(COLS[1] + W + COLS[2]) / 2} y={ROW_B - 6} text={s.implements} anchor="middle" />
 
       {/* The Director directs the team. */}
-      <line x1={dirMid} y1={ROW_C + H_C} x2={dirMid} y2={busC} stroke={EDGE} strokeWidth={1.25} />
-      <line x1={MIDS[0]} y1={busC} x2={MIDS[2]} y2={busC} stroke={EDGE} strokeWidth={1.25} />
-      {MIDS.map((m) => <Arrow key={m} x={m} y1={busC} y2={ROW_D} />)}
-      <Label x={dirMid + 8} y={ROW_C + H_C + 14} text={s.directs} />
-      {s.rowC.map((box, i) => <BoxShape key={box.name} x={COLS[i]} y={ROW_D} w={W} h={H_D} box={box} />)}
+      <line x1={dirMid} y1={ROW_B + H_B} x2={dirMid} y2={busC - (busC - ROW_B - H_B) + 20} stroke={EDGE} strokeWidth={1.25} />
+      <line x1={MIDS[0]} y1={ROW_B + H_B + 20} x2={MIDS[2]} y2={ROW_B + H_B + 20} stroke={EDGE} strokeWidth={1.25} />
+      {MIDS.map((m) => <line key={m} x1={m} y1={ROW_B + H_B + 20} x2={m} y2={ROW_C} stroke={EDGE} strokeWidth={1.25} markerEnd={arrow} />)}
+      <Label x={dirMid + 8} y={ROW_B + H_B + 15} text={s.directs} />
+      {s.rowC.map((box, i) => <BoxShape key={box.name} x={COLS[i]} y={ROW_C} w={W} h={H_C} box={box} />)}
 
       {/* The team runs the volunteer roles. */}
-      <line x1={MIDS[0]} y1={ROW_D + H_D} x2={MIDS[0]} y2={busD} stroke={EDGE} strokeWidth={1.25} />
-      <line x1={MIDS[1]} y1={ROW_D + H_D} x2={MIDS[1]} y2={busD} stroke={EDGE} strokeWidth={1.25} />
-      <line x1={MIDS[0]} y1={busD} x2={MIDS[2]} y2={busD} stroke={EDGE} strokeWidth={1.25} />
-      {MIDS.map((m) => <Arrow key={m} x={m} y1={busD} y2={ROW_E} />)}
-      <Label x={MIDS[0] + 8} y={ROW_D + H_D + 14} text={s.runs} />
-      {s.rowD.map((box, i) => <BoxShape key={box.name} x={COLS[i]} y={ROW_E} w={W} h={H_E} box={box} />)}
+      <line x1={MIDS[0]} y1={ROW_C + H_C} x2={MIDS[0]} y2={busC} stroke={EDGE} strokeWidth={1.25} />
+      <line x1={MIDS[2]} y1={ROW_C + H_C} x2={MIDS[2]} y2={busC} stroke={EDGE} strokeWidth={1.25} />
+      <line x1={MIDS[0]} y1={busC} x2={MIDS[2]} y2={busC} stroke={EDGE} strokeWidth={1.25} />
+      {MIDS.map((m) => <line key={m} x1={m} y1={busC} x2={m} y2={ROW_D} stroke={EDGE} strokeWidth={1.25} markerEnd={arrow} />)}
+      <Label x={MIDS[0] + 8} y={ROW_C + H_C + 13} text={s.runs} />
+      {s.rowD.map((box, i) => <BoxShape key={box.name} x={COLS[i]} y={ROW_D} w={W} h={H_D} box={box} />)}
 
       <rect x={24} y={keyY} width={14} height={14} rx={3} fill={PAID_FILL} stroke={RED} strokeWidth={2} />
       <text x={46} y={keyY + 11} fill="#000">{s.keyPaid}</text>

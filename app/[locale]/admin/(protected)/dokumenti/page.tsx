@@ -55,7 +55,7 @@ export default async function DocumentsIndexPage({ params, searchParams }: { par
   const groups = GROUPS_OF[section].map((g) => ({ g, docs: legalDocsByCategory(g).filter((doc) => canReadLegalDoc(role, doc)) })).filter((x) => x.docs.length > 0);
   const showRegistration = section === "registration" && canEdit;
   // The latest meetings, under the organisation: agenda and minutes together (migration 0084).
-  const meetings = section === "organisation" ? ((await (await createClient()).from("meetings").select("id, held_at, title, minutes_md").order("held_at", { ascending: false }).limit(8)).data ?? []) : [];
+  const meetings = section === "organisation" ? ((await (await createClient()).from("meetings").select("id, held_at, title, minutes_md").order("held_at", { ascending: false }).limit(5)).data ?? []) : [];
 
   const docRow = (doc: LegalDocEntry) => (
     <li key={doc.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t-[0.5px] border-line px-4 py-3 text-[14.5px] first:border-t-0">
@@ -114,34 +114,36 @@ export default async function DocumentsIndexPage({ params, searchParams }: { par
         </section>
       ) : null}
 
-      {groups.map(({ g, docs }) => (
-        <section key={g} className="mt-8">
-          <h2 className="text-[16px] font-bold">{tRules(GROUP_TITLE[g])}</h2>
-          <ul className="mt-3 overflow-hidden rounded-lg bg-mist">{docs.map(docRow)}</ul>
-        </section>
-      ))}
-      {section === "organisation" ? (
-        <section className="mt-8">
-          <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <h2 className="text-[16px] font-bold">{tMeetings("title")}</h2>
-            <Link href="/admin/dokumenti/sastanci" className="text-[14px] font-semibold text-sea hover:underline">{tMeetings("all")} →</Link>
-          </div>
-          <p className="mt-1 max-w-2xl text-[14px] text-black/60">{tMeetings("hint")}</p>
-          <ul className="mt-3 overflow-hidden rounded-lg bg-mist">
-            {meetings.length === 0 ? <li className="px-4 py-3 text-[14.5px] text-black/60">{tMeetings("empty")}</li> : null}
-            {meetings.map((m) => (
-              <li key={m.id} className="border-t-[0.5px] border-line first:border-t-0">
-                <Link href={`/admin/dokumenti/sastanci/${m.id}`} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-3 text-[14.5px] transition-colors hover:bg-mist-2">
-                  <span className="font-mono text-[13px] font-bold text-black/55">{meetingDate(m.held_at, locale)}</span>
-                  <span className="font-semibold">{m.title}</span>
-                  <span className="text-black/55">{t("audience.members")}</span>
-                  <span className="ml-auto text-[14px] font-semibold text-sea">{t("open")} →</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      <div className={section === "organisation" ? "lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-8" : ""}>
+        <div>
+          {groups.map(({ g, docs }) => (
+            <section key={g} className="mt-8">
+              <h2 className="text-[16px] font-bold">{tRules(GROUP_TITLE[g])}</h2>
+              <ul className="mt-3 overflow-hidden rounded-lg bg-mist">{docs.map(docRow)}</ul>
+            </section>
+          ))}
+        </div>
+        {section === "organisation" ? (
+          <aside className="mt-8">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="text-[16px] font-bold">{tMeetings("latest")}</h2>
+              <Link href="/admin/dokumenti/sastanci" className="text-[14px] font-semibold text-sea hover:underline">{tMeetings("all")} →</Link>
+            </div>
+            <p className="mt-1 text-[14px] text-black/60">{tMeetings("hint")}</p>
+            <ul className="mt-3 overflow-hidden rounded-lg bg-mist">
+              {meetings.length === 0 ? <li className="px-4 py-3 text-[14.5px] text-black/60">{tMeetings("empty")}</li> : null}
+              {meetings.map((m) => (
+                <li key={m.id} className="border-t-[0.5px] border-line first:border-t-0">
+                  <Link href={`/admin/dokumenti/sastanci/${m.id}`} className="block px-4 py-3 text-[14.5px] transition-colors hover:bg-mist-2">
+                    <span className="block font-mono text-[12.5px] font-bold text-black/55">{meetingDate(m.held_at, locale)}</span>
+                    <span className="block font-semibold leading-snug">{m.title}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        ) : null}
+      </div>
       {!showRegistration && groups.length === 0 && section !== "organisation" ? <p className="mt-8 text-[14.5px] text-black/60">{t("sectionEmpty")}</p> : null}
     </div>
   );

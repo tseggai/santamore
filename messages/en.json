@@ -1737,7 +1737,15 @@
       "noMinutes": "No minutes yet.",
       "empty": "No meetings recorded yet.",
       "all": "All meetings",
-      "back": "Meetings"
+      "back": "Meetings",
+      "search": "Search",
+      "searchHint": "A word in the title, agenda or minutes",
+      "year": "Year",
+      "allYears": "All years",
+      "apply": "Apply",
+      "clear": "Clear",
+      "noMatches": "No meeting matches.",
+      "latest": "Latest meetings"
     }
   },
   "forms": {
