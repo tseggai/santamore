@@ -1751,8 +1751,7 @@
       "printHint": "Печатает только протокол, с повесткой и списком присутствовавших, как PDF для отправки.",
       "sheetKind": "Протокол встречи",
       "agendaSheetTitle": "Повестка встречи",
-      "minutesSheetTitle": "Протокол",
-      "sheetMeta": "Santamore · Тиват"
+      "minutesSheetTitle": "Протокол"
     }
   },
   "forms": {
