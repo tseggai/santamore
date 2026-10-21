@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { MEETING_IMAGE_BUCKET } from "@/lib/meetings";
 import { isStaffRole } from "@/lib/roles";
 import { createClient } from "@/lib/supabase/server";
 
@@ -56,6 +57,10 @@ export async function deleteMeeting(id: string): Promise<MeetingResult> {
   if (!auth) return { ok: false, error: "forbidden" };
   const { error } = await auth.supabase.from("meetings").delete().eq("id", id);
   if (error) return { ok: false, error: error.code === "42501" ? "forbidden" : "server" };
+  // Its pictures go with it (those uploaded before the first save sit under a new-<uuid> folder and stay).
+  const images = auth.supabase.storage.from(MEETING_IMAGE_BUCKET);
+  const { data: files } = await images.list(id);
+  if (files && files.length > 0) await images.remove(files.map((file) => `${id}/${file.name}`));
   revalidatePath("/[locale]/admin/dokumenti", "layout");
   revalidatePath("/[locale]/dashboard/dokumenti", "layout");
   return { ok: true, id };

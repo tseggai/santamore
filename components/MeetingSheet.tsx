@@ -2,7 +2,9 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 import { MarkdownBlock } from "@/components/MarkdownBlock";
-import { meetingDate, sheetMarkdown, type MeetingRow } from "@/lib/meetings";
+import { OrgChart } from "@/components/org/OrgChart";
+import { MEETING_IMAGE_BUCKET, meetingDate, meetingImagePaths, sheetMarkdown, splitSheetMarkdown, withImageUrls, type MeetingRow } from "@/lib/meetings";
+import { createClient } from "@/lib/supabase/server";
 import iconColor from "@/public/brand/SantamoreIcon-Color.png";
 
 /**
@@ -20,10 +22,29 @@ import iconColor from "@/public/brand/SantamoreIcon-Color.png";
  * which browsers repeat on every printed page, are empty spacers; the footer
  * is a fixed element, which browsers also repeat on every page. Shared by
  * the console and the member area so the two print the same document.
+ *
+ * A picture in the text is a Markdown image whose target is a path in the
+ * private meeting-images bucket (migration 0085); the sheet signs every
+ * path for an hour before setting the text. A line that is the org chart
+ * token draws the chart itself, from the code, so it is always current.
  */
 export async function MeetingSheet({ row, locale }: { row: MeetingRow; locale: string }) {
   const t = await getTranslations("admin.meetings");
   const date = meetingDate(row.held_at, locale);
+  const urls = await signedImageUrls([row.agenda_md ?? "", row.minutes_md ?? ""].join("\n"));
+  const chartLang = locale === "me" ? "me" : "en";
+
+  function Body({ md, className }: { md: string; className: string }) {
+    return splitSheetMarkdown(withImageUrls(md, urls)).map((segment, i) =>
+      segment.kind === "org-chart" ? (
+        <figure key={i} className="sheet-figure">
+          <OrgChart lang={chartLang} />
+        </figure>
+      ) : (
+        <MarkdownBlock key={i} text={sheetMarkdown(segment.text)} className={i === 0 ? className : "sheet-body"} />
+      ),
+    );
+  }
 
   function Sheet({ kind, heading, children }: { kind: string; heading: string; children: React.ReactNode }) {
     return (
@@ -53,7 +74,7 @@ export async function MeetingSheet({ row, locale }: { row: MeetingRow; locale: s
           <tr>
             <td>
               <Sheet kind={t("agendaSheetTitle")} heading={t("agendaHeading")}>
-                {row.agenda_md ? <MarkdownBlock text={sheetMarkdown(row.agenda_md)} className="sheet-body mt-3" /> : <p className="mt-3 text-[14.5px] text-black/60">{t("noAgenda")}</p>}
+                {row.agenda_md ? <Body md={row.agenda_md} className="sheet-body mt-3" /> : <p className="mt-3 text-[14.5px] text-black/60">{t("noAgenda")}</p>}
               </Sheet>
             </td>
           </tr>
@@ -71,7 +92,7 @@ export async function MeetingSheet({ row, locale }: { row: MeetingRow; locale: s
                   <p className="sheet-box-title">{t("attendeesHeading")}</p>
                   <p>{row.attendees.length > 0 ? row.attendees.join(", ") : "—"}</p>
                 </div>
-                {row.minutes_md ? <MarkdownBlock text={sheetMarkdown(row.minutes_md)} className="sheet-body mt-5" /> : <p className="mt-3 text-[14.5px] text-black/60">{t("noMinutes")}</p>}
+                {row.minutes_md ? <Body md={row.minutes_md} className="sheet-body mt-5" /> : <p className="mt-3 text-[14.5px] text-black/60">{t("noMinutes")}</p>}
               </Sheet>
             </td>
           </tr>
@@ -84,6 +105,21 @@ export async function MeetingSheet({ row, locale }: { row: MeetingRow; locale: s
       </footer>
     </article>
   );
+}
+
+/** A signed URL, good for an hour, for every bucket path the text refers to; a path that cannot be signed is left out. */
+async function signedImageUrls(md: string): Promise<Map<string, string>> {
+  const urls = new Map<string, string>();
+  const paths = meetingImagePaths(md);
+  if (paths.length === 0) return urls;
+  const supabase = await createClient();
+  const { data, error } = await supabase.storage.from(MEETING_IMAGE_BUCKET).createSignedUrls(paths, 3600);
+  if (error || !data) {
+    console.error("[meetings] signing images failed:", error?.message);
+    return urls;
+  }
+  for (const item of data) if (item.signedUrl && item.path && !item.error) urls.set(item.path, item.signedUrl);
+  return urls;
 }
 
 /**
@@ -107,6 +143,8 @@ const SHEET_CSS = `
 #print-doc .sheet-body li::marker { color: #F35353; }
 #print-doc .sheet-body .tablewrap, #print-doc .sheet-body table { margin-top: .6rem; }
 #print-doc .sheet-body th { background: #F1F5F6; }
+#print-doc .sheet-body img { display: block; max-width: 100%; height: auto; margin-top: .8rem; border-radius: 8px; }
+#print-doc .sheet-figure { margin-top: 1rem; }
 #print-doc .sheet-box { background: #F1F5F6; border-radius: 8px; padding: .7rem 1rem; font-size: .95rem; }
 #print-doc .sheet-box-title { font-weight: 700; font-size: .9rem; margin-bottom: .15rem; }
 #print-doc .sheet-head { align-items: flex-end; justify-content: space-between; gap: 5mm; padding-bottom: 4mm; border-bottom: .2mm solid #000; }
@@ -134,6 +172,8 @@ const SHEET_CSS = `
   #print-doc .sheet-body p, #print-doc .sheet-body ul, #print-doc .sheet-body ol { margin-top: 1.6mm; }
   #print-doc .sheet-body li { margin-top: .8mm; }
   #print-doc .sheet-box { margin-top: 6mm; padding: 2.4mm 3.2mm; font-size: 9.6pt; }
+  #print-doc .sheet-body img { max-height: 150mm; margin-top: 3mm; break-inside: avoid; }
+  #print-doc .sheet-figure { margin-top: 4mm; break-inside: avoid; }
   #print-doc .sheet-body tr { break-inside: avoid; }
   #print-doc .sheet-body thead { break-after: avoid; }
   #print-doc .tablewrap { break-inside: auto; }
