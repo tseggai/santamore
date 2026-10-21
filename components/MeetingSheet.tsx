@@ -23,20 +23,24 @@ export async function MeetingSheet({ row, locale }: { row: MeetingRow; locale: s
       <style>{SHEET_CSS}</style>
 
       <section className="sheet-page">
-        <header className="sheet-head hidden print:block">
-          <Image src={iconColor} alt="" className="sheet-icon" />
-          <h1 className="type-display sheet-title">{t("agendaSheetTitle")}</h1>
-          <p className="sheet-meta">{meta} · {row.title}</p>
+        <header className="sheet-head hidden print:flex">
+          <Image src={iconColor} alt="" className="sheet-icon" priority unoptimized />
+          <div>
+            <h1 className="type-display sheet-title">{t("agendaSheetTitle")}</h1>
+            <p className="sheet-meta">{meta} · {row.title}</p>
+          </div>
         </header>
         <h2 className="type-display mt-8 text-2xl print:hidden">{t("agendaHeading")}</h2>
         {row.agenda_md ? <MarkdownBlock text={sheetMarkdown(row.agenda_md)} className="sheet-body mt-3" /> : <p className="mt-3 text-[14.5px] text-black/60">{t("noAgenda")}</p>}
       </section>
 
       <section className="sheet-page sheet-minutes">
-        <header className="sheet-head hidden print:block">
-          <Image src={iconColor} alt="" className="sheet-icon" />
-          <h1 className="type-display sheet-title">{t("minutesSheetTitle")}</h1>
-          <p className="sheet-meta">{meta} · {row.title}</p>
+        <header className="sheet-head hidden print:flex">
+          <Image src={iconColor} alt="" className="sheet-icon" priority unoptimized />
+          <div>
+            <h1 className="type-display sheet-title">{t("minutesSheetTitle")}</h1>
+            <p className="sheet-meta">{meta} · {row.title}</p>
+          </div>
         </header>
         <h2 className="type-display mt-10 text-2xl print:hidden">{t("minutesHeading")}</h2>
         <div className="sheet-box mt-3">
@@ -69,21 +73,25 @@ const SHEET_CSS = `
 #print-doc .sheet-body th { background: #F1F5F6; }
 #print-doc .sheet-box { background: #F1F5F6; border-radius: 8px; padding: .7rem 1rem; font-size: .95rem; }
 #print-doc .sheet-box-title { font-weight: 700; font-size: .9rem; margin-bottom: .15rem; }
-#print-doc .sheet-head { padding-bottom: 3mm; border-bottom: .5px solid #000; }
-#print-doc .sheet-icon { height: 14mm; width: auto; }
-#print-doc .sheet-title { margin-top: 2mm; font-size: 19pt; line-height: 1.05; text-transform: uppercase; letter-spacing: .02em; }
+#print-doc .sheet-head { align-items: center; gap: 5mm; padding-bottom: 3mm; border-bottom: .5px solid #000; }
+#print-doc .sheet-icon { height: 14mm; width: auto; flex: none; }
+#print-doc .sheet-title { font-size: 19pt; line-height: 1.05; text-transform: uppercase; letter-spacing: .02em; }
 #print-doc .sheet-meta { margin-top: 1mm; font-size: 9pt; color: rgba(0,0,0,.6); }
 @media print {
   @page { size: A4; margin: 13mm 13mm 16mm; @bottom-left { content: "Santamore · santamore.me"; font: 8pt sans-serif; color: rgba(0,0,0,.55); vertical-align: top; padding-top: 4mm; } @bottom-right { content: counter(page) " / " counter(pages); font: 8pt sans-serif; color: rgba(0,0,0,.55); vertical-align: top; padding-top: 4mm; } }
   html, body { margin: 0; padding: 0; background: #fff; }
   body * { visibility: hidden; }
   #print-doc, #print-doc * { visibility: visible; }
-  #print-doc { position: absolute; left: 0; top: 0; width: 100%; max-width: none; margin: 0; padding: 0; font-size: 10.5pt; line-height: 1.4; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  #print-doc { position: absolute; left: 0; top: 0; width: 100%; max-width: none; margin: 0; padding: 0; font-size: 9.8pt; line-height: 1.38; color: #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  #print-doc .prose-legal { font-size: inherit; line-height: inherit; color: #000; }
   #print-doc .sheet-minutes { break-before: page; }
-  #print-doc .sheet-body { margin-top: 4mm; }
-  #print-doc .sheet-body h2 { font-size: 11.5pt; margin-top: 5mm; break-after: avoid; }
-  #print-doc .sheet-body h3 { font-size: 8pt; }
-  #print-doc .sheet-box { margin-top: 5mm; padding: 2.6mm 3.2mm; font-size: 10pt; }
+  #print-doc .sheet-body { margin-top: 3mm; }
+  #print-doc .sheet-body h2 { font-size: 11.5pt; margin-top: 4.5mm; break-after: avoid; }
+  #print-doc .sheet-body h2::before { font-size: 8.5pt; padding: .5mm 2.2mm; }
+  #print-doc .sheet-body h3 { font-size: 8pt; margin-top: 4mm; }
+  #print-doc .sheet-body p, #print-doc .sheet-body ul, #print-doc .sheet-body ol { margin-top: 1.6mm; }
+  #print-doc .sheet-body li { margin-top: .8mm; }
+  #print-doc .sheet-box { margin-top: 4mm; padding: 2.4mm 3.2mm; font-size: 9.6pt; }
   #print-doc tr { break-inside: avoid; }
   #print-doc thead { break-after: avoid; }
   #print-doc .tablewrap { break-inside: auto; }
