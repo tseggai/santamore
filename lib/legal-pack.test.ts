@@ -7,7 +7,8 @@ const pack = packJson as unknown as LegalPack;
 
 describe("legal pack", () => {
   it("has the five filing forms, the statute with additions, and every draft", () => {
-    expect(pack.forms.map((f) => f.id)).toEqual(["01", "02", "03", "04", "04a", "05"]);
+    expect(pack.forms.map((f) => f.id)).toEqual(["01", "02", "03", "04a", "05"]);
+    expect(pack.forms.find((f) => f.id === "04a")!.label).toBe("04");
     expect(pack.drafts.length).toBeGreaterThanOrEqual(14);
   });
 
@@ -28,6 +29,13 @@ describe("legal pack", () => {
     expect(idx("Član 17f")).toBeLessThan(idx("Član 18"));
     expect(idx("UPRAVNI ODBOR")).toBeLessThan(idx("KOMISIJA ZA DODJELU SREDSTAVA"));
     expect(idx("OGRANCI")).toBeLessThan(idx("SLUŽBENICI (OSOBLJE)"));
+    // The amendments adopted 2026-10-21: tie-breaks, the founder as first Director, default authority, two-thirds dismissal, the fee as a yearly decision.
+    expect(texts.some((t) => t.startsWith("Ako je broj glasova jednak, o pitanju se ponovo glasa"))).toBe(true);
+    expect(texts).toContain("Prvog Izvršnog direktora bira osnivačka skupština.");
+    expect(texts.some((t) => t.startsWith("Izvršni direktor odlučuje o svakom pitanju"))).toBe(true);
+    expect(texts.some((t) => t.startsWith("Skupština odlučuje o razrješenju Izvršnog direktora prije isteka mandata samo"))).toBe(true);
+    expect(texts).toContain("plaća članarinu, ako ju je Skupština utvrdila za tu kalendarsku godinu;");
+    expect(texts.some((t) => /glas predsjednika Upravnog odbora/.test(t))).toBe(true);
     // The English side of a merged article is the summary on its first paragraph; the rest is Montenegrin only.
     const first = merged.blocks[idx("Član 32") + 1];
     expect(first.type === "p" && first.en.startsWith("Position and composition.")).toBe(true);
@@ -39,13 +47,14 @@ describe("legal pack", () => {
   });
 
   it("leaves no template blank in the statute", () => {
-    const statute = pack.forms.find((f) => f.id === "04")!;
+    const statute = pack.forms.find((f) => f.id === "04a")!;
     for (const block of statute.blocks) {
       if (block.type !== "p") continue;
       expect(block.me, block.en).not.toMatch(/___/);
       expect(block.en, block.me).not.toMatch(/___/);
       expect(block.me.trim()).not.toBe("");
-      expect(block.en.trim()).not.toBe("");
+      // The English side of an article the additions brought in is the draft's summary, carried on its heading, so its paragraphs may be empty.
+      if (!block.added) expect(block.en.trim()).not.toBe("");
     }
   });
 

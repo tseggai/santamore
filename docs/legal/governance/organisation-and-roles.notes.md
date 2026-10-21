@@ -2,7 +2,7 @@
 
 ## What the document is and where it hangs
 
-The members' description of how Santamore is organised: the bodies from the statute template and the statute additions, the decision-rights matrix, the hierarchy and the tie-break rules from section 6 of `docs/legal/registration/statute-additions.md` (proposed 2026-10-21, not yet adopted), the volunteer roles from the team guide, and membership (how to join, rights, duties, the 2026 fee waiver, the benefits the Board will put to the Assembly for 2027). Montenegrin (`organisation-and-roles.me.md`) is the operative text; `organisation-and-roles.en.md` is the translation. Audience: every signed-in member (the member area) and the staff (the console); the org chart (`components/org/OrgChart.tsx`) is drawn above it in both places.
+The members' description of how Santamore is organised: the bodies from the statute template and the statute additions, the decision-rights matrix, the hierarchy and the tie-break rules from section 6 of `docs/legal/registration/statute-additions.md` (adopted by the founders 2026-10-21 and merged into form 04), the volunteer roles from the team guide, and membership (how to join, rights, duties, the 2026 fee waiver, the benefits the Board will put to the Assembly for 2027). Montenegrin (`organisation-and-roles.me.md`) is the operative text; `organisation-and-roles.en.md` is the translation. Audience: every signed-in member (the member area) and the staff (the console); the org chart (`components/org/OrgChart.tsx`) is drawn above it in both places.
 
 ## Decisions embedded in the draft
 

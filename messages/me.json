@@ -1601,7 +1601,9 @@
         "leadership": "Samo za rukovodstvo"
       },
       "draftSourceUpdated": "Izvor ovog nacrta ponovo je izgrađen {date}, nakon što ga je tim posljednji put sačuvao; prikazan je sačuvani tekst.",
-      "draftLoadSource": "Učitaj važeći izvor"
+      "draftLoadSource": "Učitaj važeći izvor",
+      "formSourceUpdated": "Obrazac ovog dokumenta ponovo je izgrađen {date}, nakon što je tim posljednji put sačuvao njegov tekst; prikazan je sačuvani tekst.",
+      "formLoadSource": "Učitaj važeći obrazac"
     },
     "evDistancesHint": "Jedan red po distanci ili kategoriji, sa sopstvenim brojem mjesta ako ga ima. Cijene se ispod mogu vezati za distancu.",
     "evDistanceName": "Distanca ili kategorija (npr. 10 km, Polovina 1.9 / 90 / 21)",
@@ -1696,7 +1698,13 @@
         "members": "članovi",
         "staff": "osoblje",
         "leadership": "samo rukovodstvo"
-      }
+      },
+      "sectionRegistration": "Registracija NVO i obrasci ugovora",
+      "sectionRegistrationHint": "Ono što se podnosi i ono što se potpisuje od slučaja do slučaja: vodič za osnivače, obrasci Ministarstva sa prazninama (statut sadrži dopune i izmjene usvojene 21. 10. 2026.) i obrasci ugovora.",
+      "sectionOrganisation": "Organizacija i pravila",
+      "sectionOrganisationHint": "Kako je Santamore organizovan i po kojim pravilima radi: dokument o organizaciji koji čita svaki član, pravila koja donosi Upravni odbor i dokumenti za rukovodstvo.",
+      "sectionPublished": "Objavljene politike",
+      "sectionPublishedHint": "Javni dio svake je na sajtu; interni dio je samo ovdje."
     }
   },
   "forms": {

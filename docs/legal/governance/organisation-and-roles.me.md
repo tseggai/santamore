@@ -51,7 +51,7 @@ Osnivači, Izvršni direktor i zaposleni ne mogu biti njeni članovi. Njene odlu
 
 Izvršni direktor je lice ovlašćeno za zastupanje udruženja. Direktor potpisuje ugovore, odgovoran je za zakonitost rada, vodi događaje, ogranke, partnerstva i osoblje, sprovodi odluke Upravnog odbora i Komisije i odgovara Skupštini i Upravnom odboru. Direktor nikada ne odlučuje o tome koji korisnik dobija sredstva.
 
-Prvi Izvršni direktor je osnivač Santamorea, [[PLACEHOLDER: ime osnivača kojeg bira osnivačka skupština]], kojeg bira osnivačka skupština. Prema izmjenama predloženim u odjeljku 6 dopuna statuta mandat traje pet godina, sa ponovnim izborom bez ograničenja, a prijevremeno razrješenje moguće je samo iz razloga navedenog u Statutu, dvotrećinskom većinom svih članova. Dok Skupština ne usvoji te izmjene, primjenjuje se Statut kakav je podnesen.
+Prvi Izvršni direktor je osnivač Santamorea, [[PLACEHOLDER: ime osnivača kojeg bira osnivačka skupština]], kojeg bira osnivačka skupština. Mandat traje šest godina, sa ponovnim izborom bez ograničenja, kako bilježi zapisnik osnivačke skupštine, a prijevremeno razrješenje moguće je samo iz razloga navedenog u Statutu, dvotrećinskom većinom svih članova (izmjene usvojene 21. 10. 2026, odjeljak 6 dopuna statuta).
 
 Izvršni direktor odlučuje o svakom pitanju koje zakon, Statut ili odluka Skupštine ne stavlja u nadležnost drugog organa, u okviru usvojenog budžeta i ograničenja potrošnje koja utvrdi Upravni odbor.
 
@@ -97,13 +97,13 @@ Tabela navodi svaku odluku koja se ponavlja i organ koji je donosi. „Odlučuje
 - Ako Upravni odbor ne odluči o operativnom pitanju koje je Izvršni direktor podnio, zbog nedostatka kvoruma na dvije uzastopne sjednice ili jednakog broja glasova, Izvršni direktor može postupiti u okviru usvojenog budžeta i izvještava na narednoj sjednici Upravnog odbora.
 - U Komisiji je za odluku potrebna većina svih članova, pa neriješeno znači da dodjele nema; prijava se ponovo razmatra na narednoj sjednici sa dodatnim podacima koje Komisija zatraži.
 
-Ova pravila stupaju na snagu kada Skupština usvoji izmjene iz odjeljka 6 dopuna statuta. Do tada se primjenjuje Statut kakav je podnesen, po kojem neriješeno glasanje znači da predlog nije usvojen.
+Ova pravila su u Statutu usvojenom 21. 10. 2026. (odjeljak 6 dopuna statuta); advokat pregleda crnogorski tekst prije podnošenja.
 
 ## IV. ULOGE
 
 ### Član 11 — Osnivači
 
-Osnivači su lica koja su potpisala odluku o osnivanju i Statut. Kada je udruženje registrovano, osnivač je član sa jednim glasom, kao i svaki kasnije primljeni član. Osnivač ne može biti član Komisije za dodjelu sredstava. Prema predloženim izmjenama članstvo osnivača može prestati samo njegovim istupanjem ili dvotrećinskom većinom svih članova.
+Osnivači su lica koja su potpisala odluku o osnivanju i Statut. Kada je udruženje registrovano, osnivač je član sa jednim glasom, kao i svaki kasnije primljeni član. Osnivač ne može biti član Komisije za dodjelu sredstava. Članstvo osnivača može prestati samo njegovim istupanjem ili dvotrećinskom većinom svih članova.
 
 Ono što osnivači nose jeste priča, kultura i dužnost da pronađu prvi nezavisni Upravni odbor i Komisiju. Osnivač koji je pokrenuo Santamore vodi ga kao Izvršni direktor; ostali osnivači preuzimaju uloge u nastavku kao i svako drugi.
 

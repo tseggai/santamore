@@ -34,11 +34,11 @@ interface Props {
 }
 
 /** The order the draft groups are listed in; the label of each is a legalPack.group message. */
-const DRAFT_GROUPS = ["registration", "organisation", "public", "board", "template", "leadership"] as const;
+const DRAFT_GROUPS = ["template", "organisation", "board", "leadership", "public"] as const;
 
-/** Whether a draft saved by the team predates the pack's current build, so the source may have changed since the edit. */
-function sourceNewer(saved: SavedRows, draftId: string, builtAt: string): boolean {
-  const row = saved[`draft:${draftId}`];
+/** Whether a part saved by the team (draft:<id> or form:<id>) predates the pack's current build, so its source may have changed since the edit. */
+function sourceNewer(saved: SavedRows, key: string, builtAt: string): boolean {
+  const row = saved[key];
   return !!row && row.updatedAt.slice(0, 10) < builtAt;
 }
 
@@ -404,7 +404,7 @@ export function LegalPackApp({ pack, saved, locale, initialDoc }: Props) {
           <select value={doc} onChange={(e) => setDoc(e.target.value)} className="mt-1 w-full rounded-brand bg-mist px-3 py-2 text-[15px]">
             {pack.guide ? <optgroup label={t("guide")}><option value="guide">{titleOf("guide", pack.guide.title)}</option></optgroup> : null}
             <optgroup label={t("forms")}>
-              {pack.forms.map((f) => <option key={f.id} value={f.id}>{f.id} · {titleOf(`form:${f.id}`, f.title)}</option>)}
+              {pack.forms.map((f) => <option key={f.id} value={f.id}>{f.label ?? f.id} · {titleOf(`form:${f.id}`, f.title)}</option>)}
             </optgroup>
             {draftGroups.map((g) => (
               <optgroup key={g.c} label={t(`group.${g.c}`)}>
@@ -425,7 +425,7 @@ export function LegalPackApp({ pack, saved, locale, initialDoc }: Props) {
           <section className="border-t-[0.5px] border-black/20 py-5">
             <p className="type-eyebrow text-black/60">{t("forms")}</p>
             <ul className="mt-2 flex flex-col gap-1">
-              {pack.forms.map((f) => <NavItem key={f.id} active={doc === f.id} onClick={() => setDoc(f.id)} label={`${f.id} · ${titleOf(`form:${f.id}`, f.title)}`} />)}
+              {pack.forms.map((f) => <NavItem key={f.id} active={doc === f.id} onClick={() => setDoc(f.id)} label={`${f.label ?? f.id} · ${titleOf(`form:${f.id}`, f.title)}`} />)}
             </ul>
           </section>
           {draftGroups.map((g) => (
@@ -516,6 +516,15 @@ export function LegalPackApp({ pack, saved, locale, initialDoc }: Props) {
                 <p className="lp-subtitle">{tx(docKey, "s", form.subtitle[src])}</p>
                 <p className="lp-note" dangerouslySetInnerHTML={{ __html: tx(docKey, "n", form.note[src]) }} />
               </div>
+              {overrides[form.id] && sourceNewer(saved, `form:${form.id}`, pack.builtAt) ? (
+                <p className="lp-screen mb-4 flex flex-wrap items-center gap-3 rounded-brand bg-sand px-4 py-3 text-[14px] text-black/70">
+                  <span>{t("formSourceUpdated", { date: pack.builtAt })}</span>
+                  <button type="button" onClick={() => { setOverrides((prev) => { const rest = { ...prev }; delete rest[form.id]; return rest; }); markDirty(`form:${form.id}`); }}
+                    className="rounded-brand bg-paper px-3 py-1.5 text-[14px] font-semibold text-sea hover:bg-mist-2">
+                    {t("formLoadSource")}
+                  </button>
+                </p>
+              ) : null}
               {form.blocks.map((block, i) => (
                 <Block key={i} block={block} index={i} docKey={docKey} tx={tx} {...blockProps} />
               ))}
@@ -527,7 +536,7 @@ export function LegalPackApp({ pack, saved, locale, initialDoc }: Props) {
                 <h2 className="lp-title">{titleOf(docKey, draft.title)}</h2>
                 <p className="lp-subtitle lp-screen">{isSourceLang(lang) ? t("draftHint") : t("draftReadOnly")}</p>
               </div>
-              {isSourceLang(lang) && sourceNewer(saved, draft.id, pack.builtAt) && draftsRef.current[draft.id] !== draft.html ? (
+              {isSourceLang(lang) && sourceNewer(saved, `draft:${draft.id}`, pack.builtAt) && draftsRef.current[draft.id] !== draft.html ? (
                 <p className="lp-screen mb-4 flex flex-wrap items-center gap-3 rounded-brand bg-sand px-4 py-3 text-[14px] text-black/70">
                   <span>{t("draftSourceUpdated", { date: pack.builtAt })}</span>
                   <button type="button" onClick={() => { draftsRef.current[draft.id] = draft.html; markDirty(`draft:${draft.id}`); setReloaded((n) => n + 1); }}

@@ -51,7 +51,7 @@ Founders, the Executive Director and employees cannot sit on it. Its decisions a
 
 The Executive Director is the person authorised to represent the association. The Director signs contracts, is responsible for the legality of the work, runs events, chapters, partnerships and staff, implements the decisions of the Board and the Grants Committee, and reports to the Assembly and the Board. The Director never decides which beneficiary receives funds.
 
-The first Executive Director is the founder of Santamore, [[PLACEHOLDER: name of the founder elected by the founding assembly]], elected by the founding assembly. Under the amendments proposed in section 6 of the statute additions the term is five years, renewable without limit, and early dismissal is possible only for a reason stated in the Statute, by a two-thirds majority of all members. Until the Assembly adopts those amendments, the Statute as filed applies.
+The first Executive Director is the founder of Santamore, [[PLACEHOLDER: name of the founder elected by the founding assembly]], elected by the founding assembly. The term is six years, renewable without limit, as the founding minutes record, and early dismissal is possible only for a reason stated in the Statute, by a two-thirds majority of all members (amendments adopted on 21 October 2026, section 6 of the statute additions).
 
 The Executive Director decides every matter that the law, the Statute or a decision of the Assembly does not reserve to another body, within the adopted budget and the spending limits the Board sets.
 
@@ -97,13 +97,13 @@ The table lists every recurring decision and the body that owns it. "Decides" me
 - Where the Board does not decide on an operational matter the Executive Director submitted, because it lacked a quorum at two consecutive sessions or the vote was tied, the Executive Director may act within the adopted budget and reports at the Board's next session.
 - In the Grants Committee a decision needs a majority of all members, so a tie means no allocation; the application is re-examined at the next sitting with the additional information the Committee asks for.
 
-These rules take effect when the Assembly adopts the amendments in section 6 of the statute additions. Until then the Statute as filed applies, under which a tied vote means the proposal is not adopted.
+These rules are in the Statute as adopted on 21 October 2026 (section 6 of the statute additions); the lawyer reviews the Montenegrin text before filing.
 
 ## IV. ROLES
 
 ### Article 11 — Founders
 
-The founders are the people who signed the founding decision and the Statute. Once the association is registered, a founder is a member with one vote, like every member admitted later. A founder cannot sit on the Grants Committee. Under the proposed amendments a founder's membership can end only by the founder's own withdrawal or by a two-thirds majority of all members.
+The founders are the people who signed the founding decision and the Statute. Once the association is registered, a founder is a member with one vote, like every member admitted later. A founder cannot sit on the Grants Committee. A founder's membership can end only by the founder's own withdrawal or by a two-thirds majority of all members.
 
 What the founders carry is the story, the culture and the duty to recruit the first independent Board and Grants Committee. The founder who started Santamore leads it as Executive Director; the other founders take the roles below like anyone else.
 

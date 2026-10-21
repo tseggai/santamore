@@ -54,6 +54,8 @@ export type PackBlock =
 
 export interface PackForm {
   id: string;
+  /** The number shown in lists, where it differs from the id (form 04a is listed as 04: the one statute). */
+  label?: string;
   title: Bilingual;
   subtitle: Bilingual;
   file: string;
