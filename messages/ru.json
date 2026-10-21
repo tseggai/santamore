@@ -1749,7 +1749,10 @@
       "latest": "Последние встречи",
       "print": "Печать / PDF",
       "printHint": "Печатает только протокол, с повесткой и списком присутствовавших, как PDF для отправки.",
-      "sheetKind": "Протокол встречи"
+      "sheetKind": "Протокол встречи",
+      "agendaSheetTitle": "Повестка встречи",
+      "minutesSheetTitle": "Протокол",
+      "sheetMeta": "Santamore · Тиват"
     }
   },
   "forms": {
