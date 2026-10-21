@@ -1704,7 +1704,9 @@
       "sectionOrganisation": "Organisation and rules",
       "sectionOrganisationHint": "How Santamore is organised and the rules it runs by: the organisation document every member reads, the rules the Board adopts, and the leadership documents.",
       "sectionPublished": "Published policies",
-      "sectionPublishedHint": "The public part of each is live on the site; the internal part is here only."
+      "sectionPublishedHint": "The public part of each is live on the site; the internal part is here only.",
+      "sections": "Sections",
+      "sectionEmpty": "Nothing in this section is open to your role."
     }
   },
   "forms": {

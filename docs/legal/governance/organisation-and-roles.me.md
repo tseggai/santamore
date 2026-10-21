@@ -129,7 +129,21 @@ Ono što osnivači nose jeste priča, kultura i dužnost da pronađu prvi nezavi
 - Volonteri na događaju odgovaraju rukovodiocu tima ili funkcioneru ogranka koji tog dana vodi njihovu funkciju.
 - Prikupljač ili veza sa klubom radi sa rukovodiocem tima za partnerstva ili komunikacije.
 
-### Član 14 — Kako se preuzima uloga
+### Član 14 — Sastanci i obavještenja po nivoima
+
+Ne sjedi svaki nivo na svakom sastanku. Tabela kaže ko prisustvuje kom sastanku, a ko samo dobija obavještenje, tako da niko nije pozvan na sve i niko nije izostavljen iz onoga što ga se tiče.
+
+| Sastanak ili obavještenje | Prisustvuje i odlučuje | Prisustvuje bez prava glasa | Samo dobija obavještenje |
+|---|---|---|---|
+| Skupština, najmanje jednom godišnje | Svaki član, uključujući osnivače, lično ili preko punomoćnika | Volonteri koji nijesu članovi, pozvani gosti | Donatori, sponzori i partneri dobijaju godišnji izvještaj i poziv na Dan uticaja |
+| Upravni odbor, četiri sjednice godišnje | Članovi Upravnog odbora | Izvršni direktor; rukovodilac tima ili ogranka za svoju tačku, po pozivu | Svaki član: kratka bilješka o odlukama poslije svake sjednice |
+| Komisija za dodjelu sredstava, četiri sjednice godišnje | Članovi Komisije | Izvršni direktor radi zapisnika i sprovođenja; podnosilac prijave kada se saslušava | Svaki član: objavljeni pregled svake dodjele |
+| Operativni sastanak, sedmično pred događaj, inače mjesečno | Izvršni direktor, rukovodioci timova, rukovodioci ogranaka, osoblje | Svaki član koji ima zadatak za taj događaj | Volonteri: brifing za događaj od svog rukovodioca sedmicu prije |
+| Sastanak ogranka, najmanje deset dana prije Skupštine i prije svakog događaja ogranka | Funkcioneri i članovi ogranka | Izvršni direktor, po pozivu | Upravni odbor: tromjesečni izvještaj rukovodioca ogranka |
+
+Član koji nema ulogu prisustvuje Skupštini i dobija obavještenje poslije svake sjednice Upravnog odbora, plan za godinu, rezultate svakog događaja i poziv na svaku Skupštinu. Volonter koji nije član dobija brifinge za događaje na kojima radi i poziv da se učlani.
+
+### Član 15 — Kako se preuzima uloga
 
 1. Recite to pisano, Izvršnom direktoru, sa satima koje zaista možete dati.
 2. Dogovorite pisani opis: šta vodite, do kada i kome odgovarate.
@@ -138,13 +152,13 @@ Ono što osnivači nose jeste priča, kultura i dužnost da pronađu prvi nezavi
 
 ## V. ČLANSTVO
 
-### Član 15 — Kako se postaje član
+### Član 16 — Kako se postaje član
 
 Svako fizičko ili pravno lice koje prihvata ciljeve udruženja može se učlaniti na preporuku jednog postojećeg člana. Skupština prima nove članove većinom glasova; novi član potpisuje pristupnicu i upisuje se u registar članova.
 
 Članstvo prestaje pisanom izjavom o istupanju, ili odlukom Skupštine zbog kršenja Statuta ili nanošenja štete ugledu udruženja, pošto je članu data mogućnost da se izjasni.
 
-### Član 16 — Prava i obaveze
+### Član 17 — Prava i obaveze
 
 Član ima pravo da:
 
@@ -161,13 +175,13 @@ Od člana se očekuje da:
 - plaća članarinu, ako ju je Skupština utvrdila za tu godinu;
 - izvršava zadatke koje mu povjeri Skupština.
 
-### Član 17 — Članarina
+### Član 18 — Članarina
 
 Za 2026. godinu članarina se ne naplaćuje. Osnivači su to odlučili [[PLACEHOLDER: datum odluke]], a prva Skupština to bilježi kao odluku po Statutu.
 
-Za 2027. godinu Upravni odbor predlaže Skupštini, do [[PLACEHOLDER: mjesec predloga]], da li se članarina naplaćuje i u kom iznosu, zajedno sa spiskom pogodnosti iz člana 18. Skupština odlučuje svake godine; može odlučiti da se članarina ne naplaćuje.
+Za 2027. godinu Upravni odbor predlaže Skupštini, do [[PLACEHOLDER: mjesec predloga]], da li se članarina naplaćuje i u kom iznosu, zajedno sa spiskom pogodnosti iz člana 19. Skupština odlučuje svake godine; može odlučiti da se članarina ne naplaćuje.
 
-### Član 18 — Šta članstvo donosi
+### Član 19 — Šta članstvo donosi
 
 - Jedan glas na Skupštini i pravo da budete birani u svaki organ.
 - Pravo da predložite cilj i da glasate o užem izboru ciljeva za koje Santamore prikuplja te godine.
@@ -179,10 +193,10 @@ Za 2027. godinu Upravni odbor predlaže Skupštini, do [[PLACEHOLDER: mjesec pre
 
 ## VI. ZAVRŠNE ODREDBE
 
-### Član 19 — Pristup dokumentima
+### Član 20 — Pristup dokumentima
 
 Politike objavljene na sajtu su javne. Ovaj dokument i politike namijenjene članovima dostupni su svakom prijavljenom članu u članskom prostoru. Pravila koja donosi Upravni odbor, obrasci i registracioni paket dostupni su osoblju u konzoli. Politika zarada i zapošljavanja dostupna je samo Izvršnom direktoru i administratorima, jer sadrži iznose zarada i lične podatke.
 
-### Član 20 — Izmjene
+### Član 21 — Izmjene
 
 Upravni odbor održava ovaj dokument ažurnim. Preispituje se poslije svake Skupštine i kad god se promijeni Statut, sastav nekog organa ili plan zapošljavanja.

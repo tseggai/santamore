@@ -1704,7 +1704,9 @@
       "sectionOrganisation": "Organizacija i pravila",
       "sectionOrganisationHint": "Kako je Santamore organizovan i po kojim pravilima radi: dokument o organizaciji koji čita svaki član, pravila koja donosi Upravni odbor i dokumenti za rukovodstvo.",
       "sectionPublished": "Objavljene politike",
-      "sectionPublishedHint": "Javni dio svake je na sajtu; interni dio je samo ovdje."
+      "sectionPublishedHint": "Javni dio svake je na sajtu; interni dio je samo ovdje.",
+      "sections": "Odjeljci",
+      "sectionEmpty": "Ništa u ovom odjeljku nije otvoreno za vašu ulogu."
     }
   },
   "forms": {

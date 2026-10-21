@@ -74,6 +74,25 @@ export interface PackDraft {
   html: string;
 }
 
+/** The three sections of the Documents page (owner decision 2026-10-21): what is filed and signed, the organisation and its rules, the policies published on the site. */
+export type DocSection = "registration" | "organisation" | "published";
+export const DOC_SECTIONS: readonly DocSection[] = ["registration", "organisation", "published"];
+const SECTION_OF_CATEGORY: Record<string, DocSection> = { template: "registration", organisation: "organisation", board: "organisation", leadership: "organisation", public: "published" };
+
+/** The section a pack document belongs to: the guide and the forms are registration, a draft follows its category. */
+export function sectionOfDoc(pack: Pick<LegalPack, "drafts">, doc: string): DocSection {
+  if (doc.startsWith("draft:")) {
+    const draft = pack.drafts.find((d) => `draft:${d.id}` === doc);
+    return (draft && SECTION_OF_CATEGORY[draft.category]) ?? "registration";
+  }
+  return "registration";
+}
+
+/** The section a governance category is listed under. */
+export function sectionOfCategory(category: string): DocSection {
+  return SECTION_OF_CATEGORY[category] ?? "registration";
+}
+
 /** A translation of one document's texts into one language, keyed by text path. */
 export type DocTexts = Record<string, string>;
 

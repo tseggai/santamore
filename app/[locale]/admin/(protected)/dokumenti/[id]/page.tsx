@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/console/PageHeader";
 import { OrgChart } from "@/components/org/OrgChart";
 import { currentRole } from "@/lib/current-role";
 import { canReadLegalDoc, legalDoc, legalDocLang, type LegalDocCategory } from "@/lib/legal-docs";
+import { sectionOfCategory } from "@/lib/legal-pack";
 import { SECTIONS_BY_ROLE } from "@/lib/roles";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -44,7 +45,7 @@ export default async function DocumentReadPage({ params, searchParams }: { param
   const category = t(CATEGORY_KEY[doc.category]);
   return (
     <div className="py-8">
-      <p className="text-[14px]"><Link href="/admin/dokumenti" className="font-semibold text-sea hover:underline">← {tDocs("title")}</Link></p>
+      <p className="text-[14px]"><Link href={`/admin/dokumenti?tab=${sectionOfCategory(doc.category)}`} className="font-semibold text-sea hover:underline">← {tDocs("title")}</Link></p>
       <div className="mt-4">
         <PageHeader title={title} />
       </div>

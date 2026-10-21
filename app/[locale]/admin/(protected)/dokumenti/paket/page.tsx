@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/console/PageHeader";
 import packJson from "@/content/legal-pack/pack.json";
 import { currentRole } from "@/lib/current-role";
 import { canReadLegalDoc, type LegalDocAudience } from "@/lib/legal-docs";
-import type { LegalPack } from "@/lib/legal-pack";
+import { sectionOfDoc, type LegalPack } from "@/lib/legal-pack";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -26,12 +26,13 @@ export default async function PackEditorPage({ params, searchParams }: { params:
   setRequestLocale(locale);
   const [t, tDocs, role, { doc }] = await Promise.all([getTranslations("admin.legalPack"), getTranslations("admin.documents"), currentRole(), searchParams]);
   const visible: LegalPack = { ...pack, drafts: pack.drafts.filter((d) => canReadLegalDoc(role, { audience: d.audience as LegalDocAudience })) };
+  const section = sectionOfDoc(visible, typeof doc === "string" ? doc : "");
   const supabase = await createClient();
   const { data, error } = await supabase.from("legal_pack").select("key, value, updated_at");
   const saved: SavedRows = Object.fromEntries((data ?? []).map((row) => [row.key, { value: row.value, updatedAt: row.updated_at }]));
   return (
     <div className="py-8">
-      <p className="text-[14px]"><Link href="/admin/dokumenti" className="font-semibold text-sea hover:underline">← {tDocs("title")}</Link></p>
+      <p className="text-[14px]"><Link href={`/admin/dokumenti?tab=${section}`} className="font-semibold text-sea hover:underline">← {tDocs("title")} · {tDocs(section === "registration" ? "sectionRegistration" : section === "organisation" ? "sectionOrganisation" : "sectionPublished")}</Link></p>
       <div className="mt-4">
         <PageHeader title={t("title")} />
       </div>

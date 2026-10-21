@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { saveLegalPack, translatePackTexts } from "@/app/[locale]/admin/(protected)/registracija/actions";
 import {
-  FORM_KEY, FOUNDER_IDS, LANG_LABELS, PACK_LANGS, docHash, docTexts, formFieldIds, i18nKey, incompleteFields, initialFields, isEmptyOptional, isIncomplete, isOptionalEmpty,
+  FORM_KEY, FOUNDER_IDS, LANG_LABELS, PACK_LANGS, docHash, docTexts, formFieldIds, i18nKey, incompleteFields, initialFields, isEmptyOptional, isIncomplete, isOptionalEmpty, sectionOfDoc,
   decorateDraft, draftOriginals, htmlText, isAlignedDraft, isMeTwin, isSourceLang, keepsPlaceholders, normalizeFieldState, resolveFields, sameEverywhere, sanitizeDraftHtml, segments, splitTopLevel, stripDraftMarks,
   type DocTexts, type FieldState, type LegalPack, type PackBlock, type PackLang, type SourceLang,
 } from "@/lib/legal-pack";
@@ -147,7 +147,10 @@ export function LegalPackApp({ pack, saved, locale, initialDoc }: Props) {
     return known && initialDoc ? initialDoc : pack.forms[0]?.id ?? "01";
   });
   const [reloaded, setReloaded] = useState(0);
-  const draftGroups = useMemo(() => DRAFT_GROUPS.map((c) => ({ c, items: pack.drafts.filter((d) => d.category === c) })).filter((g) => g.items.length > 0), [pack.drafts]);
+  // The list shows the section the open document belongs to (owner decision 2026-10-21): the registration files, the organisation and its rules, or the published policies.
+  const section = sectionOfDoc(pack, doc);
+  const draftGroups = useMemo(() => DRAFT_GROUPS.map((c) => ({ c, items: pack.drafts.filter((d) => d.category === c && sectionOfDoc(pack, `draft:${d.id}`) === section) })).filter((g) => g.items.length > 0), [pack, section]);
+  const showRegistration = section === "registration";
   const [loaded] = useState(() => readSavedFields(pack, saved));
   const [fields, setFields] = useState(loaded.fields);
   const [checks, setChecks] = useState(() => readSavedChecks(saved));
@@ -402,10 +405,12 @@ export function LegalPackApp({ pack, saved, locale, initialDoc }: Props) {
         <label className="block md:hidden">
           <span className="type-eyebrow block text-black/60">{t("documents")}</span>
           <select value={doc} onChange={(e) => setDoc(e.target.value)} className="mt-1 w-full rounded-brand bg-mist px-3 py-2 text-[15px]">
-            {pack.guide ? <optgroup label={t("guide")}><option value="guide">{titleOf("guide", pack.guide.title)}</option></optgroup> : null}
-            <optgroup label={t("forms")}>
-              {pack.forms.map((f) => <option key={f.id} value={f.id}>{f.label ?? f.id} · {titleOf(`form:${f.id}`, f.title)}</option>)}
-            </optgroup>
+            {showRegistration && pack.guide ? <optgroup label={t("guide")}><option value="guide">{titleOf("guide", pack.guide.title)}</option></optgroup> : null}
+            {showRegistration ? (
+              <optgroup label={t("forms")}>
+                {pack.forms.map((f) => <option key={f.id} value={f.id}>{f.label ?? f.id} · {titleOf(`form:${f.id}`, f.title)}</option>)}
+              </optgroup>
+            ) : null}
             {draftGroups.map((g) => (
               <optgroup key={g.c} label={t(`group.${g.c}`)}>
                 {g.items.map((d) => <option key={d.id} value={`draft:${d.id}`}>{titleOf(`draft:${d.id}`, d.title)}</option>)}
@@ -414,7 +419,7 @@ export function LegalPackApp({ pack, saved, locale, initialDoc }: Props) {
           </select>
         </label>
         <div className="hidden md:sticky md:top-6 md:block md:max-h-[calc(100vh-3rem)] md:overflow-y-auto md:overscroll-contain md:pr-2">
-          {pack.guide ? (
+          {showRegistration && pack.guide ? (
             <section className="pb-5">
               <p className="type-eyebrow text-black/60">{t("guide")}</p>
               <ul className="mt-2 flex flex-col gap-1">
@@ -422,14 +427,16 @@ export function LegalPackApp({ pack, saved, locale, initialDoc }: Props) {
               </ul>
             </section>
           ) : null}
+          {showRegistration ? (
           <section className="border-t-[0.5px] border-black/20 py-5">
             <p className="type-eyebrow text-black/60">{t("forms")}</p>
             <ul className="mt-2 flex flex-col gap-1">
               {pack.forms.map((f) => <NavItem key={f.id} active={doc === f.id} onClick={() => setDoc(f.id)} label={`${f.label ?? f.id} · ${titleOf(`form:${f.id}`, f.title)}`} />)}
             </ul>
           </section>
+          ) : null}
           {draftGroups.map((g) => (
-            <section key={g.c} className="border-t-[0.5px] border-black/20 py-5 last:pb-0">
+            <section key={g.c} className="border-t-[0.5px] border-black/20 py-5 first:border-t-0 first:pt-0 last:pb-0">
               <p className="type-eyebrow text-black/60">{t(`group.${g.c}`)}</p>
               <ul className="mt-2 flex flex-col gap-1">
                 {g.items.map((d) => <NavItem key={d.id} active={doc === `draft:${d.id}`} onClick={() => setDoc(`draft:${d.id}`)} label={titleOf(`draft:${d.id}`, d.title)} />)}
