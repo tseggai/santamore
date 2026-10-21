@@ -9,7 +9,7 @@ import iconColor from "@/public/brand/SantamoreIcon-Color.png";
  * A meeting as a sheet, in the brand: the agenda as page one, the minutes
  * from page two, each under the letterhead (the icon left, the kind of sheet
  * in the display face and the date right, a hairline), then the meeting's
- * title, numbered sections as red pills, the sign-in list in a mist box, and
+ * title in the display face too, numbered sections as red pills, the sign-in list in a mist box, and
  * a footer on every page. On screen the letterhead, title and footer stay
  * hidden (the page has its own) and the console around it stays; on paper
  * the sheet is the whole page.
@@ -35,7 +35,7 @@ export async function MeetingSheet({ row, locale }: { row: MeetingRow; locale: s
             <p className="sheet-meta">{date}</p>
           </div>
         </header>
-        <h1 className="sheet-title hidden print:block">{row.title}</h1>
+        <h1 className="type-display sheet-title hidden print:block">{row.title}</h1>
         <h2 className="type-display mt-8 text-2xl print:hidden">{heading}</h2>
         {children}
       </>
@@ -114,7 +114,7 @@ const SHEET_CSS = `
 #print-doc .sheet-head-right { text-align: right; }
 #print-doc .sheet-kind { font-size: 21pt; line-height: 1.05; text-transform: uppercase; letter-spacing: .06em; }
 #print-doc .sheet-meta { margin-top: 2mm; font-size: 9.5pt; color: rgba(0,0,0,.6); }
-#print-doc .sheet-title { margin-top: 9mm; font-family: var(--font-brand); font-weight: 800; font-size: 20pt; line-height: 1.15; color: #0E3A46; }
+#print-doc .sheet-title { margin-top: 9mm; font-size: 20pt; line-height: 1.15; text-transform: uppercase; letter-spacing: .06em; color: #0E3A46; }
 #print-doc .sheet-foot { position: fixed; left: 14mm; right: 14mm; bottom: 0; height: 14mm; justify-content: space-between; align-items: flex-start; gap: 6mm; padding-top: 3mm; border-top: .2mm solid rgba(0,0,0,.45); font-size: 8pt; color: rgba(0,0,0,.55); }
 #print-doc .sheet-foot span:last-child { text-align: right; }
 @media print {
