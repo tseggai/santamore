@@ -10,7 +10,7 @@ import { pickIds, pickPeople, type IdPick, type PeoplePick } from "@/lib/site-pa
 import { supporterLogoUrl } from "@/lib/storage";
 import { howContent } from "@/content/site/how";
 import { loadSitePage } from "@/lib/site-pages-server";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 
@@ -66,8 +66,7 @@ export default async function AboutPage({
   // The team: members who agreed to appear, else the shipped names and words.
   let people: TeamRow[] = [];
   try {
-    const supabase = await createClient();
-    const { data } = await supabase.from("v_public_team").select("id, kind, full_name, title, quote, photo_path, years, sort_order").order("sort_order").order("full_name");
+    const { data } = await cachedPublic(["team"], (pub) => pub.from("v_public_team").select("id, kind, full_name, title, quote, photo_path, years, sort_order").order("sort_order").order("full_name"));
     people = (data ?? []) as TeamRow[];
   } catch {
     people = [];
@@ -85,17 +84,16 @@ export default async function AboutPage({
   let featuredBeneficiaries: PublicBeneficiary[] = [];
   let featuredSupporters: { id: string; name: string; logo_path: string | null; website: string | null }[] = [];
   try {
-    const supabase = await createClient();
     const wantBeneficiaries = content.featuredBeneficiaries?.ids ?? [];
     const wantSupporters = content.featuredSupporters?.ids ?? [];
-    const [b, s] = await Promise.all([
+    const [b, s] = await cachedPublic(["about-featured", wantBeneficiaries.join(","), wantSupporters.join(",")], (supabase) => Promise.all([
       wantBeneficiaries.length > 0
         ? supabase.from("v_public_beneficiaries").select("id, slug, name, website, photo_path, story, campaign_slug, campaign_title").in("id", wantBeneficiaries)
         : Promise.resolve({ data: [] as PublicBeneficiary[] }),
       wantSupporters.length > 0
         ? supabase.from("v_public_supporters").select("id, name, logo_path, website").in("id", wantSupporters)
         : Promise.resolve({ data: [] as { id: string; name: string; logo_path: string | null; website: string | null }[] }),
-    ]);
+    ]));
     featuredBeneficiaries = pickIds(content.featuredBeneficiaries, (b.data ?? []) as PublicBeneficiary[]);
     featuredSupporters = pickIds(content.featuredSupporters, (s.data ?? []) as typeof featuredSupporters);
   } catch {

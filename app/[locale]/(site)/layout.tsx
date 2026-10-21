@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { DonateProvider } from "@/components/donate/DonateDialog";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { createClient } from "@/lib/supabase/server";
+import { cachedTestMode } from "@/lib/public-data";
 
 /**
  * Public-site chrome. The admin area lives outside this group on purpose —
@@ -15,9 +15,7 @@ import { createClient } from "@/lib/supabase/server";
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   let testMode = false;
   try {
-    const supabase = await createClient();
-    const { data } = await supabase.rpc("test_mode");
-    testMode = Boolean(data);
+    testMode = await cachedTestMode();
   } catch {
     testMode = false;
   }

@@ -9,7 +9,7 @@ import { SponsorGrid, type PublicSponsor } from "@/components/partners/SponsorGr
 import { landingContent } from "@/content/site/landing";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl, galleryImageUrl } from "@/lib/storage";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, routing, type Locale } from "@/i18n/routing";
 
@@ -17,7 +17,7 @@ export const dynamic = "force-dynamic";
 
 async function fetchLanding() {
   try {
-    const supabase = await createClient();
+    return await cachedPublic(["home"], async (supabase) => {
     const nowIso = new Date().toISOString();
     const [summary, events, board, gallery, causes, proposals, sponsors, testMode, homePhoto] = await Promise.all([
       supabase.from("v_public_ledger_summary").select("received_cents, disbursed_cents").single(),
@@ -73,6 +73,7 @@ async function fetchLanding() {
       testMode: Boolean(testMode.data),
       homePhoto: typeof homePhoto.data === "string" ? homePhoto.data : null,
     };
+    });
   } catch {
     return {
       receivedCents: 0,

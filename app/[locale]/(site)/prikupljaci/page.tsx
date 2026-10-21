@@ -6,7 +6,7 @@ import { FundraisersBrowser } from "@/components/FundraisersBrowser";
 import type { LeaderboardEntry } from "@/components/Leaderboard";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 
@@ -45,7 +45,7 @@ interface CauseOption extends EventRow {
  */
 async function fetchBoard(causeSlug: string | undefined) {
   try {
-    const supabase = await createClient();
+    return await cachedPublic(["board", causeSlug], async (supabase) => {
     const { data: causeRows } = await supabase
       .from("v_public_campaigns")
       .select("id, slug, title, ends_at, pages_raised_cents")
@@ -88,6 +88,7 @@ async function fetchBoard(causeSlug: string | undefined) {
       // What the pages raised: the cause view's column (migration 0062), not a sum over the board.
       totalRaised: (chosen ? causeList.filter((c) => c.id === chosen.id) : causeList).reduce((sum, c) => sum + c.pages_raised_cents, 0),
     };
+    });
   } catch {
     return null;
   }

@@ -7,7 +7,7 @@ import { SponsorTabs } from "@/components/partners/SponsorTabs";
 import { TierSheet } from "@/components/partners/TierSheet";
 import type { PublicSponsor } from "@/components/partners/SponsorGrid";
 import { partnersContent } from "@/content/site/partners";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { routing, type Locale } from "@/i18n/routing";
 
 // Live supporters on every request.
@@ -43,12 +43,11 @@ interface OfferRow {
 
 async function loadSupporters() {
   try {
-    const supabase = await createClient();
-    const [{ data: supporters }, { data: sponsorships }, { data: offers }] = await Promise.all([
+    const [{ data: supporters }, { data: sponsorships }, { data: offers }] = await cachedPublic(["partners"], (supabase) => Promise.all([
       supabase.from("v_public_supporters").select("id, name, slug, kind, logo_path, website").eq("kind", "sponsor").order("name"),
       supabase.from("v_public_sponsors").select("supporter_slug, tier, is_in_kind, fund, amount_cents, campaign_title, event_name, starts_at, year"),
       supabase.from("v_public_perk_challenges").select("slug, supporter_slug, reward_label, title"),
-    ]);
+    ]));
     return {
       supporters: (supporters ?? []) as SupporterRow[],
       sponsorships: (sponsorships ?? []) as SponsorshipRow[],

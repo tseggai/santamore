@@ -14,7 +14,7 @@ import { groupDonors, type GiftDetail, type PublicSponsor } from "@/lib/sponsors
 import { formatShortDate } from "@/lib/dates";
 import { formatCents, formatSignedCents } from "@/lib/money";
 import { disbursementDocUrl } from "@/lib/storage";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
 
@@ -136,8 +136,8 @@ interface DealRow {
  * from the same public views with an entry_date window, so a year's list
  * always sums to that year's headline figures.
  */
-async function fetchLedger(year: number | null) {
-  const supabase = await createClient();
+function fetchLedger(year: number | null) {
+  return cachedPublic(["ledger", year], async (supabase) => {
   const from = year ? `${year}-01-01` : null;
   const to = year ? `${year + 1}-01-01` : null;
   const windowed = <T extends { gte: (c: string, v: string) => T; lt: (c: string, v: string) => T }>(q: T) =>
@@ -203,6 +203,7 @@ async function fetchLedger(year: number | null) {
     teams: (teams.data ?? []) as TeamRow[],
     volunteers: ((volunteerRows.data ?? []) as { full_name: string }[]).map((row) => row.full_name),
   };
+  });
 }
 
 export async function generateMetadata({

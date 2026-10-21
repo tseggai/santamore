@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { EventsBrowser, type PublicEventCard } from "@/components/events/EventsBrowser";
 import { calendarContent } from "@/content/site/calendar";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { routing, type Locale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
@@ -33,11 +33,10 @@ export default async function EventsIndexPage({
 
   let events: PublicEventCard[] = [];
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const { data } = await cachedPublic(["events"], (pub) => pub
       .from("v_public_events")
       .select("slug, name, starts_at, ends_at, venue, kind, cover_path, description")
-      .order("starts_at", { ascending: true });
+      .order("starts_at", { ascending: true }));
     events = (data ?? []) as PublicEventCard[];
   } catch {
     events = [];

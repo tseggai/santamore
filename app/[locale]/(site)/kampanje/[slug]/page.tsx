@@ -9,14 +9,14 @@ import {
   type CampaignView,
 } from "@/components/campaigns/CampaignPageView";
 import { toGalleryImages, type PublicGalleryRow } from "@/lib/gallery";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { routing } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
 async function fetchCampaign(slug: string): Promise<CampaignView | null> {
   try {
-    const supabase = await createClient();
+    return await cachedPublic(["campaign", slug], async (supabase) => {
     const [{ data: campaign }, { data: events }, { data: galleryRows }, { data: beneficiaryRows }] = await Promise.all([
       supabase
         .from("v_public_campaigns")
@@ -47,6 +47,7 @@ async function fetchCampaign(slug: string): Promise<CampaignView | null> {
       gallery: toGalleryImages((galleryRows ?? []) as PublicGalleryRow[]),
       beneficiaries: (beneficiaryRows ?? []) as PublicBeneficiary[],
     };
+    });
   } catch {
     return null;
   }

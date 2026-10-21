@@ -3,7 +3,7 @@ import { PeopleStrip, type PublicPerson } from "@/components/people/PeopleStrip"
 import { pickIds, pickPeople } from "@/lib/site-pages";
 import type { Section } from "@/lib/site-sections";
 import { supporterLogoUrl } from "@/lib/storage";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 
@@ -28,14 +28,13 @@ export async function loadAssetPools(sections: Section[]): Promise<AssetPools> {
   const beneficiaryIds = [...new Set(sections.flatMap((s) => s.assets?.beneficiaries?.ids ?? []))];
   const pools: AssetPools = { people: [], supporters: [], beneficiaries: [] };
   try {
-    const supabase = await createClient();
-    const [people, supporters, beneficiaries] = await Promise.all([
+    const [people, supporters, beneficiaries] = await cachedPublic(["asset-pools", String(wantsPeople), supporterIds.join(","), beneficiaryIds.join(",")], (supabase) => Promise.all([
       wantsPeople ? supabase.from("v_public_team").select("id, kind, full_name, title, quote, photo_path, years, sort_order").order("sort_order").order("full_name") : Promise.resolve({ data: [] }),
       supporterIds.length > 0 ? supabase.from("v_public_supporters").select("id, name, logo_path, website").in("id", supporterIds) : Promise.resolve({ data: [] }),
       beneficiaryIds.length > 0
         ? supabase.from("v_public_beneficiaries").select("id, slug, name, website, photo_path, story, campaign_slug, campaign_title").in("id", beneficiaryIds)
         : Promise.resolve({ data: [] }),
-    ]);
+    ]));
     pools.people = (people.data ?? []) as PublicPerson[];
     pools.supporters = (supporters.data ?? []) as PublicSupporterTile[];
     pools.beneficiaries = (beneficiaries.data ?? []) as PublicBeneficiary[];

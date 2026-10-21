@@ -21,6 +21,18 @@ The app also enforces this itself: in production the middleware answers any
 other host (the apex, `santamore.vercel.app`) with a 308 to the canonical
 one, path and query intact. Preview deployments keep their own hosts.
 
+### Speed: the region and the public cache
+
+`vercel.json` pins the serverless functions to Frankfurt (`fra1`), the
+region the Supabase project runs in, so every query is a short hop instead
+of a transatlantic one. The public pages read the `v_public_*` views through
+`lib/public-data.ts`: a cookie-less anon client inside Next's data cache,
+one result per page (and locale, slug or year) refreshed every 60 seconds
+and shared by every visitor. A public figure may therefore be up to a minute
+old; the console reads live, and the test-mode switch drops the whole cache
+(`revalidatePublic()`). Fundraiser, team and award pages stay live, so a
+donor sees their gift the moment they return to the page.
+
 ## 3. Supabase → Authentication → URL Configuration
 
 | Field | Value |

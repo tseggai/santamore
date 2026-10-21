@@ -10,6 +10,7 @@ import { CauseStatus } from "@/components/campaigns/CauseStatus";
 import { openFirst } from "@/lib/cause-status";
 import { formatCents } from "@/lib/money";
 import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, routing, type Locale } from "@/i18n/routing";
 
@@ -60,10 +61,10 @@ export default async function CampaignsIndexPage({
   try {
     const supabase = await createClient();
     const [{ data: proposalRows }, { data: voteRows }, { data: auth }, { data: criteriaRows }] = await Promise.all([
-      supabase.from("v_public_cause_proposals").select("*").order("vote_rank").order("created_at").limit(100),
+      cachedPublic(["cause-proposals"], (pub) => pub.from("v_public_cause_proposals").select("*").order("vote_rank").order("created_at").limit(100)),
       supabase.from("v_my_cause_votes").select("proposal_id"),
       supabase.auth.getUser(),
-      supabase.from("v_public_cause_criteria").select("*"),
+      cachedPublic(["cause-criteria"], (pub) => pub.from("v_public_cause_criteria").select("*")),
     ]);
     const lang = locale as Locale;
     criteria = ((criteriaRows ?? []) as { id: string; disqualify_on: boolean; question_me: string; question_en: string; question_ru: string; reason_me: string; reason_en: string; reason_ru: string }[]).map((row) => ({
@@ -79,10 +80,7 @@ export default async function CampaignsIndexPage({
       const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", auth.user.id).maybeSingle();
       member = { email: auth.user.email ?? "", fullName: profile?.full_name ?? "" };
     }
-    const { data } = await supabase
-      .from("v_public_campaigns")
-      .select("*")
-      .order("starts_at", { ascending: false, nullsFirst: false });
+    const { data } = await cachedPublic(["campaigns"], (pub) => pub.from("v_public_campaigns").select("*").order("starts_at", { ascending: false, nullsFirst: false }));
     // Open causes first; a completed one is read from its records, never set.
     campaigns = openFirst((data ?? []) as CampaignRow[]);
   } catch {

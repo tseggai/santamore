@@ -3,7 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { PostArticle } from "@/components/news/PostArticle";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, routing, type Locale } from "@/i18n/routing";
 
@@ -21,7 +21,7 @@ interface PostRow {
 
 async function fetchPost(slug: string, locale: string): Promise<PostRow | null> {
   try {
-    const supabase = await createClient();
+    return await cachedPublic(["post", slug, locale], async (supabase) => {
     const { data } = await supabase
       .from("v_public_posts")
       .select("slug, title, excerpt, body_md, cover_path, published_at, locale")
@@ -34,6 +34,7 @@ async function fetchPost(slug: string, locale: string): Promise<PostRow | null> 
       rows[0] ??
       null
     );
+    });
   } catch {
     return null;
   }

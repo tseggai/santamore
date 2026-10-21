@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { PerkRule } from "@/components/perks/PerkRule";
 import { ShareButton } from "@/components/ShareButton";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, routing, type Locale } from "@/i18n/routing";
 import type { PerkChallengeRow } from "../page";
@@ -13,13 +13,14 @@ export const dynamic = "force-dynamic";
 
 async function fetchChallenge(slug: string): Promise<PerkChallengeRow | null> {
   try {
-    const supabase = await createClient();
+    return await cachedPublic(["challenge", slug], async (supabase) => {
     const { data } = await supabase
       .from("v_public_perk_challenges")
       .select("*")
       .eq("slug", slug)
       .maybeSingle();
     return (data as PerkChallengeRow | null) ?? null;
+    });
   } catch {
     return null;
   }

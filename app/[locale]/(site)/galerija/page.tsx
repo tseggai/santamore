@@ -4,7 +4,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { GalleryGrid } from "@/components/gallery/GalleryGrid";
 import { toGalleryImages, type PublicGalleryRow } from "@/lib/gallery";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { routing } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
@@ -31,12 +31,11 @@ export default async function GalleryPage({
 
   let rows: PublicGalleryRow[] = [];
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const { data } = await cachedPublic(["gallery"], (pub) => pub
       .from("v_public_gallery")
       .select("id, storage_path, caption, credit, event_slug, event_name, event_starts_at, campaign_slug, campaign_title")
       .order("sort_order", { ascending: true })
-      .limit(400);
+      .limit(400));
     rows = (data ?? []) as PublicGalleryRow[];
   } catch {
     rows = [];

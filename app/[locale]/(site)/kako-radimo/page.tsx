@@ -7,7 +7,7 @@ import { PageSections, loadAssetPools } from "@/components/site/PageSections";
 import { howContent, type HowContent } from "@/content/site/how";
 import { pickPeople, type PeoplePick } from "@/lib/site-pages";
 import { loadSitePage } from "@/lib/site-pages-server";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 
 // Staff edit this page from the admin.
 export const dynamic = "force-dynamic";
@@ -53,8 +53,7 @@ export default async function HowPage({
   let committee: PublicPerson[] = [];
   if (content.committeePeople && (content.committeePeople.kinds.length > 0 || content.committeePeople.ids.length > 0)) {
     try {
-      const supabase = await createClient();
-      const { data } = await supabase.from("v_public_team").select("id, kind, full_name, title, quote, photo_path, years, sort_order").order("sort_order").order("full_name");
+      const { data } = await cachedPublic(["team"], (pub) => pub.from("v_public_team").select("id, kind, full_name, title, quote, photo_path, years, sort_order").order("sort_order").order("full_name"));
       committee = pickPeople(content.committeePeople, (data ?? []) as PublicPerson[]);
     } catch {
       committee = [];

@@ -13,6 +13,7 @@ import {
   type ChallengeMetric,
 } from "@/lib/metrics";
 import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { routing, type Locale } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
@@ -35,13 +36,14 @@ interface PublicEvent {
 
 async function fetchEvent(slug: string) {
   try {
-    const supabase = await createClient();
+    return await cachedPublic(["event", slug], async (supabase) => {
     const { data } = await supabase
       .from("v_public_events")
       .select("*")
       .eq("slug", slug)
       .maybeSingle();
     return data as PublicEvent | null;
+    });
   } catch {
     return null;
   }
