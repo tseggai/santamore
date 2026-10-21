@@ -1745,7 +1745,10 @@
       "apply": "Primijeni",
       "clear": "Poništi",
       "noMatches": "Nijedan sastanak ne odgovara.",
-      "latest": "Posljednji sastanci"
+      "latest": "Posljednji sastanci",
+      "print": "Štampaj / PDF",
+      "printHint": "Štampa samo zapisnik, sa dnevnim redom i listom prisutnih, kao PDF za dijeljenje.",
+      "sheetKind": "Zapisnik sa sastanka"
     }
   },
   "forms": {
