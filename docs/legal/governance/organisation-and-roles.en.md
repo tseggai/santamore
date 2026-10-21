@@ -129,7 +129,21 @@ What the founders carry is the story, the culture and the duty to recruit the fi
 - Event-day volunteers report to the team lead or chapter officer running their function on the day.
 - A fundraiser or club connector works with the partnerships or communications team lead.
 
-### Article 14 — How a role is taken up
+### Article 14 — Meetings and updates by level
+
+Not every level sits in every meeting. The table says who attends which meeting and who only receives updates, so nobody is invited to everything and nobody is left out of what concerns them.
+
+| Meeting or update | Attends and decides | Attends without a vote | Receives the update only |
+|---|---|---|---|
+| Assembly, at least once a year | Every member, founders included, in person or by proxy | Volunteers who are not members, invited guests | Donors, sponsors and partners get the annual report and the Impact Day invitation |
+| Board, four meetings a year | Board members | The Executive Director; a team lead or chapter lead for their item, on invitation | Every member: a short note of the decisions after each meeting |
+| Grants Committee, four sittings a year | Committee members | The Executive Director for the record and the implementation; an applicant when heard | Every member: the published summary of each allocation |
+| Operations meeting, weekly in the run-up to an event, monthly otherwise | The Executive Director, team leads, chapter leads, staff | Any member who holds a task for that event | Volunteers: the event briefing from their lead the week before |
+| Chapter meeting, at least ten days before an Assembly and before each chapter event | The chapter's officers and members | The Executive Director, on invitation | The Board: the chapter lead's quarterly report |
+
+A member who holds no role attends the Assembly and receives the update after every Board meeting, the plan for the year, the results of every event and the invitation to each Assembly. A volunteer who is not a member receives the briefings for the events they work and the invitation to join.
+
+### Article 15 — How a role is taken up
 
 1. Say it in writing, to the Executive Director, with the hours you can actually give.
 2. Agree a written remit: what you own, until when, and who you report to.
@@ -138,13 +152,13 @@ What the founders carry is the story, the culture and the duty to recruit the fi
 
 ## V. MEMBERSHIP
 
-### Article 15 — Becoming a member
+### Article 16 — Becoming a member
 
 Any person or legal entity who accepts the goals of the association can join on the recommendation of one existing member. The Assembly admits new members by majority vote; the new member signs the membership form and is entered in the register of members.
 
 Membership ends by a written statement of withdrawal, or by a decision of the Assembly for breaching the Statute or harming the association's reputation, after the member has had the opportunity to respond.
 
-### Article 16 — Rights and duties
+### Article 17 — Rights and duties
 
 A member has the right to:
 
@@ -161,13 +175,13 @@ A member is expected to:
 - pay the membership fee, if the Assembly has set one for that year;
 - carry out the tasks the Assembly entrusts to them.
 
-### Article 17 — Membership fee
+### Article 18 — Membership fee
 
 No membership fee is charged for 2026. The founding members decided this on [[PLACEHOLDER: date of the decision]] and the first Assembly records it as a decision under the Statute.
 
-For 2027 the Board proposes to the Assembly, by [[PLACEHOLDER: month of the proposal]], whether a fee is charged and in what amount, together with the list of benefits in Article 18. The Assembly decides every year; it may decide that no fee is charged.
+For 2027 the Board proposes to the Assembly, by [[PLACEHOLDER: month of the proposal]], whether a fee is charged and in what amount, together with the list of benefits in Article 19. The Assembly decides every year; it may decide that no fee is charged.
 
-### Article 18 — What membership brings
+### Article 19 — What membership brings
 
 - One vote at the Assembly, and the right to be elected to every body.
 - The right to propose a cause and to vote on the shortlist of causes Santamore raises for that year.
@@ -179,10 +193,10 @@ For 2027 the Board proposes to the Assembly, by [[PLACEHOLDER: month of the prop
 
 ## VI. FINAL PROVISIONS
 
-### Article 19 — Access to documents
+### Article 20 — Access to documents
 
 The policies published on the site are public. This document and the member-facing policies are available to every signed-in member in the member area. The rules the Board adopts, the templates and the registration pack are available to the staff in the console. The pay and staffing policy is available only to the Executive Director and the administrators, because it carries pay figures and personal data.
 
-### Article 20 — Changes
+### Article 21 — Changes
 
 The Board keeps this document current. It is reviewed after every Assembly and whenever the Statute, the membership of a body or the staffing plan changes.
