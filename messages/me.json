@@ -533,7 +533,10 @@
     "documentsPublicHint": "Politike koje svako može da pročita, na sajtu.",
     "documentsOnSite": "Pročitaj na sajtu",
     "documentsOperative": "Mjerodavan tekst, na crnogorskom.",
-    "documentsTranslation": "Prevod; mjerodavan je crnogorski tekst."
+    "documentsTranslation": "Prevod; mjerodavan je crnogorski tekst.",
+    "meetingsTitle": "Sastanci",
+    "meetingsHint": "Dnevni red i zapisnik svakog sastanka, za članove.",
+    "meetingsOpen": "Otvori"
   },
   "email": {
     "instructions": {
@@ -1707,6 +1710,34 @@
       "sectionPublishedHint": "Javni dio svake je na sajtu; interni dio je samo ovdje.",
       "sections": "Odjeljci",
       "sectionEmpty": "Ništa u ovom odjeljku nije otvoreno za vašu ulogu."
+    },
+    "meetings": {
+      "title": "Sastanci",
+      "hint": "Dnevni red i zapisnik zajedno, jedan unos po sastanku. Osoblje ih piše ovdje; svaki prijavljeni član čita ih u članskom prostoru.",
+      "new": "Novi sastanak",
+      "edit": "Uredi",
+      "save": "Sačuvaj",
+      "saving": "Čuvanje…",
+      "saved": "Sačuvano.",
+      "failed": "Čuvanje nije uspjelo. Pokušajte ponovo.",
+      "delete": "Obriši ovaj sastanak",
+      "confirmDelete": "Obrisati ovaj sastanak i njegov zapisnik?",
+      "date": "Datum",
+      "titleField": "Naslov",
+      "attendees": "Prisutni",
+      "attendeesHint": "Jedno ime po redu: lista prijavljenih.",
+      "agenda": "Dnevni red",
+      "agendaHint": "Markdown: naslovi sa ##, liste sa -, tabele sa |.",
+      "minutes": "Zapisnik",
+      "minutesHint": "Markdown. Odluke i zadaci sa nosiocem i datumom na kraju.",
+      "agendaHeading": "Dnevni red",
+      "minutesHeading": "Zapisnik",
+      "attendeesHeading": "Prisutni",
+      "noAgenda": "Dnevni red nije zabilježen.",
+      "noMinutes": "Zapisnika još nema.",
+      "empty": "Još nema zabilježenih sastanaka.",
+      "all": "Svi sastanci",
+      "back": "Sastanci"
     }
   },
   "forms": {
