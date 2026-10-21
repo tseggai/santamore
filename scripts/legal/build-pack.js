@@ -95,9 +95,9 @@ const F = {
   date_app: T('Datum prijave', 'Filing date', '[datum predaje]', '[filing date]', { neutral: true }),
   start: NEUTRAL('Vrijeme početka', 'Start time', '[18:00]'), end: NEUTRAL('Vrijeme završetka', 'End time', '[19:30]'), venue: T('Adresa mjesta održavanja', 'Venue address', '[adresa mjesta održavanja], Tivat', '[venue address], Tivat', { neutral: true }),
   salut: T('g./gđa', 'Mr/Ms', 'g.', 'Mr'), v1: T('izložio/la', '', 'izložio', '', { meOnly: true }), v2: T('upoznao/la', '', 'upoznao', '', { meOnly: true }),
-  term: T('Mandat', 'Term', '4 (četiri)', '4 (four)'), vote: T('Rezultat glasanja', 'Vote', 'jednoglasno', 'unanimously'),
+  term: T('Mandat', 'Term', '6 (šest)', '6 (six)'), vote: T('Rezultat glasanja', 'Vote', 'jednoglasno', 'unanimously'),
   seal_text: T('Tekst po obodu pečata', 'Text on the rim of the seal', 'Nevladino udruženje „Santamore“, Tivat', 'Non-governmental association "Santamore", Tivat'), seal_symbol: T('Znak u sredini pečata', 'Symbol in the centre of the seal', '[opis znaka Santamore]', '[description of the Santamore mark]'),
-  term_pres: T('Mandat predsjednika Skupštine', 'Term of the President of the Assembly', '4 (četiri)', '4 (four)'), term_assembly: T('Mandat Skupštine', 'Term of the Assembly', '4 (četiri)', '4 (four)'), term_rep: T('Mandat ovlašćenog lica', 'Term of the authorised person', '4 (četiri)', '4 (four)'),
+  term_pres: T('Mandat predsjednika Skupštine', 'Term of the President of the Assembly', '6 (šest)', '6 (six)'), term_assembly: T('Mandat Skupštine', 'Term of the Assembly', '4 (četiri)', '4 (four)'), term_rep: T('Mandat ovlašćenog lica', 'Term of the authorised person', '6 (šest)', '6 (six)'),
   econ: T('Privredne djelatnosti', 'Economic activities', econME, econEN, { block: true }),
 };
 void N;
@@ -366,6 +366,16 @@ function buildStatuteWithAdditions() {
   ensure(/Upravni odbor/.test(blocks[staff].me) && /by the Board/.test(blocks[staff].en), 'Article 32 wording');
   blocks.splice(articleEnd(34), 0, P('Dobrovoljni prilozi i donacije prikupljeni za korisnike u cjelini se dodjeljuju korisnicima. Troškovi rada udruženja pokrivaju se iz sponzorstava, kotizacija, članarina, grantova, prihoda od privredne djelatnosti i drugih prihoda, osim ako je donator izričito odredio drugačije.', 'Voluntary contributions and donations collected for beneficiaries are allocated to beneficiaries in full. The costs of the association\'s work are covered from sponsorship, entry fees, membership fees, grants, income from economic activity and other income, unless the donor has expressly specified otherwise.'));
 
+  // 1b. The amendments adopted 2026-10-21 (section 6 of the additions), by wording, still in the template's numbering.
+  blocks.splice(articleEnd(17), 0, P('Ako je broj glasova jednak, o pitanju se ponovo glasa na istoj sjednici poslije dodatne rasprave. Ako je broj glasova ponovo jednak, odlučuje glas Predsjednika Skupštine.', 'If the votes are equal, the matter is put to a second vote at the same session after further discussion. If the votes are again equal, the vote of the President of the Assembly decides.'));
+  blocks.splice(inArticle(27, t => /^Isto lice može biti ponovo birano/.test(t)) + 1, 0, P('Prvog Izvršnog direktora bira osnivačka skupština.', 'The first Executive Director is elected by the founding assembly.'));
+  blocks.splice(articleEnd(28), 0, P('Izvršni direktor odlučuje o svakom pitanju koje Zakon, ovaj statut ili odluka Skupštine ne stavlja u nadležnost drugog organa, u okviru usvojenog budžeta i ograničenja potrošnje koja utvrdi Upravni odbor. Ako Upravni odbor ne odluči o pitanju koje mu je Izvršni direktor podnio, zbog nedostatka kvoruma na dvije uzastopne sjednice ili jednakog broja glasova, Izvršni direktor može postupiti u okviru usvojenog budžeta i o tome izvještava na narednoj sjednici Upravnog odbora.', 'The Executive Director decides on every matter that the Law, this Statute or a decision of the Assembly does not reserve to another body, within the adopted budget and the spending limits the Board sets. Where the Board does not decide on a matter the Executive Director submitted to it, because it lacked a quorum at two consecutive sessions or because the vote was tied, the Executive Director may act within the adopted budget and reports on it at the Board\'s next session.'));
+  blocks[inArticle(31, t => /^O razriješenju Izvršnog direktora odlučuje/.test(t))] = P('Skupština odlučuje o razrješenju Izvršnog direktora prije isteka mandata samo iz razloga iz člana 30 ovog statuta, na predlog Upravnog odbora ili najmanje jedne trećine članova, dvotrećinskom većinom svih članova udruženja, pošto je Izvršnom direktoru data mogućnost da se izjasni. Izvršni direktor na toj sjednici može biti predstavljen preko punomoćnika, ali ne može biti punomoćnik.', 'The Assembly decides on the dismissal of the Executive Director before the end of the term only for a reason in Article 30 of this Statute, on the proposal of the Board or of at least one third of the members, by a two-thirds majority of all members of the association, after the Executive Director has been given the opportunity to respond. The Executive Director may be represented by proxy at that session but not act as a proxy.');
+  blocks.splice(articleEnd(34), 0, P('Skupština odlučuje, na predlog Upravnog odbora, da li se za kalendarsku godinu naplaćuje članarina i u kom iznosu; može odlučiti da se članarina ne naplaćuje.', 'The Assembly decides, on the Board\'s proposal, whether a membership fee is charged for a calendar year and in what amount; it may decide that no fee is charged.'));
+  blocks.splice(articleEnd(36), 0, P('Članstvo osnivača udruženja prestaje samo pisanom izjavom osnivača o istupanju, ili odlukom Skupštine donesenom dvotrećinskom većinom svih članova iz razloga iz stava 2 ovog člana.', 'The membership of a founder of the association ends only by the founder\'s written statement of withdrawal, or by a decision of the Assembly taken by a two-thirds majority of all members for a reason in paragraph 2 of this Article.'));
+  blocks.splice(inArticle(38, t => /^bira i bude biran u organe/.test(t)) + 1, 0, P('predlaže ciljeve za koje udruženje prikuplja sredstva i glasa o užem izboru ciljeva;', 'proposes causes for which the association raises funds, and votes on the shortlist of causes;'));
+  blocks[inArticle(38, t => /^plaća članarinu/.test(t))] = P('plaća članarinu, ako ju je Skupština utvrdila za tu kalendarsku godinu;', 'pays the membership fee, if the Assembly has set one for that calendar year;');
+
   // 2. The template's Articles 32 to 42 become 45 to 55 (nothing in the template refers to them by number).
   for (const b of blocks) {
     const m = b.type === 'h3' && b.me.match(/^Član (\d+)$/);
@@ -394,8 +404,8 @@ function buildStatuteWithAdditions() {
   for (let n = 1; n <= 55; n++) { expected.push(String(n)); if (n === 17) for (const l of 'abcdef') expected.push(`17${l}`); }
   ensure(heads.join(',') === expected.join(','), `article sequence: ${heads.join(',')}`);
 
-  return { id: '04a', title: { me: 'Statut sa dopunama (Opcija 1)', en: 'Statute with additions (Option 1)' }, subtitle: base.subtitle, file: 'santamore-04a-statut-dopunjen',
-    note: { me: 'Obrazac 04 sa unesenim nacrtom „Dopune statuta“: Upravni odbor, Komisija za dodjelu sredstava i ogranci (čl. 32 do 44), punomoćja (čl. 17a do 17f), izmjene postojećih članova (čl. 9, 12, 14, 22, 28, 29, 45 i 47), a dosadašnji čl. 32 do 42 postali su čl. 45 do 55. Engleska strana novih članova je sažetak iz nacrta; crnogorski tekst je mjerodavan. Sve što je došlo iz dopuna prikazano je ružičasto na ekranu, kao popunjene praznine (na papiru je crno) i mijenja se klikom u tekst, kao i praznine; advokat pregleda crnogorsku stranu prije potpisivanja. Uglaste zagrade u čl. 17f su napomena za advokata.', en: 'Form 04 with the draft "Statute additions" merged in: the Board, the Grants Committee and chapters (Arts. 32 to 44), proxies (Arts. 17a to 17f), the edits to existing articles (Arts. 9, 12, 14, 22, 28, 29, 45 and 47), and the former Arts. 32 to 42 renumbered 45 to 55. The English side of a new article is the draft\'s summary; the Montenegrin text is the operative one. Everything the additions brought in shows in pink on screen, like a completed blank (black on paper) and is changed by clicking into it, like a blank; the lawyer reviews the Montenegrin side before signing. The square brackets in Art. 17f are a note for the lawyer.' },
+  return { id: '04a', label: '04', title: { me: 'Statut', en: 'Statute' }, subtitle: base.subtitle, file: 'santamore-04-statut',
+    note: { me: 'Obrazac 04 sa unesenim nacrtom „Dopune statuta“: Upravni odbor, Komisija za dodjelu sredstava i ogranci (čl. 32 do 44), punomoćja (čl. 17a do 17f), izmjene postojećih članova (čl. 9, 12, 14, 22, 28, 29, 45 i 47), a dosadašnji čl. 32 do 42 postali su čl. 45 do 55. Unijete su i izmjene usvojene 21. 10. 2026. (odjeljak 6 Dopuna): odlučujući glas kod jednakog broja glasova (čl. 17 i 35), prvi direktor iz osnivačke skupštine i njegova opšta nadležnost (čl. 27 i 28), razrješenje direktora dvotrećinskom većinom svih članova (čl. 31), članarina kao godišnja odluka Skupštine (čl. 47 i 51), zaštita članstva osnivača (čl. 49) i pravo članova da predlažu ciljeve (čl. 51). Engleska strana novih članova je sažetak iz nacrta; crnogorski tekst je mjerodavan. Sve što je došlo iz dopuna prikazano je ružičasto na ekranu, kao popunjene praznine (na papiru je crno) i mijenja se klikom u tekst, kao i praznine; advokat pregleda crnogorsku stranu prije potpisivanja. Uglaste zagrade u čl. 17f su napomena za advokata.', en: 'Form 04 with the draft "Statute additions" merged in: the Board, the Grants Committee and chapters (Arts. 32 to 44), proxies (Arts. 17a to 17f), the edits to existing articles (Arts. 9, 12, 14, 22, 28, 29, 45 and 47), and the former Arts. 32 to 42 renumbered 45 to 55. The amendments adopted on 21 October 2026 (section 6 of the additions) are in too: casting votes on a tie (Arts. 17 and 35), the first Director from the founding assembly and the Director\'s default authority (Arts. 27 and 28), dismissal of the Director by two-thirds of all members (Art. 31), the fee as a yearly Assembly decision (Arts. 47 and 51), a founder\'s membership protected (Art. 49) and the members\' right to propose causes (Art. 51). The English side of a new article is the draft\'s summary; the Montenegrin text is the operative one. Everything the additions brought in shows in pink on screen, like a completed blank (black on paper) and is changed by clicking into it, like a blank; the lawyer reviews the Montenegrin side before signing. The square brackets in Art. 17f are a note for the lawyer.' },
     blocks };
 }
 
@@ -429,26 +439,14 @@ function buildInstructions() {
 // documents come from their per-language files, Montenegrin and English interleaved.
 const governance = buildDocs();
 if (governance.missing.length) console.warn('drafts without language files (skipped):', governance.missing.join(', '));
-/** The markdown of one "## N." section of a bilingual registration file, alone (title line kept). */
-function sectionOf(md, n) {
-  const lines = md.split('\n'); const out = []; let on = false;
-  for (const line of lines) {
-    const m = line.match(/^## (\d+)\. /);
-    if (m) { on = +m[1] === n; if (on) { out.push(line.replace(/^## \d+\. /, '## ')); continue; } }
-    if (on) out.push(line);
-  }
-  if (!out.length) throw new Error(`statute-additions.md: no section ${n}`);
-  return '# x\n\n' + out.join('\n');
-}
-const additionsMd = read(path.join(R, 'statute-additions.md'));
 // Every draft carries its category (the group it is listed under) and its audience (who may
-// read it; the console serves each staff member only the drafts their role may read).
+// read it; the console serves each staff member only the drafts their role may read). The
+// statute additions and the adopted amendments are not drafts any more: form 04 carries them.
 const drafts = [
-  { id: 'statute-additions', category: 'registration', audience: 'staff', title: { me: 'Dopune statuta', en: 'Statute additions' }, file: 'santamore-nacrt-statute-additions', html: draftHtml(additionsMd) },
-  { id: 'statute-amendments-2026-10', category: 'registration', audience: 'staff', title: { me: 'Predložene izmjene statuta, 21. 10. 2026.', en: 'Proposed statute amendments, 21 October 2026' }, file: 'santamore-nacrt-izmjene-statuta-2026-10', html: draftHtml(sectionOf(additionsMd, 6)) },
   ...governance.order.filter(id => governance.docs[id]).map(id => { const d = governance.docs[id]; return { id, category: d.category, audience: d.audience, title: { me: d.title.me, en: d.title.en }, file: 'santamore-nacrt-' + id, html: d.bilingualHtml }; }),
 ];
-const forms = [buildInstructions(), form02, form03, buildStatute(), buildStatuteWithAdditions(), form05];
+// One statute: the Ministry's template with the additions and the adopted amendments merged in (the bare template is its base only).
+const forms = [buildInstructions(), form02, form03, buildStatuteWithAdditions(), form05];
 const guide = { title: { me: 'Kako dovršiti paket', en: 'How to complete the pack' }, file: 'santamore-kako-dovrsiti', html: draftHtml(read(path.join(R, 'HOW-TO-COMPLETE.md'))) };
 const pack = { fields: F, groups: GROUPS, forms, drafts, guide, builtAt: new Date().toISOString().slice(0, 10) };
 const out = path.join(ROOT, 'content/legal-pack/pack.json');

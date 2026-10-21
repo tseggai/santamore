@@ -29,7 +29,7 @@ const STRINGS: Record<OrgChartLang, Strings> = {
     rowB: [
       { name: "Board · 5–7 people", lines: ["4 meetings a year", "Strategy, budget, staffing, pay", "A tie: the President's vote", "Unpaid"] },
       { name: "Grants Committee · 3–5", lines: ["4 sittings a year", "Decides who receives funds", "Final; no founders or staff", "Unpaid"] },
-      { name: "Executive Director · 1", lines: ["Founder, 5-year term, renewable", "Decides everything not reserved", "Removed only by 2/3 of members", "Paid once the fund exists"], paid: true },
+      { name: "Executive Director · 1", lines: ["Founder, 6-year term, renewable", "Decides everything not reserved", "Removed only by 2/3 of members", "Paid once the fund exists"], paid: true },
     ],
     rowC: [
       { name: "Team leads · about 5", lines: ["4–6 hours a month", "One function each", "Report to the Director", "Unpaid"] },
@@ -50,7 +50,7 @@ const STRINGS: Record<OrgChartLang, Strings> = {
     rowB: [
       { name: "Upravni odbor · 5–7", lines: ["4 sjednice godišnje", "Strategija, budžet, zarade", "Neriješeno: glas predsjednika", "Neplaćeno"] },
       { name: "Komisija za sredstva · 3–5", lines: ["4 sjednice godišnje", "Odlučuje ko dobija sredstva", "Konačno; bez osnivača i osoblja", "Neplaćeno"] },
-      { name: "Izvršni direktor · 1", lines: ["Osnivač, mandat 5 g., ponovljiv", "Odlučuje o svemu nerezervisanom", "Razrješenje samo sa 2/3 članova", "Plaćeno kad fond postoji"], paid: true },
+      { name: "Izvršni direktor · 1", lines: ["Osnivač, mandat 6 g., ponovljiv", "Odlučuje o svemu nerezervisanom", "Razrješenje samo sa 2/3 članova", "Plaćeno kad fond postoji"], paid: true },
     ],
     rowC: [
       { name: "Rukovodioci timova · oko 5", lines: ["4–6 sati mjesečno", "Po jedna funkcija", "Odgovaraju direktoru", "Neplaćeno"] },

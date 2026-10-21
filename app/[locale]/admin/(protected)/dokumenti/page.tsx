@@ -13,20 +13,27 @@ export const dynamic = "force-dynamic";
 
 const pack = packJson as unknown as LegalPack;
 
-/** The governance groups, in reading order; each lists the documents the role may read. */
-const GROUPS: { key: LegalDocCategory; title: string; hint: string }[] = [
-  { key: "organisation", title: "catOrganisation", hint: "catOrganisationHint" },
-  { key: "public", title: "catPublic", hint: "catPublicHint" },
-  { key: "board", title: "catBoard", hint: "catBoardHint" },
-  { key: "template", title: "catTemplates", hint: "catTemplatesHint" },
-  { key: "leadership", title: "catLeadership", hint: "catLeadershipHint" },
+/** The governance groups by section (owner decision 2026-10-21); each lists the documents the role may read. */
+const SECTIONS: { key: string; title: string; hint: string; groups: LegalDocCategory[]; registration?: boolean }[] = [
+  { key: "registration", title: "sectionRegistration", hint: "sectionRegistrationHint", groups: ["template"], registration: true },
+  { key: "organisation", title: "sectionOrganisation", hint: "sectionOrganisationHint", groups: ["organisation", "board", "leadership"] },
+  { key: "published", title: "sectionPublished", hint: "sectionPublishedHint", groups: ["public"] },
 ];
 
+const GROUP_TITLE: Record<LegalDocCategory, string> = {
+  organisation: "catOrganisation",
+  board: "catBoard",
+  leadership: "catLeadership",
+  template: "catTemplates",
+  public: "catPublic",
+};
+
 /**
- * Every document in one place: the registration files (the Ministry forms,
- * the founders' guide, the statute drafts), then the governance documents by
- * group. Each row says who may read it; the role decides which rows show and
- * whether the row opens for editing (the pack) as well as reading.
+ * Every document in one place, in three sections: what is filed and signed
+ * (the founders' guide, the Ministry forms, the agreement templates), the
+ * organisation and its rules, and the policies published on the site. Each
+ * row says who may read it; the role decides which rows show and whether a
+ * row opens for editing (the pack) as well as reading.
  */
 export default async function DocumentsIndexPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -36,71 +43,66 @@ export default async function DocumentsIndexPage({ params }: { params: Promise<{
   const lang = (doc: LegalDocEntry) => legalDocLang(doc, locale as Locale);
   const me = locale === "me";
   const editHref = (doc: string) => `/admin/dokumenti/paket?doc=${encodeURIComponent(doc)}`;
-  const registrationDrafts = pack.drafts.filter((d) => d.category === "registration");
-  const audienceLabel = (doc: LegalDocEntry) => t(`audience.${doc.audience}`);
+
+  const docRow = (doc: LegalDocEntry) => (
+    <li key={doc.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t-[0.5px] border-line px-4 py-3 text-[14.5px] first:border-t-0">
+      <Link href={`/admin/dokumenti/${doc.id}`} className="font-semibold text-black hover:underline">{doc.title[lang(doc)] ?? doc.title.en}</Link>
+      <span className={doc.audience === "leadership" ? "font-semibold text-red-dark" : "text-black/55"}>{t(`audience.${doc.audience}`)}</span>
+      {doc.route ? <a href={`/${locale}/${doc.route}`} className="text-black/55 hover:underline" target="_blank" rel="noreferrer">{tRules("onSite", { path: `/${doc.route}` })}</a> : null}
+      <span className="ml-auto flex gap-4 text-[14px] font-semibold text-sea">
+        <Link href={`/admin/dokumenti/${doc.id}`} className="hover:underline">{t("read")}</Link>
+        {canEdit ? <Link href={editHref(`draft:${doc.id}`)} className="hover:underline">{t("edit")} →</Link> : null}
+      </span>
+    </li>
+  );
 
   return (
     <div className="py-8">
       <PageHeader title={t("title")} />
       <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-black/60">{t("intro")}</p>
 
-      {canEdit ? (
-        <section className="mt-8">
-          <h2 className="text-[16px] font-bold">{t("registration")}</h2>
-          <p className="mt-1 max-w-2xl text-[14px] text-black/60">{t("registrationHint")}</p>
-          <ul className="mt-3 overflow-hidden rounded-lg bg-mist">
-            {pack.guide ? (
-              <li className="border-t-[0.5px] border-line first:border-t-0">
-                <Link href={editHref("guide")} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-3 text-[14.5px] transition-colors hover:bg-mist-2">
-                  <span className="font-semibold">{me ? pack.guide.title.me : pack.guide.title.en}</span>
-                  <span className="text-black/55">{tPack("guide")}</span>
-                  <span className="ml-auto text-[14px] font-semibold text-sea">{t("open")} →</span>
-                </Link>
-              </li>
-            ) : null}
-            {pack.forms.map((form) => (
-              <li key={form.id} className="border-t-[0.5px] border-line first:border-t-0">
-                <Link href={editHref(form.id)} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-3 text-[14.5px] transition-colors hover:bg-mist-2">
-                  <span className="font-mono text-[13px] font-bold text-black/55">{form.id}</span>
-                  <span className="font-semibold">{me ? form.title.me : form.title.en}</span>
-                  <span className="text-black/55">{tPack("forms")}</span>
-                  <span className="ml-auto text-[14px] font-semibold text-sea">{t("edit")} →</span>
-                </Link>
-              </li>
-            ))}
-            {registrationDrafts.map((draft) => (
-              <li key={draft.id} className="border-t-[0.5px] border-line first:border-t-0">
-                <Link href={editHref(`draft:${draft.id}`)} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-3 text-[14.5px] transition-colors hover:bg-mist-2">
-                  <span className="font-semibold">{me ? draft.title.me : draft.title.en}</span>
-                  <span className="text-black/55">{tPack("drafts")}</span>
-                  <span className="ml-auto text-[14px] font-semibold text-sea">{t("edit")} →</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
-      {GROUPS.map((group) => {
-        const docs = legalDocsByCategory(group.key).filter((doc) => canReadLegalDoc(role, doc));
-        if (docs.length === 0) return null;
+      {SECTIONS.map((section) => {
+        const groups = section.groups.map((g) => ({ g, docs: legalDocsByCategory(g).filter((doc) => canReadLegalDoc(role, doc)) })).filter((x) => x.docs.length > 0);
+        const showRegistration = !!section.registration && canEdit;
+        if (!showRegistration && groups.length === 0) return null;
         return (
-          <section key={group.key} className="mt-8">
-            <h2 className="text-[16px] font-bold">{tRules(group.title)}</h2>
-            <p className="mt-1 max-w-2xl text-[14px] text-black/60">{tRules(group.hint)}</p>
-            <ul className="mt-3 overflow-hidden rounded-lg bg-mist">
-              {docs.map((doc) => (
-                <li key={doc.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t-[0.5px] border-line px-4 py-3 text-[14.5px] first:border-t-0">
-                  <Link href={`/admin/dokumenti/${doc.id}`} className="font-semibold text-black hover:underline">{doc.title[lang(doc)] ?? doc.title.en}</Link>
-                  <span className={doc.audience === "leadership" ? "font-semibold text-red-dark" : "text-black/55"}>{audienceLabel(doc)}</span>
-                  {doc.route ? <a href={`/${locale}/${doc.route}`} className="text-black/55 hover:underline" target="_blank" rel="noreferrer">{tRules("onSite", { path: `/${doc.route}` })}</a> : null}
-                  <span className="ml-auto flex gap-4 text-[14px] font-semibold text-sea">
-                    <Link href={`/admin/dokumenti/${doc.id}`} className="hover:underline">{t("read")}</Link>
-                    {canEdit ? <Link href={editHref(`draft:${doc.id}`)} className="hover:underline">{t("edit")} →</Link> : null}
-                  </span>
-                </li>
-              ))}
-            </ul>
+          <section key={section.key} className="mt-10">
+            <h2 className="type-display text-xl">{t(section.title)}</h2>
+            <p className="mt-1 max-w-2xl text-[14px] text-black/60">{t(section.hint)}</p>
+
+            {showRegistration ? (
+              <div className="mt-4">
+                <h3 className="text-[15px] font-bold">{t("registration")}</h3>
+                <ul className="mt-2 overflow-hidden rounded-lg bg-mist">
+                  {pack.guide ? (
+                    <li className="border-t-[0.5px] border-line first:border-t-0">
+                      <Link href={editHref("guide")} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-3 text-[14.5px] transition-colors hover:bg-mist-2">
+                        <span className="font-semibold">{me ? pack.guide.title.me : pack.guide.title.en}</span>
+                        <span className="text-black/55">{tPack("guide")}</span>
+                        <span className="ml-auto text-[14px] font-semibold text-sea">{t("open")} →</span>
+                      </Link>
+                    </li>
+                  ) : null}
+                  {pack.forms.map((form) => (
+                    <li key={form.id} className="border-t-[0.5px] border-line first:border-t-0">
+                      <Link href={editHref(form.id)} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 px-4 py-3 text-[14.5px] transition-colors hover:bg-mist-2">
+                        <span className="font-mono text-[13px] font-bold text-black/55">{form.label ?? form.id}</span>
+                        <span className="font-semibold">{me ? form.title.me : form.title.en}</span>
+                        <span className="text-black/55">{tPack("forms")}</span>
+                        <span className="ml-auto text-[14px] font-semibold text-sea">{t("edit")} →</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {groups.map(({ g, docs }) => (
+              <div key={g} className="mt-4">
+                <h3 className="text-[15px] font-bold">{tRules(GROUP_TITLE[g])}</h3>
+                <ul className="mt-2 overflow-hidden rounded-lg bg-mist">{docs.map(docRow)}</ul>
+              </div>
+            ))}
           </section>
         );
       })}
