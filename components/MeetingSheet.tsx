@@ -84,7 +84,9 @@ const SHEET_CSS = `
   #print-doc .sheet-body h2 { font-size: 11.5pt; margin-top: 5mm; break-after: avoid; }
   #print-doc .sheet-body h3 { font-size: 8pt; }
   #print-doc .sheet-box { margin-top: 5mm; padding: 2.6mm 3.2mm; font-size: 10pt; }
-  #print-doc table, #print-doc tr { break-inside: avoid; }
+  #print-doc tr { break-inside: avoid; }
+  #print-doc thead { break-after: avoid; }
+  #print-doc .tablewrap { break-inside: auto; }
   #print-doc .sheet-body th, #print-doc .sheet-body td { font-size: 9.5pt; padding: 1.2mm 1.8mm; }
 }
 `;
