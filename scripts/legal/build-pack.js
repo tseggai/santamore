@@ -429,10 +429,24 @@ function buildInstructions() {
 // documents come from their per-language files, Montenegrin and English interleaved.
 const governance = buildDocs();
 if (governance.missing.length) console.warn('drafts without language files (skipped):', governance.missing.join(', '));
+/** The markdown of one "## N." section of a bilingual registration file, alone (title line kept). */
+function sectionOf(md, n) {
+  const lines = md.split('\n'); const out = []; let on = false;
+  for (const line of lines) {
+    const m = line.match(/^## (\d+)\. /);
+    if (m) { on = +m[1] === n; if (on) { out.push(line.replace(/^## \d+\. /, '## ')); continue; } }
+    if (on) out.push(line);
+  }
+  if (!out.length) throw new Error(`statute-additions.md: no section ${n}`);
+  return '# x\n\n' + out.join('\n');
+}
+const additionsMd = read(path.join(R, 'statute-additions.md'));
+// Every draft carries its category (the group it is listed under) and its audience (who may
+// read it; the console serves each staff member only the drafts their role may read).
 const drafts = [
-  { id: 'statute-additions', title: { me: 'Dopune statuta', en: 'Statute additions' }, file: 'santamore-nacrt-statute-additions', html: draftHtml(read(path.join(R, 'statute-additions.md'))) },
-  // The leadership documents (pay figures) stay out of the pack, which every staff member reads: they live in Rules for the director and the admins only.
-  ...governance.order.filter(id => governance.docs[id] && governance.docs[id].audience !== 'leadership').map(id => { const d = governance.docs[id]; return { id, title: { me: d.title.me, en: d.title.en }, file: 'santamore-nacrt-' + id, html: d.bilingualHtml }; }),
+  { id: 'statute-additions', category: 'registration', audience: 'staff', title: { me: 'Dopune statuta', en: 'Statute additions' }, file: 'santamore-nacrt-statute-additions', html: draftHtml(additionsMd) },
+  { id: 'statute-amendments-2026-10', category: 'registration', audience: 'staff', title: { me: 'Predložene izmjene statuta, 21. 10. 2026.', en: 'Proposed statute amendments, 21 October 2026' }, file: 'santamore-nacrt-izmjene-statuta-2026-10', html: draftHtml(sectionOf(additionsMd, 6)) },
+  ...governance.order.filter(id => governance.docs[id]).map(id => { const d = governance.docs[id]; return { id, category: d.category, audience: d.audience, title: { me: d.title.me, en: d.title.en }, file: 'santamore-nacrt-' + id, html: d.bilingualHtml }; }),
 ];
 const forms = [buildInstructions(), form02, form03, buildStatute(), buildStatuteWithAdditions(), form05];
 const guide = { title: { me: 'Kako dovršiti paket', en: 'How to complete the pack' }, file: 'santamore-kako-dovrsiti', html: draftHtml(read(path.join(R, 'HOW-TO-COMPLETE.md'))) };

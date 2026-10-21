@@ -1545,7 +1545,7 @@
     "navRegistration": "Registracija",
     "navRules": "Pravila",
     "legalPack": {
-      "title": "Registracija NVO",
+      "title": "Obrasci i nacrti",
       "loadFailed": "Sačuvano stanje nije moglo da se učita; prikazane su preporučene vrijednosti. Ako tabela legal_pack ne postoji, primijenite migraciju 20260921000069.",
       "documents": "Dokumenti",
       "forms": "Obrasci",
@@ -1591,7 +1591,17 @@
       "addFounder": "Osnivač",
       "fewFounders": "Upisano osnivača: {n}. Zakon o NVO traži najmanje tri osnivača za udruženje.",
       "chipHint": "Praznina: popunjava se u panelu „Dovrši“.",
-      "emptyBlock": "prazan stav"
+      "emptyBlock": "prazan stav",
+      "group": {
+        "registration": "Registracioni nacrti",
+        "organisation": "Organizacija",
+        "public": "Objavljene politike",
+        "board": "Pravila koja usvaja Upravni odbor",
+        "template": "Obrasci ugovora",
+        "leadership": "Samo za rukovodstvo"
+      },
+      "draftSourceUpdated": "Izvor ovog nacrta ponovo je izgrađen {date}, nakon što ga je tim posljednji put sačuvao; prikazan je sačuvani tekst.",
+      "draftLoadSource": "Učitaj važeći izvor"
     },
     "evDistancesHint": "Jedan red po distanci ili kategoriji, sa sopstvenim brojem mjesta ako ga ima. Cijene se ispod mogu vezati za distancu.",
     "evDistanceName": "Distanca ili kategorija (npr. 10 km, Polovina 1.9 / 90 / 21)",
@@ -1633,7 +1643,7 @@
       "showMe": "Crnogorski",
       "showEn": "English",
       "showBoth": "Oba",
-      "hint": "Ovdje se čita; tekst se mijenja u Registracija NVO › Nacrti, ili pošalji izmjenu da se unese u izvorne fajlove. Stavke u [[PLACEHOLDER]] su odluke ili podaci koji tek treba da se unesu.",
+      "hint": "Ovdje se čita; za izmjenu teksta otvorite Uredi, što vodi u paket, ili pošaljite izmjenu da se unese u izvorne datoteke. Stavke u [[PLACEHOLDER]] su odluke ili činjenice koje još treba dostaviti.",
       "notes": "Radne bilješke",
       "notesHint": "Na šta se dokument oslanja, odluke ugrađene u njega, provjere i parametri za Upravni odbor i pitanja za advokata. Samo na engleskom, nije dio dokumenta.",
       "catOrganisation": "Organizacija",
@@ -1671,7 +1681,23 @@
     "yearMoneyNoteHint": "Kako se novac kretao te godine: ko je platio, odakle, šta dokumenti pokazuju. Prikazuje se na stranici Transparentnost ispod korisnika. Markdown.",
     "yearInternalNote": "Interna napomena (samo tim)",
     "yearInternalNoteHint": "Gdje su originali i sve što ostaje van javne stranice. Nikad se ne prikazuje na sajtu.",
-    "accessDirectorExtra": "i dokumente za rukovodstvo"
+    "accessDirectorExtra": "i dokumente za rukovodstvo",
+    "navDocuments": "Dokumenti",
+    "documents": {
+      "title": "Dokumenti",
+      "intro": "Sve što udruženje podnosi, usvaja ili objavljuje, na jednom mjestu: registracioni dokumenti, organizacija, politike na sajtu, pravila koja donosi Upravni odbor, obrasci i dokumenti za rukovodstvo. Svaki red kaže ko ga može čitati; dokument se otvara za čitanje, na crnogorskom i engleskom, ili za uređivanje u paketu.",
+      "registration": "Registracioni dokumenti",
+      "registrationHint": "Obrasci Ministarstva sa prazninama, vodič za osnivače i nacrti statuta: dopune već unesene u obrazac 04a i izmjene predložene 21. 10. 2026. koje osnivači i advokat treba da pregledaju.",
+      "open": "Otvori",
+      "read": "Čitaj",
+      "edit": "Uredi",
+      "audience": {
+        "public": "javno",
+        "members": "članovi",
+        "staff": "osoblje",
+        "leadership": "samo rukovodstvo"
+      }
+    }
   },
   "forms": {
     "nameLabel": "Ime i prezime",

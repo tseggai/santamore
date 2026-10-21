@@ -46,15 +46,18 @@ export const SECTION_NAV_KEY: Record<string, string> = {
   "/admin/osoblje": "navStaff",
   "/admin/poruke": "navMessages",
   "/admin/podesavanja": "navSettings",
-  "/admin/registracija": "navRegistration",
-  "/admin/pravila": "navRules",
+  "/admin/dokumenti": "navDocuments",
 };
 
-/** Console sections by role: the nav shows these, the pages check nothing more (RLS does). */
+/**
+ * Console sections by role: the nav shows these, the pages check nothing more
+ * (RLS does). "/admin/dokumenti/paket" is not a nav entry: it says who may
+ * open the forms and drafts for editing (accounting reads the documents only).
+ */
 export const SECTIONS_BY_ROLE: Record<Role, readonly string[]> = {
   member: [],
-  accounting: ["/admin", "/admin/novac", "/admin/podrska", "/admin/pravila"],
-  chapter_lead: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/registracija", "/admin/pravila"],
-  director: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/registracija", "/admin/pravila"],
-  admin: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/registracija", "/admin/pravila"],
+  accounting: ["/admin", "/admin/novac", "/admin/podrska", "/admin/dokumenti"],
+  chapter_lead: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/dokumenti", "/admin/dokumenti/paket"],
+  director: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/dokumenti", "/admin/dokumenti/paket"],
+  admin: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/dokumenti", "/admin/dokumenti/paket"],
 };

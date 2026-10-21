@@ -63,6 +63,10 @@ export interface PackForm {
 
 export interface PackDraft {
   id: string;
+  /** The group it is listed under: registration, or a governance category (lib/legal-docs.ts). */
+  category: string;
+  /** Who may read it (lib/legal-docs.ts audiences); the server hands each role only its drafts. */
+  audience: string;
   title: Bilingual;
   file: string;
   html: string;
@@ -258,6 +262,12 @@ export function initialFields(pack: LegalPack): Record<string, FieldState> {
 
 export const FORM_KEY = /^form:([0-9]{2}[a-z]?)$/;
 export const DRAFT_KEY = /^draft:([a-z0-9-]{1,60})$/;
+
+/** The draft a pack row belongs to (draft:<id> or its cached translation i18n:draft:<id>:<lang>), or null for the shared parts. */
+export function draftIdOfKey(key: string): string | null {
+  const m = key.match(/^(?:i18n:)?draft:([a-z0-9-]{1,60})(?::(?:ru|tr))?$/);
+  return m ? m[1] : null;
+}
 export const I18N_KEY = /^i18n:(labels|guide|form:[0-9]{2}|draft:[a-z0-9-]{1,60}):(ru|tr)$/;
 
 // A draft is edited as HTML in the browser and shown again to other staff,

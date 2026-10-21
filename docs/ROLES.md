@@ -48,9 +48,9 @@ control.
 | Value | Label | Console sections | Can also |
 | --- | --- | --- | --- |
 | `member` | None | none | run pages, join teams, register, vote, propose |
-| `accounting` | Accounting | Overview, Money, Supporters, Rules | record gifts and hand-overs, year reports, sponsorships (staff at the database level) |
+| `accounting` | Accounting | Overview, Money, Supporters, Documents (read only) | record gifts and hand-overs, year reports, sponsorships (staff at the database level) |
 | `chapter_lead` | Editor | everything except what is admin-only | causes, events, beneficiaries, pages, staff records, inbox, content; may delete content records (supporters, beneficiaries, staff records, photos, news) |
-| `director` | Director | everything except what is admin-only | what an editor can, plus the leadership documents in Rules (pay and staffing); the Executive Director's level (0082) |
+| `director` | Director | everything except what is admin-only | what an editor can, plus the leadership documents under Documents (pay and staffing); the Executive Director's level (0082) |
 | `admin` | Admin | everything | roles; deleting causes, events, pages and teams; marking test or live; test mode, purge, demo data; the leadership documents |
 
 The value `chapter_lead` is historical; its label is Editor. What a role
@@ -61,10 +61,12 @@ opens is summarised in the console from the same table the nav uses
 that read documents carrying pay figures. The documents ship with the code
 (`content/legal/docs.json`), so the gate is in the app: every governance
 document has an audience in `docs/legal/governance/manifest.json` (public on
-the site, members in the member area at `/dashboard/dokumenti`, staff in
-Rules, leadership in Rules for those two roles) and `canReadLegalDoc()` in
-`lib/legal-docs.ts` decides; a document the role may not read is not found.
-The function exists in the database so a policy can use the same line.
+the site, members in the member area at `/dashboard/dokumenti`, staff under
+Documents, leadership under Documents for those two roles) and
+`canReadLegalDoc()` in `lib/legal-docs.ts` decides; a document the role may
+not read is not found. The pack editor (`/admin/dokumenti/paket`, roles
+with that section) is handed only the drafts the role may read, and the
+`legal_pack` policy (0083) keeps a leadership draft's rows to those roles.
 
 What is admin-only is enforced in SQL (`is_admin()` inside the function or
 policy), and the console shows those buttons only to admins. Deleting a
