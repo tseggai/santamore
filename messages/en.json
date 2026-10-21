@@ -533,7 +533,10 @@
     "documentsPublicHint": "The policies everyone can read, on the site.",
     "documentsOnSite": "Read on the site",
     "documentsOperative": "The operative text, in Montenegrin.",
-    "documentsTranslation": "A translation; the Montenegrin text is the operative one."
+    "documentsTranslation": "A translation; the Montenegrin text is the operative one.",
+    "meetingsTitle": "Meetings",
+    "meetingsHint": "The agenda and the minutes of every meeting, for members.",
+    "meetingsOpen": "Open"
   },
   "email": {
     "instructions": {
@@ -1707,6 +1710,34 @@
       "sectionPublishedHint": "The public part of each is live on the site; the internal part is here only.",
       "sections": "Sections",
       "sectionEmpty": "Nothing in this section is open to your role."
+    },
+    "meetings": {
+      "title": "Meetings",
+      "hint": "Agenda and minutes together, one entry per meeting. Staff write them here; every signed-in member reads them in the member area.",
+      "new": "New meeting",
+      "edit": "Edit",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Saved.",
+      "failed": "Saving failed. Try again.",
+      "delete": "Delete this meeting",
+      "confirmDelete": "Delete this meeting and its minutes?",
+      "date": "Date",
+      "titleField": "Title",
+      "attendees": "Attendees",
+      "attendeesHint": "One name per line: the sign-in list.",
+      "agenda": "Agenda",
+      "agendaHint": "Markdown: headings with ##, lists with -, tables with |.",
+      "minutes": "Minutes",
+      "minutesHint": "Markdown. Decisions and actions with an owner and a date at the end.",
+      "agendaHeading": "Agenda",
+      "minutesHeading": "Minutes",
+      "attendeesHeading": "Present",
+      "noAgenda": "No agenda recorded.",
+      "noMinutes": "No minutes yet.",
+      "empty": "No meetings recorded yet.",
+      "all": "All meetings",
+      "back": "Meetings"
     }
   },
   "forms": {

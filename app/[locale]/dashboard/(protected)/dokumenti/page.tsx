@@ -1,8 +1,12 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { legalDocLang, legalDocsByAudience, type LegalDocEntry } from "@/lib/legal-docs";
+import { meetingDate } from "@/lib/meetings";
+import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+
+export const dynamic = "force-dynamic";
 
 /**
  * Documents for members: how Santamore is organised and the policies written
@@ -17,6 +21,8 @@ export default async function DocumentsPage({ params }: { params: Promise<{ loca
   const lang = (doc: LegalDocEntry) => legalDocLang(doc, locale as Locale);
   const members = legalDocsByAudience("members");
   const published = legalDocsByAudience("public").filter((doc) => doc.route);
+  const supabase = await createClient();
+  const { data: meetings } = await supabase.from("meetings").select("id, held_at, title").order("held_at", { ascending: false });
   return (
     <div className="py-8">
       <h1 className="type-display text-2xl">{t("documentsTitle")}</h1>
@@ -27,6 +33,19 @@ export default async function DocumentsPage({ params }: { params: Promise<{ loca
             <Link href={`/dashboard/dokumenti/${doc.id}`} className="flex flex-wrap items-baseline gap-x-3 px-4 py-3 text-[14.5px] transition-colors hover:bg-mist-2">
               <span className="font-semibold">{doc.title[lang(doc)] ?? doc.title.en}</span>
               <span className="ml-auto text-[14px] font-semibold text-sea">{t("documentsOpen")} →</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <h2 className="mt-8 text-[16px] font-bold">{t("meetingsTitle")}</h2>
+      <p className="mt-1 max-w-xl text-[14px] text-black/60">{t("meetingsHint")}</p>
+      <ul className="mt-3 max-w-2xl overflow-hidden rounded-lg bg-mist">
+        {(meetings ?? []).map((m) => (
+          <li key={m.id} className="border-t-[0.5px] border-line first:border-t-0">
+            <Link href={`/dashboard/dokumenti/sastanci/${m.id}`} className="flex flex-wrap items-baseline gap-x-3 px-4 py-3 text-[14.5px] transition-colors hover:bg-mist-2">
+              <span className="font-mono text-[13px] font-bold text-black/55">{meetingDate(m.held_at, locale)}</span>
+              <span className="font-semibold">{m.title}</span>
+              <span className="ml-auto text-[14px] font-semibold text-sea">{t("meetingsOpen")} →</span>
             </Link>
           </li>
         ))}
