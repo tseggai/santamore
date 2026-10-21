@@ -1745,7 +1745,10 @@
       "apply": "Apply",
       "clear": "Clear",
       "noMatches": "No meeting matches.",
-      "latest": "Latest meetings"
+      "latest": "Latest meetings",
+      "print": "Print / PDF",
+      "printHint": "Prints the minutes alone, with the agenda and the sign-in list, as a PDF to share.",
+      "sheetKind": "Minutes of the meeting"
     }
   },
   "forms": {
