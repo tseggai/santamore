@@ -5,7 +5,7 @@ word now, and each is set in one place.
 
 | | What it is | Values | Who sets it | Where |
 | --- | --- | --- | --- | --- |
-| **Role** | What the person may do in the admin | None, Accounting, Editor, Admin | admin only | People → Staff, on the person's record (`team_members.access`, applied to `profiles.role`) |
+| **Role** | What the person may do in the admin | None, Accounting, Editor, Director, Admin | admin only | People → Staff, on the person's record (`team_members.access`, applied to `profiles.role`) |
 | **Title** | Free text under the name, e.g. "Co-founder, Treasurer" or "Chapter lead, Boka" | any | admin or editor | the same record (`team_members.title`) |
 | **Listed under** | Where the person appears on About us | Team, Board, Grants committee, Volunteers | admin or editor | the same record (`team_members.kind`) |
 | **Participation** | What a member has done on the site | Fundraiser, Athlete, Participant, Captain, Donor | the member, by acting | derived; never edited (People → Members) |
@@ -50,11 +50,21 @@ control.
 | `member` | None | none | run pages, join teams, register, vote, propose |
 | `accounting` | Accounting | Overview, Money, Supporters, Rules | record gifts and hand-overs, year reports, sponsorships (staff at the database level) |
 | `chapter_lead` | Editor | everything except what is admin-only | causes, events, beneficiaries, pages, staff records, inbox, content; may delete content records (supporters, beneficiaries, staff records, photos, news) |
-| `admin` | Admin | everything | roles; deleting causes, events, pages and teams; marking test or live; test mode, purge, demo data |
+| `director` | Director | everything except what is admin-only | what an editor can, plus the leadership documents in Rules (pay and staffing); the Executive Director's level (0082) |
+| `admin` | Admin | everything | roles; deleting causes, events, pages and teams; marking test or live; test mode, purge, demo data; the leadership documents |
 
 The value `chapter_lead` is historical; its label is Editor. What a role
 opens is summarised in the console from the same table the nav uses
 (`lib/roles.ts`), so the two cannot disagree.
+
+`is_leadership()` (0082) is true for `director` and `admin`: the two levels
+that read documents carrying pay figures. The documents ship with the code
+(`content/legal/docs.json`), so the gate is in the app: every governance
+document has an audience in `docs/legal/governance/manifest.json` (public on
+the site, members in the member area at `/dashboard/dokumenti`, staff in
+Rules, leadership in Rules for those two roles) and `canReadLegalDoc()` in
+`lib/legal-docs.ts` decides; a document the role may not read is not found.
+The function exists in the database so a policy can use the same line.
 
 What is admin-only is enforced in SQL (`is_admin()` inside the function or
 policy), and the console shows those buttons only to admins. Deleting a

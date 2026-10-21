@@ -1,18 +1,27 @@
 import docsJson from "@/content/legal/docs.json";
 import type { Locale } from "@/i18n/routing";
+import { isLeadershipRole, isStaffRole } from "@/lib/roles";
 
 /**
  * The governance documents, built from docs/legal/governance/<id>.<lang>.md by
  * scripts/legal/build-legal-docs.js. The site's legal pages show a document's
- * public part(s); the console's Rules section shows whole documents to staff,
- * Montenegrin and English side by side, with the working notes.
+ * public part(s); the member area shows the documents written for members; the
+ * console's Rules section shows whole documents to staff, Montenegrin and
+ * English side by side, with the working notes. Who may read a document is its
+ * audience (the manifest), checked with canReadLegalDoc().
  */
-export type LegalDocCategory = "public" | "board" | "template";
+export type LegalDocCategory = "public" | "board" | "template" | "organisation" | "leadership";
+export type LegalDocAudience = "public" | "members" | "staff" | "leadership";
+export type LegalDocFigure = "org-chart";
 export type LegalDocLang = "me" | "en" | "ru";
 
 export interface LegalDocEntry {
   id: string;
   category: LegalDocCategory;
+  /** Who may read the whole document: everyone, every signed-in member, the staff, or the Executive Director and the administrators. */
+  audience: LegalDocAudience;
+  /** A drawing shown with the document (components/org), or null. */
+  figure: LegalDocFigure | null;
   /** The site route the public part is published on, or null for internal documents. */
   route: string | null;
   langs: LegalDocLang[];
@@ -48,4 +57,28 @@ export function publicLegalDoc(id: string, locale: Locale): { title: string; htm
 
 export function legalDocsByCategory(category: LegalDocCategory): LegalDocEntry[] {
   return LEGAL_DOC_IDS.map((id) => data.docs[id]).filter((doc) => doc.category === category);
+}
+
+export function legalDocsByAudience(audience: LegalDocAudience): LegalDocEntry[] {
+  return LEGAL_DOC_IDS.map((id) => data.docs[id]).filter((doc) => doc.audience === audience);
+}
+
+/**
+ * Whether a person with this role (null = not signed in) may read the whole
+ * document. Public documents open to everyone; members' documents to any
+ * signed-in account; staff documents to the console roles; leadership
+ * documents, which carry pay figures, to the Executive Director and the
+ * administrators only.
+ */
+export function canReadLegalDoc(role: string | null | undefined, doc: Pick<LegalDocEntry, "audience">): boolean {
+  switch (doc.audience) {
+    case "public":
+      return true;
+    case "members":
+      return role != null;
+    case "staff":
+      return isStaffRole(role);
+    case "leadership":
+      return isLeadershipRole(role);
+  }
 }

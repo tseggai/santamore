@@ -22,7 +22,7 @@ export type TeamKind = (typeof TEAM_KINDS)[number];
 const asKind = (kind: string): TeamKind => (TEAM_KINDS.includes(kind as TeamKind) ? (kind as TeamKind) : "staff");
 
 /** Chip tone per role, so a glance tells the levels apart. */
-const ROLE_TONE: Record<Role, "red" | "sea" | "ink" | "paper"> = { admin: "red", chapter_lead: "sea", accounting: "ink", member: "paper" };
+const ROLE_TONE: Record<Role, "red" | "sea" | "ink" | "paper"> = { admin: "red", director: "red", chapter_lead: "sea", accounting: "ink", member: "paper" };
 
 export interface TeamRow {
   id: string;

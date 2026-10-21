@@ -8,20 +8,30 @@
  *   chapter_lead "Editor": everything in the console except access levels,
  *                deletes and the switches under Settings (the value is
  *                historical; the label is Editor, a chapter lead is a team role)
+ *   director     the Executive Director: everything an editor has, plus the
+ *                leadership documents (pay and staffing); access levels,
+ *                deletes and the switches stay with the admin
  *   admin        everything
  *
  * This is the access level only. A person's role on the team (officer,
  * board, chapter lead…) and their participation (fundraiser, athlete,
  * donor…) are other things — see docs/ROLES.md.
  */
-export const ROLES = ["member", "accounting", "chapter_lead", "admin"] as const;
+export const ROLES = ["member", "accounting", "chapter_lead", "director", "admin"] as const;
 export type Role = (typeof ROLES)[number];
 
 /** Roles that get through the console gate and the is_staff() policies. */
-export const STAFF_ROLES: readonly Role[] = ["accounting", "chapter_lead", "admin"];
+export const STAFF_ROLES: readonly Role[] = ["accounting", "chapter_lead", "director", "admin"];
 
 export function isStaffRole(role: string | null | undefined): boolean {
   return STAFF_ROLES.includes(role as Role);
+}
+
+/** The leadership: the Executive Director and the administrators, who alone read the documents that carry pay figures (is_leadership() in the database). */
+export const LEADERSHIP_ROLES: readonly Role[] = ["director", "admin"];
+
+export function isLeadershipRole(role: string | null | undefined): boolean {
+  return LEADERSHIP_ROLES.includes(role as Role);
 }
 
 /** The nav label (admin namespace) of each console section, for summaries of what a level opens. */
@@ -45,5 +55,6 @@ export const SECTIONS_BY_ROLE: Record<Role, readonly string[]> = {
   member: [],
   accounting: ["/admin", "/admin/novac", "/admin/podrska", "/admin/pravila"],
   chapter_lead: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/registracija", "/admin/pravila"],
+  director: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/registracija", "/admin/pravila"],
   admin: ["/admin", "/admin/novac", "/admin/kampanje", "/admin/dogadjaji", "/admin/korisnici", "/admin/podrska", "/admin/stranice", "/admin/osoblje", "/admin/poruke", "/admin/podesavanja", "/admin/registracija", "/admin/pravila"],
 };

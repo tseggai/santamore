@@ -524,7 +524,16 @@
     "evCauseEvents": "Učestvuj na nekom od ovih događaja — svaki prikuplja za ovaj cilj",
     "evNoCauseEvents": "Još nema predstojećih događaja za ovaj cilj.",
     "evOtherEvents": "Ostali događaji",
-    "evFundraiseCauseCta": "Počni prikupljanje za ovaj cilj"
+    "evFundraiseCauseCta": "Počni prikupljanje za ovaj cilj",
+    "navDocuments": "Dokumenti",
+    "documentsTitle": "Dokumenti",
+    "documentsHint": "Kako je Santamore organizovan, ko o čemu odlučuje, uloge i šta članstvo donosi. Crnogorski je mjerodavan tekst; engleski je prevod.",
+    "documentsOpen": "Otvori",
+    "documentsPublic": "Objavljeno na sajtu",
+    "documentsPublicHint": "Politike koje svako može da pročita, na sajtu.",
+    "documentsOnSite": "Pročitaj na sajtu",
+    "documentsOperative": "Mjerodavan tekst, na crnogorskom.",
+    "documentsTranslation": "Prevod; mjerodavan je crnogorski tekst."
   },
   "email": {
     "instructions": {
@@ -1129,7 +1138,8 @@
       "member": "Bez pristupa",
       "accounting": "Računovodstvo",
       "chapter_lead": "Urednik",
-      "admin": "Admin"
+      "admin": "Admin",
+      "director": "Direktor"
     },
     "memberProfileHeading": "Profil i pristup",
     "memberProfileHint": "Ime naloga. Šta smije u adminu postavlja se na zapisu osobe u Osoblju.",
@@ -1140,7 +1150,8 @@
       "member": "Bez pristupa adminu. Vodi stranice, pridružuje se timovima i događajima.",
       "accounting": "Sekcija Novac i podržavaoci iza nje. Ništa drugo u konzoli.",
       "chapter_lead": "Sve u adminu osim nivoa pristupa, brisanja i prekidača u Podešavanjima.",
-      "admin": "Sve, uključujući ko je admin."
+      "admin": "Sve, uključujući ko je admin.",
+      "director": "Sve što ima urednik, plus dokumenti za rukovodstvo (zarade i zapošljavanje). Nivoi pristupa, brisanja i prekidači ostaju adminu."
     },
     "memberTitle": "Titula",
     "memberTitleHint": "npr. suosnivač, finansijski direktor · vođa ogranka, Boka",
@@ -1495,7 +1506,7 @@
     "supportersTabTeams": "Timovi",
     "donorsHint": "Svi kojima pripada poklon, iz knjige: pokloni upareni ovdje, imena zapisana na godišnjem izvještaju, novac pojedinca podržavaoca. Jedan red po donatoru, sa nalogom ili bez; red otvara njegove poklone. Sponzorstvo organizacije je na kartici Sponzori.",
     "participantsHint": "Svi prijavljeni na događaj ili koji su javili da dolaze, i sportisti sa uključenom Stravom. Otvori red za prijave i aktivnost.",
-    "staffSectionHint": "Zapisi osoblja koji čine tim, i svaki nalog sa nivoom pristupa: član, računovodstvo, osoblje ili admin.",
+    "staffSectionHint": "Zapisi osoblja koji čine tim, i svaki nalog sa nivoom pristupa: član, računovodstvo, urednik, direktor ili admin.",
     "staffTabTeam": "Osoblje",
     "staffTabAccounts": "Članovi",
     "pagesHint": "Svaka stranica za prikupljanje: ko je vodi, za koji cilj i tim prikuplja, i u kom je stanju. Prikupljač je osoba i može imati više stranica.",
@@ -1608,7 +1619,7 @@
     "evFeeFundHint": "Pravilo je cilj. Tim izaberite samo po odluci Upravnog odbora za ovaj događaj; stranica o novcu to kaže.",
     "rules": {
       "title": "Pravila i obrasci",
-      "intro": "Pravila udruženja, politike objavljene na sajtu i obrasci ugovora, na crnogorskom i engleskom, da ih tim čita i ima pri ruci. Crnogorski je mjerodavan tekst; engleski je potpun prevod. Samo za osoblje.",
+      "intro": "Pravila udruženja, politike objavljene na sajtu, dokument o organizaciji i obrasci ugovora, na crnogorskom i engleskom, da ih tim čita i ima pri ruci. Crnogorski je mjerodavan tekst; engleski je potpun prevod. Samo za osoblje; dokumenti za rukovodstvo otvaraju se Izvršnom direktoru i administratorima.",
       "catBoard": "Pravila koja usvaja Upravni odbor",
       "catBoardHint": "Usvajaju se na prvoj sjednici Upravnog odbora poslije registracije; statut ih pominje po imenu.",
       "catPublic": "Politike objavljene na sajtu",
@@ -1624,7 +1635,13 @@
       "showBoth": "Oba",
       "hint": "Ovdje se čita; tekst se mijenja u Registracija NVO › Nacrti, ili pošalji izmjenu da se unese u izvorne fajlove. Stavke u [[PLACEHOLDER]] su odluke ili podaci koji tek treba da se unesu.",
       "notes": "Radne bilješke",
-      "notesHint": "Na šta se dokument oslanja, odluke ugrađene u njega, provjere i parametri za Upravni odbor i pitanja za advokata. Samo na engleskom, nije dio dokumenta."
+      "notesHint": "Na šta se dokument oslanja, odluke ugrađene u njega, provjere i parametri za Upravni odbor i pitanja za advokata. Samo na engleskom, nije dio dokumenta.",
+      "catOrganisation": "Organizacija",
+      "catOrganisationHint": "Kako je Santamore organizovan, ko o čemu odlučuje, uloge i članstvo. Svaki prijavljeni član čita ga u članskom prostoru.",
+      "catLeadership": "Samo za rukovodstvo",
+      "catLeadershipHint": "Zarade i zapošljavanje: brojke i lični podaci. Samo Izvršni direktor i administratori.",
+      "forMembers": "za članove",
+      "forLeadership": "samo rukovodstvo"
     },
     "memberSchemaStale": "API baze još ne zna za set_member_access: provjeri migraciju 0069 pomoću supabase/status.sql, zatim pokreni ovo u SQL editoru i pokušaj ponovo.",
     "teamAccess": "Uloga",
@@ -1653,7 +1670,8 @@
     "yearMoneyNote": "Napomena ispod isplata (javna)",
     "yearMoneyNoteHint": "Kako se novac kretao te godine: ko je platio, odakle, šta dokumenti pokazuju. Prikazuje se na stranici Transparentnost ispod korisnika. Markdown.",
     "yearInternalNote": "Interna napomena (samo tim)",
-    "yearInternalNoteHint": "Gdje su originali i sve što ostaje van javne stranice. Nikad se ne prikazuje na sajtu."
+    "yearInternalNoteHint": "Gdje su originali i sve što ostaje van javne stranice. Nikad se ne prikazuje na sajtu.",
+    "accessDirectorExtra": "i dokumente za rukovodstvo"
   },
   "forms": {
     "nameLabel": "Ime i prezime",

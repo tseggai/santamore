@@ -20,7 +20,8 @@ export function AccessSummary({ role, className = "" }: { role: Role; className?
       ) : (
         <>
           {t("accessSections", { sections: sections.join(", ") })}
-          {role === "admin" ? <>, {t("accessAdminExtra")}</> : null}.
+          {role === "admin" ? <>, {t("accessAdminExtra")}</> : null}
+          {role === "director" ? <>, {t("accessDirectorExtra")}</> : null}.
         </>
       )}
     </span>
