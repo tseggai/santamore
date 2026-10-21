@@ -13,9 +13,9 @@ translation for founders who do not read it.
 | `registration/statute-additions.md` | Draft statute chapters for the Board, Grants Committee, chapters and proxy voting |
 | `governance/<id>.me.md`, `<id>.en.md`, `<id>.ru.md` | The policies, rules and agreement templates, one file per language, aligned block for block (`manifest.json` names them; `scripts/legal/check-align.js` checks the alignment). Montenegrin is the operative text; English is a full translation; Russian exists for the seven public documents |
 | `governance/<id>.notes.md` | Working notes per document (English): what it hangs on, the decisions embedded, the checks and parameters for the Board, points for the lawyer, corrections made to the Montenegrin |
-| `../../content/legal/docs.json` | Built by `scripts/legal/build-legal-docs.js`: the public part of each document for the site's legal pages (`/pravila-privatnosti` and the rest, `lib/legal-docs.ts`) and the whole documents, Montenegrin and English side by side, for the console's Rules section (`/admin/pravila`, staff only) |
+| `../../content/legal/docs.json` | Built by `scripts/legal/build-legal-docs.js`: the public part of each document for the site's legal pages (`/pravila-privatnosti` and the rest, `lib/legal-docs.ts`) and the whole documents, Montenegrin and English side by side, for the console's Documents section (`/admin/dokumenti`, by role: every document carries an audience in the manifest) and the member area (`/dashboard/dokumenti`, the members' documents) |
 | `dist/*.docx` | Word renders: A4, Montenegrin left, English right, one row per block; the completion guide as a single column |
-| `../../content/legal-pack/pack.json` | The registration pack the console serves at `/admin/registracija`: the five filing documents with pre-filled blanks, the statute with the additions merged in (04a), the founding checklist and the drafts, in both languages |
+| `../../content/legal-pack/pack.json` | The registration pack the console serves at `/admin/dokumenti/paket`: the five filing documents with pre-filled blanks, the statute with the additions merged in (04a), the founding checklist and the drafts (every governance document, with its category and audience; the proposed amendments as a draft of their own), in both languages |
 
 ## Rebuilding the Word files
 
@@ -43,7 +43,7 @@ the English translations per article, and embeds the drafts, into `content/legal
 `buildStatuteWithAdditions` applies `statute-additions.md` to the statute template (the
 consequential edits by wording, the proxy chapter after Article 17, the three new chapters
 after Article 31, the old Articles 32 to 42 renumbered 45 to 55) as form 04a.
-The console page `/admin/registracija` (staff only) renders it: one language on screen
+The console page `/admin/dokumenti/paket` (staff; a role is handed only the drafts it may read, and the `legal_pack` policy keeps the leadership rows to the director and the admins, migration 0083) renders it: one language on screen
 (Montenegrin, English, Russian or Turkish), editable blanks shared by every form (blue until
 completed, pink after), the text the additions brought into form 04a editable in place (pink on screen, like a completed blank,
 saved as `form:<id>` rows), a Complete panel that lists a form's blanks with a hint each, the

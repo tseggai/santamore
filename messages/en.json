@@ -1545,7 +1545,7 @@
     "navRegistration": "Registration",
     "navRules": "Rules",
     "legalPack": {
-      "title": "NGO Registration",
+      "title": "Forms and drafts",
       "loadFailed": "The saved state could not be loaded; the recommended values are shown. If the legal_pack table does not exist yet, apply migration 20260921000069.",
       "documents": "Documents",
       "forms": "Forms",
@@ -1591,7 +1591,17 @@
       "addFounder": "Founder",
       "fewFounders": "Founders named: {n}. The Law on NGOs requires at least three founders for an association.",
       "chipHint": "A blank: fill it in Complete.",
-      "emptyBlock": "empty paragraph"
+      "emptyBlock": "empty paragraph",
+      "group": {
+        "registration": "Registration drafts",
+        "organisation": "The organisation",
+        "public": "Published policies",
+        "board": "Rules the Board adopts",
+        "template": "Templates",
+        "leadership": "Leadership only"
+      },
+      "draftSourceUpdated": "The source of this draft was rebuilt on {date}, after the team last saved it; the saved text is shown.",
+      "draftLoadSource": "Load the current source"
     },
     "evDistancesHint": "One line per distance or category, with its own number of places if it has one. Prices can be tied to a distance below.",
     "evDistanceName": "Distance or category (e.g. 10 km, Half distance 1.9 / 90 / 21)",
@@ -1633,7 +1643,7 @@
       "showMe": "Crnogorski",
       "showEn": "English",
       "showBoth": "Both",
-      "hint": "Read here; change the text in NGO Registration › Drafts, or send the change to be folded into the source files. Items in [[PLACEHOLDER]] are decisions or facts still to be supplied.",
+      "hint": "Read here; to change the text open Edit, which takes you to the pack, or send the change to be folded into the source files. Items in [[PLACEHOLDER]] are decisions or facts still to be supplied.",
       "notes": "Working notes",
       "notesHint": "What the document hangs on, the decisions embedded in it, the checks and parameters for the Board, and points for the lawyer. English only, not part of the document.",
       "catOrganisation": "The organisation",
@@ -1671,7 +1681,23 @@
     "yearMoneyNoteHint": "How the money moved that year: who paid, from where, what the documents show. Shown on the Transparency page under the beneficiaries. Markdown.",
     "yearInternalNote": "Internal note (staff only)",
     "yearInternalNoteHint": "Where the originals are, and anything that stays off the public page. Never shown on the site.",
-    "accessDirectorExtra": "and the leadership documents"
+    "accessDirectorExtra": "and the leadership documents",
+    "navDocuments": "Documents",
+    "documents": {
+      "title": "Documents",
+      "intro": "Everything the association files, adopts or publishes, in one place: the registration files, the organisation, the policies on the site, the rules the Board adopts, the templates, and the leadership documents. Each row says who may read it; a document opens to read, in Montenegrin and English, or to edit in the pack.",
+      "registration": "Registration files",
+      "registrationHint": "The Ministry's forms with their blanks, the founders' guide, and the statute drafts: the additions already merged into form 04a, and the amendments proposed on 21 October 2026 for the founders and the lawyer to review.",
+      "open": "Open",
+      "read": "Read",
+      "edit": "Edit",
+      "audience": {
+        "public": "public",
+        "members": "members",
+        "staff": "staff",
+        "leadership": "leadership only"
+      }
+    }
   },
   "forms": {
     "nameLabel": "Full name",

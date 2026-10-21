@@ -29,6 +29,17 @@ interface Props {
   pack: LegalPack;
   saved: SavedRows;
   locale: Locale;
+  /** The document to open first: "guide", a form id, or "draft:<id>" (from the Documents index). */
+  initialDoc?: string;
+}
+
+/** The order the draft groups are listed in; the label of each is a legalPack.group message. */
+const DRAFT_GROUPS = ["registration", "organisation", "public", "board", "template", "leadership"] as const;
+
+/** Whether a draft saved by the team predates the pack's current build, so the source may have changed since the edit. */
+function sourceNewer(saved: SavedRows, draftId: string, builtAt: string): boolean {
+  const row = saved[`draft:${draftId}`];
+  return !!row && row.updatedAt.slice(0, 10) < builtAt;
 }
 
 type Notice = { tone: "ok" | "warn"; text: string } | null;
@@ -127,11 +138,16 @@ function chunk(texts: DocTexts): DocTexts[] {
 
 const docKeyOf = (doc: string) => (doc === "guide" ? "guide" : doc.startsWith("draft:") ? doc : `form:${doc}`);
 
-export function LegalPackApp({ pack, saved, locale }: Props) {
+export function LegalPackApp({ pack, saved, locale, initialDoc }: Props) {
   const t = useTranslations("admin.legalPack");
   const [lang, setLang] = useState<PackLang>(locale === "en" ? "en" : locale === "ru" ? "ru" : "me");
   const [both, setBoth] = useState(false);
-  const [doc, setDoc] = useState<string>(pack.forms[0]?.id ?? "01");
+  const [doc, setDoc] = useState<string>(() => {
+    const known = initialDoc === "guide" ? !!pack.guide : initialDoc?.startsWith("draft:") ? pack.drafts.some((d) => `draft:${d.id}` === initialDoc) : pack.forms.some((f) => f.id === initialDoc);
+    return known && initialDoc ? initialDoc : pack.forms[0]?.id ?? "01";
+  });
+  const [reloaded, setReloaded] = useState(0);
+  const draftGroups = useMemo(() => DRAFT_GROUPS.map((c) => ({ c, items: pack.drafts.filter((d) => d.category === c) })).filter((g) => g.items.length > 0), [pack.drafts]);
   const [loaded] = useState(() => readSavedFields(pack, saved));
   const [fields, setFields] = useState(loaded.fields);
   const [checks, setChecks] = useState(() => readSavedChecks(saved));
@@ -390,9 +406,11 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
             <optgroup label={t("forms")}>
               {pack.forms.map((f) => <option key={f.id} value={f.id}>{f.id} · {titleOf(`form:${f.id}`, f.title)}</option>)}
             </optgroup>
-            <optgroup label={t("drafts")}>
-              {pack.drafts.map((d) => <option key={d.id} value={`draft:${d.id}`}>{titleOf(`draft:${d.id}`, d.title)}</option>)}
-            </optgroup>
+            {draftGroups.map((g) => (
+              <optgroup key={g.c} label={t(`group.${g.c}`)}>
+                {g.items.map((d) => <option key={d.id} value={`draft:${d.id}`}>{titleOf(`draft:${d.id}`, d.title)}</option>)}
+              </optgroup>
+            ))}
           </select>
         </label>
         <div className="hidden md:sticky md:top-6 md:block md:max-h-[calc(100vh-3rem)] md:overflow-y-auto md:overscroll-contain md:pr-2">
@@ -410,12 +428,14 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
               {pack.forms.map((f) => <NavItem key={f.id} active={doc === f.id} onClick={() => setDoc(f.id)} label={`${f.id} · ${titleOf(`form:${f.id}`, f.title)}`} />)}
             </ul>
           </section>
-          <section className="border-t-[0.5px] border-black/20 pt-5">
-            <p className="type-eyebrow text-black/60">{t("drafts")}</p>
-            <ul className="mt-2 flex flex-col gap-1">
-              {pack.drafts.map((d) => <NavItem key={d.id} active={doc === `draft:${d.id}`} onClick={() => setDoc(`draft:${d.id}`)} label={titleOf(`draft:${d.id}`, d.title)} />)}
-            </ul>
-          </section>
+          {draftGroups.map((g) => (
+            <section key={g.c} className="border-t-[0.5px] border-black/20 py-5 last:pb-0">
+              <p className="type-eyebrow text-black/60">{t(`group.${g.c}`)}</p>
+              <ul className="mt-2 flex flex-col gap-1">
+                {g.items.map((d) => <NavItem key={d.id} active={doc === `draft:${d.id}`} onClick={() => setDoc(`draft:${d.id}`)} label={titleOf(`draft:${d.id}`, d.title)} />)}
+              </ul>
+            </section>
+          ))}
         </div>
       </nav>
 
@@ -507,8 +527,17 @@ export function LegalPackApp({ pack, saved, locale }: Props) {
                 <h2 className="lp-title">{titleOf(docKey, draft.title)}</h2>
                 <p className="lp-subtitle lp-screen">{isSourceLang(lang) ? t("draftHint") : t("draftReadOnly")}</p>
               </div>
+              {isSourceLang(lang) && sourceNewer(saved, draft.id, pack.builtAt) && draftsRef.current[draft.id] !== draft.html ? (
+                <p className="lp-screen mb-4 flex flex-wrap items-center gap-3 rounded-brand bg-sand px-4 py-3 text-[14px] text-black/70">
+                  <span>{t("draftSourceUpdated", { date: pack.builtAt })}</span>
+                  <button type="button" onClick={() => { draftsRef.current[draft.id] = draft.html; markDirty(`draft:${draft.id}`); setReloaded((n) => n + 1); }}
+                    className="rounded-brand bg-paper px-3 py-1.5 text-[14px] font-semibold text-sea hover:bg-mist-2">
+                    {t("draftLoadSource")}
+                  </button>
+                </p>
+              ) : null}
               {isSourceLang(lang) ? (
-                <DraftEditor key={`${draft.id}-${lang}`} label={draft.title[src]} original={draft.html} html={draftsRef.current[draft.id] ?? draft.html}
+                <DraftEditor key={`${draft.id}-${lang}-${reloaded}`} label={draft.title[src]} original={draft.html} html={draftsRef.current[draft.id] ?? draft.html}
                   onInput={(html) => { draftsRef.current[draft.id] = html; markDirty(`draft:${draft.id}`); }} />
               ) : (
                 <div key={`${draft.id}-${lang}`} className="lp-prose" dangerouslySetInnerHTML={{ __html: translatedHtml(stripDraftMarks(draftsRef.current[draft.id] ?? draft.html), i18n[i18nKey(docKey, lang)], true) }} />

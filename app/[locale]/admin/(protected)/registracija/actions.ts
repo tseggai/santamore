@@ -4,7 +4,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 
 import packJson from "@/content/legal-pack/pack.json";
-import { FORM_KEY, PACK_LANGS, sanitizeBlocks, sanitizeDraftHtml, savePackSchema, type LegalPack, type PackBlock } from "@/lib/legal-pack";
+import { canReadLegalDoc, type LegalDocAudience } from "@/lib/legal-docs";
+import { FORM_KEY, PACK_LANGS, draftIdOfKey, sanitizeBlocks, sanitizeDraftHtml, savePackSchema, type LegalPack, type PackBlock } from "@/lib/legal-pack";
 import { isStaffRole } from "@/lib/roles";
 import { TRANSLATE_MODEL, describeError, translateFieldsWithClaude } from "@/lib/server/translate";
 import { createClient } from "@/lib/supabase/server";
@@ -28,6 +29,10 @@ export async function saveLegalPack(input: unknown): Promise<SaveLegalPackResult
   if (!user) return { ok: false, error: "forbidden" };
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
   if (!isStaffRole(profile?.role)) return { ok: false, error: "forbidden" };
+  // A draft's row is saved only by a role that may read the draft (the leadership documents: the director and the admins); the policy says the same.
+  const draftId = draftIdOfKey(parsed.data.key);
+  const draft = draftId ? pack.drafts.find((d) => d.id === draftId) : null;
+  if (draft && !canReadLegalDoc(profile?.role, { audience: draft.audience as LegalDocAudience })) return { ok: false, error: "forbidden" };
 
   let value: unknown = parsed.data.value;
   if (parsed.data.key.startsWith("draft:")) {

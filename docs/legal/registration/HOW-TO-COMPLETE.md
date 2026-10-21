@@ -1,6 +1,6 @@
 # How to complete the registration pack / Kako dovršiti paket za registraciju
 
-This is the working guide for the founders. It says what to collect, what to decide, which form each fact lands in, and what each draft is for. Open the forms and drafts at `/admin/registracija` in the console (staff only). Montenegrin is the operative text of everything that is filed; the English side is a translation for founders who do not read it. Nothing in this pack is legal advice: the lawyer reviews the Montenegrin before anything is signed.
+This is the working guide for the founders. It says what to collect, what to decide, which form each fact lands in, and what each draft is for. Open the forms and drafts under Documents in the console (`/admin/dokumenti`, staff only; the index lists every document by group and who may read it, and Edit opens the pack). Montenegrin is the operative text of everything that is filed; the English side is a translation for founders who do not read it. Nothing in this pack is legal advice: the lawyer reviews the Montenegrin before anything is signed.
 
 ## 1. What to do, in order
 
