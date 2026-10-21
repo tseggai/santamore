@@ -1748,7 +1748,10 @@
       "latest": "Posljednji sastanci",
       "print": "Štampaj / PDF",
       "printHint": "Štampa samo zapisnik, sa dnevnim redom i listom prisutnih, kao PDF za dijeljenje.",
-      "sheetKind": "Zapisnik sa sastanka"
+      "sheetKind": "Zapisnik sa sastanka",
+      "agendaSheetTitle": "Dnevni red sastanka",
+      "minutesSheetTitle": "Zapisnik",
+      "sheetMeta": "Santamore · Tivat"
     }
   },
   "forms": {
