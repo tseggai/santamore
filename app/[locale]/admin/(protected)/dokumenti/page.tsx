@@ -22,10 +22,10 @@ const GROUPS_OF: Record<DocSection, LegalDocCategory[]> = {
   published: ["public"],
 };
 
-const SECTION_TEXT: Record<DocSection, { title: string; hint: string }> = {
-  registration: { title: "sectionRegistration", hint: "sectionRegistrationHint" },
-  organisation: { title: "sectionOrganisation", hint: "sectionOrganisationHint" },
-  published: { title: "sectionPublished", hint: "sectionPublishedHint" },
+const SECTION_TITLE: Record<DocSection, string> = {
+  registration: "sectionRegistration",
+  organisation: "sectionOrganisation",
+  published: "sectionPublished",
 };
 
 const GROUP_TITLE: Record<LegalDocCategory, string> = {
@@ -72,7 +72,6 @@ export default async function DocumentsIndexPage({ params, searchParams }: { par
   return (
     <div className="py-8">
       <PageHeader title={t("title")} />
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-black/60">{t("intro")}</p>
 
       <nav aria-label={t("sections")} className="mt-6 grid gap-3 sm:grid-cols-3">
         {DOC_SECTIONS.map((key) => {
@@ -80,8 +79,7 @@ export default async function DocumentsIndexPage({ params, searchParams }: { par
           return (
             <Link key={key} href={`/admin/dokumenti?tab=${key}`} aria-current={active ? "page" : undefined}
               className={`block rounded-lg px-4 py-4 transition-colors sm:min-h-28 ${active ? "bg-sea text-paper" : "bg-mist text-black hover:bg-mist-2"}`}>
-              <span className="block text-[15px] font-bold leading-snug">{t(SECTION_TEXT[key].title)}</span>
-              <span className={`mt-1.5 block text-[13px] leading-relaxed ${active ? "text-paper/75" : "text-black/60"}`}>{t(SECTION_TEXT[key].hint)}</span>
+              <span className="block text-[15px] font-bold leading-snug">{t(SECTION_TITLE[key])}</span>
             </Link>
           );
         })}
@@ -129,7 +127,6 @@ export default async function DocumentsIndexPage({ params, searchParams }: { par
               <h2 className="text-[16px] font-bold">{tMeetings("latest")}</h2>
               <Link href="/admin/dokumenti/sastanci" className="text-[14px] font-semibold text-sea hover:underline">{tMeetings("all")} →</Link>
             </div>
-            <p className="mt-1 text-[14px] text-black/60">{tMeetings("hint")}</p>
             <ul className="mt-3 overflow-hidden rounded-lg bg-mist">
               {meetings.length === 0 ? <li className="px-4 py-3 text-[14.5px] text-black/60">{tMeetings("empty")}</li> : null}
               {meetings.map((m) => (

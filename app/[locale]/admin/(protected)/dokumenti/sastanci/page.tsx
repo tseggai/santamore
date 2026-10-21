@@ -33,7 +33,6 @@ export default async function MeetingsPage({ params, searchParams }: { params: P
         <PageHeader title={t("title")} />
         <MeetingEditor row={null} label={t("new")} />
       </div>
-      <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-black/60">{t("hint")}</p>
 
       <form method="get" className="mt-5 flex flex-wrap items-end gap-3">
         <label className="text-[13.5px] font-semibold">
