@@ -524,7 +524,16 @@
     "evCauseEvents": "Take part in one of these events — each one raises for this cause",
     "evNoCauseEvents": "No upcoming events for this cause yet.",
     "evOtherEvents": "Other events",
-    "evFundraiseCauseCta": "Start fundraising for this cause"
+    "evFundraiseCauseCta": "Start fundraising for this cause",
+    "navDocuments": "Documents",
+    "documentsTitle": "Documents",
+    "documentsHint": "How Santamore is organised, who decides what, the roles and what membership brings. Montenegrin is the operative text; English is a translation.",
+    "documentsOpen": "Open",
+    "documentsPublic": "Published on the site",
+    "documentsPublicHint": "The policies everyone can read, on the site.",
+    "documentsOnSite": "Read on the site",
+    "documentsOperative": "The operative text, in Montenegrin.",
+    "documentsTranslation": "A translation; the Montenegrin text is the operative one."
   },
   "email": {
     "instructions": {
@@ -1129,7 +1138,8 @@
       "member": "None",
       "accounting": "Accounting",
       "chapter_lead": "Editor",
-      "admin": "Admin"
+      "admin": "Admin",
+      "director": "Director"
     },
     "memberProfileHeading": "Profile and access",
     "memberProfileHint": "The account's name. What it may do in the admin is set on the person's Staff record.",
@@ -1140,7 +1150,8 @@
       "member": "No admin access. Runs pages, joins teams and events.",
       "accounting": "The Money section and the supporters behind it. Nothing else in the console.",
       "chapter_lead": "Everything in the admin except access levels, deletions and the switches under Settings.",
-      "admin": "Everything, including who is admin."
+      "admin": "Everything, including who is admin.",
+      "director": "Everything an editor has, plus the leadership documents (pay and staffing). Access levels, deletions and the switches stay with the admin."
     },
     "memberTitle": "Title",
     "memberTitleHint": "e.g. Co-founder, Chief Financial Officer · Chapter lead, Boka",
@@ -1495,7 +1506,7 @@
     "supportersTabTeams": "Teams",
     "donorsHint": "Everyone a gift belongs to, from the ledger: gifts matched here, names recorded on a year report, an individual supporter's cash. One row per donor, whether or not they have an account; the row opens their gifts. An organisation's sponsorship is on the Sponsors tab.",
     "participantsHint": "Everyone registered for an event or who said they are coming, and the athletes with Strava on. Open a row for their registrations and activity.",
-    "staffSectionHint": "The staff records that make up the team, and every account with its access level: member, accounting, staff or admin.",
+    "staffSectionHint": "The staff records that make up the team, and every account with its access level: member, accounting, editor, director or admin.",
     "staffTabTeam": "Staff",
     "staffTabAccounts": "Members",
     "pagesHint": "Every fundraising page: who runs it, which cause and team it raises for, and its state. A fundraiser is a person and may hold several pages.",
@@ -1608,7 +1619,7 @@
     "evFeeFundHint": "The rule is the cause. Choose the team only on a Board decision for this event; the money page says so.",
     "rules": {
       "title": "Rules and templates",
-      "intro": "The association's rules, the policies published on the site, and the agreement templates, in Montenegrin and English, for the team to read and refer to. Montenegrin is the operative text; the English is a full translation. Staff only.",
+      "intro": "The association's rules, the policies published on the site, the organisation document and the agreement templates, in Montenegrin and English, for the team to read and refer to. Montenegrin is the operative text; the English is a full translation. Staff only; the leadership documents open for the Executive Director and the administrators.",
       "catBoard": "Rules the Board adopts",
       "catBoardHint": "Adopted at the Board's first session after registration; the statute refers to them by name.",
       "catPublic": "Policies published on the site",
@@ -1624,7 +1635,13 @@
       "showBoth": "Both",
       "hint": "Read here; change the text in NGO Registration › Drafts, or send the change to be folded into the source files. Items in [[PLACEHOLDER]] are decisions or facts still to be supplied.",
       "notes": "Working notes",
-      "notesHint": "What the document hangs on, the decisions embedded in it, the checks and parameters for the Board, and points for the lawyer. English only, not part of the document."
+      "notesHint": "What the document hangs on, the decisions embedded in it, the checks and parameters for the Board, and points for the lawyer. English only, not part of the document.",
+      "catOrganisation": "The organisation",
+      "catOrganisationHint": "How Santamore is organised, who decides what, the roles and membership. Every signed-in member reads it in the member area.",
+      "catLeadership": "Leadership only",
+      "catLeadershipHint": "Pay and staffing: figures and personal data. The Executive Director and the administrators only.",
+      "forMembers": "for members",
+      "forLeadership": "leadership only"
     },
     "memberSchemaStale": "The database API does not know set_member_access yet: confirm migration 0069 with supabase/status.sql, then run this in the SQL editor and try again.",
     "teamAccess": "Role",
@@ -1653,7 +1670,8 @@
     "yearMoneyNote": "Note under the hand-overs (public)",
     "yearMoneyNoteHint": "How the money moved that year: who paid, from where, what the documents show. Shown on the Transparency page under the beneficiaries. Markdown.",
     "yearInternalNote": "Internal note (staff only)",
-    "yearInternalNoteHint": "Where the originals are, and anything that stays off the public page. Never shown on the site."
+    "yearInternalNoteHint": "Where the originals are, and anything that stays off the public page. Never shown on the site.",
+    "accessDirectorExtra": "and the leadership documents"
   },
   "forms": {
     "nameLabel": "Full name",

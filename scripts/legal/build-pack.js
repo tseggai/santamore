@@ -431,7 +431,8 @@ const governance = buildDocs();
 if (governance.missing.length) console.warn('drafts without language files (skipped):', governance.missing.join(', '));
 const drafts = [
   { id: 'statute-additions', title: { me: 'Dopune statuta', en: 'Statute additions' }, file: 'santamore-nacrt-statute-additions', html: draftHtml(read(path.join(R, 'statute-additions.md'))) },
-  ...governance.order.filter(id => governance.docs[id]).map(id => { const d = governance.docs[id]; return { id, title: { me: d.title.me, en: d.title.en }, file: 'santamore-nacrt-' + id, html: d.bilingualHtml }; }),
+  // The leadership documents (pay figures) stay out of the pack, which every staff member reads: they live in Rules for the director and the admins only.
+  ...governance.order.filter(id => governance.docs[id] && governance.docs[id].audience !== 'leadership').map(id => { const d = governance.docs[id]; return { id, title: { me: d.title.me, en: d.title.en }, file: 'santamore-nacrt-' + id, html: d.bilingualHtml }; }),
 ];
 const forms = [buildInstructions(), form02, form03, buildStatute(), buildStatuteWithAdditions(), form05];
 const guide = { title: { me: 'Kako dovršiti paket', en: 'How to complete the pack' }, file: 'santamore-kako-dovrsiti', html: draftHtml(read(path.join(R, 'HOW-TO-COMPLETE.md'))) };

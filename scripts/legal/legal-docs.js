@@ -6,6 +6,8 @@ const fs = require('fs'), path = require('path');
 const { parseBlocks, blockHtml, shape } = require('./md');
 const G = path.join(__dirname, '..', '..', 'docs/legal/governance');
 const LANGS = ['me', 'en', 'ru'];
+/** Who may read a document when the manifest does not say: the site's policies are public, the rest is for the staff. */
+const DEFAULT_AUDIENCE = { public: 'public', board: 'staff', template: 'staff', organisation: 'members', leadership: 'leadership' };
 
 function readMd(id, lang) {
   const file = path.join(G, `${id}.${lang}.md`);
@@ -42,7 +44,7 @@ function loadDoc(id, meta) {
   const title = Object.fromEntries(langs.map(l => [l, blocks[l].find(b => b.type === 'h1')?.text ?? id]));
   const notes = readMd(id, 'notes');
   return {
-    id, category: meta.category, route: meta.route ?? null, langs, title,
+    id, category: meta.category, audience: meta.audience ?? DEFAULT_AUDIENCE[meta.category] ?? 'staff', figure: meta.figure ?? null, route: meta.route ?? null, langs, title,
     html: Object.fromEntries(langs.map(l => [l, html(blocks[l].filter(b => b.type !== 'h1'))])),
     publicHtml: meta.route ? Object.fromEntries(langs.map(l => [l, html(publicBlocks(blocks[l], meta.publicParts ?? 1))])) : null,
     bilingualHtml: bilingualHtml(blocks.me, blocks.en),
