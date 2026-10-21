@@ -18,7 +18,7 @@ Two boxes are marked as paid: the Executive Director and the staff. Everyone els
 
 ### Article 3 — The Assembly
 
-The Assembly is the highest body. It consists of all members, each with one vote, and meets at least once a year. A member who cannot attend may give a written proxy to another member.
+The Assembly is the highest body. It consists of all members, each with one vote, and meets at least once a year. A member who cannot attend may give a written proxy to another member. The Assembly elects its President and deputy President from among the members; the President convenes and chairs the sessions, verifies proxies and the quorum, and has the casting vote when a vote is tied twice.
 
 The Assembly:
 
@@ -51,7 +51,7 @@ Founders, the Executive Director and employees cannot sit on it. Its decisions a
 
 The Executive Director is the person authorised to represent the association. The Director signs contracts, is responsible for the legality of the work, runs events, chapters, partnerships and staff, implements the decisions of the Board and the Grants Committee, and reports to the Assembly and the Board. The Director never decides which beneficiary receives funds.
 
-The first Executive Director is the founder of Santamore, [[PLACEHOLDER: name of the founder elected by the founding assembly]], elected by the founding assembly. The term is six years, renewable without limit, as the founding minutes record, and early dismissal is possible only for a reason stated in the Statute, by a two-thirds majority of all members (amendments adopted on 21 October 2026, section 6 of the statute additions).
+The first Executive Director is the founder of Santamore, Tseggai Debrezion, elected by the founding assembly on 26 September 2026, which also elected him President of the Assembly and Dragana Durica deputy President. The term is six years, renewable without limit, as the founding minutes record, and early dismissal is possible only for a reason stated in the Statute, by a two-thirds majority of all members (amendments adopted on 21 October 2026, section 6 of the statute additions).
 
 The Executive Director decides every matter that the law, the Statute or a decision of the Assembly does not reserve to another body, within the adopted budget and the spending limits the Board sets.
 

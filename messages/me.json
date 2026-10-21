@@ -1737,7 +1737,15 @@
       "noMinutes": "Zapisnika još nema.",
       "empty": "Još nema zabilježenih sastanaka.",
       "all": "Svi sastanci",
-      "back": "Sastanci"
+      "back": "Sastanci",
+      "search": "Pretraga",
+      "searchHint": "Riječ iz naslova, dnevnog reda ili zapisnika",
+      "year": "Godina",
+      "allYears": "Sve godine",
+      "apply": "Primijeni",
+      "clear": "Poništi",
+      "noMatches": "Nijedan sastanak ne odgovara.",
+      "latest": "Posljednji sastanci"
     }
   },
   "forms": {

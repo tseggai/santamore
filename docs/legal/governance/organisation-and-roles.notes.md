@@ -6,7 +6,7 @@ The members' description of how Santamore is organised: the bodies from the stat
 
 ## Decisions embedded in the draft
 
-- The founder who started Santamore is the first Executive Director; the placeholder carries the name until the founding minutes do.
+- The founder who started Santamore, Tseggai Debrezion, is the first Executive Director and President of the Assembly, as the founding minutes of 26 September 2026 record; Dragana Durica is deputy President.
 - Decision rights follow the delegation-of-authority pattern: a short list of matters reserved to the Assembly, the Board and the Grants Committee, everything else delegated to the Executive Director within the budget.
 - Tie-breaks: the President of the Assembly and the President of the Board have a casting vote except on pay, dismissals and the Director's report; an inquorate or tied Board hands an operational matter to the Director.
 - No fee for 2026; a yearly Assembly decision from 2027, with the benefits list.

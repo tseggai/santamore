@@ -3,7 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { PerkRule, type PerkChallengeFields } from "@/components/perks/PerkRule";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
@@ -46,11 +46,10 @@ export default async function ChallengesIndexPage({
 
   let challenges: PerkChallengeRow[] = [];
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const { data } = await cachedPublic(["challenges"], (pub) => pub
       .from("v_public_perk_challenges")
       .select("*")
-      .order("partner_name");
+      .order("partner_name"));
     challenges = (data ?? []) as PerkChallengeRow[];
   } catch {
     challenges = [];

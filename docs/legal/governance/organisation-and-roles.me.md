@@ -18,7 +18,7 @@ Dva polja su označena kao plaćena: Izvršni direktor i osoblje. Svi ostali su 
 
 ### Član 3 — Skupština
 
-Skupština je najviši organ. Čine je svi članovi, svaki sa jednim glasom, i sastaje se najmanje jednom godišnje. Član koji ne može prisustvovati može dati pisano punomoćje drugom članu.
+Skupština je najviši organ. Čine je svi članovi, svaki sa jednim glasom, i sastaje se najmanje jednom godišnje. Član koji ne može prisustvovati može dati pisano punomoćje drugom članu. Skupština iz reda članova bira Predsjednika i zamjenika Predsjednika; Predsjednik saziva sjednice i rukovodi njima, provjerava punomoćja i kvorum i ima odlučujući glas kada je glasanje dva puta neriješeno.
 
 Skupština:
 
@@ -51,7 +51,7 @@ Osnivači, Izvršni direktor i zaposleni ne mogu biti njeni članovi. Njene odlu
 
 Izvršni direktor je lice ovlašćeno za zastupanje udruženja. Direktor potpisuje ugovore, odgovoran je za zakonitost rada, vodi događaje, ogranke, partnerstva i osoblje, sprovodi odluke Upravnog odbora i Komisije i odgovara Skupštini i Upravnom odboru. Direktor nikada ne odlučuje o tome koji korisnik dobija sredstva.
 
-Prvi Izvršni direktor je osnivač Santamorea, [[PLACEHOLDER: ime osnivača kojeg bira osnivačka skupština]], kojeg bira osnivačka skupština. Mandat traje šest godina, sa ponovnim izborom bez ograničenja, kako bilježi zapisnik osnivačke skupštine, a prijevremeno razrješenje moguće je samo iz razloga navedenog u Statutu, dvotrećinskom većinom svih članova (izmjene usvojene 21. 10. 2026, odjeljak 6 dopuna statuta).
+Prvi Izvršni direktor je osnivač Santamorea, Tseggai Debrezion, kojeg je osnivačka skupština izabrala 26. 9. 2026, kada je izabran i za Predsjednika Skupštine, a Dragana Durica za zamjenika Predsjednika. Mandat traje šest godina, sa ponovnim izborom bez ograničenja, kako bilježi zapisnik osnivačke skupštine, a prijevremeno razrješenje moguće je samo iz razloga navedenog u Statutu, dvotrećinskom većinom svih članova (izmjene usvojene 21. 10. 2026, odjeljak 6 dopuna statuta).
 
 Izvršni direktor odlučuje o svakom pitanju koje zakon, Statut ili odluka Skupštine ne stavlja u nadležnost drugog organa, u okviru usvojenog budžeta i ograničenja potrošnje koja utvrdi Upravni odbor.
 

@@ -3,7 +3,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { BeneficiaryStories, type PublicBeneficiary } from "@/components/beneficiaries/BeneficiaryStories";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { routing, type Locale } from "@/i18n/routing";
 
 // Staff publish stories from the admin; live on every request.
@@ -11,12 +11,11 @@ export const dynamic = "force-dynamic";
 
 async function loadBeneficiaries(): Promise<PublicBeneficiary[]> {
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const { data } = await cachedPublic(["beneficiaries"], (pub) => pub
       .from("v_public_beneficiaries")
       .select("id, slug, name, website, photo_path, story, campaign_slug, campaign_title")
       .order("sort_order")
-      .order("name");
+      .order("name"));
     return (data ?? []) as PublicBeneficiary[];
   } catch {
     return [];

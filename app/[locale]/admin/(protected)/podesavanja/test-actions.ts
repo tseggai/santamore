@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import { revalidatePublic } from "@/lib/public-data";
 import { createClient } from "@/lib/supabase/server";
 
 // Test mode (migration 0055): admin only, enforced in SQL. While it is on,
@@ -28,6 +29,7 @@ export async function setTestMode(input: unknown): Promise<TestModeResult> {
     return { ok: false, error: "server", detail: `${error.code}: ${error.message}` };
   }
   revalidatePath("/", "layout");
+  revalidatePublic();
   return { ok: true, on: Boolean(data) };
 }
 
@@ -39,5 +41,6 @@ export async function purgeTestData(): Promise<TestModeResult> {
     return { ok: false, error: "server", detail: `${error.code}: ${error.message}` };
   }
   revalidatePath("/", "layout");
+  revalidatePublic();
   return { ok: true, deleted: Number((data as { deleted?: number } | null)?.deleted ?? 0) };
 }

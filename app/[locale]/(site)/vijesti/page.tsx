@@ -4,7 +4,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { galleryImageUrl } from "@/lib/storage";
-import { createClient } from "@/lib/supabase/server";
+import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, routing, type Locale } from "@/i18n/routing";
 
@@ -40,13 +40,12 @@ export default async function NewsIndexPage({
 
   let posts: PostRow[] = [];
   try {
-    const supabase = await createClient();
-    const { data } = await supabase
+    const { data } = await cachedPublic(["posts", locale], (pub) => pub
       .from("v_public_posts")
       .select("slug, title, excerpt, cover_path, published_at")
       .eq("locale", locale)
       .order("published_at", { ascending: false })
-      .limit(50);
+      .limit(50));
     posts = (data ?? []) as PostRow[];
   } catch {
     posts = [];
