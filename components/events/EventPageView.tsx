@@ -177,7 +177,14 @@ export function EventPageView({
                     <span className="text-black/60">{fmt(perk.starts_at ?? null)} — {fmt(perk.ends_at ?? null)}</span>
                   ) : null}
                   {preview ? null : (
-                    <Link href={`/izazovi/${perk.slug}`} className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2">{tPerks("share")}</Link>
+                    <ShareButton
+                      title={event.name}
+                      path={`/${locale}/dogadjaji/${event.slug}`}
+                      label={tPerks("share")}
+                      copiedLabel={tDonate("copied")}
+                      variant="ghost"
+                      className="font-semibold text-sea underline underline-offset-2 hover:text-sea-2"
+                    />
                   )}
                 </p>
               </li>
