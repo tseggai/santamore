@@ -89,7 +89,9 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
     max_pace_s_per_km: data.maxPaceSPerKm,
     required_days: data.requiredDays,
     window_days: data.requiredDays > 1 ? data.windowDays : null,
-    partner_url: data.partnerUrl ?? supporter.website,
+    // The supporter's record is where the website is kept; a link typed on
+    // an older reward stays only while the record has none.
+    partner_url: supporter.website ?? data.partnerUrl,
     event_id: data.eventId,
     allow_manual: data.allowManual,
     per_user_daily_cap: data.perUserDailyCap,
@@ -100,9 +102,14 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
     is_active: data.isActive,
   };
 
-  const { data: saved, error } = data.id
+  let { data: saved, error } = data.id
     ? await supabase.from("perk_challenges").update(row).eq("id", data.id).select("id").single()
     : await supabase.from("perk_challenges").insert(row).select("id").single();
+  // A new reward's address is made for it, not typed: when it is taken (a
+  // second reward from the same supporter on the same challenge), number it.
+  for (let n = 2; !data.id && error?.code === "23505" && n <= 9; n++) {
+    ({ data: saved, error } = await supabase.from("perk_challenges").insert({ ...row, slug: `${slug}-${n}` }).select("id").single());
+  }
   if (error || !saved) {
     if (error?.code === "23505") return { ok: false, error: "slug" };
     console.error("[admin] perk challenge save failed:", error?.code);
