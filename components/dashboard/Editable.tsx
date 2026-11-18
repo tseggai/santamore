@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type KeyboardEvent, type ReactNode } from "react";
+import { type KeyboardEvent, type ReactNode } from "react";
 
 /**
  * Click-to-edit wrapper for the live-preview editor. In view mode it shows
@@ -8,6 +8,13 @@ import { useRef, type KeyboardEvent, type ReactNode } from "react";
  * on hover and focus; Enter, Space or a click switches to the input. In
  * edit mode, blur, Escape, or Enter (single-line fields) returns to view
  * mode. Keyboard users get the same path: the wrapper is a real button.
+ *
+ * The two modes are separate elements (the keys), and the blur test reads
+ * the event's own element, not a ref. Safari keeps focus on the tapped
+ * wrapper until the new field takes it, so the wrapper's blur arrives while
+ * the field is mounting, before a ref on the edit element is attached; with
+ * a ref the test read "focus left" and closed the field the moment it
+ * opened, which made every in-place edit dead on an iPhone.
  */
 export function Editable({
   label,
@@ -30,8 +37,6 @@ export function Editable({
   multiline?: boolean;
   className?: string;
 }) {
-  const editRef = useRef<HTMLDivElement>(null);
-
   const onViewKey = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -49,10 +54,10 @@ export function Editable({
   if (editing) {
     return (
       <div
-        ref={editRef}
+        key="edit"
         onKeyDown={onEditKey}
         onBlur={(event) => {
-          if (!editRef.current?.contains(event.relatedTarget as Node | null)) onDone();
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) onDone();
         }}
         className={className}
       >
@@ -63,6 +68,7 @@ export function Editable({
 
   return (
     <div
+      key="view"
       role="button"
       tabIndex={0}
       aria-label={label}

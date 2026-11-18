@@ -45,6 +45,7 @@ export function RedeemForm({ code }: { code: string }) {
           value={pin}
           onChange={(event) => setPin(event.target.value.replace(/\D/g, ""))}
           placeholder={t("pinLabel")}
+          data-field="large"
           className="w-full rounded-lg border-[1.5px] border-line bg-paper px-3.5 py-3 font-mono text-[19px] tracking-[0.3em] outline-none focus:border-sea"
         />
         <button
