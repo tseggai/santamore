@@ -325,3 +325,16 @@
     opacity: 1;
   }
 }
+
+/* iOS zooms the page into any focused field whose text is under 16px and
+   leaves it zoomed when the keyboard closes, so the page ends up wider than
+   the screen. On iOS only (the @supports test), every field is set at 16px.
+   Unlayered on purpose, so it wins over the size utilities; a field that is
+   already larger says so with data-field="large" and keeps its size. */
+@supports (-webkit-touch-callout: none) {
+  input:not([data-field="large"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}

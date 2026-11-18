@@ -416,6 +416,7 @@ export function PageEditor({
                       setTitle(event.target.value);
                       touch();
                     }}
+                    data-field="large"
                     className={`${fieldInput} type-display text-3xl leading-tight sm:text-4xl`}
                   />
                 </>
