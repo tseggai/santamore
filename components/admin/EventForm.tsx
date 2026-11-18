@@ -81,6 +81,14 @@ function toLocalInput(iso: string | null): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+/** A challenge counts whole days: its first from midnight, its last to the end of the day. */
+function dayStart(local: string): string {
+  return local ? `${local.slice(0, 10)}T00:00` : "";
+}
+function dayEnd(local: string): string {
+  return local ? `${local.slice(0, 10)}T23:59` : "";
+}
+
 function toIso(local: string): string | null {
   if (!local) return null;
   const date = new Date(local);
@@ -109,9 +117,14 @@ const labelClass = "text-[14.5px] font-semibold";
 
 /**
  * One form for every kind of event. The kind comes first because it
- * decides the rest: a race has distances and shirts, a challenge a metric
- * and a period, a gathering neither — just a date, a place and, if
- * ticketed, tiers.
+ * decides the rest: a race has distances and shirts, a gathering neither —
+ * just a date, a place and, if ticketed, tiers.
+ *
+ * A challenge is the shortest: a name, what it is ranked by, a chapter and
+ * a cause, a first and a last day, a picture, and its rewards. Joining one
+ * is an account and a Strava connection, not a registration, so it has no
+ * places, registration window, contributions or shirts, and the form does
+ * not show them; its period is whole days, and its rewards run for it.
  */
 export function EventForm({
   event,
@@ -180,6 +193,11 @@ export function EventForm({
   const [formId] = useState(() => `ev-${Math.random().toString(36).slice(2, 8)}`);
   const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "slug" | "invalid">("idle");
 
+  const challenge = kind === "challenge";
+  // What is saved and previewed: a challenge's period in whole days.
+  const startLocal = challenge ? dayStart(startsAt) : startsAt;
+  const endLocal = challenge ? dayEnd(endsAt) : endsAt;
+
   const parsedTiers = tiers
     .filter((tier) => tier.label.trim() !== "" || tier.euros.trim() !== "")
     .map((tier) => {
@@ -201,13 +219,13 @@ export function EventForm({
     slug: slug || slugify(name) || "dogadjaj",
     name,
     kind,
-    starts_at: toIso(startsAt),
-    ends_at: toIso(endsAt),
+    starts_at: toIso(startLocal),
+    ends_at: toIso(endLocal),
     venue: venue.trim() || null,
-    registration_opens_at: toIso(regOpens),
-    registration_closes_at: toIso(regCloses),
+    registration_opens_at: challenge ? null : toIso(regOpens),
+    registration_closes_at: challenge ? null : toIso(regCloses),
     distances: distanceList,
-    tiers: cleanTiers,
+    tiers: challenge ? [] : cleanTiers,
     description: description.trim() || null,
     cover_path: coverPath,
     campaign_slug: campaignId ? "cause" : null,
@@ -230,8 +248,9 @@ export function EventForm({
 
   const submit = async (formEvent: FormEvent) => {
     formEvent.preventDefault();
-    const startsIso = toIso(startsAt);
-    if (!tiersValid || !startsIso || !chapterId) {
+    const startsIso = toIso(startLocal);
+    const endsIso = toIso(endLocal);
+    if ((!challenge && !tiersValid) || !startsIso || !chapterId || (endsIso !== null && endsIso < startsIso)) {
       setState("invalid");
       return;
     }
@@ -245,16 +264,16 @@ export function EventForm({
       chapterId,
       campaignId: campaignId || null,
       startsAt: startsIso,
-      endsAt: toIso(endsAt),
+      endsAt: endsIso,
       venue: venue.trim() || null,
-      capacity: capacity.trim() === "" ? null : Number(capacity),
-      registrationOpensAt: toIso(regOpens),
-      registrationClosesAt: toIso(regCloses),
+      capacity: challenge || capacity.trim() === "" ? null : Number(capacity),
+      registrationOpensAt: challenge ? null : toIso(regOpens),
+      registrationClosesAt: challenge ? null : toIso(regCloses),
       distances: distanceList,
-      priceTiers: cleanTiers.map((tier) => ({ ...tier, distance: tier.distance && distanceNamesNow.includes(tier.distance) ? tier.distance : null })),
+      priceTiers: (challenge ? [] : cleanTiers).map((tier) => ({ ...tier, distance: tier.distance && distanceNamesNow.includes(tier.distance) ? tier.distance : null })),
       isPublished: published,
       description: description.trim() || null,
-      offersShirts: kind === "social" ? false : offersShirts,
+      offersShirts: kind === "race" ? offersShirts : false,
       coverPath,
       hosting,
       externalUrl: externalUrl.trim() || null,
@@ -412,38 +431,48 @@ export function EventForm({
           <Link href="/admin/kampanje" className="mt-1.5 inline-block text-[13.5px] font-semibold text-sea underline underline-offset-2">
             {t("evNewCause")} →
           </Link>
-          <p className="mt-1 text-[13px] text-black/55">{t("evCampaignHint")}</p>
         </div>
       </div>
 
       {/* 4 — when and where */}
-      <div className={`${section} grid gap-4 sm:grid-cols-2`}>
-        <DateTimeField id="evStarts" label={t("evStarts")} value={startsAt} onChange={setStartsAt} required />
-        <DateTimeField id="evEnds" label={kind === "challenge" ? t("evEndsChallenge") : t("evEnds")} value={endsAt} onChange={setEndsAt} />
-        <div>
-          <label htmlFor="evVenue" className={labelClass}>{t("evVenue")}</label>
-          <input id="evVenue" type="text" value={venue} onChange={(e) => setVenue(e.target.value)} className={inputClass} />
+      {challenge ? (
+        <div className={`${section} grid gap-4 sm:grid-cols-2`}>
+          <DateTimeField id="evStarts" mode="date" label={t("evStartsChallenge")} value={startsAt.slice(0, 10)} onChange={(day) => setStartsAt(dayStart(day))} required />
+          <DateTimeField id="evEnds" mode="date" label={t("evEndsChallenge")} value={endsAt.slice(0, 10)} onChange={(day) => setEndsAt(dayEnd(day))} />
+          <div className="sm:col-span-2">
+            <label htmlFor="evVenue" className={labelClass}>{t("evVenueChallenge")}</label>
+            <input id="evVenue" type="text" value={venue} onChange={(e) => setVenue(e.target.value)} className={inputClass} />
+            <p className="mt-1 text-[13px] text-black/55">{t("evVenueChallengeHint")}</p>
+          </div>
         </div>
-        <div>
-          <label htmlFor="evCapacity" className={labelClass}>{t("evCapacity")}</label>
-          <input id="evCapacity" type="number" min={0} value={capacity} onChange={(e) => setCapacity(e.target.value)} className={`${inputClass} font-mono`} />
+      ) : (
+        <div className={`${section} grid gap-4 sm:grid-cols-2`}>
+          <DateTimeField id="evStarts" label={t("evStarts")} value={startsAt} onChange={setStartsAt} required />
+          <DateTimeField id="evEnds" label={t("evEnds")} value={endsAt} onChange={setEndsAt} />
+          <div>
+            <label htmlFor="evVenue" className={labelClass}>{t("evVenue")}</label>
+            <input id="evVenue" type="text" value={venue} onChange={(e) => setVenue(e.target.value)} className={inputClass} />
+          </div>
+          <div>
+            <label htmlFor="evCapacity" className={labelClass}>{t("evCapacity")}</label>
+            <input id="evCapacity" type="number" min={0} value={capacity} onChange={(e) => setCapacity(e.target.value)} className={`${inputClass} font-mono`} />
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* 5 — taking part */}
+      {/* 5 — taking part: registration, contributions, shirts. Not for a challenge. */}
+      {challenge ? null : (
       <div className={`${section} grid gap-4 sm:grid-cols-2`}>
         <DateTimeField id="evRegOpens" label={t("evRegOpens")} value={regOpens} onChange={setRegOpens} />
         <DateTimeField id="evRegCloses" label={t("evRegCloses")} value={regCloses} onChange={setRegCloses} />
-        {kind !== "challenge" ? (
-          <div>
-            <label htmlFor="evFeeFund" className={labelClass}>{t("evFeeFund")}</label>
-            <select id="evFeeFund" value={feeFund} onChange={(e) => setFeeFund(e.target.value as "impact" | "operations")} className={inputClass}>
-              <option value="impact">{t("evFeeFundImpact")}</option>
-              <option value="operations">{t("evFeeFundOperations")}</option>
-            </select>
-            <p className="mt-1 text-[13px] text-black/55">{t("evFeeFundHint")}</p>
-          </div>
-        ) : null}
+        <div>
+          <label htmlFor="evFeeFund" className={labelClass}>{t("evFeeFund")}</label>
+          <select id="evFeeFund" value={feeFund} onChange={(e) => setFeeFund(e.target.value as "impact" | "operations")} className={inputClass}>
+            <option value="impact">{t("evFeeFundImpact")}</option>
+            <option value="operations">{t("evFeeFundOperations")}</option>
+          </select>
+          <p className="mt-1 text-[13px] text-black/55">{t("evFeeFundHint")}</p>
+        </div>
         {kind === "race" ? (
           <>
             <div>
@@ -624,7 +653,7 @@ export function EventForm({
             {t("evAddTier")}
           </button>
         </div>
-        {kind !== "social" ? (
+        {kind === "race" ? (
           <label className="flex items-start gap-2.5 text-[14.5px] sm:col-span-2">
             <input type="checkbox" checked={offersShirts} onChange={(e) => setOffersShirts(e.target.checked)} className="mt-0.5 h-4 w-4 accent-red" />
             <span>
@@ -634,6 +663,7 @@ export function EventForm({
           </label>
         ) : null}
       </div>
+      )}
 
       <div className={section}>
         <CoverField value={coverPath} onChange={setCoverPath} folder={coverFolder} />
@@ -646,7 +676,7 @@ export function EventForm({
 
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "slug" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evSlugTaken")}</p> : null}
-      {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evInvalid")}</p> : null}
+      {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{challenge ? t("evInvalidChallenge") : t("evInvalid")}</p> : null}
       {state === "saved" ? <p className="mt-3 text-[14px] font-semibold text-sea">{t("postSaved")}</p> : null}
 
       <PreviewFrame liveHref={event?.is_published ? `/dogadjaji/${event.slug}` : null}>
@@ -672,7 +702,7 @@ export function EventForm({
                       <span className="text-black/60">{draft.supporterName} · {draft.rewardLabel}</span>
                       <span className="rounded-full bg-mist px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-black/60">{t("evOfferPending")}</span>
                       <button type="button" onClick={() => setPendingOffers((list) => list.filter((_, i) => i !== index))} className="ml-auto text-[13px] font-semibold text-red-dark underline underline-offset-2">
-                        {t("evRemoveTier")}
+                        {t("offerRemove")}
                       </button>
                     </li>
                   ))}

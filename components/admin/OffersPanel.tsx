@@ -62,8 +62,6 @@ export interface OfferDraft {
   perUserDailyCap: number;
   dailyCap: number | null;
   validDays: number;
-  startsAt: string | null;
-  endsAt: string | null;
   isActive: boolean;
   pin: string;
 }
@@ -72,19 +70,17 @@ const inputClass =
   "mt-1 w-full rounded-lg border-[1.5px] border-line bg-paper px-3 py-2.5 text-[15px] outline-none focus:border-sea";
 const labelClass = "text-[13.5px] font-semibold";
 
-function toDateInput(iso: string | null): string {
-  return iso ? iso.slice(0, 10) : "";
-}
-function fromDateInput(value: string, endOfDay: boolean): string | null {
-  if (!value) return null;
-  const date = new Date(`${value}T${endOfDay ? "23:59:59" : "00:00:00"}+02:00`);
-  return Number.isNaN(date.getTime()) ? null : date.toISOString();
-}
-
 /**
- * One offer on a challenge: which supporter gives what, for which runs,
- * and the PIN they redeem with. Saved as a perk_challenges row bound to
- * the event.
+ * One reward on a challenge: which supporter gives what, for which
+ * activities, how many, and the PIN the partner redeems with. Saved as a
+ * perk_challenges row bound to the event.
+ *
+ * The form asks only for what the reward itself decides. Its period is the
+ * challenge's (no dates here); it goes live once it has a PIN and is paused
+ * from the list (no Active box); its share page takes the challenge's name
+ * and the supporter's website unless the last, folded group says otherwise.
+ * The extra conditions (time, pace, climbing, manual entries) are folded
+ * too, and open by themselves when a reward already uses one.
  */
 export function OfferForm({
   eventId,
@@ -108,7 +104,7 @@ export function OfferForm({
   const [supporters, setSupporters] = useState(initialSupporters);
   const [supporterId, setSupporterId] = useState(challenge?.supporter_id ?? initialSupporters[0]?.id ?? "");
   const [newSupporter, setNewSupporter] = useState<string | null>(null);
-  const [title, setTitle] = useState(challenge?.title ?? eventName);
+  const [title, setTitle] = useState(challenge?.title ?? "");
   const [slug, setSlug] = useState(challenge?.slug ?? "");
   const [slugTouched, setSlugTouched] = useState(Boolean(challenge));
   const [description, setDescription] = useState(challenge?.description ?? "");
@@ -118,7 +114,7 @@ export function OfferForm({
   const [maxMin, setMaxMin] = useState(
     challenge?.max_moving_time_s ? String(Math.round(challenge.max_moving_time_s / 60)) : "",
   );
-  const [minElev, setMinElev] = useState(String(challenge?.min_elevation_m ?? 0));
+  const [minElev, setMinElev] = useState(challenge?.min_elevation_m ? String(challenge.min_elevation_m) : "");
   const [pace, setPace] = useState(
     challenge?.max_pace_s_per_km ? formatPace(challenge.max_pace_s_per_km) : "",
   );
@@ -131,12 +127,21 @@ export function OfferForm({
   const [perUser, setPerUser] = useState(String(challenge?.per_user_daily_cap ?? 1));
   const [dailyCap, setDailyCap] = useState(challenge?.daily_cap ? String(challenge.daily_cap) : "5");
   const [validDays, setValidDays] = useState(String(challenge?.valid_days ?? 7));
-  const [startsAt, setStartsAt] = useState(toDateInput(challenge?.starts_at ?? null));
-  const [endsAt, setEndsAt] = useState(toDateInput(challenge?.ends_at ?? null));
-  const [active, setActive] = useState(challenge?.is_active ?? false);
   const [pin, setPin] = useState("");
+  // Folded groups: open from the start when the reward already uses them.
+  const [stricterOpen, setStricterOpen] = useState(
+    Boolean(challenge && (challenge.max_moving_time_s || challenge.max_pace_s_per_km || challenge.min_elevation_m > 0 || challenge.allow_manual)),
+  );
+  const [shareOpen, setShareOpen] = useState(false);
   const [state, setState] = useState<"idle" | "busy" | "error" | "slug" | "invalid">("idle");
 
+  const supporterName = supporters.find((s) => s.id === supporterId)?.name ?? "";
+  // The share page is called after the challenge unless a title is typed.
+  const effectiveTitle = title.trim() || eventName.trim() || reward.trim();
+  // A new reward's address carries the supporter, so two rewards on one
+  // challenge do not ask for the same one.
+  const autoSlug = slugify(`${effectiveTitle} ${supporterName}`.trim());
+  const streak = Number(requiredDays) > 1;
   const minDistanceM = Math.round(Number(minKm.replace(",", ".")) * 1000);
   // "5:00" or "5" → seconds per km; empty → no pace rule; garbage → NaN.
   const paceMatch = /^(\d{1,2})(?::([0-5]\d))?$/.exec(pace.trim());
@@ -148,7 +153,7 @@ export function OfferForm({
     min_elevation_m: Number(minElev) || 0,
     max_pace_s_per_km: paceS !== null && Number.isFinite(paceS) ? paceS : null,
     required_days: Number(requiredDays) || 1,
-    window_days: windowDays.trim() ? Number(windowDays) : null,
+    window_days: streak && windowDays.trim() ? Number(windowDays) : null,
     per_user_daily_cap: Number(perUser) || 1,
     daily_cap: dailyCap.trim() ? Number(dailyCap) : null,
     valid_days: Number(validDays) || 7,
@@ -156,14 +161,15 @@ export function OfferForm({
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!Number.isFinite(minDistanceM) || sports.length === 0 || Number.isNaN(paceS) || !supporterId) {
+    if (!Number.isFinite(minDistanceM) || sports.length === 0 || Number.isNaN(paceS) || !supporterId || effectiveTitle.length < 2) {
+      if (effectiveTitle.length < 2) setShareOpen(true);
       setState("invalid");
       return;
     }
     const values = {
-      slug: slug || slugify(title),
+      slug: slugTouched ? slug || autoSlug : autoSlug,
       supporterId,
-      title,
+      title: effectiveTitle,
       description: description.trim() || null,
       rewardLabel: reward,
       sportTypes: sports,
@@ -178,13 +184,13 @@ export function OfferForm({
       perUserDailyCap: preview.per_user_daily_cap,
       dailyCap: preview.daily_cap,
       validDays: preview.valid_days,
-      startsAt: fromDateInput(startsAt, false),
-      endsAt: fromDateInput(endsAt, true),
-      isActive: active,
+      // Live once it has a PIN; an existing reward keeps the state the
+      // list's Pause / Resume gave it, and its first PIN switches it on.
+      isActive: challenge ? challenge.is_active || (!challenge.has_pin && pin !== "") : pin !== "",
       pin,
     };
     if (onQueue) {
-      onQueue({ ...values, supporterName: supporters.find((s) => s.id === supporterId)?.name ?? "" });
+      onQueue({ ...values, supporterName });
       onDone();
       return;
     }
@@ -194,6 +200,7 @@ export function OfferForm({
       router.refresh();
       onDone();
     } else {
+      if (result.error === "slug") setShareOpen(true);
       setState(result.error === "slug" ? "slug" : result.error === "invalid" ? "invalid" : "error");
     }
   };
@@ -203,9 +210,15 @@ export function OfferForm({
       current.includes(sport) ? current.filter((s) => s !== sport) : [...current, sport],
     );
 
+  const group = "mt-5 border-t-[0.5px] border-line pt-4";
+  const groupTitle = "type-eyebrow text-black/60";
+  const summaryClass = "cursor-pointer text-[14px] font-semibold text-sea underline-offset-2 hover:underline";
+
   return (
     <form onSubmit={submit} className="rounded-lg bg-paper p-4 sm:p-5">
-      <div className="grid gap-4 sm:grid-cols-2">
+      {/* 1 — who gives what */}
+      <p className={groupTitle}>{t("offerGroupWho")}</p>
+      <div className="mt-2 grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="pkSupporter" className={labelClass}>{t("perkSupporter")}</label>
           {newSupporter === null ? (
@@ -247,40 +260,12 @@ export function OfferForm({
           <label htmlFor="pkReward" className={labelClass}>{t("perkReward")}</label>
           <input id="pkReward" type="text" required value={reward} onChange={(e) => setReward(e.target.value)} placeholder={t("perkRewardHint")} className={inputClass} />
         </div>
-        <div>
-          <label htmlFor="pkTitle" className={labelClass}>{t("postTitle")}</label>
-          <input
-            id="pkTitle"
-            type="text"
-            required
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-              if (!slugTouched) setSlug(slugify(e.target.value));
-            }}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label htmlFor="pkSlug" className={labelClass}>{t("postSlug")}</label>
-          <input
-            id="pkSlug"
-            type="text"
-            required
-            value={slug}
-            onChange={(e) => {
-              setSlugTouched(true);
-              setSlug(e.target.value);
-            }}
-            className={`${inputClass} font-mono`}
-          />
-        </div>
-        <div className="sm:col-span-2">
-          <label htmlFor="pkDescription" className={labelClass}>{t("campDescription")}</label>
-          <textarea id="pkDescription" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} className={inputClass} />
-        </div>
+      </div>
 
-        <fieldset className="sm:col-span-2">
+      {/* 2 — what earns it */}
+      <div className={group}>
+        <p className={groupTitle}>{t("offerGroupRule")}</p>
+        <fieldset className="mt-2">
           <legend className={labelClass}>{t("perkSports")}</legend>
           <div className="mt-1 flex flex-wrap gap-2">
             {SPORTS.map((sport) => (
@@ -296,57 +281,71 @@ export function OfferForm({
             ))}
           </div>
         </fieldset>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div>
+            <label htmlFor="pkMinKm" className={labelClass}>{t("perkMinKm")}</label>
+            <input id="pkMinKm" type="text" inputMode="decimal" value={minKm} onChange={(e) => setMinKm(e.target.value)} className={`${inputClass} font-mono`} />
+          </div>
+          <div>
+            <label htmlFor="pkDays" className={labelClass}>{t("perkRequiredDays")}</label>
+            <input id="pkDays" type="number" min={1} value={requiredDays} onChange={(e) => setRequiredDays(e.target.value)} className={`${inputClass} font-mono`} />
+          </div>
+          {streak ? (
+            <div>
+              <label htmlFor="pkWindow" className={labelClass}>{t("perkWindowDays")}</label>
+              <input id="pkWindow" type="number" min={1} value={windowDays} onChange={(e) => setWindowDays(e.target.value)} placeholder="—" className={`${inputClass} font-mono`} />
+            </div>
+          ) : null}
+        </div>
+        {streak ? <p className="mt-1.5 text-[13px] text-black/55">{t("perkWindowHint")}</p> : null}
 
-        <div>
-          <label htmlFor="pkMinKm" className={labelClass}>{t("perkMinKm")}</label>
-          <input id="pkMinKm" type="text" inputMode="decimal" value={minKm} onChange={(e) => setMinKm(e.target.value)} className={`${inputClass} font-mono`} />
+        <details className="mt-4" open={stricterOpen} onToggle={(e) => setStricterOpen((e.currentTarget as HTMLDetailsElement).open)}>
+          <summary className={summaryClass}>{t("offerStricter")}</summary>
+          <div className="mt-3 grid gap-4 sm:grid-cols-3">
+            <div>
+              <label htmlFor="pkMaxMin" className={labelClass}>{t("perkMaxMin")}</label>
+              <input id="pkMaxMin" type="number" min={1} value={maxMin} onChange={(e) => setMaxMin(e.target.value)} placeholder="—" className={`${inputClass} font-mono`} />
+            </div>
+            <div>
+              <label htmlFor="pkPace" className={labelClass}>{t("perkMaxPace")}</label>
+              <input id="pkPace" type="text" inputMode="numeric" value={pace} onChange={(e) => setPace(e.target.value)} placeholder="—" className={`${inputClass} font-mono`} />
+            </div>
+            <div>
+              <label htmlFor="pkElev" className={labelClass}>{t("perkMinElev")}</label>
+              <input id="pkElev" type="number" min={0} value={minElev} onChange={(e) => setMinElev(e.target.value)} placeholder="—" className={`${inputClass} font-mono`} />
+            </div>
+            <label className="flex items-center gap-2 text-[14.5px] sm:col-span-3">
+              <input type="checkbox" checked={allowManual} onChange={(e) => setAllowManual(e.target.checked)} className="h-4 w-4 accent-red" />
+              {t("perkAllowManual")}
+            </label>
+          </div>
+        </details>
+      </div>
+
+      {/* 3 — how many */}
+      <div className={group}>
+        <p className={groupTitle}>{t("offerGroupLimits")}</p>
+        <div className="mt-2 grid gap-4 sm:grid-cols-3">
+          <div>
+            <label htmlFor="pkPerUser" className={labelClass}>{t("perkPerUser")}</label>
+            <input id="pkPerUser" type="number" min={1} value={perUser} onChange={(e) => setPerUser(e.target.value)} className={`${inputClass} font-mono`} />
+          </div>
+          <div>
+            <label htmlFor="pkDaily" className={labelClass}>{t("perkDailyCap")}</label>
+            <input id="pkDaily" type="number" min={1} value={dailyCap} onChange={(e) => setDailyCap(e.target.value)} placeholder="—" className={`${inputClass} font-mono`} />
+          </div>
+          <div>
+            <label htmlFor="pkValid" className={labelClass}>{t("perkValidDays")}</label>
+            <input id="pkValid" type="number" min={1} value={validDays} onChange={(e) => setValidDays(e.target.value)} className={`${inputClass} font-mono`} />
+          </div>
         </div>
-        <div>
-          <label htmlFor="pkMaxMin" className={labelClass}>{t("perkMaxMin")}</label>
-          <input id="pkMaxMin" type="number" min={1} value={maxMin} onChange={(e) => setMaxMin(e.target.value)} placeholder="—" className={`${inputClass} font-mono`} />
-        </div>
-        <div>
-          <label htmlFor="pkPace" className={labelClass}>{t("perkMaxPace")}</label>
-          <input id="pkPace" type="text" inputMode="numeric" value={pace} onChange={(e) => setPace(e.target.value)} placeholder="5:00" className={`${inputClass} font-mono`} />
-        </div>
-        <div>
-          <label htmlFor="pkDays" className={labelClass}>{t("perkRequiredDays")}</label>
-          <input id="pkDays" type="number" min={1} value={requiredDays} onChange={(e) => setRequiredDays(e.target.value)} className={`${inputClass} font-mono`} />
-        </div>
-        <div>
-          <label htmlFor="pkWindow" className={labelClass}>{t("perkWindowDays")}</label>
-          <input id="pkWindow" type="number" min={1} value={windowDays} onChange={(e) => setWindowDays(e.target.value)} disabled={Number(requiredDays) <= 1} placeholder="—" className={`${inputClass} font-mono disabled:opacity-50`} />
-          <p className="mt-1 text-[13px] text-black/55">{t("perkWindowHint")}</p>
-        </div>
-        <div>
-          <label htmlFor="pkPartnerUrl" className={labelClass}>{t("perkPartnerUrl")}</label>
-          <input id="pkPartnerUrl" type="url" value={partnerUrl} onChange={(e) => setPartnerUrl(e.target.value)} placeholder="https://" className={inputClass} />
-        </div>
-        <div>
-          <label htmlFor="pkElev" className={labelClass}>{t("perkMinElev")}</label>
-          <input id="pkElev" type="number" min={0} value={minElev} onChange={(e) => setMinElev(e.target.value)} className={`${inputClass} font-mono`} />
-        </div>
-        <div>
-          <label htmlFor="pkValid" className={labelClass}>{t("perkValidDays")}</label>
-          <input id="pkValid" type="number" min={1} value={validDays} onChange={(e) => setValidDays(e.target.value)} className={`${inputClass} font-mono`} />
-        </div>
-        <div>
-          <label htmlFor="pkPerUser" className={labelClass}>{t("perkPerUser")}</label>
-          <input id="pkPerUser" type="number" min={1} value={perUser} onChange={(e) => setPerUser(e.target.value)} className={`${inputClass} font-mono`} />
-        </div>
-        <div>
-          <label htmlFor="pkDaily" className={labelClass}>{t("perkDailyCap")}</label>
-          <input id="pkDaily" type="number" min={1} value={dailyCap} onChange={(e) => setDailyCap(e.target.value)} placeholder="—" className={`${inputClass} font-mono`} />
-        </div>
-        <div>
-          <label htmlFor="pkStarts" className={labelClass}>{t("campStarts")}</label>
-          <input id="pkStarts" type="date" value={startsAt} onChange={(e) => setStartsAt(e.target.value)} className={inputClass} />
-        </div>
-        <div>
-          <label htmlFor="pkEnds" className={labelClass}>{t("campEnds")}</label>
-          <input id="pkEnds" type="date" value={endsAt} onChange={(e) => setEndsAt(e.target.value)} className={inputClass} />
-        </div>
-        <div>
+        <p className="mt-1.5 text-[13px] text-black/55">{t("offerPeriodNote")}</p>
+      </div>
+
+      {/* 4 — at the partner */}
+      <div className={group}>
+        <p className={groupTitle}>{t("offerGroupRedeem")}</p>
+        <div className="mt-2 max-w-xs">
           <label htmlFor="pkPin" className={labelClass}>
             {challenge?.has_pin ? t("perkPinReset") : t("perkPin")}
           </label>
@@ -361,21 +360,44 @@ export function OfferForm({
             placeholder={challenge?.has_pin ? "••••" : "4–8"}
             className={`${inputClass} font-mono`}
           />
-          <p className="mt-1 text-[13px] text-black/55">{t("perkPinHint")}</p>
         </div>
-        <div className="space-y-2 pt-1">
-          <label className="flex items-center gap-2 text-[14.5px]">
-            <input type="checkbox" checked={allowManual} onChange={(e) => setAllowManual(e.target.checked)} className="h-4 w-4 accent-red" />
-            {t("perkAllowManual")}
-          </label>
-          <label className="flex items-center gap-2 text-[14.5px]">
-            <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="h-4 w-4 accent-red" />
-            {t("perkActive")}
-          </label>
-        </div>
+        <p className="mt-1.5 text-[13px] text-black/55">{t("perkPinHint")}</p>
       </div>
 
-      <p className="mt-4 rounded-lg bg-paper px-4 py-3 text-[14px] leading-relaxed text-black/75">
+      {/* 5 — the share page, which fills itself */}
+      <details className={group} open={shareOpen} onToggle={(e) => setShareOpen((e.currentTarget as HTMLDetailsElement).open)}>
+        <summary className={summaryClass}>{t("offerSharePage")}</summary>
+        <p className="mt-1.5 text-[13px] text-black/55">{t("offerSharePageHint")}</p>
+        <div className="mt-3 grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="pkTitle" className={labelClass}>{t("postTitle")}</label>
+            <input id="pkTitle" type="text" maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder={eventName} className={inputClass} />
+          </div>
+          <div>
+            <label htmlFor="pkSlug" className={labelClass}>{t("postSlug")}</label>
+            <input
+              id="pkSlug"
+              type="text"
+              value={slugTouched ? slug : autoSlug}
+              onChange={(e) => {
+                setSlugTouched(true);
+                setSlug(e.target.value);
+              }}
+              className={`${inputClass} font-mono`}
+            />
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="pkDescription" className={labelClass}>{t("campDescription")}</label>
+            <textarea id="pkDescription" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} className={inputClass} />
+          </div>
+          <div className="sm:col-span-2">
+            <label htmlFor="pkPartnerUrl" className={labelClass}>{t("perkPartnerUrl")}</label>
+            <input id="pkPartnerUrl" type="url" value={partnerUrl} onChange={(e) => setPartnerUrl(e.target.value)} placeholder="https://" className={inputClass} />
+          </div>
+        </div>
+      </details>
+
+      <p className="mt-5 rounded-lg bg-mist px-4 py-3 text-[14px] leading-relaxed text-black/75">
         <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-black/50">{t("perkRulePreview")}</span>
         <br />
         <PerkRule challenge={preview} />
@@ -387,7 +409,7 @@ export function OfferForm({
 
       <div className="mt-4 flex gap-2">
         <button type="submit" disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
-          {challenge ? t("evSave") : t("perkCreate")}
+          {challenge ? t("offerSave") : t("perkCreate")}
         </button>
         <button type="button" onClick={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
           {t("cancel")}
