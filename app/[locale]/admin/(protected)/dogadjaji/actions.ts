@@ -90,6 +90,10 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
   const slug = slugify(data.slug, "");
   if (!slug) return { ok: false, error: "invalid" };
 
+  // Joining a challenge is an account and a Strava connection, not a
+  // registration: no places, no registration window, no contributions, no
+  // shirts, however the form was driven.
+  const challenge = data.kind === "challenge";
   const row = {
     name: data.name,
     slug,
@@ -100,11 +104,11 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
     starts_at: data.startsAt,
     ends_at: data.endsAt,
     venue: data.venue,
-    capacity: data.capacity,
-    registration_opens_at: data.registrationOpensAt,
-    registration_closes_at: data.registrationClosesAt,
+    capacity: challenge ? null : data.capacity,
+    registration_opens_at: challenge ? null : data.registrationOpensAt,
+    registration_closes_at: challenge ? null : data.registrationClosesAt,
     distances: data.distances,
-    price_tiers: data.priceTiers.map((tier) => ({ label: tier.label, amount_cents: tier.amount_cents, ...(tier.until ? { until: tier.until } : {}), ...(tier.distance ? { distance: tier.distance } : {}) })),
+    price_tiers: (challenge ? [] : data.priceTiers).map((tier) => ({ label: tier.label, amount_cents: tier.amount_cents, ...(tier.until ? { until: tier.until } : {}), ...(tier.distance ? { distance: tier.distance } : {}) })),
     is_published: data.isPublished,
     // Only a race can be someone else's; only a gathering brings guests.
     hosting: data.kind === "race" ? data.hosting : "own",
@@ -119,7 +123,7 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
     bib_capacity: data.kind === "race" && data.hosting === "external" && data.registrationMode === "here" && data.bibPolicy === "we_buy" ? data.bibCapacity : null,
     max_guests: data.kind === "social" ? data.maxGuests : 0,
     description: data.description,
-    offers_shirts: data.kind === "social" ? false : data.offersShirts,
+    offers_shirts: data.kind === "race" ? data.offersShirts : false,
     ...(data.coverPath !== undefined ? { cover_path: data.coverPath } : {}),
     // Gatherings have no distances, however the form was driven.
     ...(data.kind !== "race" ? { distances: [] } : {}),
@@ -133,6 +137,16 @@ export async function saveEvent(input: unknown): Promise<EventActionResult> {
     if (error?.code === "23505") return { ok: false, error: "slug" };
     console.error("[admin] event save failed:", error?.code);
     return { ok: false, error: "server" };
+  }
+
+  // A challenge's rewards run for its period. Migration 0086 keeps them
+  // equal in the database; this covers a save made before it is applied.
+  if (challenge && data.id) {
+    const { error: periodError } = await supabase
+      .from("perk_challenges")
+      .update({ starts_at: row.starts_at, ends_at: row.ends_at })
+      .eq("event_id", saved.id);
+    if (periodError) console.error("[admin] reward period sync failed:", periodError.code);
   }
 
   revalidatePath("/[locale]/admin/dogadjaji", "page");

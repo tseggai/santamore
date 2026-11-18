@@ -24,7 +24,6 @@ export interface PerkActionResult {
   message?: string;
 }
 
-const isoDate = z.string().datetime({ offset: true });
 const SPORTS = ["Run", "TrailRun", "VirtualRun", "Walk", "Hike", "Ride", "Swim"] as const;
 
 const challengeSchema = z.object({
@@ -46,8 +45,6 @@ const challengeSchema = z.object({
   perUserDailyCap: z.number().int().min(1).max(20),
   dailyCap: z.number().int().min(1).max(10_000).nullable(),
   validDays: z.number().int().min(1).max(365),
-  startsAt: isoDate.nullable(),
-  endsAt: isoDate.nullable(),
   isActive: z.boolean(),
   /** Set or reset the partner's PIN; empty = leave as is. */
   pin: z.string().regex(/^([0-9]{4,8})?$/),
@@ -69,6 +66,14 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
     .eq("id", data.supporterId)
     .maybeSingle();
   if (!supporter) return { ok: false, error: "invalid" };
+  // A reward runs for its challenge's period; it has no dates of its own
+  // (migration 0086 keeps the two columns equal to the event's from then on).
+  const { data: event } = await supabase
+    .from("events")
+    .select("starts_at, ends_at")
+    .eq("id", data.eventId)
+    .maybeSingle();
+  if (!event) return { ok: false, error: "invalid" };
 
   const row = {
     slug,
@@ -90,8 +95,8 @@ export async function savePerkChallenge(input: unknown): Promise<PerkActionResul
     per_user_daily_cap: data.perUserDailyCap,
     daily_cap: data.dailyCap,
     valid_days: data.validDays,
-    starts_at: data.startsAt,
-    ends_at: data.endsAt,
+    starts_at: event.starts_at,
+    ends_at: event.ends_at,
     is_active: data.isActive,
   };
 
