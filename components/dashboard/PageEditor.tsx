@@ -535,7 +535,9 @@ export function PageEditor({
           </div>
         </header>
 
-        {/* waterline with the goal editable in its corner */}
+        {/* waterline with the goal editable in its bottom corner: the plate
+            with the amount raised grows from the top left, so a chip beside it
+            ran into it on a phone */}
         <div className="relative mt-7">
           <Waterline
             raisedCents={raisedCents}
@@ -544,7 +546,7 @@ export function PageEditor({
             locale={locale}
             surface="paper"
           />
-          <div className="absolute right-3 top-3 z-10">
+          <div className="absolute bottom-3 right-3 z-10">
             <Editable
               label={t("goalEdit")}
               editing={editing === "goal"}
