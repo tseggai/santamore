@@ -8,7 +8,6 @@ import { savePerkChallenge, setPerkChallengeActive } from "@/app/[locale]/admin/
 import { saveSupporter } from "@/app/[locale]/admin/(protected)/podrska/actions";
 import { PerkRule, formatPace } from "@/components/perks/PerkRule";
 import { slugify } from "@/lib/slug";
-import { Link } from "@/i18n/navigation";
 
 export interface PerkChallengeAdminRow {
   id: string;
@@ -76,11 +75,13 @@ const labelClass = "text-[13.5px] font-semibold";
  * perk_challenges row bound to the event.
  *
  * The form asks only for what the reward itself decides. Its period is the
- * challenge's (no dates here); it goes live once it has a PIN and is paused
- * from the list (no Active box); its share page takes the challenge's name
- * and the supporter's website unless the last, folded group says otherwise.
- * The extra conditions (time, pace, climbing, manual entries) are folded
- * too, and open by themselves when a reward already uses one.
+ * challenge's (no dates here); it goes live once it has a PIN and its
+ * challenge is published, and is paused from the list (no Active box). It
+ * has no page of its own: it is shown and shared on the challenge's page,
+ * so there is no title, address or description to type, and the partner's
+ * website is the one on the supporter's record. The extra conditions (time,
+ * pace, climbing, manual entries) are folded, and open by themselves when a
+ * reward already uses one.
  */
 export function OfferForm({
   eventId,
@@ -104,10 +105,6 @@ export function OfferForm({
   const [supporters, setSupporters] = useState(initialSupporters);
   const [supporterId, setSupporterId] = useState(challenge?.supporter_id ?? initialSupporters[0]?.id ?? "");
   const [newSupporter, setNewSupporter] = useState<string | null>(null);
-  const [title, setTitle] = useState(challenge?.title ?? "");
-  const [slug, setSlug] = useState(challenge?.slug ?? "");
-  const [slugTouched, setSlugTouched] = useState(Boolean(challenge));
-  const [description, setDescription] = useState(challenge?.description ?? "");
   const [reward, setReward] = useState(challenge?.reward_label ?? "");
   const [sports, setSports] = useState<string[]>(challenge?.sport_types ?? ["Run", "TrailRun", "VirtualRun"]);
   const [minKm, setMinKm] = useState(challenge ? String(challenge.min_distance_m / 1000) : "5");
@@ -122,7 +119,6 @@ export function OfferForm({
   const [windowDays, setWindowDays] = useState(
     challenge?.window_days ? String(challenge.window_days) : "7",
   );
-  const [partnerUrl, setPartnerUrl] = useState(challenge?.partner_url ?? "");
   const [allowManual, setAllowManual] = useState(challenge?.allow_manual ?? false);
   const [perUser, setPerUser] = useState(String(challenge?.per_user_daily_cap ?? 1));
   const [dailyCap, setDailyCap] = useState(challenge?.daily_cap ? String(challenge.daily_cap) : "5");
@@ -132,15 +128,14 @@ export function OfferForm({
   const [stricterOpen, setStricterOpen] = useState(
     Boolean(challenge && (challenge.max_moving_time_s || challenge.max_pace_s_per_km || challenge.min_elevation_m > 0 || challenge.allow_manual)),
   );
-  const [shareOpen, setShareOpen] = useState(false);
   const [state, setState] = useState<"idle" | "busy" | "error" | "slug" | "invalid">("idle");
 
   const supporterName = supporters.find((s) => s.id === supporterId)?.name ?? "";
-  // The share page is called after the challenge unless a title is typed.
-  const effectiveTitle = title.trim() || eventName.trim() || reward.trim();
-  // A new reward's address carries the supporter, so two rewards on one
-  // challenge do not ask for the same one.
-  const autoSlug = slugify(`${effectiveTitle} ${supporterName}`.trim());
+  // Kept on the row for the records and old links, never typed: a reward is
+  // named after its challenge, and its address carries the supporter so two
+  // rewards on one challenge do not ask for the same one.
+  const rowTitle = challenge?.title ?? (eventName.trim() || reward.trim());
+  const rowSlug = challenge?.slug ?? slugify(`${rowTitle} ${supporterName}`.trim());
   const streak = Number(requiredDays) > 1;
   const minDistanceM = Math.round(Number(minKm.replace(",", ".")) * 1000);
   // "5:00" or "5" → seconds per km; empty → no pace rule; garbage → NaN.
@@ -161,16 +156,15 @@ export function OfferForm({
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (!Number.isFinite(minDistanceM) || sports.length === 0 || Number.isNaN(paceS) || !supporterId || effectiveTitle.length < 2) {
-      if (effectiveTitle.length < 2) setShareOpen(true);
+    if (!Number.isFinite(minDistanceM) || sports.length === 0 || Number.isNaN(paceS) || !supporterId || rowTitle.length < 2) {
       setState("invalid");
       return;
     }
     const values = {
-      slug: slugTouched ? slug || autoSlug : autoSlug,
+      slug: rowSlug,
       supporterId,
-      title: effectiveTitle,
-      description: description.trim() || null,
+      title: rowTitle,
+      description: challenge?.description ?? null,
       rewardLabel: reward,
       sportTypes: sports,
       minDistanceM,
@@ -179,7 +173,7 @@ export function OfferForm({
       maxPaceSPerKm: preview.max_pace_s_per_km,
       requiredDays: preview.required_days,
       windowDays: preview.window_days,
-      partnerUrl: partnerUrl.trim() || null,
+      partnerUrl: challenge?.partner_url ?? null,
       allowManual,
       perUserDailyCap: preview.per_user_daily_cap,
       dailyCap: preview.daily_cap,
@@ -200,7 +194,6 @@ export function OfferForm({
       router.refresh();
       onDone();
     } else {
-      if (result.error === "slug") setShareOpen(true);
       setState(result.error === "slug" ? "slug" : result.error === "invalid" ? "invalid" : "error");
     }
   };
@@ -364,39 +357,6 @@ export function OfferForm({
         <p className="mt-1.5 text-[13px] text-black/55">{t("perkPinHint")}</p>
       </div>
 
-      {/* 5 — the share page, which fills itself */}
-      <details className={group} open={shareOpen} onToggle={(e) => setShareOpen((e.currentTarget as HTMLDetailsElement).open)}>
-        <summary className={summaryClass}>{t("offerSharePage")}</summary>
-        <p className="mt-1.5 text-[13px] text-black/55">{t("offerSharePageHint")}</p>
-        <div className="mt-3 grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="pkTitle" className={labelClass}>{t("postTitle")}</label>
-            <input id="pkTitle" type="text" maxLength={120} value={title} onChange={(e) => setTitle(e.target.value)} placeholder={eventName} className={inputClass} />
-          </div>
-          <div>
-            <label htmlFor="pkSlug" className={labelClass}>{t("postSlug")}</label>
-            <input
-              id="pkSlug"
-              type="text"
-              value={slugTouched ? slug : autoSlug}
-              onChange={(e) => {
-                setSlugTouched(true);
-                setSlug(e.target.value);
-              }}
-              className={`${inputClass} font-mono`}
-            />
-          </div>
-          <div className="sm:col-span-2">
-            <label htmlFor="pkDescription" className={labelClass}>{t("campDescription")}</label>
-            <textarea id="pkDescription" rows={2} value={description} onChange={(e) => setDescription(e.target.value)} className={inputClass} />
-          </div>
-          <div className="sm:col-span-2">
-            <label htmlFor="pkPartnerUrl" className={labelClass}>{t("perkPartnerUrl")}</label>
-            <input id="pkPartnerUrl" type="url" value={partnerUrl} onChange={(e) => setPartnerUrl(e.target.value)} placeholder="https://" className={inputClass} />
-          </div>
-        </div>
-      </details>
-
       <p className="mt-5 rounded-lg bg-mist px-4 py-3 text-[14px] leading-relaxed text-black/75">
         <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-black/50">{t("perkRulePreview")}</span>
         <br />
@@ -423,11 +383,14 @@ export function OfferForm({
 export function OffersPanel({
   eventId,
   eventName,
+  eventPublished,
   challenges,
   supporters,
 }: {
   eventId: string;
   eventName: string;
+  /** A reward is on the site and awarding only while its challenge is published. */
+  eventPublished: boolean;
   challenges: PerkChallengeAdminRow[];
   supporters: { id: string; name: string }[];
 }) {
@@ -462,21 +425,15 @@ export function OffersPanel({
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <div className="min-w-0 flex-1">
                   <p className="flex flex-wrap items-center gap-2 text-[15.5px] font-bold">
-                    {challenge.is_active ? (
-                      <Link href={`/izazovi/${challenge.slug}`} className="hover:underline">{challenge.title}</Link>
-                    ) : (
-                      challenge.title
-                    )}
-                    <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${challenge.is_active ? "bg-sea text-paper" : "bg-mist text-black/60"}`}>
-                      {challenge.is_active ? t("perkActiveBadge") : t("postDraft")}
+                    {challenge.reward_label}
+                    <span className={`rounded-full px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] ${challenge.is_active && eventPublished ? "bg-sea text-paper" : "bg-mist text-black/60"}`}>
+                      {!challenge.is_active ? t("perkPausedBadge") : eventPublished ? t("perkActiveBadge") : t("perkWaitingBadge")}
                     </span>
                     {!challenge.has_pin ? (
                       <span className="rounded-full border border-red px-2 py-0.5 font-mono text-[11px] uppercase tracking-[0.12em] text-red-dark">{t("perkNoPin")}</span>
                     ) : null}
                   </p>
-                  <p className="mt-0.5 text-[13.5px] text-black/60">
-                    {challenge.partner_name} · {challenge.reward_label}
-                  </p>
+                  <p className="mt-0.5 text-[13.5px] text-black/60">{challenge.partner_name}</p>
                   <p className="mt-0.5 text-[13.5px] text-black/60">
                     <PerkRule challenge={challenge} />
                   </p>

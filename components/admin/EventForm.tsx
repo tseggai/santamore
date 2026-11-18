@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { Link } from "@/i18n/navigation";
 import { createChapter, saveEvent } from "@/app/[locale]/admin/(protected)/dogadjaji/actions";
@@ -191,6 +191,7 @@ export function EventForm({
   const [pendingOffers, setPendingOffers] = useState<OfferDraft[]>([]);
   const [offerFormOpen, setOfferFormOpen] = useState(false);
   const [formId] = useState(() => `ev-${Math.random().toString(36).slice(2, 8)}`);
+  const formRef = useRef<HTMLFormElement>(null);
   const [state, setState] = useState<"idle" | "busy" | "saved" | "error" | "slug" | "invalid">("idle");
 
   const challenge = kind === "challenge";
@@ -246,8 +247,12 @@ export function EventForm({
     }
   };
 
-  const submit = async (formEvent: FormEvent) => {
-    formEvent.preventDefault();
+  /**
+   * Save the form, on the site or not. Publishing is a decision, so it has
+   * its own button in the footer beside Save, which keeps the state the
+   * event is in: `published` is what was last saved, never a pending tick.
+   */
+  const save = async (publish: boolean) => {
     const startsIso = toIso(startLocal);
     const endsIso = toIso(endLocal);
     if ((!challenge && !tiersValid) || !startsIso || !chapterId || (endsIso !== null && endsIso < startsIso)) {
@@ -271,7 +276,7 @@ export function EventForm({
       registrationClosesAt: challenge ? null : toIso(regCloses),
       distances: distanceList,
       priceTiers: (challenge ? [] : cleanTiers).map((tier) => ({ ...tier, distance: tier.distance && distanceNamesNow.includes(tier.distance) ? tier.distance : null })),
-      isPublished: published,
+      isPublished: publish,
       description: description.trim() || null,
       offersShirts: kind === "race" ? offersShirts : false,
       coverPath,
@@ -284,6 +289,7 @@ export function EventForm({
       maxGuests: maxGuests.trim() === "" ? 0 : Number(maxGuests),
     }).catch(() => ({ ok: false as const, error: "server" as const }));
     if (result.ok) {
+      setPublished(publish);
       let offersFailed = false;
       if (!event && result.id && kind === "challenge") {
         const eventId = result.id;
@@ -305,11 +311,21 @@ export function EventForm({
     }
   };
 
+  const submit = (formEvent: FormEvent) => {
+    formEvent.preventDefault();
+    void save(published);
+  };
+  /** Publish or unpublish: the same save, with the fields checked first. */
+  const saveAs = (publish: boolean) => {
+    if (formRef.current && !formRef.current.reportValidity()) return;
+    void save(publish);
+  };
+
   const section = "mt-6 border-t-[0.5px] border-line pt-5";
 
   return (
     <div>
-    <form id={formId} onSubmit={submit}>
+    <form id={formId} ref={formRef} onSubmit={submit}>
       {/* 1 — what kind of event; everything below follows from it */}
       <p className={labelClass}>{t("evKind")}</p>
       <div className="mt-2 grid gap-2 sm:grid-cols-3" role="radiogroup" aria-label={t("evKind")}>
@@ -669,11 +685,6 @@ export function EventForm({
         <CoverField value={coverPath} onChange={setCoverPath} folder={coverFolder} />
       </div>
 
-      <label className={`${section} flex items-center gap-2 text-[14.5px]`}>
-        <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="h-4 w-4 accent-red" />
-        {t("evPublished")}
-      </label>
-
       {state === "error" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("actionError")}</p> : null}
       {state === "slug" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{t("evSlugTaken")}</p> : null}
       {state === "invalid" ? <p role="alert" className="mt-3 text-[14px] font-semibold text-red-dark">{challenge ? t("evInvalidChallenge") : t("evInvalid")}</p> : null}
@@ -691,7 +702,7 @@ export function EventForm({
         <p className="text-[13px] text-black/55">{t("evOffersHint")}</p>
         <div className="mt-3">
           {event?.id ? (
-            <OffersPanel eventId={event.id} eventName={event.name} challenges={offers} supporters={supporters} />
+            <OffersPanel eventId={event.id} eventName={event.name} eventPublished={published} challenges={offers} supporters={supporters} />
           ) : (
             <div className="space-y-2">
               {pendingOffers.length > 0 ? (
@@ -739,10 +750,24 @@ export function EventForm({
       </div>
     ) : null}
 
-    <div className="sticky bottom-0 -mx-5 -mb-5 mt-6 flex gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+    {/* Save keeps the event as it is, a draft or on the site; Publish and
+        Unpublish change that and save in the same click. Always in view. */}
+    <div className="sticky bottom-0 -mx-5 -mb-5 mt-6 flex flex-wrap items-center gap-2 border-t-[0.5px] border-black/25 bg-mist px-5 py-3 sm:-mx-6 sm:px-6">
+      <span className={`rounded-full px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.12em] ${published ? "bg-sea text-paper" : "bg-paper text-black/70"}`}>
+        {published ? t("evStatusLive") : t("evStatusDraft")}
+      </span>
       <button type="submit" form={formId} disabled={state === "busy"} className="rounded-lg bg-ink px-5 py-2.5 text-[14.5px] font-bold text-paper transition-opacity hover:opacity-90 disabled:opacity-60">
-        {event ? t("evSave") : t("evCreate")}
+        {published ? t("evSave") : t("evSaveDraft")}
       </button>
+      {published ? (
+        <button type="button" disabled={state === "busy"} onClick={() => saveAs(false)} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-60">
+          {t("galleryUnpublish")}
+        </button>
+      ) : (
+        <button type="button" disabled={state === "busy"} onClick={() => saveAs(true)} className="rounded-lg bg-red px-5 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60">
+          {t("galleryPublish")}
+        </button>
+      )}
       {onDone ? (
         <button type="button" onClick={onDone} className="rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
           {t("cancel")}

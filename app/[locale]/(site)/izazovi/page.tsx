@@ -21,6 +21,8 @@ export interface PerkChallengeRow extends PerkChallengeFields {
   partner_url: string | null;
   issued_today: number;
   redeemed_total: number;
+  /** The published challenge the reward belongs to: where it is shown and shared. */
+  event_slug: string | null;
 }
 
 export async function generateMetadata({
@@ -50,7 +52,7 @@ export default async function ChallengesIndexPage({
       .from("v_public_perk_challenges")
       .select("*")
       .order("partner_name"));
-    challenges = (data ?? []) as PerkChallengeRow[];
+    challenges = ((data ?? []) as PerkChallengeRow[]).filter((challenge) => challenge.event_slug);
   } catch {
     challenges = [];
   }
@@ -81,7 +83,7 @@ export default async function ChallengesIndexPage({
             return (
               <li key={challenge.id}>
                 <Link
-                  href={`/izazovi/${challenge.slug}`}
+                  href={`/dogadjaji/${challenge.event_slug}`}
                   className="block rounded-brand bg-mist px-5 py-4 transition-colors hover:bg-mist-2"
                 >
                   <span className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
