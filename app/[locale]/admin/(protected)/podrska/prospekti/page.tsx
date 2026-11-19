@@ -1,7 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
 
 import { ProspectsManager } from "@/components/admin/ProspectsManager";
-import { PROSPECT_COLUMNS, SPONSORSHIP_PDF_PATH, type ProspectActivityRow, type ProspectRow } from "@/lib/prospects";
+import { SPONSORSHIP_PDF_PATH, type ProspectActivityRow, type ProspectRow } from "@/lib/prospects";
+import { googlePlacesConfigured } from "@/lib/server/google-places";
+import { researchConfigured } from "@/lib/server/prospect-research";
 import { catalogueFacets } from "@/lib/server/prospect-catalogue";
 import { siteOrigin } from "@/lib/site";
 import { createClient } from "@/lib/supabase/server";
@@ -25,7 +27,8 @@ export default async function AdminProspectsPage({ params }: { params: Promise<{
   } = await supabase.auth.getUser();
 
   const [{ data: prospects }, { data: activities }, { data: profile }] = await Promise.all([
-    supabase.from("prospects").select(PROSPECT_COLUMNS).order("created_at", { ascending: false }).limit(2000),
+    // Every column: the page must read the list both before and after migration 0089 adds its two.
+    supabase.from("prospects").select("*").order("created_at", { ascending: false }).limit(2000),
     supabase.from("prospect_activities").select("id, prospect_id, kind, channel, template, lang, body, created_at").order("created_at", { ascending: false }).limit(3000),
     user ? supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle() : Promise.resolve({ data: null }),
   ]);
@@ -41,6 +44,7 @@ export default async function AdminProspectsPage({ params }: { params: Promise<{
         sender={(profile as { full_name: string | null } | null)?.full_name?.trim() || "Santamore"}
         today={new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Podgorica" }).format(new Date())}
         links={{ pledge: `${origin}/partneri`, site: origin, pdf: `${origin}${SPONSORSHIP_PDF_PATH}` }}
+        live={{ google: googlePlacesConfigured(), research: researchConfigured() }}
       />
     </div>
   );

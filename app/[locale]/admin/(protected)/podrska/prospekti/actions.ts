@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
+import Anthropic from "@anthropic-ai/sdk";
+
 import { saveSupporter } from "@/app/[locale]/admin/(protected)/podrska/actions";
+import { GOOGLE_DEPTHS, liveCandidateSchema, planSearches, researchCheckSchema, type LiveCandidate, type ResearchCheck } from "@/lib/prospect-live";
 import {
   PROSPECT_AREAS,
   PROSPECT_CHANNELS,
@@ -12,10 +15,15 @@ import {
   PROSPECT_STAGES,
   PROSPECT_TEMPLATES,
   PROSPECT_TIERS,
+  catalogueKey,
   followUpAfter,
   matchesCriteria,
 } from "@/lib/prospects";
+import { GooglePlacesError, googlePlacesConfigured, searchPlaces } from "@/lib/server/google-places";
 import { CATALOGUE } from "@/lib/server/prospect-catalogue";
+import { checkProspect, findSponsors, researchConfigured } from "@/lib/server/prospect-research";
+import { readSiteContacts } from "@/lib/server/site-contacts";
+import { describeError } from "@/lib/server/translate";
 import { isStaff } from "@/lib/server/access";
 import { createClient } from "@/lib/supabase/server";
 
@@ -295,4 +303,209 @@ export async function prospectToSupporter(input: unknown): Promise<ProspectResul
   revalidatePath(PAGE, "page");
   revalidatePath("/[locale]/admin/podrska", "page");
   return { ok: true, id: created.supporter.id };
+}
+
+// ── found and checked live (migration 0089) ─────────────────────────────────
+
+export type LiveSearchResult =
+  | { ok: true; candidates: LiveCandidate[]; requests?: number }
+  | { ok: false; error: "invalid" | "forbidden" | "unconfigured" | "refused" | "server"; detail?: string };
+
+/** Mark the candidates already on the list: the same Google place, or the same name. */
+async function markExisting(candidates: LiveCandidate[]): Promise<LiveCandidate[]> {
+  const supabase = await createClient();
+  const { data } = await supabase.from("prospects").select("name, google_place_id").limit(5000);
+  const places = new Set((data ?? []).map((row) => row.google_place_id).filter(Boolean));
+  const names = new Set((data ?? []).map((row) => catalogueKey(row.name)));
+  return candidates.map((candidate) => ({ ...candidate, exists: places.has(candidate.ref) || names.has(catalogueKey(candidate.name)) }));
+}
+
+const googleSchema = z.object({
+  sectors: z.array(z.enum(PROSPECT_SECTORS)).max(PROSPECT_SECTORS.length),
+  towns: z.array(z.string().trim().min(2).max(60)).min(1).max(8),
+  extra: z.string().trim().max(80),
+  depth: z.union([z.literal(GOOGLE_DEPTHS[0]), z.literal(GOOGLE_DEPTHS[1]), z.literal(GOOGLE_DEPTHS[2])]),
+});
+
+/** At most this many searches in one go, so a wide pick cannot run up a bill by accident. */
+const MAX_SEARCHES = 12;
+
+/** Search Google for businesses of a type in a town. Nothing is saved: the finds come back to be picked. */
+export async function searchGoogleProspects(input: unknown): Promise<LiveSearchResult> {
+  const parsed = googleSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  if (!(await isStaff())) return { ok: false, error: "forbidden" };
+  if (!googlePlacesConfigured()) return { ok: false, error: "unconfigured" };
+  const plan = planSearches(parsed.data.sectors, parsed.data.towns, parsed.data.extra);
+  if (plan.length === 0 || plan.length > MAX_SEARCHES) return { ok: false, error: "invalid" };
+  try {
+    const results = await Promise.all(plan.map((search) => searchPlaces(search, parsed.data.depth)));
+    const byRef = new Map<string, LiveCandidate>();
+    for (const result of results) for (const candidate of result.candidates) if (!byRef.has(candidate.ref)) byRef.set(candidate.ref, candidate);
+    const candidates = [...byRef.values()].sort((a, b) => (b.rating_count ?? 0) - (a.rating_count ?? 0));
+    return { ok: true, candidates: await markExisting(candidates), requests: results.reduce((sum, result) => sum + result.requests, 0) };
+  } catch (error) {
+    if (error instanceof GooglePlacesError && error.message === "refused") return { ok: false, error: "refused" };
+    console.error("[prospects] google search failed:", error instanceof Error ? error.message : error);
+    return { ok: false, error: "server" };
+  }
+}
+
+function researchError(error: unknown): { ok: false; error: "unconfigured" | "server"; detail?: string } {
+  console.error("[prospects] live research failed:", describeError(error));
+  if (error instanceof Anthropic.AuthenticationError) return { ok: false, error: "unconfigured", detail: describeError(error) };
+  return { ok: false, error: "server", detail: describeError(error) };
+}
+
+/** Live research: who has sponsored or supported events like ours in an area and is not on the list. Nothing is saved. */
+export async function findLiveProspects(input: unknown): Promise<LiveSearchResult> {
+  const parsed = z.object({ kind: z.enum(PROSPECT_KINDS), area: z.enum(PROSPECT_AREAS), focus: z.string().trim().max(200) }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  if (!(await isStaff())) return { ok: false, error: "forbidden" };
+  if (!researchConfigured()) return { ok: false, error: "unconfigured" };
+  const supabase = await createClient();
+  const { data } = await supabase.from("prospects").select("name").limit(5000);
+  // The research file counts as known too: its entries are one click away.
+  const exclude = [...new Set([...(data ?? []).map((row) => row.name), ...CATALOGUE.map((entry) => entry.name)])];
+  try {
+    const candidates = await findSponsors({ ...parsed.data, exclude });
+    return { ok: true, candidates: await markExisting(candidates) };
+  } catch (error) {
+    return researchError(error);
+  }
+}
+
+const addSchema = z.object({
+  kind: z.enum(PROSPECT_KINDS),
+  /** Visit each website for a published email and Instagram account. */
+  enrich: z.boolean(),
+  items: z.array(liveCandidateSchema).min(1).max(60),
+});
+
+/** Add the picked finds to the list. A Google find's website is read for its email when asked; a place or name already on the list is skipped. */
+export async function addLiveProspects(input: unknown): Promise<ProspectResult> {
+  const parsed = addSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  if (!(await isStaff())) return { ok: false, error: "forbidden" };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const items = (await markExisting(parsed.data.items)).filter((item) => !item.exists);
+  if (items.length === 0) return { ok: true, added: 0, matched: parsed.data.items.length };
+
+  // Read the websites six at a time, and stop starting new ones after 40 seconds.
+  const read = new Map<string, Awaited<ReturnType<typeof readSiteContacts>>>();
+  if (parsed.data.enrich) {
+    const started = Date.now();
+    const queue = items.filter((item) => item.website && !item.email);
+    const worker = async () => {
+      for (let item = queue.shift(); item; item = queue.shift()) {
+        if (Date.now() - started > 40_000) return;
+        read.set(item.ref, await readSiteContacts(item.website!).catch(() => null));
+      }
+    };
+    await Promise.all(Array.from({ length: 6 }, worker));
+  }
+
+  const rows = items.map((item) => {
+    const site = read.get(item.ref);
+    return {
+      kind: parsed.data.kind,
+      name: item.name,
+      sector: item.sector,
+      area: item.area,
+      town: item.town,
+      website: item.website,
+      email: item.email ?? site?.emails[0] ?? null,
+      phone: item.phone,
+      instagram: item.instagram ?? site?.instagram ?? null,
+      contact_name: item.contact_name,
+      contact_role: item.contact_role,
+      why: item.why,
+      notes: item.address,
+      sources: [...new Set([...item.sources, ...(site && (site.emails.length > 0 || site.instagram) ? site.pages : [])])].slice(0, 8),
+      google_place_id: item.source === "google" ? item.ref : null,
+      catalogue_key: item.source === "research" ? `live-${item.ref}`.slice(0, 90) : null,
+      created_by: user?.id ?? null,
+    };
+  });
+  let added = 0;
+  for (const [column, subset] of [["google_place_id", rows.filter((row) => row.google_place_id)], ["catalogue_key", rows.filter((row) => row.catalogue_key)]] as const) {
+    if (subset.length === 0) continue;
+    const { data, error } = await supabase.from("prospects").upsert(subset, { onConflict: column, ignoreDuplicates: true }).select("id");
+    if (error) {
+      console.error("[prospects] add live failed:", error.code, error.message);
+      return { ok: false, error: error.code === "42501" ? "forbidden" : "server" };
+    }
+    added += data?.length ?? 0;
+  }
+  revalidatePath(PAGE, "page");
+  return { ok: true, added, matched: parsed.data.items.length };
+}
+
+export type LiveCheckResult =
+  | { ok: true; check: ResearchCheck }
+  | { ok: false; error: "invalid" | "forbidden" | "unconfigured" | "nothing" | "server"; detail?: string };
+
+/**
+ * Check one prospect live: is it operating, what has it sponsored, who to
+ * ask now. The finding is logged and dated at once, so the log shows how a
+ * prospect changes over time; the details change only when a person
+ * applies them (applyProspectCheck).
+ */
+export async function checkProspectLive(input: unknown): Promise<LiveCheckResult> {
+  const parsed = z.object({ id: z.string().uuid() }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  if (!(await isStaff())) return { ok: false, error: "forbidden" };
+  if (!researchConfigured()) return { ok: false, error: "unconfigured" };
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data: row } = await supabase.from("prospects").select("id, name, kind, town, website, contact_name, contact_role, why").eq("id", parsed.data.id).maybeSingle();
+  if (!row) return { ok: false, error: "invalid" };
+  let check: ResearchCheck | null;
+  try {
+    check = await checkProspect(row as Parameters<typeof checkProspect>[0]);
+  } catch (error) {
+    return researchError(error);
+  }
+  if (!check) return { ok: false, error: "nothing" };
+  const body = [check.summary, check.sponsorship_record, check.sources.join("\n")].filter(Boolean).join("\n\n");
+  await supabase.from("prospect_activities").insert({ prospect_id: row.id, kind: "research", body: body.slice(0, 6000), created_by: user?.id ?? null });
+  await supabase.from("prospects").update({ checked_at: new Date().toISOString() }).eq("id", row.id);
+  revalidatePath(PAGE, "page");
+  return { ok: true, check };
+}
+
+/** Apply what a live check proposed: the details it found replace the ones on file, its sources join the prospect's. */
+export async function applyProspectCheck(input: unknown): Promise<ProspectResult> {
+  const parsed = z.object({ id: z.string().uuid(), check: researchCheckSchema }).safeParse(input);
+  if (!parsed.success) return { ok: false, error: "invalid" };
+  const { id, check } = parsed.data;
+  const supabase = await createClient();
+  const { data: current } = await supabase.from("prospects").select("sources").eq("id", id).maybeSingle();
+  if (!current) return { ok: false, error: "invalid" };
+  const person = check.contact_name
+    ? { contact_name: check.contact_name, contact_role: check.contact_role, contact_email: check.contact_email, contact_phone: check.contact_phone }
+    : {};
+  const { error } = await supabase
+    .from("prospects")
+    .update({
+      ...(check.website ? { website: check.website } : {}),
+      ...(check.email ? { email: check.email } : {}),
+      ...(check.phone ? { phone: check.phone } : {}),
+      ...(check.instagram ? { instagram: check.instagram.replace(/^@/, "") } : {}),
+      ...person,
+      ...(check.sponsorship_record ? { why: check.sponsorship_record.slice(0, 600) } : {}),
+      sources: [...new Set([...check.sources, ...((current.sources as string[] | null) ?? [])])].slice(0, 10),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", id)
+    .select("id")
+    .single();
+  if (error) return { ok: false, error: error.code === "42501" ? "forbidden" : "server" };
+  revalidatePath(PAGE, "page");
+  return { ok: true, id };
 }

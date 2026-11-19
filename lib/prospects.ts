@@ -92,6 +92,9 @@ export interface ProspectRow {
   notes: string | null;
   supporter_id: string | null;
   created_at: string;
+  /** When live research last checked it (migration 0089); absent before that migration. */
+  checked_at?: string | null;
+  google_place_id?: string | null;
 }
 
 export const PROSPECT_COLUMNS =
@@ -100,7 +103,7 @@ export const PROSPECT_COLUMNS =
 export interface ProspectActivityRow {
   id: string;
   prospect_id: string;
-  kind: "message" | "note" | "stage";
+  kind: "message" | "note" | "stage" | "research";
   channel: ProspectChannel | null;
   template: string | null;
   lang: string | null;
