@@ -12,6 +12,7 @@ export function SupportersTabs() {
       ariaLabel={t("navSupporters")}
       tabs={[
         { href: "/admin/podrska", label: t("supportersTabSponsors"), exact: true },
+        { href: "/admin/podrska/prospekti", label: t("supportersTabProspects") },
         { href: "/admin/podrska/prikupljaci", label: t("supportersTabFundraisers") },
         { href: "/admin/podrska/donatori", label: t("supportersTabDonors") },
         { href: "/admin/podrska/ucesnici", label: t("supportersTabParticipants") },
