@@ -14,6 +14,7 @@ import {
   setProspectFollowUp,
   setProspectStage,
 } from "@/app/[locale]/admin/(protected)/podrska/prospekti/actions";
+import { GoogleSearchForm, LiveCheck, LiveResearchForm } from "@/components/admin/ProspectsLive";
 import { SidePanel, useSidePanel } from "@/components/console/SidePanel";
 import { useDialog } from "@/components/console/useDialog";
 import { Link } from "@/i18n/navigation";
@@ -87,6 +88,7 @@ export function ProspectsManager({
   sender,
   today,
   links,
+  live,
 }: {
   locale: Locale;
   prospects: ProspectRow[];
@@ -98,10 +100,13 @@ export function ProspectsManager({
   /** Today in Podgorica, YYYY-MM-DD. */
   today: string;
   links: Links;
+  /** Which live sources have their key: Google search, and live research. */
+  live: { google: boolean; research: boolean };
 }) {
   const t = useTranslations("admin.prospects");
   const router = useRouter();
   const [panel, setPanel] = useState<"" | "develop" | "new" | "edit">("");
+  const [source, setSource] = useState<"file" | "research" | "google">("file");
   const [openId, setOpenId] = useState<string | null>(null);
   const [stageFilter, setStageFilter] = useState<"all" | "due" | ProspectStage>("all");
   const [kindFilter, setKindFilter] = useState<"" | ProspectKind>("");
@@ -311,17 +316,27 @@ export function ProspectsManager({
         </ul>
       )}
 
-      <SidePanel open={panel === "develop"} title={t("develop")} onClose={() => setPanel("")}>
-        <DevelopForm
-          facets={facets}
-          existing={new Set(prospects.map((p) => p.catalogue_key).filter((k): k is string => Boolean(k)))}
-          onDone={(added) => {
+      <SidePanel open={panel === "develop"} title={t("develop")} onClose={() => setPanel("")} wide>
+        {/* three ways to the same list: what we researched, what the web says now, what Google lists */}
+        <div className="mb-5 grid gap-2 sm:grid-cols-3" role="tablist" aria-label={t("sourceLabel")}>
+          {(["file", "research", "google"] as const).map((key) => (
+            <button key={key} type="button" role="tab" aria-selected={source === key} onClick={() => setSource(key)} className={`rounded-lg px-4 py-3 text-left transition-colors ${source === key ? "bg-ink text-paper" : "bg-paper hover:bg-mist-2"}`}>
+              <span className="block text-[15px] font-bold">{t(`source.${key}`)}</span>
+              <span className={`mt-0.5 block text-[13px] ${source === key ? "text-paper/70" : "text-black/60"}`}>{t(`sourceHint.${key}`)}</span>
+            </button>
+          ))}
+        </div>
+        {(() => {
+          const added = (count: number | null) => {
             setPanel("");
-            setNotice(added === null ? null : t("developed", { count: added }));
+            setNotice(count === null ? null : t("developed", { count }));
             setStageFilter("all");
             router.refresh();
-          }}
-        />
+          };
+          if (source === "research") return <LiveResearchForm configured={live.research} onAdded={added} />;
+          if (source === "google") return <GoogleSearchForm configured={live.google} onAdded={added} />;
+          return <DevelopForm facets={facets} existing={new Set(prospects.map((p) => p.catalogue_key).filter((k): k is string => Boolean(k)))} onDone={added} />;
+        })()}
       </SidePanel>
 
       <SidePanel open={panel === "new" || (panel === "edit" && open !== null)} title={panel === "edit" ? t("edit") : t("addByHand")} onClose={() => setPanel("")}>
@@ -344,6 +359,7 @@ export function ProspectsManager({
             sender={sender}
             today={today}
             links={links}
+            liveResearch={live.research}
             summary={describe(open)}
             dueChip={dueChip(open)}
             onEdit={() => setPanel("edit")}
@@ -609,6 +625,7 @@ function ProspectDetail({
   sender,
   today,
   links,
+  liveResearch,
   summary,
   dueChip,
   onEdit,
@@ -620,6 +637,8 @@ function ProspectDetail({
   sender: string;
   today: string;
   links: Links;
+  /** Whether live research has its key. */
+  liveResearch: boolean;
   /** Kind, sector and town in one line. */
   summary: string;
   dueChip: ReactNode;
@@ -758,6 +777,8 @@ function ProspectDetail({
         </div>
       </div>
 
+      <LiveCheck row={row} configured={liveResearch} checkedLabel={row.checked_at ? dateTime.format(new Date(row.checked_at)) : null} onChanged={() => router.refresh()} />
+
       {/* where it stands */}
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <label className={labelClass}>
@@ -852,11 +873,11 @@ function ProspectDetail({
               {activities.map((a) => (
                 <li key={a.id} className="rounded-lg bg-paper px-4 py-3">
                   <p className="text-[13.5px] font-semibold text-black/60">
-                    {a.kind === "message" ? t("activityMessage", { channel: t(`channel.${a.channel ?? "copy"}`) }) : a.kind === "stage" ? t("activityStage") : t("activityNote")}
+                    {a.kind === "message" ? t("activityMessage", { channel: t(`channel.${a.channel ?? "copy"}`) }) : a.kind === "stage" ? t("activityStage") : a.kind === "research" ? t("activityResearch") : t("activityNote")}
                     {" · "}{dateTime.format(new Date(a.created_at))}
                   </p>
                   {a.body ? (
-                    <p className="mt-1 whitespace-pre-line text-[14.5px] leading-relaxed">
+                    <p className="mt-1 whitespace-pre-line break-words text-[14.5px] leading-relaxed">
                       {a.kind === "stage" && (PROSPECT_STAGES as readonly string[]).includes(a.body) ? t(`stage.${a.body as ProspectStage}`) : a.body}
                     </p>
                   ) : null}
