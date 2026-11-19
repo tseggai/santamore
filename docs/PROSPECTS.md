@@ -49,6 +49,38 @@ npx vitest run lib/prospect-catalogue.test.ts
 The merge refuses an unknown kind, sector, area, an entry with no source, and
 drops a named person who has no `contact_source`.
 
+## Found and checked live
+
+Two live sources sit beside the research file in **Develop a list**
+(migration 0089). Neither saves anything by itself: each returns finds to pick
+from, and a find already on the list is shown and cannot be added twice.
+
+| Source | Finds | Needs |
+| --- | --- | --- |
+| Live research | Organisations with a record: who sponsored, gave to or partnered with events like ours, with the page that says so | `ANTHROPIC_API_KEY` (the Translate key) |
+| Google search | Businesses of a type in a town: name, address, phone, website, rating | `GOOGLE_PLACES_API_KEY` |
+
+**Live research** (`lib/server/prospect-research.ts`) is Claude with the web
+search tool. It is held to its sources in code, not on trust
+(`lib/prospect-live.ts`): a source is kept only when it is a page the search
+tool returned in that same request, a named person stays only with such a page
+naming them, and a find or a check with no source left is dropped.
+
+**Check now**, on a prospect, asks the same research what is true today: is it
+operating, what has it sponsored, who to ask. The finding is logged with its
+date at once, so the log shows how a prospect changes over time. The details on
+file change only when someone presses Apply.
+
+**Google search** (`lib/server/google-places.ts`, shapes in
+`docs/vendor/google-places.md`) runs one search per kind of business and town,
+twelve at most in one go. Google gives no email, so on adding, each website's
+home and contact page are read for the email and Instagram account they publish
+(`lib/server/site-contacts.ts`: public hosts only, redirects checked, 400 kB per
+page).
+
+The research file stays the reviewed baseline. Live finds worth keeping for
+everyone can be merged into it with the script above.
+
 ## Sending
 
 A message opens in the sender's own WhatsApp, mail app or Instagram, where they

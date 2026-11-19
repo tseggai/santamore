@@ -137,3 +137,24 @@ It calls the Claude API server-side and needs `ANTHROPIC_API_KEY` in the
 Vercel environment (server-only; never `NEXT_PUBLIC_`). Without it the
 Translate button explains that it is not set up. Every translation lands in
 the editor as a draft: a person reads it before it is saved or published.
+
+The same key runs live research on prospects (Supporters › Prospects, "Research
+now" and "Check now"). A check takes about a minute and searches the web
+through the Claude API, so it is billed like any other use of the key.
+
+### Prospects: Google search (optional)
+
+Supporters › Prospects › Develop a list › Google search needs a Google key:
+
+1. In Google Cloud, create or pick a project with billing, and enable
+   **Places API (New)**.
+2. Create an API key. Under API restrictions, restrict it to Places API (New).
+   Leave application restrictions at None: the calls come from Vercel's
+   servers, which have no fixed address or referrer.
+3. Add it in Vercel › Settings › Environment Variables as
+   `GOOGLE_PLACES_API_KEY` (Production; server-only, never `NEXT_PUBLIC_`), and
+   redeploy.
+
+Each search asks for a phone and a website, which Google bills at its Text
+Search Enterprise rate; the form shows how many requests a search will make
+before it runs. See docs/PROSPECTS.md.
