@@ -220,15 +220,19 @@ export interface MessageContext {
   pdfUrl: string | null;
 }
 
+/** Who signs every ask, whoever is signed in when it is sent. (Owner decision 2026-11-20.) */
+export const PROSPECT_SIGNER = "Staša Ceranić";
+
+// Names Santamore Week with its dates: change this once the week has passed.
 const WHO: Record<ProspectLang, string> = {
-  me: "javljam se u ime Santamorea, crnogorske neprofitne organizacije iz Tivta. Organizujemo sportske i društvene događaje, a novac ide za cilj koji izabere naša zajednica.",
-  en: "I'm writing on behalf of Santamore, a Montenegrin non-profit in Tivat. We run sport and community events, and the money goes to a cause our community chooses.",
+  me: "javljam se u ime Santamorea, crnogorske neprofitne organizacije sa sjedištem u Tivtu. Organizujemo Santamore Week, od 7. do 13. decembra: sedmicu društvenih aktivnosti i događaja kroz koje prikupljamo sredstva, od kojih 100% ide u humanitarne svrhe.",
+  en: "I'm writing on behalf of Santamore, a Montenegrin non-profit based in Tivat. We are organizing Santamore Week, taking place from December 7–13 — a week of community activities and events through which we raise funds, 100% of which go to charitable causes.",
 };
 
 const ASK: Record<ProspectKind, Record<ProspectLang, (org: string) => string>> = {
   sponsor: {
-    me: (org) => `Troškove našeg rada pokrivaju sponzorstva, pa svaka donacija stiže do onih kojima je potrebna. Voljeli bismo da ${org} bude među našim sponzorima. Nivoi počinju od €250.`,
-    en: (org) => `Sponsorships cover our operating costs, so every donation reaches those who need it. We would love to have ${org} among our sponsors. Tiers start at €250.`,
+    me: (org) => `Ove praznične sezone voljeli bismo da nam se ${org} pridruži kao sponzor. Nivoi sponzorstva počinju od €5.000.`,
+    en: (org) => `This holiday season, we would love for ${org} to join us as a sponsor. Tiers start at €5,000.`,
   },
   in_kind: {
     me: (org) => `Tražimo podršku u robi ili uslugama za naše događaje: voda, voće, štampa, ozvučenje, prva pomoć, fotografija. Vrednujemo je i knjižimo tačno kao gotovinu, uz priznanje na odgovarajućem nivou sponzorstva. Voljeli bismo da ${org} bude dio toga. Možete li nam pomoći?`,
@@ -256,8 +260,18 @@ const SUBJECT: Record<ProspectKind, Record<ProspectLang, string>> = {
   funder: { me: "Santamore: pitanje o pozivima za podršku", en: "Santamore: a question about your calls" },
 };
 
+const TITLE = /^(dr|mr|mrs|ms|prof|doc|g|gđa|gdja|gospodin|gospođa)\.?$/i;
+
+/** The name to greet by: the first name, or the whole name when it opens with a title. */
+function greetingName(name: string | null): string | null {
+  const clean = name?.trim().replace(/\s+/g, " ");
+  if (!clean) return null;
+  const first = clean.split(" ")[0]!;
+  return TITLE.test(first) ? clean : first;
+}
+
 function greeting(lang: ProspectLang, name: string | null): string {
-  const clean = name?.trim();
+  const clean = greetingName(name);
   if (lang === "me") return clean ? `Poštovani/a ${clean},` : "Poštovani,";
   return clean ? `Hello ${clean},` : "Hello,";
 }
