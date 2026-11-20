@@ -2010,7 +2010,24 @@
       "checkApply": "Primijeni na organizaciju",
       "checkDismiss": "Odbaci",
       "checkLoggedHint": "Nalaz je u evidenciji u svakom slučaju, sa datumom, pa se vidi kako se organizacija mijenja kroz vrijeme.",
-      "activityResearch": "Provjera uživo"
+      "activityResearch": "Provjera uživo",
+      "allTiers": "Svi nivoi",
+      "tierNone": "Bez nivoa",
+      "reachLabel": "Kontakt",
+      "allReach": "Svi kontakti",
+      "reach": {
+        "email": "Ima e-poštu",
+        "phone": "Samo telefon",
+        "none": "Bez e-pošte i telefona"
+      },
+      "langBoth": "CG + EN",
+      "sendEmailCopy": "Kopiraj i otvori aplikaciju za poštu",
+      "pasteLogged": "Kopirano i zabilježeno. Nalijepi poruku u otvorenu poruku.",
+      "linksHint": {
+        "email": "Otvara se nova poruka sa adresom i naslovom. Tekst je kopiran, a linkovi su riječi na koje se klikće: nalijepi ga u poruku.",
+        "copy": "Kopira se sa linkovima kao riječima na koje se klikće. Nalijepi u poruku e-pošte.",
+        "plain": "WhatsApp i Instagram ne prikazuju linkove kao riječi, pa svaki link ide kao adresa."
+      }
     },
     "supportersTabProspects": "Potencijalni"
   },

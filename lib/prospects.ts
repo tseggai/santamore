@@ -33,6 +33,9 @@ export const PROSPECT_TEMPLATES = ["first", "follow_up"] as const;
 export type ProspectTemplate = (typeof PROSPECT_TEMPLATES)[number];
 
 export type ProspectLang = "me" | "en";
+/** The language of a message: one of the two, or both, Montenegrin first. */
+export type MessageLang = ProspectLang | "both";
+export const MESSAGE_LANGS = ["both", "me", "en"] as const satisfies readonly MessageLang[];
 
 /** One researched organisation (content/prospects/catalogue.json): every fact from a published page, listed in `sources`. */
 export interface CatalogueEntry {
@@ -192,6 +195,16 @@ export function whatsappLink(phone: string | null | undefined, text: string): st
   return digits ? `https://wa.me/${digits}?text=${encodeURIComponent(text)}` : null;
 }
 
+export const PROSPECT_REACH = ["email", "phone", "none"] as const;
+export type ProspectReach = (typeof PROSPECT_REACH)[number];
+
+/** How a prospect can be reached: by email when any address is on file, else by phone only, else not at all. */
+export function contactReach(p: Pick<ProspectRow, "email" | "contact_email" | "phone" | "contact_phone">): ProspectReach {
+  const has = (v: string | null) => Boolean(v?.trim());
+  if (has(p.contact_email) || has(p.email)) return "email";
+  return has(p.contact_phone) || has(p.phone) ? "phone" : "none";
+}
+
 export function mailtoLink(email: string | null | undefined, subject: string, body: string): string | null {
   if (!email) return null;
   return `mailto:${encodeURIComponent(email).replace(/%40/g, "@")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
@@ -208,7 +221,7 @@ export function instagramLink(handle: string | null | undefined): string | null 
 export interface MessageContext {
   kind: ProspectKind;
   template: ProspectTemplate;
-  lang: ProspectLang;
+  lang: MessageLang;
   org: string;
   contactName: string | null;
   /** The prospect's tier fit; it sets the figure a sponsor ask opens with. */
@@ -292,14 +305,63 @@ function greeting(lang: ProspectLang, name: string | null): string {
   return clean ? `Hello ${clean},` : "Hello,";
 }
 
+/** A link written as [words](address), the form the message keeps its links in. */
+const LINK = /\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g;
+
+/** The message for an app that shows no linked words (WhatsApp, Instagram): "words: address". */
+export function messagePlain(body: string): string {
+  return body.replace(LINK, "$1: $2");
+}
+
+const escapeHtml = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+/**
+ * The message as HTML for the clipboard, so that pasted into a mail it keeps
+ * its links as clickable words. Paragraphs split on blank lines, a line of
+ * three dashes is a rule, and everything else is escaped.
+ */
+export function messageHtml(body: string): string {
+  return body
+    .trim()
+    .split(/\n{2,}/)
+    .map((block) => {
+      if (block.trim() === "---") return "<hr>";
+      let html = "";
+      let at = 0;
+      for (const match of block.matchAll(LINK)) {
+        html += `${escapeHtml(block.slice(at, match.index))}<a href="${escapeHtml(match[2]!)}">${escapeHtml(match[1]!)}</a>`;
+        at = match.index + match[0].length;
+      }
+      html += escapeHtml(block.slice(at));
+      return `<p style="margin:0 0 1em">${html.replace(/\n/g, "<br>")}</p>`;
+    })
+    .join("");
+}
+
+/** Whether the message carries a link that only a rich paste keeps. */
+export function hasLinks(body: string): boolean {
+  return body.search(LINK) !== -1;
+}
+
 /**
  * The message for an ask, ready to edit before it is sent. Plain text with
- * blank lines between paragraphs, so the same words work in WhatsApp, a mail
- * app and Instagram. Sponsors and in-kind asks point at the sponsor page;
- * the others at the site.
+ * blank lines between paragraphs and links as [words](address): a mail keeps
+ * them as clickable words (`messageHtml`), WhatsApp and Instagram get the
+ * address after the words (`messagePlain`). Sponsors and in-kind asks point at
+ * the sponsor page; the others at the site. "both" is the Montenegrin message,
+ * a rule, then the English one.
  */
 export function composeMessage(ctx: MessageContext): { subject: string; body: string } {
-  const { lang, kind, org } = ctx;
+  if (ctx.lang === "both") {
+    const me = composeOne(ctx, "me");
+    const en = composeOne(ctx, "en");
+    return { subject: `${me.subject} / ${en.subject.replace(/^Santamore: /, "")}`, body: `${me.body}\n\n---\n\n${en.body}` };
+  }
+  return composeOne(ctx, ctx.lang);
+}
+
+function composeOne(ctx: MessageContext, lang: ProspectLang): { subject: string; body: string } {
+  const { kind, org } = ctx;
   const tiered = kind === "sponsor" || kind === "in_kind";
   const link = tiered ? ctx.pledgeUrl : ctx.siteUrl;
   const sign = lang === "me" ? `Hvala unaprijed,\n${ctx.sender}\nSantamore` : `Thank you,\n${ctx.sender}\nSantamore`;
@@ -315,16 +377,14 @@ export function composeMessage(ctx: MessageContext): { subject: string; body: st
     paragraphs.push(WHO[lang], ASK[kind][lang](org, tierFrom(ctx.tierFit, lang)));
   }
 
-  const lines: string[] = [];
-  if (ctx.pdfUrl) lines.push(lang === "me" ? `Sve na jednoj stranici (PDF): ${ctx.pdfUrl}` : `Everything on one page (PDF): ${ctx.pdfUrl}`);
-  lines.push(
-    tiered
-      ? lang === "me" ? `Nivoi i prijava: ${link}` : `Tiers and the pledge form: ${link}`
-      : lang === "me" ? `Više o nama: ${link}` : `More about us: ${link}`,
+  if (ctx.pdfUrl) paragraphs.push(`[${lang === "me" ? "Sve na jednoj stranici (PDF)" : "Everything on one page (PDF)"}](${ctx.pdfUrl})`);
+  paragraphs.push(
+    `[${tiered ? (lang === "me" ? "Nivoi i prijava" : "Tiers and the pledge form") : lang === "me" ? "Više o nama" : "More about us"}](${link})`,
+    sign,
   );
-  paragraphs.push(lines.join("\n"), sign);
   return { subject: SUBJECT[kind][lang], body: paragraphs.join("\n\n") };
 }
+
 
 /** Where the sponsorship sheet is served from (public/sponzorstvo). */
 export const SPONSORSHIP_PDF_PATH = "/sponzorstvo/santamore-sponzorstvo-sponsorship.pdf";

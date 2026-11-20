@@ -9,6 +9,7 @@ import { saveSupporter } from "@/app/[locale]/admin/(protected)/podrska/actions"
 import { GOOGLE_DEPTHS, liveCandidateSchema, planSearches, researchCheckSchema, type LiveCandidate, type ResearchCheck } from "@/lib/prospect-live";
 import {
   PROSPECT_AREAS,
+  MESSAGE_LANGS,
   PROSPECT_CHANNELS,
   PROSPECT_KINDS,
   PROSPECT_SECTORS,
@@ -195,7 +196,7 @@ const messageSchema = z.object({
   id: z.string().uuid(),
   channel: z.enum(PROSPECT_CHANNELS),
   template: z.enum(PROSPECT_TEMPLATES),
-  lang: z.enum(["me", "en"]),
+  lang: z.enum(MESSAGE_LANGS),
   body: z.string().trim().min(1).max(6000),
 });
 
