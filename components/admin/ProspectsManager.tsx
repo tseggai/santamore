@@ -23,11 +23,13 @@ import {
   MESSAGE_LANGS,
   PROSPECT_AREAS,
   PROSPECT_KINDS,
+  PROSPECT_REACH,
   PROSPECT_SECTORS,
   PROSPECT_STAGES,
   PROSPECT_TEMPLATES,
   PROSPECT_TIERS,
   composeMessage,
+  contactReach,
   hasLinks,
   messageHtml,
   messagePlain,
@@ -45,6 +47,7 @@ import {
   type ProspectChannel,
   type ProspectCriteria,
   type ProspectKind,
+  type ProspectReach,
   type ProspectRow,
   type ProspectSector,
   type ProspectStage,
@@ -136,6 +139,8 @@ export function ProspectsManager({
   const [kindFilter, setKindFilter] = useState<"" | ProspectKind>("");
   const [sectorFilter, setSectorFilter] = useState("");
   const [areaFilter, setAreaFilter] = useState<"" | ProspectArea>("");
+  const [tierFilter, setTierFilter] = useState<"" | "none" | ProspectTier>("");
+  const [reachFilter, setReachFilter] = useState<"" | ProspectReach>("");
   const [query, setQuery] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -171,6 +176,8 @@ export function ProspectsManager({
     if (kindFilter && p.kind !== kindFilter) return false;
     if (sectorFilter && p.sector !== sectorFilter) return false;
     if (areaFilter && p.area !== areaFilter) return false;
+    if (tierFilter && (tierFilter === "none" ? p.tier_fit !== null : p.tier_fit !== tierFilter)) return false;
+    if (reachFilter && contactReach(p) !== reachFilter) return false;
     if (needle && ![p.name, p.town, p.contact_name, p.contact_role, p.email, p.contact_email].some((v) => v?.toLowerCase().includes(needle))) return false;
     return true;
   });
@@ -253,7 +260,7 @@ export function ProspectsManager({
         })}
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
         <select aria-label={t("kindLabel")} value={kindFilter} onChange={(e) => setKindFilter(e.target.value as "" | ProspectKind)} className={`${inputClass} mt-0 bg-mist`}>
           <option value="">{t("allKinds")}</option>
           {PROSPECT_KINDS.map((k) => <option key={k} value={k}>{t(`kind.${k}`)}</option>)}
@@ -265,6 +272,15 @@ export function ProspectsManager({
         <select aria-label={t("areaLabel")} value={areaFilter} onChange={(e) => setAreaFilter(e.target.value as "" | ProspectArea)} className={`${inputClass} mt-0 bg-mist`}>
           <option value="">{t("allAreas")}</option>
           {PROSPECT_AREAS.map((a) => <option key={a} value={a}>{t(`area.${a}`)}</option>)}
+        </select>
+        <select aria-label={t("tierLabel")} value={tierFilter} onChange={(e) => setTierFilter(e.target.value as "" | "none" | ProspectTier)} className={`${inputClass} mt-0 bg-mist`}>
+          <option value="">{t("allTiers")}</option>
+          {PROSPECT_TIERS.map((tier) => <option key={tier} value={tier}>{t(`tier.${tier}`)}</option>)}
+          <option value="none">{t("tierNone")}</option>
+        </select>
+        <select aria-label={t("reachLabel")} value={reachFilter} onChange={(e) => setReachFilter(e.target.value as "" | ProspectReach)} className={`${inputClass} mt-0 bg-mist`}>
+          <option value="">{t("allReach")}</option>
+          {PROSPECT_REACH.map((r) => <option key={r} value={r}>{t(`reach.${r}`)}</option>)}
         </select>
         <input type="search" aria-label={t("search")} placeholder={t("search")} value={query} onChange={(e) => setQuery(e.target.value)} className={`${inputClass} mt-0 bg-mist`} style={{ minWidth: 0 }} />
       </div>

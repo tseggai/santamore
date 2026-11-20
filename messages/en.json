@@ -2011,6 +2011,15 @@
       "checkDismiss": "Dismiss",
       "checkLoggedHint": "The finding is in the log either way, with its date, so you can see how a prospect changes over time.",
       "activityResearch": "Live check",
+      "allTiers": "Every tier",
+      "tierNone": "No tier set",
+      "reachLabel": "Contact",
+      "allReach": "Any contact",
+      "reach": {
+        "email": "Has an email",
+        "phone": "Phone only",
+        "none": "No email or phone"
+      },
       "langBoth": "CG + EN",
       "sendEmailCopy": "Copy and open your mail app",
       "pasteLogged": "Copied and logged. Paste the message into the draft.",

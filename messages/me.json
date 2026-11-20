@@ -2011,6 +2011,15 @@
       "checkDismiss": "Odbaci",
       "checkLoggedHint": "Nalaz je u evidenciji u svakom slučaju, sa datumom, pa se vidi kako se organizacija mijenja kroz vrijeme.",
       "activityResearch": "Provjera uživo",
+      "allTiers": "Svi nivoi",
+      "tierNone": "Bez nivoa",
+      "reachLabel": "Kontakt",
+      "allReach": "Svi kontakti",
+      "reach": {
+        "email": "Ima e-poštu",
+        "phone": "Samo telefon",
+        "none": "Bez e-pošte i telefona"
+      },
       "langBoth": "CG + EN",
       "sendEmailCopy": "Kopiraj i otvori aplikaciju za poštu",
       "pasteLogged": "Kopirano i zabilježeno. Nalijepi poruku u otvorenu poruku.",

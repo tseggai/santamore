@@ -195,6 +195,16 @@ export function whatsappLink(phone: string | null | undefined, text: string): st
   return digits ? `https://wa.me/${digits}?text=${encodeURIComponent(text)}` : null;
 }
 
+export const PROSPECT_REACH = ["email", "phone", "none"] as const;
+export type ProspectReach = (typeof PROSPECT_REACH)[number];
+
+/** How a prospect can be reached: by email when any address is on file, else by phone only, else not at all. */
+export function contactReach(p: Pick<ProspectRow, "email" | "contact_email" | "phone" | "contact_phone">): ProspectReach {
+  const has = (v: string | null) => Boolean(v?.trim());
+  if (has(p.contact_email) || has(p.email)) return "email";
+  return has(p.contact_phone) || has(p.phone) ? "phone" : "none";
+}
+
 export function mailtoLink(email: string | null | undefined, subject: string, body: string): string | null {
   if (!email) return null;
   return `mailto:${encodeURIComponent(email).replace(/%40/g, "@")}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;

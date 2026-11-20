@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { catalogueKey, composeMessage, hasLinks, messageHtml, messagePlain, tierFrom, followUpAfter, followUpDays, instagramLink, isDue, isMobile, mailtoLink, matchesCriteria, phoneDigits, whatsappLink, type ProspectCriteria } from "@/lib/prospects";
+import { catalogueKey, composeMessage, contactReach, hasLinks, messageHtml, messagePlain, tierFrom, followUpAfter, followUpDays, instagramLink, isDue, isMobile, mailtoLink, matchesCriteria, phoneDigits, whatsappLink, type ProspectCriteria } from "@/lib/prospects";
 
 const any: ProspectCriteria = { kinds: [], sectors: [], areas: [], tiers: [], personOnly: false };
 const bank = { kind: "sponsor", sector: "bank", area: "national", tier_fit: "gold", hasPerson: true } as const;
@@ -66,6 +66,17 @@ describe("send links", () => {
     expect(instagramLink("@porto.montenegro")).toBe("https://ig.me/m/porto.montenegro");
     expect(instagramLink("https://www.instagram.com/radio_tivat/")).toBe("https://ig.me/m/radio_tivat");
     expect(instagramLink("not a handle")).toBeNull();
+  });
+});
+
+describe("contact reach", () => {
+  const none = { email: null, contact_email: null, phone: null, contact_phone: null };
+  it("is email when any address is on file, else phone only, else none", () => {
+    expect(contactReach({ ...none, email: "info@example.me", phone: "020 111 222" })).toBe("email");
+    expect(contactReach({ ...none, contact_email: "ana@example.me" })).toBe("email");
+    expect(contactReach({ ...none, contact_phone: "067 111 222" })).toBe("phone");
+    expect(contactReach({ ...none, email: " ", phone: "020 111 222" })).toBe("phone");
+    expect(contactReach(none)).toBe("none");
   });
 });
 
