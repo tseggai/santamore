@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { catalogueKey, composeMessage, tierFrom, followUpAfter, followUpDays, instagramLink, isDue, isMobile, mailtoLink, matchesCriteria, phoneDigits, whatsappLink, type ProspectCriteria } from "@/lib/prospects";
+import { catalogueKey, composeMessage, hasLinks, messageHtml, messagePlain, tierFrom, followUpAfter, followUpDays, instagramLink, isDue, isMobile, mailtoLink, matchesCriteria, phoneDigits, whatsappLink, type ProspectCriteria } from "@/lib/prospects";
 
 const any: ProspectCriteria = { kinds: [], sectors: [], areas: [], tiers: [], personOnly: false };
 const bank = { kind: "sponsor", sector: "bank", area: "national", tier_fit: "gold", hasPerson: true } as const;
@@ -78,8 +78,7 @@ describe("messages", () => {
     expect(me.body.startsWith("Poštovani/a Ana,")).toBe(true);
     expect(me.body).toContain("Organizujemo Santamore Week, od 7. do 13. decembra");
     expect(me.body).toContain("voljeli bismo da nam se Banka pridruži kao sponzor. Nivoi sponzorstva počinju od €5.000.");
-    expect(me.body).toContain("https://santamore.me/s.pdf");
-    expect(me.body).toContain("Nivoi i prijava: https://santamore.me/partneri");
+    expect(me.body).toContain("[Sve na jednoj stranici (PDF)](https://santamore.me/s.pdf)\n\n[Nivoi i prijava](https://santamore.me/partneri)");
     expect(me.body.endsWith("Hvala unaprijed,\nMarko\nSantamore")).toBe(true);
     const en = composeMessage({ ...base, kind: "sponsor", template: "first", lang: "en", contactName: null });
     expect(en.body.startsWith("Hello,")).toBe(true);
@@ -109,8 +108,32 @@ describe("messages", () => {
   it("points the other asks at the site and can leave the sheet out", () => {
     const media = composeMessage({ ...base, kind: "media", template: "first", lang: "en", pdfUrl: null });
     expect(media.body).not.toContain("PDF");
-    expect(media.body).toContain("More about us: https://santamore.me");
+    expect(media.body).toContain("[More about us](https://santamore.me)");
     expect(media.body).not.toContain("/partneri");
+  });
+
+  it("writes both languages, Montenegrin first, under one subject", () => {
+    const both = composeMessage({ ...base, kind: "sponsor", template: "first", lang: "both", tierFit: "title", contactName: null });
+    expect(both.subject).toBe("Santamore: sponzorstvo / sponsorship");
+    const [me, en] = both.body.split("\n\n---\n\n");
+    expect(me!.startsWith("Poštovani,")).toBe(true);
+    expect(me).toContain("počinju od €10.000.");
+    expect(en!.startsWith("Hello,")).toBe(true);
+    expect(en).toContain("Tiers start at €10,000.");
+    expect(en!.endsWith("Thank you,\nMarko\nSantamore")).toBe(true);
+  });
+
+  it("keeps links as clickable words for a mail and as addresses elsewhere", () => {
+    const body = "Hello,\n\nA & <b>\nsecond line\n\n[Tiers and the pledge form](https://santamore.me/partneri?a=1&b=2)\n\n---\n\nBye";
+    expect(hasLinks(body)).toBe(true);
+    expect(hasLinks("Tiers: https://santamore.me/partneri")).toBe(false);
+    expect(messagePlain(body)).toContain("Tiers and the pledge form: https://santamore.me/partneri?a=1&b=2");
+    expect(messageHtml(body)).toBe(
+      '<p style="margin:0 0 1em">Hello,</p><p style="margin:0 0 1em">A &amp; &lt;b&gt;<br>second line</p>' +
+        '<p style="margin:0 0 1em"><a href="https://santamore.me/partneri?a=1&amp;b=2">Tiers and the pledge form</a></p><hr><p style="margin:0 0 1em">Bye</p>',
+    );
+    // Only web addresses become links.
+    expect(messageHtml("[x](javascript:alert(1))")).not.toContain("<a ");
   });
 
   it("follows up briefly", () => {

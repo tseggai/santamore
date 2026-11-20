@@ -20,6 +20,7 @@ import { useDialog } from "@/components/console/useDialog";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, type Locale } from "@/i18n/routing";
 import {
+  MESSAGE_LANGS,
   PROSPECT_AREAS,
   PROSPECT_KINDS,
   PROSPECT_SECTORS,
@@ -27,6 +28,9 @@ import {
   PROSPECT_TEMPLATES,
   PROSPECT_TIERS,
   composeMessage,
+  hasLinks,
+  messageHtml,
+  messagePlain,
   followUpDays,
   instagramLink,
   isDue,
@@ -35,12 +39,12 @@ import {
   matchesCriteria,
   whatsappLink,
   type CatalogueFacet,
+  type MessageLang,
   type ProspectActivityRow,
   type ProspectArea,
   type ProspectChannel,
   type ProspectCriteria,
   type ProspectKind,
-  type ProspectLang,
   type ProspectRow,
   type ProspectSector,
   type ProspectStage,
@@ -60,6 +64,26 @@ const inputClass = "mt-1 w-full rounded-lg bg-paper px-3.5 py-2.5 text-[15px] ou
 const labelClass = "text-[13.5px] font-semibold";
 const chipBase = "rounded-full px-3.5 py-1.5 text-[14px] font-semibold transition-colors";
 const ghost = "rounded-lg bg-mist px-3 py-1.5 text-[13.5px] font-semibold text-black/80 transition-colors hover:bg-mist-2 disabled:opacity-50";
+
+/**
+ * Puts the message on the clipboard with its links as clickable words, and as
+ * plain text for an app that takes no formatting. False where the browser has
+ * no rich clipboard or refuses it.
+ */
+async function copyRich(body: string): Promise<boolean> {
+  try {
+    if (typeof ClipboardItem === "undefined" || !navigator.clipboard?.write) return false;
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        "text/html": new Blob([messageHtml(body)], { type: "text/html" }),
+        "text/plain": new Blob([messagePlain(body)], { type: "text/plain" }),
+      }),
+    ]);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const STAGE_TONE: Record<ProspectStage, string> = {
   new: "bg-mist-2 text-black/80",
@@ -661,10 +685,11 @@ function ProspectDetail({
   const [tab, setTab] = useState<"message" | "activity">("message");
   const [template, setTemplate] = useState<ProspectTemplate>(activities.some((a) => a.kind === "message") ? "follow_up" : "first");
   const [channel, setChannel] = useState<ProspectChannel>(firstChannel);
-  const [lang, setLang] = useState<ProspectLang>(locale === "en" ? "en" : "me");
+  const [lang, setLang] = useState<MessageLang>("both");
   const [withPdf, setWithPdf] = useState(tiered);
   const [edited, setEdited] = useState<string | null>(null);
   const [state, setState] = useState<"idle" | "busy" | "sent" | "error">("idle");
+  const [pasted, setPasted] = useState(false);
   const [note, setNote] = useState("");
 
   const message = composeMessage({
@@ -680,6 +705,7 @@ function ProspectDetail({
     pdfUrl: withPdf ? links.pdf : null,
   });
   const body = edited ?? message.body;
+  const linked = hasLinks(body);
   // A control changed: the words start again from the template.
   const reset = () => {
     setEdited(null);
@@ -690,12 +716,19 @@ function ProspectDetail({
 
   const send = async () => {
     // Open the app first, inside the click, or the browser blocks it.
-    if (channel === "whatsapp") window.open(whatsappLink(waPhone, body) ?? "", "_blank", "noopener");
-    else if (channel === "email") window.location.href = mailtoLink(email, message.subject, body) ?? "";
-    else {
-      void navigator.clipboard?.writeText(body);
-      if (channel === "instagram" && igLink) window.open(igLink, "_blank", "noopener");
+    const plain = messagePlain(body);
+    let rich = false;
+    if (channel === "whatsapp") window.open(whatsappLink(waPhone, plain) ?? "", "_blank", "noopener");
+    else if (channel === "instagram") {
+      void navigator.clipboard?.writeText(plain);
+      if (igLink) window.open(igLink, "_blank", "noopener");
+    } else {
+      // A mail link carries plain text only: the linked words travel on the clipboard instead.
+      if (channel === "copy" || linked) rich = await copyRich(body);
+      if (channel === "copy" && !rich) void navigator.clipboard?.writeText(plain);
+      if (channel === "email") window.location.href = mailtoLink(email, message.subject, rich ? "" : plain) ?? "";
     }
+    setPasted(rich && channel === "email");
     setState("busy");
     const result = await logProspectMessage({ id: row.id, channel, template, lang, body }).catch(() => ({ ok: false as const, error: "server" as const }));
     setState(result.ok ? "sent" : "error");
@@ -721,7 +754,7 @@ function ProspectDetail({
   const seg = "px-3.5 py-2 text-[14px] font-semibold transition-colors disabled:opacity-35";
   const segOn = "bg-sea text-paper";
   const segOff = "bg-paper text-black/75 hover:bg-mist-2";
-  const sendLabel = { whatsapp: t("sendWhatsapp"), email: t("sendEmail"), instagram: t("sendInstagram"), copy: t("sendCopy") }[channel];
+  const sendLabel = { whatsapp: t("sendWhatsapp"), email: linked ? t("sendEmailCopy") : t("sendEmail"), instagram: t("sendInstagram"), copy: t("sendCopy") }[channel];
 
   return (
     <div>
@@ -816,9 +849,9 @@ function ProspectDetail({
               ))}
             </div>
             <div className="inline-flex overflow-hidden rounded-lg" role="group" aria-label={t("langLabel")}>
-              {(["me", "en"] as const).map((l) => (
+              {MESSAGE_LANGS.map((l) => (
                 <button key={l} type="button" aria-pressed={lang === l} onClick={() => { setLang(l); reset(); }} className={`${seg} ${lang === l ? segOn : segOff}`}>
-                  {l === "me" ? "CG" : "EN"}
+                  {l === "both" ? t("langBoth") : l === "me" ? "CG" : "EN"}
                 </button>
               ))}
             </div>
@@ -838,15 +871,16 @@ function ProspectDetail({
           {channel === "email" ? <p className="mt-3 text-[14px] text-black/65"><span className="font-semibold">{t("subject")}</span> {message.subject}</p> : null}
           <label className="mt-2 block">
             <span className="sr-only">{t("messageLabel")}</span>
-            <textarea rows={12} value={body} onChange={(e) => { setEdited(e.target.value); setState("idle"); }} className={`${inputClass} leading-relaxed`} />
+            <textarea rows={lang === "both" ? 22 : 12} value={body} onChange={(e) => { setEdited(e.target.value); setState("idle"); }} className={`${inputClass} leading-relaxed`} />
           </label>
+          {linked ? <p className="mt-1.5 text-[13.5px] leading-relaxed text-black/55">{t(`linksHint.${channel === "email" || channel === "copy" ? channel : "plain"}`)}</p> : null}
           {!available.whatsapp && channel !== "whatsapp" && (row.contact_phone || row.phone) ? <p className="mt-1.5 text-[13.5px] text-black/55">{t("landlineNote")}</p> : null}
 
           <div className="mt-3 flex flex-wrap items-center gap-3">
             <button type="button" disabled={state === "busy" || body.trim() === ""} onClick={() => void send()} className="rounded-lg bg-red px-5 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-50">
               {sendLabel}
             </button>
-            {state === "sent" ? <p role="status" className="text-[14px] font-semibold text-sea">{channel === "instagram" || channel === "copy" ? t("copiedLogged") : t("logged")}</p> : null}
+            {state === "sent" ? <p role="status" className="text-[14px] font-semibold text-sea">{pasted ? t("pasteLogged") : channel === "instagram" || channel === "copy" ? t("copiedLogged") : t("logged")}</p> : null}
             {state === "error" ? <p role="alert" className="text-[14px] font-semibold text-red-dark">{t("failed")}</p> : null}
           </div>
           <p className="mt-2 text-[13.5px] leading-relaxed text-black/55">{t("sendHint")}</p>

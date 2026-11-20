@@ -2010,7 +2010,15 @@
       "checkApply": "Apply to the prospect",
       "checkDismiss": "Dismiss",
       "checkLoggedHint": "The finding is in the log either way, with its date, so you can see how a prospect changes over time.",
-      "activityResearch": "Live check"
+      "activityResearch": "Live check",
+      "langBoth": "CG + EN",
+      "sendEmailCopy": "Copy and open your mail app",
+      "pasteLogged": "Copied and logged. Paste the message into the draft.",
+      "linksHint": {
+        "email": "A draft opens with the address and subject. The message is copied with its links as clickable words: paste it into the draft.",
+        "copy": "Copied with its links as clickable words. Paste it into a mail.",
+        "plain": "WhatsApp and Instagram show no linked words, so each link goes as its address."
+      }
     },
     "supportersTabProspects": "Prospects"
   },
