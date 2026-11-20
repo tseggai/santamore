@@ -117,7 +117,8 @@ export function SidePanel({
               ×
             </button>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain bg-mist px-5 py-5 sm:px-6">
+          {/* Never sideways: one field wider than a phone must not make the whole panel pan. */}
+          <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-mist px-5 py-5 sm:px-6">
             <SidePanelContext.Provider value={context}>{children}</SidePanelContext.Provider>
           </div>
         </div>
