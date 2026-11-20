@@ -314,6 +314,18 @@
   }
 }
 
+/* The filter sheet that rises on a phone (components/admin/ProspectsManager.tsx). */
+@keyframes sheet-in {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 /* Console slide-over (components/console/SidePanel.tsx). */
 @keyframes panel-in {
   from {

@@ -1766,7 +1766,6 @@
     "perkWaitingBadge": "Aktivno kad se izazov objavi",
     "prospects": {
       "tab": "Potencijalni",
-      "lead": "Organizacije od kojih želimo podršku i dokle je stigao svaki upit. Napravite listu iz istraživanja, otvorite organizaciju da joj pišete i vratite se kad dođe red za podsjetnik.",
       "develop": "Napravi listu",
       "addByHand": "Dodaj ručno",
       "edit": "Izmijeni",
@@ -1783,7 +1782,6 @@
       "statPledged": "Obećali",
       "statWon": "Dobijeni",
       "share": "{pct}% prethodnog koraka",
-      "stageFilter": "Dokle su stigli",
       "all": "Svi",
       "due": "Na redu",
       "stage": {
@@ -1796,7 +1794,6 @@
       },
       "stageLabel": "Faza",
       "kindLabel": "Koga pitamo",
-      "allKinds": "Svi koje pitamo",
       "kind": {
         "sponsor": "Sponzor",
         "in_kind": "U robi",
@@ -1813,7 +1810,6 @@
       },
       "kindHintMany": "Izaberite jedno da vidite šta znači, ili više da ih kombinujete.",
       "sectorLabel": "Sektor",
-      "allSectors": "Svi sektori",
       "sector": {
         "bank": "Banke",
         "insurance": "Osiguranja",
@@ -1839,7 +1835,6 @@
         "embassy_intl": "Ambasade i međunarodna tijela"
       },
       "areaLabel": "Gdje",
-      "allAreas": "Svuda",
       "area": {
         "tivat": "Tivat",
         "boka": "Boka",
@@ -2011,10 +2006,8 @@
       "checkDismiss": "Odbaci",
       "checkLoggedHint": "Nalaz je u evidenciji u svakom slučaju, sa datumom, pa se vidi kako se organizacija mijenja kroz vrijeme.",
       "activityResearch": "Provjera uživo",
-      "allTiers": "Svi nivoi",
       "tierNone": "Bez nivoa",
       "reachLabel": "Kontakt",
-      "allReach": "Svi kontakti",
       "reach": {
         "email": "Ima e-poštu",
         "phone": "Samo telefon",
@@ -2027,6 +2020,19 @@
         "email": "Otvara se nova poruka sa adresom i naslovom. Tekst je kopiran, a linkovi su riječi na koje se klikće: nalijepi ga u poruku.",
         "copy": "Kopira se sa linkovima kao riječima na koje se klikće. Nalijepi u poruku e-pošte.",
         "plain": "WhatsApp i Instagram ne prikazuju linkove kao riječi, pa svaki link ide kao adresa."
+      },
+      "searchShort": "Traži",
+      "filters": "Filteri",
+      "filtersClear": "Očisti sve",
+      "filtersShow": "{count, plural, one {Prikaži # organizaciju} few {Prikaži # organizacije} other {Prikaži # organizacija}}",
+      "filterRemove": "Ukloni filter {name}",
+      "filterName": {
+        "stage": "Status",
+        "kind": "Vrsta",
+        "sector": "Sektor",
+        "area": "Mjesto",
+        "tier": "Nivo",
+        "reach": "Kontakt"
       }
     },
     "supportersTabProspects": "Potencijalni"

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import {
   addProspectNote,
@@ -65,8 +65,53 @@ interface Links {
 
 const inputClass = "mt-1 w-full rounded-lg bg-paper px-3.5 py-2.5 text-[15px] outline-none ring-sea/40 focus:ring-2";
 const labelClass = "text-[13.5px] font-semibold";
+/** A filter control: a mist box on the paper of the page or the sheet. */
+const filterClass = "w-full rounded-lg px-3 py-2.5 text-[14.5px] outline-none ring-sea/40 focus:ring-2";
 const chipBase = "rounded-full px-3.5 py-1.5 text-[14px] font-semibold transition-colors";
 const ghost = "rounded-lg bg-mist px-3 py-1.5 text-[13.5px] font-semibold text-black/80 transition-colors hover:bg-mist-2 disabled:opacity-50";
+
+/**
+ * A sheet that rises from the bottom of a phone screen, for a handful of
+ * controls that apply as they change. A native <dialog>: focus stays inside,
+ * Escape and a tap on the backdrop close it.
+ */
+function BottomSheet({ open, title, onClose, children }: { open: boolean; title: string; onClose: () => void; children: ReactNode }) {
+  const t = useTranslations("admin");
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (open && !dialog.open) dialog.showModal();
+    if (!open && dialog.open) dialog.close();
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+  return (
+    <dialog
+      ref={ref}
+      aria-label={title}
+      onClose={onClose}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+      className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-end justify-center bg-transparent p-0 backdrop:bg-ink/55 open:flex"
+    >
+      {open ? (
+        <div className="max-h-[88dvh] w-full max-w-[560px] overflow-y-auto overscroll-contain rounded-t-lg bg-paper px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 motion-safe:animate-[sheet-in_200ms_ease-out]">
+          <div className="mb-4 flex items-center gap-3">
+            <h2 className="min-w-0 flex-1 text-[17px] font-bold">{title}</h2>
+            <button type="button" onClick={onClose} aria-label={t("panelClose")} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist text-[19px] leading-none text-black/70 transition-colors hover:bg-mist-2 hover:text-sea">
+              ×
+            </button>
+          </div>
+          {children}
+        </div>
+      ) : null}
+    </dialog>
+  );
+}
 
 /**
  * Puts the message on the clipboard with its links as clickable words, and as
@@ -122,7 +167,7 @@ export function ProspectsManager({
   activities: ProspectActivityRow[];
   /** The researched catalogue, reduced to what the criteria count with. */
   facets: CatalogueFacet[];
-  /** Who signs the messages: the signed-in person's name. */
+  /** Who signs the messages. */
   sender: string;
   /** Today in Podgorica, YYYY-MM-DD. */
   today: string;
@@ -142,6 +187,8 @@ export function ProspectsManager({
   const [tierFilter, setTierFilter] = useState<"" | "none" | ProspectTier>("");
   const [reachFilter, setReachFilter] = useState<"" | ProspectReach>("");
   const [query, setQuery] = useState("");
+  const [statsOpen, setStatsOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
@@ -218,22 +265,64 @@ export function ProspectsManager({
   );
   const share = (part: number, whole: number) => (whole > 0 ? t("share", { pct: Math.round((part / whole) * 100) }) : undefined);
 
+  // The filters once, for the row on a wide screen and the sheet on a phone.
+  // In the row an unset filter shows its own name; in the sheet, under its label, "All".
+  const filterFields: { key: string; name: string; label: string; value: string; empty: string; set: (value: string) => void; options: (readonly [string, string])[] }[] = [
+    {
+      key: "stage", name: t("filterName.stage"), label: t("filterName.stage"), value: stageFilter, empty: "all", set: (v) => setStageFilter(v as typeof stageFilter),
+      options: [["due", `${t("due")} (${counts.due})`], ...PROSPECT_STAGES.map((st) => [st, `${t(`stage.${st}`)} (${counts.by[st]})`] as const)],
+    },
+    { key: "kind", name: t("filterName.kind"), label: t("kindLabel"), value: kindFilter, empty: "", set: (v) => setKindFilter(v as typeof kindFilter), options: PROSPECT_KINDS.map((k) => [k, t(`kind.${k}`)] as const) },
+    { key: "sector", name: t("filterName.sector"), label: t("sectorLabel"), value: sectorFilter, empty: "", set: setSectorFilter, options: sectorsInList.map((sec) => [sec, sectorLabel(sec)] as const) },
+    { key: "area", name: t("filterName.area"), label: t("areaLabel"), value: areaFilter, empty: "", set: (v) => setAreaFilter(v as typeof areaFilter), options: PROSPECT_AREAS.map((ar) => [ar, t(`area.${ar}`)] as const) },
+    { key: "tier", name: t("filterName.tier"), label: t("tierLabel"), value: tierFilter, empty: "", set: (v) => setTierFilter(v as typeof tierFilter), options: [...PROSPECT_TIERS.map((tier) => [tier, t(`tier.${tier}`)] as const), ["none", t("tierNone")]] },
+    { key: "reach", name: t("filterName.reach"), label: t("reachLabel"), value: reachFilter, empty: "", set: (v) => setReachFilter(v as typeof reachFilter), options: PROSPECT_REACH.map((r) => [r, t(`reach.${r}`)] as const) },
+  ];
+  const activeFilters = filterFields
+    .filter((f) => f.value !== f.empty)
+    .map((f) => ({ ...f, chosen: (f.options.find(([value]) => value === f.value)?.[1] ?? f.value).replace(/ \(\d+\)$/, "") }));
+  // Follow-ups that are due, one tap away while the status filter is closed.
+  const dueShortcut =
+    counts.due > 0 && stageFilter !== "due" ? (
+      <button type="button" onClick={() => setStageFilter("due")} className={`${chipBase} bg-sand text-black hover:bg-mist-2`}>
+        {t("due")} <span className="font-mono tabular-nums opacity-70">{counts.due}</span>
+      </button>
+    ) : null;
+  const clearFilters = () => filterFields.forEach((f) => f.set(f.empty));
+
   return (
     <div>
-      <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-        <p className="max-w-2xl text-[15px] leading-relaxed text-black/65">{t("lead")}</p>
-        <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => setPanel("develop")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
-            + {t("develop")}
-          </button>
-          <button type="button" onClick={() => setPanel("new")} className="rounded-lg bg-mist px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
-            {t("addByHand")}
-          </button>
-        </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" onClick={() => setPanel("develop")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
+          + {t("develop")}
+        </button>
+        <button type="button" onClick={() => setPanel("new")} className="rounded-lg bg-mist px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
+          {t("addByHand")}
+        </button>
+        {dueShortcut ? <span className="ml-auto hidden lg:block">{dueShortcut}</span> : null}
       </div>
 
-      {/* the funnel */}
-      <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-5">
+      {/* the funnel: one line on a phone until it is opened */}
+      <button
+        type="button"
+        aria-expanded={statsOpen}
+        aria-controls="prospect-stats"
+        onClick={() => setStatsOpen((v) => !v)}
+        className="mt-3 flex w-full items-center gap-2 rounded-lg bg-mist px-4 py-3 text-left text-[14.5px] font-semibold sm:hidden"
+      >
+        <span className="min-w-0 flex-1">
+          {[[t("statAll"), prospects.length], [t("statContacted"), reached.contacted], [t("statWon"), reached.won]].map(([label, value], i) => (
+            <span key={label} className="whitespace-nowrap">
+              {i > 0 ? <span className="text-black/35"> · </span> : null}
+              <span className="text-black/60">{label}</span> <span className="font-mono font-extrabold tabular-nums">{value}</span>
+            </span>
+          ))}
+        </span>
+        <svg aria-hidden="true" viewBox="0 0 20 20" className={`h-4 w-4 shrink-0 text-black/55 motion-safe:transition-transform ${statsOpen ? "rotate-180" : ""}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 7.5l5 5 5-5" />
+        </svg>
+      </button>
+      <div id="prospect-stats" className={`mt-2 grid-cols-2 gap-2 sm:mt-5 sm:grid sm:grid-cols-5 ${statsOpen ? "grid" : "hidden"}`}>
         {stat(t("statAll"), prospects.length, t("statAllSub", { count: prospects.filter((p) => p.contact_name).length }))}
         {stat(t("statContacted"), reached.contacted, share(reached.contacted, prospects.length))}
         {stat(t("statEngaged"), reached.engaged, share(reached.engaged, reached.contacted))}
@@ -241,49 +330,60 @@ export function ProspectsManager({
         {stat(t("statWon"), reached.won, share(reached.won, reached.contacted))}
       </div>
 
-      {/* where they stand */}
-      <div className="mt-5 flex flex-wrap gap-1.5" role="group" aria-label={t("stageFilter")}>
-        {([["all", prospects.length], ["due", counts.due], ...PROSPECT_STAGES.map((s) => [s, counts.by[s]] as const)] as const).map(([key, count]) => {
-          const active = stageFilter === key;
-          const label = key === "all" ? t("all") : key === "due" ? t("due") : t(`stage.${key}`);
-          return (
-            <button
-              key={key}
-              type="button"
-              aria-pressed={active}
-              onClick={() => setStageFilter(key)}
-              className={`${chipBase} ${active ? "bg-ink text-paper" : key === "due" && count > 0 ? "bg-sand text-black hover:bg-mist-2" : "bg-mist text-black/75 hover:bg-mist-2"}`}
-            >
-              {label} <span className="font-mono tabular-nums opacity-70">{count}</span>
-            </button>
-          );
-        })}
+      {/* filters: one row on a wide screen, two on a narrower one */}
+      <div className="mt-4 hidden grid-cols-4 gap-2 lg:grid xl:flex">
+        {filterFields.map((f) => (
+          <select key={f.key} aria-label={f.label} value={f.value} onChange={(e) => f.set(e.target.value)} className={`${filterClass} min-w-0 flex-1 truncate ${f.value === f.empty ? "bg-mist" : "bg-mist-2 font-bold"}`}>
+            <option value={f.empty}>{f.name}</option>
+            {f.options.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+        ))}
+        <input type="search" aria-label={t("search")} placeholder={t("searchShort")} value={query} onChange={(e) => setQuery(e.target.value)} className={`${filterClass} col-span-2 min-w-0 bg-mist xl:flex-[1.4]`} />
       </div>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
-        <select aria-label={t("kindLabel")} value={kindFilter} onChange={(e) => setKindFilter(e.target.value as "" | ProspectKind)} className={`${inputClass} mt-0 bg-mist`}>
-          <option value="">{t("allKinds")}</option>
-          {PROSPECT_KINDS.map((k) => <option key={k} value={k}>{t(`kind.${k}`)}</option>)}
-        </select>
-        <select aria-label={t("sectorLabel")} value={sectorFilter} onChange={(e) => setSectorFilter(e.target.value)} className={`${inputClass} mt-0 bg-mist`}>
-          <option value="">{t("allSectors")}</option>
-          {sectorsInList.map((s) => <option key={s} value={s}>{sectorLabel(s)}</option>)}
-        </select>
-        <select aria-label={t("areaLabel")} value={areaFilter} onChange={(e) => setAreaFilter(e.target.value as "" | ProspectArea)} className={`${inputClass} mt-0 bg-mist`}>
-          <option value="">{t("allAreas")}</option>
-          {PROSPECT_AREAS.map((a) => <option key={a} value={a}>{t(`area.${a}`)}</option>)}
-        </select>
-        <select aria-label={t("tierLabel")} value={tierFilter} onChange={(e) => setTierFilter(e.target.value as "" | "none" | ProspectTier)} className={`${inputClass} mt-0 bg-mist`}>
-          <option value="">{t("allTiers")}</option>
-          {PROSPECT_TIERS.map((tier) => <option key={tier} value={tier}>{t(`tier.${tier}`)}</option>)}
-          <option value="none">{t("tierNone")}</option>
-        </select>
-        <select aria-label={t("reachLabel")} value={reachFilter} onChange={(e) => setReachFilter(e.target.value as "" | ProspectReach)} className={`${inputClass} mt-0 bg-mist`}>
-          <option value="">{t("allReach")}</option>
-          {PROSPECT_REACH.map((r) => <option key={r} value={r}>{t(`reach.${r}`)}</option>)}
-        </select>
-        <input type="search" aria-label={t("search")} placeholder={t("search")} value={query} onChange={(e) => setQuery(e.target.value)} className={`${inputClass} mt-0 bg-mist`} style={{ minWidth: 0 }} />
+      {/* filters on a phone: the search, and a sheet for the rest */}
+      <div className="mt-3 flex gap-2 lg:hidden">
+        <input type="search" aria-label={t("search")} placeholder={t("searchShort")} value={query} onChange={(e) => setQuery(e.target.value)} className={`${filterClass} min-w-0 flex-1 bg-mist`} />
+        <button type="button" onClick={() => setSheetOpen(true)} className={`flex shrink-0 items-center gap-2 rounded-lg px-4 py-2.5 text-[14.5px] font-semibold transition-colors ${activeFilters.length > 0 ? "bg-ink text-paper" : "bg-mist text-black hover:bg-mist-2"}`}>
+          <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M3 5.5h14M6 10h8M8.5 14.5h3" />
+          </svg>
+          {t("filters")}
+          {activeFilters.length > 0 ? <span className="font-mono tabular-nums">{activeFilters.length}</span> : null}
+        </button>
       </div>
+      {activeFilters.length > 0 || dueShortcut ? (
+        <div className="mt-2 flex flex-wrap gap-1.5 lg:hidden">
+          {dueShortcut}
+          {activeFilters.map((f) => (
+            <button key={f.key} type="button" onClick={() => f.set(f.empty)} aria-label={t("filterRemove", { name: f.chosen })} className={`${chipBase} flex items-center gap-1.5 bg-mist text-black hover:bg-mist-2`}>
+              {f.chosen} <span aria-hidden="true" className="text-[16px] leading-none text-black/50">×</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+
+      <BottomSheet open={sheetOpen} title={t("filters")} onClose={() => setSheetOpen(false)}>
+        <div className="grid grid-cols-2 gap-3">
+          {filterFields.map((f) => (
+            <label key={f.key} className={`${labelClass} min-w-0`}>
+              {f.label}
+              <select value={f.value} onChange={(e) => f.set(e.target.value)} className={`${filterClass} mt-1 bg-mist`}>
+                <option value={f.empty}>{f.key === "stage" ? `${t("all")} (${prospects.length})` : t("all")}</option>
+                {f.options.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+            </label>
+          ))}
+        </div>
+        <div className="mt-5 flex gap-2">
+          <button type="button" disabled={activeFilters.length === 0} onClick={clearFilters} className="rounded-lg bg-mist px-4 py-3 text-[15px] font-semibold transition-colors hover:bg-mist-2 disabled:opacity-40">
+            {t("filtersClear")}
+          </button>
+          <button type="button" onClick={() => setSheetOpen(false)} className="flex-1 rounded-lg bg-red px-4 py-3 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark">
+            {t("filtersShow", { count: shown.length })}
+          </button>
+        </div>
+      </BottomSheet>
 
       {notice ? <p role="status" className="mt-3 text-[14px] font-semibold text-sea">{notice}</p> : null}
 
@@ -831,13 +931,13 @@ function ProspectDetail({
 
       {/* where it stands */}
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        <label className={labelClass}>
+        <label className={`${labelClass} min-w-0`}>
           {t("stageLabel")}
           <select value={row.stage} onChange={(e) => void act(() => setProspectStage({ id: row.id, stage: e.target.value }))} className={inputClass}>
             {PROSPECT_STAGES.map((s) => <option key={s} value={s}>{t(`stage.${s}`)}</option>)}
           </select>
         </label>
-        <label className={labelClass}>
+        <label className={`${labelClass} min-w-0`}>
           {t("followUpField")}
           <input type="date" min={today} value={row.next_follow_up ?? ""} onChange={(e) => void act(() => setProspectFollowUp({ id: row.id, date: e.target.value || null }))} className={inputClass} />
         </label>
