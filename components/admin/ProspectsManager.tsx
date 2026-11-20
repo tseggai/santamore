@@ -673,6 +673,7 @@ function ProspectDetail({
     lang,
     org: row.name,
     contactName: row.contact_name,
+    tierFit: row.tier_fit,
     sender,
     pledgeUrl: links.pledge,
     siteUrl: links.site,

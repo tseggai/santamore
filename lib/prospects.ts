@@ -211,6 +211,8 @@ export interface MessageContext {
   lang: ProspectLang;
   org: string;
   contactName: string | null;
+  /** The prospect's tier fit; it sets the figure a sponsor ask opens with. */
+  tierFit?: ProspectTier | null;
   sender: string;
   /** The sponsor page with the tiers and the pledge form. */
   pledgeUrl: string;
@@ -229,10 +231,24 @@ const WHO: Record<ProspectLang, string> = {
   en: "I'm writing on behalf of Santamore, a Montenegrin non-profit based in Tivat. We are organizing Santamore Week, taking place from December 7–13 — a week of community activities and events through which we raise funds, 100% of which go to charitable causes.",
 };
 
-const ASK: Record<ProspectKind, Record<ProspectLang, (org: string) => string>> = {
+/**
+ * The figure a sponsor ask opens with, in whole euros, by the prospect's tier
+ * fit. The prices are the ones on the sponsor page (`content/site/partners.ts`);
+ * a prospect with no cash tier on file gets the Gold figure. (Owner decision 2026-11-20.)
+ */
+const TIER_FROM_EUR: Partial<Record<ProspectTier, number>> = { core: 25000, title: 10000, gold: 5000, silver: 2000, local: 250 };
+const DEFAULT_FROM_EUR = 5000;
+
+/** "€5,000" in English, "€5.000" in Montenegrin; no separator under a thousand. */
+export function tierFrom(tier: ProspectTier | null | undefined, lang: ProspectLang): string {
+  const euros = (tier && TIER_FROM_EUR[tier]) || DEFAULT_FROM_EUR;
+  return `€${String(euros).replace(/\B(?=(\d{3})+$)/g, lang === "me" ? "." : ",")}`;
+}
+
+const ASK: Record<ProspectKind, Record<ProspectLang, (org: string, from: string) => string>> = {
   sponsor: {
-    me: (org) => `Ove praznične sezone voljeli bismo da nam se ${org} pridruži kao sponzor. Nivoi sponzorstva počinju od €5.000.`,
-    en: (org) => `This holiday season, we would love for ${org} to join us as a sponsor. Tiers start at €5,000.`,
+    me: (org, from) => `Ove praznične sezone voljeli bismo da nam se ${org} pridruži kao sponzor. Nivoi sponzorstva počinju od ${from}.`,
+    en: (org, from) => `This holiday season, we would love for ${org} to join us as a sponsor. Tiers start at ${from}.`,
   },
   in_kind: {
     me: (org) => `Tražimo podršku u robi ili uslugama za naše događaje: voda, voće, štampa, ozvučenje, prva pomoć, fotografija. Vrednujemo je i knjižimo tačno kao gotovinu, uz priznanje na odgovarajućem nivou sponzorstva. Voljeli bismo da ${org} bude dio toga. Možete li nam pomoći?`,
@@ -296,7 +312,7 @@ export function composeMessage(ctx: MessageContext): { subject: string; body: st
         : `I wanted to follow up on my message about ${org} and Santamore. Is there someone I should speak to, or a good time for a short call?`,
     );
   } else {
-    paragraphs.push(WHO[lang], ASK[kind][lang](org));
+    paragraphs.push(WHO[lang], ASK[kind][lang](org, tierFrom(ctx.tierFit, lang)));
   }
 
   const lines: string[] = [];

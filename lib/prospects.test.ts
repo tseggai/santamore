@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { catalogueKey, composeMessage, followUpAfter, followUpDays, instagramLink, isDue, isMobile, mailtoLink, matchesCriteria, phoneDigits, whatsappLink, type ProspectCriteria } from "@/lib/prospects";
+import { catalogueKey, composeMessage, tierFrom, followUpAfter, followUpDays, instagramLink, isDue, isMobile, mailtoLink, matchesCriteria, phoneDigits, whatsappLink, type ProspectCriteria } from "@/lib/prospects";
 
 const any: ProspectCriteria = { kinds: [], sectors: [], areas: [], tiers: [], personOnly: false };
 const bank = { kind: "sponsor", sector: "bank", area: "national", tier_fit: "gold", hasPerson: true } as const;
@@ -84,6 +84,19 @@ describe("messages", () => {
     const en = composeMessage({ ...base, kind: "sponsor", template: "first", lang: "en", contactName: null });
     expect(en.body.startsWith("Hello,")).toBe(true);
     expect(en.body).toContain("This holiday season, we would love for Banka to join us as a sponsor. Tiers start at €5,000.");
+  });
+
+  it("opens a sponsor ask at the prospect's tier", () => {
+    expect(tierFrom("local", "en")).toBe("€250");
+    expect(tierFrom("silver", "en")).toBe("€2,000");
+    expect(tierFrom("gold", "me")).toBe("€5.000");
+    expect(tierFrom("title", "en")).toBe("€10,000");
+    expect(tierFrom("core", "me")).toBe("€25.000");
+    // No cash tier on file: the Gold figure.
+    expect(tierFrom("inkind", "en")).toBe("€5,000");
+    expect(tierFrom(null, "en")).toBe("€5,000");
+    const silver = composeMessage({ ...base, kind: "sponsor", template: "first", lang: "me", tierFit: "silver" });
+    expect(silver.body).toContain("Nivoi sponzorstva počinju od €2.000.");
   });
 
   it("greets by first name, and keeps the whole name after a title", () => {
