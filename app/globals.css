@@ -314,6 +314,18 @@
   }
 }
 
+/* The filter sheet that rises on a phone (components/admin/ProspectsManager.tsx). */
+@keyframes sheet-in {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 /* Console slide-over (components/console/SidePanel.tsx). */
 @keyframes panel-in {
   from {
@@ -336,5 +348,16 @@
   select,
   textarea {
     font-size: 16px;
+  }
+  /* An iOS date or time field keeps its native box, which adds its padding to
+     a full width and so runs past its column. Without the native box it is
+     sized like every other field; the picker still opens. */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    -webkit-appearance: none;
+    appearance: none;
+    min-width: 0;
+    max-width: 100%;
   }
 }

@@ -1766,7 +1766,6 @@
     "perkWaitingBadge": "Live once the challenge is published",
     "prospects": {
       "tab": "Prospects",
-      "lead": "The organisations we want to support us, and where each ask stands. Develop the list from the research, open a prospect to message them, and come back when a follow-up is due.",
       "develop": "Develop a list",
       "addByHand": "Add by hand",
       "edit": "Edit",
@@ -1783,7 +1782,6 @@
       "statPledged": "Pledged",
       "statWon": "Won",
       "share": "{pct}% of the step before",
-      "stageFilter": "Where they stand",
       "all": "All",
       "due": "Due",
       "stage": {
@@ -1796,7 +1794,6 @@
       },
       "stageLabel": "Stage",
       "kindLabel": "Who we ask",
-      "allKinds": "Everyone we ask",
       "kind": {
         "sponsor": "Sponsor",
         "in_kind": "In kind",
@@ -1813,7 +1810,6 @@
       },
       "kindHintMany": "Pick one to see what it means, or several to mix.",
       "sectorLabel": "Sector",
-      "allSectors": "Every sector",
       "sector": {
         "bank": "Banks",
         "insurance": "Insurers",
@@ -1839,7 +1835,6 @@
         "embassy_intl": "Embassies and international bodies"
       },
       "areaLabel": "Where",
-      "allAreas": "Everywhere",
       "area": {
         "tivat": "Tivat",
         "boka": "Boka Bay",
@@ -2011,10 +2006,8 @@
       "checkDismiss": "Dismiss",
       "checkLoggedHint": "The finding is in the log either way, with its date, so you can see how a prospect changes over time.",
       "activityResearch": "Live check",
-      "allTiers": "Every tier",
       "tierNone": "No tier set",
       "reachLabel": "Contact",
-      "allReach": "Any contact",
       "reach": {
         "email": "Has an email",
         "phone": "Phone only",
@@ -2027,6 +2020,19 @@
         "email": "A draft opens with the address and subject. The message is copied with its links as clickable words: paste it into the draft.",
         "copy": "Copied with its links as clickable words. Paste it into a mail.",
         "plain": "WhatsApp and Instagram show no linked words, so each link goes as its address."
+      },
+      "searchShort": "Search",
+      "filters": "Filters",
+      "filtersClear": "Clear all",
+      "filtersShow": "{count, plural, one {Show # prospect} other {Show # prospects}}",
+      "filterRemove": "Remove the filter {name}",
+      "filterName": {
+        "stage": "Status",
+        "kind": "Kind",
+        "sector": "Sector",
+        "area": "Area",
+        "tier": "Tier",
+        "reach": "Contact"
       }
     },
     "supportersTabProspects": "Prospects"
