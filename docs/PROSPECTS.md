@@ -87,7 +87,11 @@ A message opens in the sender's own WhatsApp, mail app or Instagram, where they
 press send, so replies come to a person. The console logs the words, moves a new
 prospect to Contacted and sets the follow-up: five days after a first message, a
 week after a follow-up. Templates are in `lib/prospects.ts` (`composeMessage`),
-in Montenegrin and English, one ask per kind.
+in Montenegrin and English, one ask per kind. Every message is signed by
+`PROSPECT_SIGNER`, whoever is signed in, and greets the contact by first name.
+A sponsor ask opens at the prospect's tier fit (Local Business €250, Silver €2 000,
+Gold €5 000, Title €10 000, Core Cost €25 000), and at the Gold figure when none is on file.
+The opening names Santamore Week and its dates: change it once the week has passed.
 
 "Attach the sponsorship sheet" adds a link to the PDF served from
 `public/sponzorstvo/`; WhatsApp and `mailto:` cannot carry a file from a web
