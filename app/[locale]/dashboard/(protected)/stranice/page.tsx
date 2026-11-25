@@ -108,7 +108,8 @@ export default async function PagesHubPage({
       .maybeSingle();
     if (team) {
       const existing = pages.find((page) => page.campaign_id === team.campaign_id);
-      if (existing) {
+      // Already on that page's editor: nothing to redirect to.
+      if (existing && stranica !== existing.slug) {
         redirect(`/${locale}/dashboard/stranice?stranica=${existing.slug}&team=${teamParam}`);
       }
       teamEventSlug = causes.find((cause) => cause.id === team.campaign_id)?.slug ?? null;
