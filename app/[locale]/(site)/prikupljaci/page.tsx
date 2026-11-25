@@ -167,7 +167,8 @@ export default async function FundraisersDirectoryPage({
               title: row.title,
               photoUrl: fundraiserPhotoUrl(row.photo_path),
               raisedCents: row.raised_cents,
-              goalCents: board.goalBySlug[row.slug] ?? null,
+              // A board cached before a deploy can lack a field added since: never assume it.
+              goalCents: board.goalBySlug?.[row.slug] ?? null,
               meta: board.event ? undefined : (board.options.find((option) => option.id === row.campaign_id)?.name ?? undefined),
               href: `/f/${row.slug}`,
             }),
