@@ -550,6 +550,8 @@ export interface PageEditorData {
   captainOf: string[];
   raisedCents: number;
   donorCount: number;
+  /** Open pledges on the page: promised, not received. */
+  pledgedCents: number;
   event: { kind: string; challenge_metric: string | null } | null;
   activities: { id: string; started_at: string; distance_m: number; moving_time_s: number; source: string }[];
   cash: { id: string; amount_cents: number; status: string; created_at: string; donor_name: string | null; message: string | null }[];
@@ -578,7 +580,7 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
     .filter((row) => row.id === mine.campaign_id || !causeState(row).completed)
     .map((row) => ({ id: row.id, title: row.title }));
   if (!causes.some((row) => row.id === mine.campaign_id)) causes.unshift({ id: mine.campaign_id, title: cause?.title ?? "" });
-  const [{ data: teams }, { data: captained }, { data: totals }, { data: challenge }, { data: activityRows }, { data: cashRows }] =
+  const [{ data: teams }, { data: captained }, { data: totals }, { data: challenge }, { data: activityRows }, { data: cashRows }, { data: pledges }] =
     await Promise.all([
       supabase.from("v_team_totals").select("id, name, description, photo_path, campaign_id").in("campaign_id", causes.map((row) => row.id)).order("name"),
       supabase.from("teams").select("id").eq("captain_id", user.id),
@@ -603,6 +605,7 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
         .eq("rail", "cash")
         .order("created_at", { ascending: false })
         .limit(30),
+      supabase.from("v_public_fundraiser_pledges").select("pledged_cents").eq("id", mine.id).maybeSingle(),
     ]);
 
   return {
@@ -631,6 +634,7 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
     captainOf: (captained ?? []).map((row) => row.id),
     raisedCents: totals?.raised_cents ?? 0,
     donorCount: totals?.donor_count ?? 0,
+    pledgedCents: Number(pledges?.pledged_cents ?? 0),
     event: challenge ? { kind: challenge.kind, challenge_metric: challenge.challenge_metric } : null,
     activities: (activityRows ?? []) as PageEditorData["activities"],
     cash: (cashRows ?? []) as PageEditorData["cash"],

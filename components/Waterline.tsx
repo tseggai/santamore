@@ -33,6 +33,7 @@ export function Waterline({
   locale,
   surface = "mist",
   stacked = false,
+  pledgedCents = 0,
 }: {
   raisedCents: Cents;
   goalCents: Cents;
@@ -42,10 +43,15 @@ export function Waterline({
   surface?: "mist" | "paper";
   /** Goal and donors on lines of their own under the amount (the editor). */
   stacked?: boolean;
+  /** Open pledges: promised, not received. Shown beside the amount raised, never inside it. */
+  pledgedCents?: Cents;
 }) {
   const t = useTranslations("runner");
   const pct =
     goalCents > 0 ? Math.min(100, Math.round((raisedCents / goalCents) * 100)) : 0;
+  // Where the water would stand if every pledge arrived: a pale band above the real level.
+  const promisedPct =
+    goalCents > 0 && pledgedCents > 0 ? Math.min(100, Math.round(((raisedCents + pledgedCents) / goalCents) * 100)) : 0;
   const [fill, setFill] = useState(0);
 
   useEffect(() => {
@@ -57,6 +63,7 @@ export function Waterline({
 
   return (
     <div className={`${styles.waterline}${surface === "paper" ? ` ${styles.paper}` : ""}${fill > 55 ? ` ${styles.deep}` : ""}`}>
+      {promisedPct > pct ? <div className={styles.promised} style={{ height: `${promisedPct}%` }} /> : null}
       <div className={styles.fill} style={{ height: `${fill}%` }} />
       <div className={styles.waveA} style={{ bottom: `calc(${fill}% - 13px)` }}>
         <Wave d={WAVE_A} fill="#15505F" />
@@ -85,6 +92,11 @@ export function Waterline({
               <span className="font-mono tabular-nums">{donorCount}</span> {t("donors")}
             </div>
           )}
+          {pledgedCents > 0 ? (
+            <div className={styles.of}>
+              {t("pledgedLabel")}: <span className="font-mono font-bold tabular-nums">{money(pledgedCents)}</span>
+            </div>
+          ) : null}
         </div>
         <div className={styles.pct}>{pct}%</div>
       </div>

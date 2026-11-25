@@ -233,7 +233,8 @@
     "wallEmpty": "Još nema donacija — budi prvi/a.",
     "raisingFor": "Prikuplja za",
     "goalLabel": "Cilj",
-    "donorsLabel": "Donatori"
+    "donorsLabel": "Donatori",
+    "pledgedLabel": "Obećano"
   },
   "leaderboard": {
     "title": "Rang lista",

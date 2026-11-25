@@ -70,6 +70,10 @@ Each row carries a `source`, so the public ledger can say where a row comes from
 | Supporters → Donors | `v_donors`, `v_donor_gifts` | the same rows by donor, account or not |
 | Chapter totals | `v_chapter_totals` | ledger only; recorded rows have no chapter |
 
+## Pledges
+
+A pledge is a pending SEPA donation: a promise, not money (while the bank account is not open, every gift is one). It never enters `v_money_in_all`, so no raised figure, donor count, ledger or leaderboard includes it. It has one source of its own, `v_pledges_open` (internal), and `v_public_fundraiser_pledges` sums it per published page: an amount and a count, never a name (migration 0090, owner decision 2026-11-25). The fundraiser page, its share card and the fundraiser's dashboard show it as "Pledged", beside the amount raised and never added to it. When staff match the transfer the row becomes approved: it leaves the pledge view and enters the ledger, so no euro is shown twice.
+
 ## Cause state
 
 `lib/cause-status.ts` derives a cause's state from the same figures: ended when its end date has passed, goal reached when raised meets the goal, completed when ended or when everything raised was handed over. A completed cause takes no more money: its Donate and Raise buttons give way to "See where the money went", and the donate sheet's flagship picks the most recent open cause.
