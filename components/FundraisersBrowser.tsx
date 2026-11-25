@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Avatar } from "@/components/Avatar";
-import { LeaderboardList, type LeaderboardEntry } from "@/components/Leaderboard";
+import { LeaderboardList, entryBar, type LeaderboardEntry } from "@/components/Leaderboard";
 import { formatCents } from "@/lib/money";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -95,7 +95,7 @@ export function FundraisersBrowser({
                   {entry.meta ? <span className="mt-0.5 font-mono text-[12.5px] text-black/50">{entry.meta}</span> : null}
                   <span className="mt-2 font-mono text-[15px] font-semibold tabular-nums">{entry.display ?? money(entry.raisedCents)}</span>
                   <span className="mt-2 block h-[5px] w-full overflow-hidden rounded-[3px] bg-mist-2">
-                    <span className={`block h-full rounded-[3px] ${rank === 1 ? "bg-red" : "bg-ink"}`} style={{ width: `${Math.max(2, Math.round((entry.raisedCents / top) * 100))}%` }} />
+                    <span className={`block h-full rounded-[3px] ${entryBar(entry, top, rank === 1).tone}`} style={{ width: entryBar(entry, top, rank === 1).width }} />
                   </span>
                 </Link>
               </li>
