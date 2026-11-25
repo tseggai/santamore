@@ -72,7 +72,14 @@ Each row carries a `source`, so the public ledger can say where a row comes from
 
 ## Pledges
 
-A pledge is a pending SEPA donation: a promise, not money (while the bank account is not open, every gift is one). It never enters `v_money_in_all`, so no raised figure, donor count, ledger or leaderboard includes it. It has one source of its own, `v_pledges_open` (internal), and `v_public_fundraiser_pledges` sums it per published page: an amount and a count, never a name (migration 0090, owner decision 2026-11-25). The fundraiser page, its share card and the fundraiser's dashboard show it as "Pledged", beside the amount raised and never added to it. When staff match the transfer the row becomes approved: it leaves the pledge view and enters the ledger, so no euro is shown twice.
+A pledge is a pending SEPA donation: a promise, not money (while the bank account is not open, every gift is one). It never enters `v_money_in_all`, so the ledger, the leaderboards and every stored "raised" figure are money received only. Pledges have one source of their own, `v_pledges_open` (internal), summed per published page in `v_public_fundraiser_pledges` and per public cause in `v_public_campaign_pledges`: amounts and counts, never a name (migration 0090).
+
+What a page shows is decided in one place, `lib/pledges.ts` (owner decisions of 2026-11-25):
+
+- **Pledge mode** (no bank account yet): a pledger is a donor. The headline is the view's `total_cents` (received plus pledged) and the donor count is its `donor_count` (the distinct people behind both). A "Pledged" line still says how much of it is promised.
+- **Account open**: the headline is money received again, with open pledges on a "Pledged" line beside it.
+
+Both totals are computed in the views; no page adds them up. A cause's state (goal reached, completed) follows money received only. When staff match a transfer the row becomes approved: it leaves the pledges and enters the ledger, so no euro is shown twice.
 
 ## Cause state
 
