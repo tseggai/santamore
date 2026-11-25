@@ -32,6 +32,7 @@ export function Waterline({
   donorCount,
   locale,
   surface = "mist",
+  stacked = false,
 }: {
   raisedCents: Cents;
   goalCents: Cents;
@@ -39,6 +40,8 @@ export function Waterline({
   locale: Locale;
   /** "paper" when the tank already sits on a mist surface, e.g. the editor. */
   surface?: "mist" | "paper";
+  /** Goal and donors on lines of their own under the amount (the editor). */
+  stacked?: boolean;
 }) {
   const t = useTranslations("runner");
   const pct =
@@ -66,11 +69,22 @@ export function Waterline({
       <div className={styles.copy}>
         <div className={styles.plate}>
           <div className={styles.raised}>{money(raisedCents)}</div>
-          <div className={styles.of}>
-            {t("of")}{" "}
-            <span className="font-mono tabular-nums">{money(goalCents)}</span> ·{" "}
-            <span className="font-mono tabular-nums">{donorCount}</span> {t("donors")}
-          </div>
+          {stacked ? (
+            <>
+              <div className={styles.of}>
+                {t("goalLabel")}: <span className="font-mono tabular-nums">{goalCents > 0 ? money(goalCents) : "—"}</span>
+              </div>
+              <div className={styles.of}>
+                {t("donorsLabel")}: <span className="font-mono tabular-nums">{donorCount}</span>
+              </div>
+            </>
+          ) : (
+            <div className={styles.of}>
+              {t("of")}{" "}
+              <span className="font-mono tabular-nums">{money(goalCents)}</span> ·{" "}
+              <span className="font-mono tabular-nums">{donorCount}</span> {t("donors")}
+            </div>
+          )}
         </div>
         <div className={styles.pct}>{pct}%</div>
       </div>

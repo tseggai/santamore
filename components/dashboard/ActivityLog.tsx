@@ -24,10 +24,13 @@ export function ActivityLog({
   fundraiserId,
   metric,
   activities,
+  surface = "mist",
 }: {
   fundraiserId: string;
   metric: ChallengeMetric;
   activities: ActivityEntry[];
+  /** "paper" inside the hub's slide-over, which is mist itself. */
+  surface?: "mist" | "paper";
 }) {
   const t = useTranslations("dashboard");
   const locale = useLocale() as Locale;
@@ -67,10 +70,10 @@ export function ActivityLog({
   };
 
   const inputClass =
-    "mt-1 w-full rounded-lg border-[1.5px] border-line px-3 py-2.5 font-mono text-[15px] tabular-nums outline-none focus:border-sea";
+    "mt-1 h-11 w-full min-w-0 rounded-lg border-[1.5px] border-line bg-paper px-2 font-mono text-[15px] tabular-nums outline-none focus:border-sea";
 
   return (
-    <div className="mt-6 rounded-brand bg-mist px-4 py-4">
+    <div className={`mt-6 rounded-brand px-4 py-4 ${surface === "paper" ? "bg-paper" : "bg-mist"}`}>
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-[15px] font-bold">{t("activityHeading")}</p>
         <p className="font-mono text-[16px] font-medium tabular-nums text-sea">
@@ -79,8 +82,9 @@ export function ActivityLog({
       </div>
       <p className="mt-1 text-[13.5px] text-black/60">{t("activitySub")}</p>
 
-      <form onSubmit={submit} className="mt-3 flex flex-wrap items-end gap-2">
-        <label className="w-24 text-[13px] font-semibold">
+      {/* One row on a phone: two narrow figures, the date takes what is left. */}
+      <form onSubmit={submit} className="mt-3 flex items-end gap-2">
+        <label className="w-14 shrink-0 text-[13px] font-semibold sm:w-20">
           {t("activityKm")}
           <input
             type="text"
@@ -90,7 +94,7 @@ export function ActivityLog({
             className={inputClass}
           />
         </label>
-        <label className="w-24 text-[13px] font-semibold">
+        <label className="w-14 shrink-0 text-[13px] font-semibold sm:w-20">
           {t("activityMinutes")}
           <input
             type="text"
@@ -100,7 +104,7 @@ export function ActivityLog({
             className={inputClass}
           />
         </label>
-        <label className="text-[13px] font-semibold">
+        <label className="min-w-0 flex-1 text-[13px] font-semibold sm:max-w-[180px]">
           {t("activityDate")}
           <input
             type="date"
@@ -112,7 +116,7 @@ export function ActivityLog({
         <button
           type="submit"
           disabled={state === "busy" || (km.trim() === "" && minutes.trim() === "")}
-          className="rounded-lg bg-sea px-4 py-2.5 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
+          className="h-11 shrink-0 rounded-lg bg-sea px-3.5 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
         >
           {t("activitySubmit")}
         </button>
