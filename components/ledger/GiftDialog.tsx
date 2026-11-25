@@ -66,7 +66,7 @@ export function GiftDialog({
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      className="m-auto w-[calc(100%-32px)] max-w-md rounded-lg bg-paper p-0 text-black shadow-none backdrop:bg-ink/60"
+      className="m-auto w-[calc(100%-32px)] max-w-md rounded-lg bg-paper p-0 text-black shadow-none ring-[100vmax] ring-ink/55"
     >
       {open ? (
         <div className="p-5 sm:p-6">

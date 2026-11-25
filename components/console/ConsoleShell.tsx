@@ -104,9 +104,9 @@ export function ConsoleShell({
         onClick={(event) => {
           if (event.target === event.currentTarget) setOpen(false);
         }}
-        className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none bg-transparent p-0 backdrop:bg-ink/55 open:block md:hidden"
+        className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none bg-transparent p-0 open:block md:hidden"
       >
-        <div className={`flex h-full w-[min(84vw,20rem)] flex-col gap-5 overflow-y-auto px-5 py-5 text-paper ${bg}`}>
+        <div className={`flex h-full w-[min(84vw,20rem)] flex-col gap-5 overflow-y-auto px-5 py-5 text-paper ring-[100vmax] ring-ink/55 ${bg}`}>
           <div className="flex items-center justify-between gap-3">
             <Link href={homeHref} className="inline-block">
               <Image src={icon} alt="Santamore" className="h-12 w-auto" />

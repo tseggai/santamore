@@ -8,7 +8,7 @@ import { useDialog } from "@/components/console/useDialog";
 /**
  * Right-hand slide-over for console forms. The list behind it stays put:
  * a native <dialog> gives the focus trap, Escape and the inert page; we
- * add the scroll lock, the backdrop close and the slide-in (which
+ * add the scroll lock, the close on a click outside and the slide-in (which
  * `prefers-reduced-motion` turns off). Children mount only while open,
  * so a form always starts fresh. Once something inside has been typed
  * or changed, a click on the backdrop, Escape or the × asks before
@@ -101,11 +101,11 @@ export function SidePanel({
       }}
       onInputCapture={() => { dirty.current = true; }}
       onChangeCapture={() => { dirty.current = true; }}
-      className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none justify-end bg-transparent p-0 backdrop:bg-ink/55 open:flex"
+      className={`fixed inset-0 m-0 h-full max-h-none w-full max-w-none justify-end p-0 open:flex sm:bg-transparent ${bare ? "bg-mist" : "bg-paper"}`}
     >
       {open ? (
         <div
-          className={`relative flex h-full w-full flex-col shadow-[-16px_0_48px_rgba(14,58,70,0.18)] motion-safe:animate-[panel-in_220ms_ease-out] ${
+          className={`relative flex h-full w-full flex-col shadow-[-16px_0_48px_rgba(14,58,70,0.18)] sm:ring-[100vmax] sm:ring-ink/55 motion-safe:animate-[panel-in_220ms_ease-out] ${
             bare ? "bg-mist" : "bg-paper"
           } ${wide ? "sm:max-w-[820px]" : "sm:max-w-[640px]"}`}
         >
