@@ -4,13 +4,10 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { FundraisersBrowser } from "@/components/FundraisersBrowser";
 import type { LeaderboardEntry } from "@/components/Leaderboard";
-import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
-import { isPledgeMode } from "@/lib/org";
 import { PLEDGE_COLUMNS, countPledges, type PledgeRowBySlug } from "@/lib/pledges";
 import { cachedPublic } from "@/lib/public-data";
-import { Link } from "@/i18n/navigation";
-import { routing, type Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 
 export const dynamic = "force-dynamic";
 
@@ -70,7 +67,7 @@ async function fetchBoard(causeSlug: string | undefined) {
       teamsQuery = teamsQuery.eq("campaign_id", chosen.id);
       totalsQuery = totalsQuery.eq("campaign_id", chosen.id);
     }
-    const [{ data: individuals }, { data: teams }, { data: allTotals }, { data: pagePledges }, { data: teamPledges }, { data: causePledges }] = await Promise.all([
+    const [{ data: individuals }, { data: teams }, { data: allTotals }, { data: pagePledges }, { data: teamPledges }] = await Promise.all([
       individualsQuery.order("raised_cents", { ascending: false }).limit(100),
       teamsQuery.order("raised_cents", { ascending: false }).limit(100),
       // Header aggregates over EVERY active page, not just the displayed 100.
@@ -78,13 +75,7 @@ async function fetchBoard(causeSlug: string | undefined) {
       // Open pledges (migration 0090): in pledge mode they count on the board.
       supabase.from("v_public_fundraiser_pledges").select(`slug, ${PLEDGE_COLUMNS}`).limit(2000),
       supabase.from("v_public_team_pledges").select(`slug, ${PLEDGE_COLUMNS}`).limit(500),
-      supabase.from("v_public_campaign_pledges").select("id, pages_pledged_cents"),
     ]);
-    const pagesPledged = isPledgeMode()
-      ? ((causePledges ?? []) as { id: string; pages_pledged_cents: number }[])
-          .filter((row) => !chosen || row.id === chosen.id)
-          .reduce((sum, row) => sum + Number(row.pages_pledged_cents), 0)
-      : 0;
     const totalsRows = (allTotals ?? []) as { slug: string; campaign_id: string | null; goal_cents: number | null }[];
     // Each page's own goal: a card's bar is progress towards it, as on the page.
     const goalBySlug = Object.fromEntries(totalsRows.map((row) => [row.slug, row.goal_cents]));
@@ -99,9 +90,6 @@ async function fetchBoard(causeSlug: string | undefined) {
       individuals: countPledges((individuals ?? []) as IndividualRow[], pagePledges as PledgeRowBySlug[] | null),
       teams: countPledges((teams ?? []) as TeamRow[], teamPledges as PledgeRowBySlug[] | null),
       goalBySlug,
-      activeCount: totalsRows.length,
-      // What the pages raised: the cause view's column (migration 0062), not a sum over the board.
-      totalRaised: (chosen ? causeList.filter((c) => c.id === chosen.id) : causeList).reduce((sum, c) => sum + c.pages_raised_cents, 0) + pagesPledged,
     };
     });
   } catch {
@@ -132,32 +120,16 @@ export default async function FundraisersDirectoryPage({
   const t = await getTranslations("leaderboard");
 
   const board = await fetchBoard(cilj);
-  const totalRaised = board?.totalRaised ?? 0;
 
   return (
-    <div className="mx-auto max-w-3xl px-5 py-14">
+    <div className="mx-auto w-full max-w-3xl px-5 py-14">
       <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
         {board?.event?.name ?? t("allCauses")}
       </p>
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
-        <h1 className="type-display text-4xl">{t("fundraisersTitle")}</h1>
-        <Link
-          href={board?.causeSlug ? `/dashboard/prikupljaj?cause=${board.causeSlug}` : "/dashboard/prikupljaj"}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-red px-4 py-2.5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark"
-        >
-          <span aria-hidden className="text-[18px] leading-none">+</span>
-          {t("startFundraisingCta")}
-        </Link>
-      </div>
-      <p className="mt-2 text-[14.5px] text-black/65">
-        <span className="font-mono tabular-nums">{board?.activeCount ?? 0}</span>{" "}
-        {t("activeFundraisers")} ·{" "}
-        <span className="font-mono tabular-nums">
-          {formatCents(totalRaised, locale as Locale, { trimWholeCents: true })}
-        </span>
-      </p>
+      <h1 className="type-display mt-2 text-4xl">{t("fundraisersTitle")}</h1>
 
       <FundraisersBrowser
+        startHref={board?.causeSlug ? `/dashboard/prikupljaj?cause=${board.causeSlug}` : "/dashboard/prikupljaj"}
         causes={(board?.options ?? []).map((option) => ({ slug: option.slug, name: option.name, pages: option.pages }))}
         selectedCause={board?.causeSlug ?? null}
         individuals={
@@ -167,7 +139,8 @@ export default async function FundraisersDirectoryPage({
               title: row.title,
               photoUrl: fundraiserPhotoUrl(row.photo_path),
               raisedCents: row.raised_cents,
-              goalCents: board.goalBySlug[row.slug] ?? null,
+              // A board cached before a deploy can lack a field added since: never assume it.
+              goalCents: board.goalBySlug?.[row.slug] ?? null,
               meta: board.event ? undefined : (board.options.find((option) => option.id === row.campaign_id)?.name ?? undefined),
               href: `/f/${row.slug}`,
             }),
