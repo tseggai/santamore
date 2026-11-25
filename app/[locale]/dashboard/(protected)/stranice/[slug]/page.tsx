@@ -1,53 +1,14 @@
-import { notFound, redirect } from "next/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
-
-import { ActivityLog, type ActivityEntry } from "@/components/dashboard/ActivityLog";
-import { CashForm } from "@/components/dashboard/CashForm";
-import { PageEditor } from "@/components/dashboard/PageEditor";
-import type { TeamOption } from "@/components/dashboard/TeamPanel";
-import type { ChallengeMetric } from "@/lib/metrics";
-import { formatCents } from "@/lib/money";
-import { createServiceClient } from "@/lib/supabase/admin";
-import { causeState } from "@/lib/cause-status";
-import { createClient } from "@/lib/supabase/server";
-import { Link } from "@/i18n/navigation";
-import type { Locale } from "@/i18n/routing";
-
-export const dynamic = "force-dynamic";
+import { redirect } from "next/navigation";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-interface CashRow {
-  id: string;
-  amount_cents: number;
-  status: string;
-  created_at: string;
-  donor_name: string | null;
-  message: string | null;
-}
-
 /**
- * The runner's own cash log for this page. Donations carry donor PII and
- * stay staff-only under RLS, so this is read server-side with the service
- * role, restricted to the runner's page, the cash rail, and the fields
- * they typed in themselves.
+ * A page has one editor: the slide-over on the fundraising hub. This
+ * address is what the overview, the create form and old links point at, so
+ * it hands over to the hub with that page open (owner decision 2026-11-25:
+ * the same page must look the same from wherever it is opened). A "#gotovina"
+ * on the link survives the redirect.
  */
-async function cashLog(fundraiserId: string): Promise<CashRow[]> {
-  try {
-    const service = createServiceClient();
-    const { data } = await service
-      .from("donations")
-      .select("id, amount_cents, status, created_at, donor_name, message")
-      .eq("fundraiser_id", fundraiserId)
-      .eq("rail", "cash")
-      .order("created_at", { ascending: false })
-      .limit(30);
-    return (data ?? []) as CashRow[];
-  } catch {
-    return [];
-  }
-}
-
 export default async function EditPagePage({
   params,
   searchParams,
@@ -55,164 +16,8 @@ export default async function EditPagePage({
   params: Promise<{ locale: string; slug: string }>;
   searchParams: Promise<{ team?: string }>;
 }) {
-  const [{ locale, slug }, { team: teamParam }] = await Promise.all([params, searchParams]);
-  setRequestLocale(locale);
-  const [t, tRunner] = await Promise.all([getTranslations("dashboard"), getTranslations("runner")]);
-
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) notFound();
-
-  const { data: mine } = await supabase
-    .from("fundraisers")
-    .select("id, slug, title, story, goal_cents, photo_path, status, team_id, campaign_id")
-    .eq("user_id", user.id)
-    .eq("slug", slug)
-    .maybeSingle();
-  if (!mine || !mine.campaign_id) redirect(`/${locale}/dashboard/stranice`);
-
-  // The cause by id, public or not: a page can be built on a cause staff
-  // have not published yet, and the editor should still name it.
-  const { data: cause } = await createServiceClient()
-    .from("campaigns")
-    .select("slug, title, is_public")
-    .eq("id", mine.campaign_id)
-    .maybeSingle();
-
-  // The causes the page may move to: published and still open, plus its own.
-  const { data: openCauses } = await supabase.from("v_public_campaigns").select("id, title, goal_cents, raised_cents, disbursed_cents, ends_at").order("starts_at", { ascending: false, nullsFirst: false });
-  const causeChoices = ((openCauses ?? []) as { id: string; title: string; goal_cents: number | null; raised_cents: number; disbursed_cents: number | null; ends_at: string | null }[])
-    .filter((row) => row.id === mine.campaign_id || !causeState(row).completed)
-    .map((row) => ({ id: row.id, title: row.title }));
-  if (!causeChoices.some((row) => row.id === mine.campaign_id)) causeChoices.unshift({ id: mine.campaign_id, title: cause?.title ?? "" });
-
-  const [
-    { data: teams },
-    { data: captained },
-    { data: totals },
-    { data: event },
-    { data: activityRows },
-    cash,
-  ] = await Promise.all([
-    supabase
-      .from("v_team_totals")
-      .select("id, name, description, photo_path, campaign_id")
-      .in("campaign_id", causeChoices.map((row) => row.id))
-      .order("name"),
-    // teams_select_own: the rows this runner captains.
-    supabase.from("teams").select("id").eq("captain_id", user.id),
-    supabase
-      .from("v_fundraiser_totals")
-      .select("raised_cents, donor_count")
-      .eq("slug", mine.slug)
-      .maybeSingle(),
-    // A challenge under this cause makes the activity log relevant.
-    cause
-      ? supabase
-          .from("v_public_events")
-          .select("name, kind, challenge_metric")
-          .eq("campaign_slug", cause.slug)
-          .eq("kind", "challenge")
-          .order("starts_at", { ascending: false })
-          .limit(1)
-          .maybeSingle()
-      : Promise.resolve({ data: null as { name: string; kind: string; challenge_metric: string | null } | null }),
-    supabase
-      .from("activities")
-      .select("id, started_at, distance_m, moving_time_s, source")
-      .eq("fundraiser_id", mine.id)
-      .order("started_at", { ascending: false })
-      .limit(100),
-    cashLog(mine.id),
-  ]);
-  const money = (cents: number) => formatCents(cents, locale as Locale, { trimWholeCents: true });
-
-  return (
-    <div className="py-8">
-      <p className="text-[13.5px]">
-        <Link href="/dashboard/stranice" className="font-semibold text-sea underline underline-offset-2">
-          ← {t("navPages")}
-        </Link>
-      </p>
-      <h1 className="type-display mt-2 text-2xl">{t("editorTitle")}</h1>
-      <div className="mt-5">
-        <PageEditor
-          locale={locale as Locale}
-          fundraiser={{
-            id: mine.id,
-            slug: mine.slug,
-            title: mine.title,
-            story: mine.story ?? "",
-            goalCents: mine.goal_cents,
-            photoPath: mine.photo_path,
-            status: mine.status,
-            teamId: mine.team_id,
-            causeId: mine.campaign_id,
-            causeTitle: cause?.title ?? "",
-            causeSlug: cause?.slug ?? null,
-            causePublic: Boolean(cause?.is_public),
-          }}
-          causes={causeChoices}
-          teams={((teams ?? []) as {
-            id: string;
-            name: string;
-            description: string | null;
-            photo_path: string | null;
-            campaign_id: string | null;
-          }[]).map(
-            (team): TeamOption => ({
-              id: team.id,
-              name: team.name,
-              description: team.description,
-              photoPath: team.photo_path,
-              causeId: team.campaign_id ?? undefined,
-            }),
-          )}
-          captainOf={(captained ?? []).map((row) => row.id)}
-          presetTeamId={teamParam && UUID.test(teamParam) ? teamParam : null}
-          raisedCents={totals?.raised_cents ?? 0}
-          donorCount={totals?.donor_count ?? 0}
-        >
-
-      {event?.kind === "challenge" && event.challenge_metric ? (
-        <ActivityLog
-          fundraiserId={mine.id}
-          metric={event.challenge_metric as ChallengeMetric}
-          activities={(activityRows ?? []) as ActivityEntry[]}
-        />
-      ) : null}
-
-      <section id="gotovina" className="mt-10 scroll-mt-6 rounded-brand bg-mist p-5">
-        <h2 className="text-[16px] font-bold">{t("cashHeading")}</h2>
-        <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("cashSub")}</p>
-        <div className="mt-4">
-          <CashForm fundraiserId={mine.id} />
-        </div>
-        {cash.length > 0 ? (
-          <ul className="mt-5">
-            {cash.map((row) => (
-              <li
-                key={row.id}
-                className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t-[0.5px] border-line py-2.5 text-[14.5px]"
-              >
-                <span className="font-mono tabular-nums text-black/60">{row.created_at.slice(0, 10)}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="font-semibold">{row.donor_name ?? tRunner("anonymous")}</span>
-                  {row.message ? <span className="text-black/55"> · {row.message}</span> : null}
-                </span>
-                <span className={`text-[13.5px] ${row.status === "approved" ? "text-sea" : "text-black/50"}`}>
-                  {row.status === "approved" ? t("cashConfirmed") : t("cashAwaiting")}
-                </span>
-                <span className="font-mono font-medium tabular-nums">{money(row.amount_cents)}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </section>
-        </PageEditor>
-      </div>
-    </div>
-  );
+  const [{ locale, slug }, { team }] = await Promise.all([params, searchParams]);
+  const query = new URLSearchParams({ stranica: slug });
+  if (team && UUID.test(team)) query.set("team", team);
+  redirect(`/${locale}/dashboard/stranice?${query.toString()}`);
 }

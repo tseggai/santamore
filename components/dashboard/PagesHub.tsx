@@ -95,6 +95,11 @@ export function PagesHub({
     if (open && open !== "new") void load(open);
   }, [open, load]);
 
+  // "Log cash" links land on #gotovina; the section only exists once the editor has loaded.
+  useEffect(() => {
+    if (editor && window.location.hash === "#gotovina") document.getElementById("gotovina")?.scrollIntoView();
+  }, [editor]);
+
   const openPage = pages.find((page) => page.slug === open) ?? null;
   const panelTitle = open === "new" ? t("createHeading") : (openPage?.title ?? editor?.fundraiser.title ?? "");
 
@@ -186,16 +191,16 @@ export function PagesHub({
               {editor.cash.length > 0 ? (
                 <ul className="mt-5">
                   {editor.cash.map((row) => (
-                    <li key={row.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-t-[0.5px] border-line py-2.5 text-[14.5px]">
-                      <span className="font-mono tabular-nums text-black/60">{row.created_at.slice(0, 10)}</span>
-                      <span className="min-w-0 flex-1">
-                        <span className="font-semibold">{row.donor_name ?? tRunner("anonymous")}</span>
-                        {row.message ? <span className="text-black/55"> · {row.message}</span> : null}
-                      </span>
-                      <span className={`text-[13.5px] ${row.status === "approved" ? "text-sea" : "text-black/50"}`}>
+                    <li key={row.id} className="border-t-[0.5px] border-line py-2.5 text-[14.5px]">
+                      <div className="flex items-baseline gap-3">
+                        <span className="shrink-0 font-mono tabular-nums text-black/60">{row.created_at.slice(0, 10)}</span>
+                        <span className="min-w-0 flex-1 truncate font-semibold">{row.donor_name ?? tRunner("anonymous")}</span>
+                        <span className="shrink-0 font-mono font-medium tabular-nums">{money(row.amount_cents)}</span>
+                      </div>
+                      <p className={`mt-0.5 text-[14px] ${row.status === "approved" ? "text-sea" : "text-black/55"}`}>
                         {row.status === "approved" ? t("cashConfirmed") : t("cashAwaiting")}
-                      </span>
-                      <span className="font-mono font-medium tabular-nums">{money(row.amount_cents)}</span>
+                        {row.message ? <span className="text-black/55"> · {row.message}</span> : null}
+                      </p>
                     </li>
                   ))}
                 </ul>
