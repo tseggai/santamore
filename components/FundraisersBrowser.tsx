@@ -81,7 +81,7 @@ export function FundraisersBrowser({
         <p className="mt-5 text-[14.5px] text-black/60">{needle ? t("noMatch") : tab === "individuals" ? t("emptyIndividuals") : t("emptyTeams")}</p>
       ) : view === "list" ? (
         <div className="mt-3">
-          <LeaderboardList locale={locale} entries={entries} />
+          <LeaderboardList locale={locale} entries={entries} numbered={false} />
         </div>
       ) : (
         <ul className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
@@ -90,12 +90,7 @@ export function FundraisersBrowser({
             return (
               <li key={entry.slug}>
                 <Link href={entry.href} className="flex h-full flex-col items-center rounded-lg bg-mist px-3 py-5 text-center transition-colors hover:bg-mist-2">
-                  <span className="relative">
-                    <Avatar src={entry.photoUrl ?? null} name={entry.title} size={72} />
-                    <span className={`absolute -left-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full font-mono text-[12px] font-bold ${rank <= 3 ? "bg-red text-paper" : "bg-paper text-black/60"}`}>
-                      {rank}
-                    </span>
-                  </span>
+                  <Avatar src={entry.photoUrl ?? null} name={entry.title} size={72} />
                   <span className="mt-3 line-clamp-2 text-[15px] font-semibold leading-snug">{entry.title}</span>
                   {entry.meta ? <span className="mt-0.5 font-mono text-[12.5px] text-black/50">{entry.meta}</span> : null}
                   <span className="mt-2 font-mono text-[15px] font-semibold tabular-nums">{entry.display ?? money(entry.raisedCents)}</span>

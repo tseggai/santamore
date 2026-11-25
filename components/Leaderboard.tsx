@@ -32,10 +32,13 @@ export function LeaderboardList({
   locale,
   entries,
   emptyLabel,
+  numbered = true,
 }: {
   locale: Locale;
   entries: LeaderboardEntry[];
   emptyLabel?: string;
+  /** The rank column; off on the fundraisers board, where a place number says nothing (owner decision 2026-11-25). */
+  numbered?: boolean;
 }) {
   const top = entries[0]?.raisedCents || 1;
   if (entries.length === 0 && emptyLabel) {
@@ -51,13 +54,15 @@ export function LeaderboardList({
               href={entry.href}
               className="flex items-center gap-3 py-3 transition-colors hover:text-sea"
             >
-              <span
-                className={`w-[22px] shrink-0 text-right font-mono text-[14px] ${
-                  rank <= 3 ? "font-medium text-red" : "text-black/40"
-                }`}
-              >
-                {rank}
-              </span>
+              {numbered ? (
+                <span
+                  className={`w-[22px] shrink-0 text-right font-mono text-[14px] ${
+                    rank <= 3 ? "font-medium text-red" : "text-black/40"
+                  }`}
+                >
+                  {rank}
+                </span>
+              ) : null}
               <Avatar src={entry.photoUrl ?? null} name={entry.title} size={40} />
               <span className="min-w-0 flex-1">
                 <span className="block truncate text-[15px] font-semibold">
