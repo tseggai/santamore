@@ -93,9 +93,9 @@ export function CashForm({ fundraiserId }: { fundraiserId: string }) {
         <button
           type="submit"
           disabled={state === "busy"}
-          className="rounded-lg bg-red px-5 py-2.5 text-[15px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
+          className="h-11 rounded-lg bg-sea px-3.5 text-[14px] font-bold text-paper transition-colors hover:bg-sea-2 disabled:opacity-60"
         >
-          {t("cashSubmit")}
+          {t("activitySubmit")}
         </button>
         {state === "error" ? (
           <p role="alert" className="text-[14px] font-semibold text-red-dark">

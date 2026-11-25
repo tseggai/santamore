@@ -113,7 +113,7 @@ export function PagesHub({
         onClick={(event) => {
           if (event.target === event.currentTarget) setHave(null);
         }}
-        className="m-auto w-[calc(100%-32px)] max-w-md rounded-lg bg-paper p-0 backdrop:bg-ink/55"
+        className="m-auto w-[calc(100%-32px)] max-w-md rounded-lg bg-paper p-0 ring-[100vmax] ring-ink/55"
       >
         {have ? (
           <div className="p-6">
@@ -173,12 +173,12 @@ export function PagesHub({
               raisedCents={editor.raisedCents}
               donorCount={editor.donorCount}
               inPanel
-            />
+            >
             {editor.event?.kind === "challenge" && editor.event.challenge_metric ? (
               <ActivityLog fundraiserId={editor.fundraiser.id} metric={editor.event.challenge_metric as ChallengeMetric} activities={editor.activities} surface="paper" />
             ) : null}
             <section id="gotovina" className="mt-8 rounded-lg bg-paper p-5">
-              <h2 className="text-[16px] font-bold">{t("logCash")}</h2>
+              <h2 className="text-[16px] font-bold">{t("cashHeading")}</h2>
               <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("cashSub")}</p>
               <div className="mt-4">
                 <CashForm fundraiserId={editor.fundraiser.id} />
@@ -201,6 +201,7 @@ export function PagesHub({
                 </ul>
               ) : null}
             </section>
+            </PageEditor>
           </div>
         ) : (
           <div aria-busy className="space-y-3">

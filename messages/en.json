@@ -314,7 +314,6 @@
     "nextActionSelf": "Start your page with your own €20. Pages that open at €0 stay at €0.",
     "nudgeShare": "Ask five more people. Tap Share on your page — the message is ready.",
     "editPage": "Edit my fundraising page",
-    "logCash": "Log cash I collected",
     "viewPublic": "View my public page",
     "editorTitle": "Edit my fundraising page",
     "titleLabel": "Title",
@@ -334,7 +333,6 @@
     "previewHeading": "Live preview",
     "cashSub": "Record cash you collected by hand.",
     "cashAmountLabel": "Amount (€)",
-    "cashSubmit": "Log it",
     "cashAwaiting": "Awaiting hand-in confirmation",
     "cashConfirmed": "Confirmed",
     "goalInvalid": "Enter the goal as a number, e.g. 300",
@@ -353,7 +351,6 @@
     "eventLabel": "Event",
     "eventSingle": "You're raising for {name} · {date}.",
     "unsaved": "Unsaved changes",
-    "editorHint": "This is your page as donors will see it. Click the photo, your name, the goal or the story to edit them.",
     "photoChange": "Change photo",
     "photoAdd": "Add photo",
     "nameEdit": "Edit your name",
@@ -415,7 +412,6 @@
     "cashDonorPlaceholder": "Name — shown on donor wall (optional)",
     "cashNotePlaceholder": "Note (optional)",
     "cashLogged": "Logged — it counts once staff confirm the hand-in.",
-    "donateWhenPublished": "Publish the page first — then you can give to it here.",
     "navEvents": "Causes and events",
     "qaSharePage": "Share my fundraising page",
     "qaGiveOwn": "Give to my fundraising page",
@@ -537,7 +533,8 @@
     "meetingsOpen": "Open",
     "pagesHeading": "My pages",
     "newTeam": "New team",
-    "teamCaptainTag": "captain"
+    "teamCaptainTag": "captain",
+    "cashHeading": "Cash log"
   },
   "email": {
     "instructions": {

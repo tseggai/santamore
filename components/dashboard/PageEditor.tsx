@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from "react";
 
 import {
   setFundraiserStatus,
@@ -10,10 +10,8 @@ import {
 } from "@/app/[locale]/dashboard/(protected)/actions";
 import { Avatar } from "@/components/Avatar";
 import { useSidePanel } from "@/components/console/SidePanel";
-import { DonateButton } from "@/components/donate/DonateButton";
 import { Editable, PencilIcon } from "@/components/dashboard/Editable";
 import { TeamPanel, type TeamOption } from "@/components/dashboard/TeamPanel";
-import { ExternalIcon } from "@/components/Icons";
 import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
 import { downscaleToJpeg } from "@/lib/images";
@@ -50,8 +48,8 @@ const NEW_TEAM = "__new__";
 /**
  * The page editor IS the page (brief §10, owner decision 2026-09): one
  * column that looks like /f/[slug], where the photo, name, story and team
- * are edited in place and the goal in a small overlay. The photo leads,
- * with Donate and Share beside it (owner decision 2026-11-25). Publishing
+ * are edited in place and the goal in a small overlay. Status and Share
+ * head it, Save and Publish stick to the foot (owner decision 2026-11-25). Publishing
  * goes through the database gate — photo, goal and a real story, or it
  * stays a draft.
  */
@@ -65,6 +63,7 @@ export function PageEditor({
   raisedCents,
   donorCount,
   inPanel = false,
+  children,
 }: {
   locale: Locale;
   fundraiser: EditorFundraiser;
@@ -79,6 +78,8 @@ export function PageEditor({
   donorCount: number;
   /** In the hub's slide-over: no box of its own, and the first row keeps clear of the ×. */
   inPanel?: boolean;
+  /** What follows the page — the challenge and cash logs — above the sticky Save bar. */
+  children?: ReactNode;
 }) {
   const t = useTranslations("dashboard");
   const tRunner = useTranslations("runner");
@@ -315,103 +316,12 @@ export function PageEditor({
   const fieldInput =
     "w-full rounded-lg border-[1.5px] border-sea bg-paper px-3 py-2 outline-none";
   const selectClass =
-    "h-10 max-w-full rounded-lg border-[1.5px] border-line bg-paper px-2 text-[14.5px] font-semibold text-black outline-none focus:border-sea";
-  // Square header buttons sit on mist in the slide-over, on paper on the page.
-  const iconButton = `inline-flex h-11 w-11 items-center justify-center rounded-lg text-black transition-colors hover:bg-mist-2 hover:text-sea ${
-    inPanel ? "bg-paper" : "bg-mist"
-  }`;
-
+    "h-10 min-w-0 flex-1 rounded-lg border-[1.5px] border-line bg-paper px-2 text-[14.5px] font-semibold text-black outline-none focus:border-sea";
   return (
     <div>
-      {/* photo, and what a donor does first: give and share. In the
-          slide-over the row stays clear of the × in the corner. */}
-      <div className={`flex items-start justify-between gap-3 ${inPanel ? "pr-12" : ""}`}>
-        <div className="shrink-0">
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={busy === "photo"}
-            aria-label={photoUrl ? t("photoChange") : t("photoAdd")}
-            title={photoUrl ? t("photoChange") : t("photoAdd")}
-            className="group relative block rounded-full outline-none ring-sea/40 ring-offset-2 focus-visible:ring-2"
-          >
-            <Avatar src={photoUrl} name={title} size={68} />
-            <span
-              aria-hidden
-              className="absolute -bottom-0.5 -right-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-ink text-[13px] font-bold leading-none text-paper"
-            >
-              {busy === "photo" ? "…" : <PencilIcon className="h-3 w-3" />}
-            </span>
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={onPhoto}
-            className="sr-only"
-            tabIndex={-1}
-          />
-        </div>
-
-        {/* Donate is live once the page is published — the runner's own
-            first gift happens right here (brief §10: pages that open at
-            €0 stay at €0). */}
-        <div className="flex items-center gap-2">
-          {isActive ? (
-            <>
-              <DonateButton
-                request={{ kind: "fundraiser", slug: fundraiser.slug }}
-                href={`/f/${fundraiser.slug}/podrzi`}
-                className="inline-flex h-11 items-center rounded-lg bg-red px-5 text-[16px] font-bold text-paper transition-colors hover:bg-red-dark"
-              >
-                {tDonate("payVerb")}
-              </DonateButton>
-              <ShareButton
-                title={title}
-                path={`/${locale}/f/${fundraiser.slug}`}
-                text={t("shareMessageShort", { title })}
-                label={tRunner("share")}
-                copiedLabel={tDonate("copied")}
-                variant="icon"
-                className={iconButton}
-              />
-              <Link
-                href={`/f/${fundraiser.slug}`}
-                target="_blank"
-                aria-label={t("viewPublic")}
-                title={t("viewPublic")}
-                className={iconButton}
-              >
-                <ExternalIcon />
-              </Link>
-            </>
-          ) : (
-            <>
-              <span
-                title={t("donateWhenPublished")}
-                className="inline-flex h-11 items-center rounded-lg bg-red px-5 text-[16px] font-bold text-paper opacity-50"
-              >
-                {tDonate("payVerb")}
-              </span>
-              <span aria-hidden title={t("donateWhenPublished")} className={`${iconButton} opacity-60`}>
-                <svg viewBox="0 0 24 24" className="h-5 w-5">
-                  <path
-                    d="M12 3v12m0-12L8 7m4-4 4 4M5 13v6h14v-6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </span>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* status + actions bar */}
-      <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2">
+      {/* status on the left, Share on the right; in the slide-over the row
+          sits level with the × in the corner and keeps clear of it */}
+      <div className={`flex min-h-9 items-center justify-between gap-3 ${inPanel ? "-mt-1 pr-12" : ""}`}>
         <span
           className={`rounded-full px-2.5 py-1 font-mono text-[11.5px] uppercase tracking-[0.14em] ${
             isActive ? "bg-sea text-paper" : "border-[1.5px] border-line text-black/70"
@@ -419,52 +329,50 @@ export function PageEditor({
         >
           {isActive ? t("statusActive") : t("statusDraft")}
         </span>
-        {dirty ? <span className="text-[14px] text-black/55">{t("unsaved")}</span> : null}
-        <div className="flex gap-2">
-          <button
-            type="button"
-            disabled={busy !== ""}
-            onClick={() => void save()}
-            className="rounded-lg border-[1.5px] border-line px-4 py-2 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
-          >
-            {t("save")}
-          </button>
-          <button
-            type="button"
-            disabled={busy !== ""}
-            onClick={togglePublish}
-            className="rounded-lg bg-red px-4 py-2 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
-          >
-            {isActive ? t("unpublish") : t("publish")}
-          </button>
-        </div>
+        {isActive ? (
+          <ShareButton
+            title={title}
+            path={`/${locale}/f/${fundraiser.slug}`}
+            text={t("shareMessageShort", { title })}
+            label={tRunner("share")}
+            copiedLabel={tDonate("copied")}
+            variant="icon"
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-black/70 transition-colors hover:bg-mist-2 hover:text-sea ${
+              inPanel ? "bg-paper" : "bg-mist"
+            }`}
+          />
+        ) : null}
       </div>
-      <p className="mt-2 text-[14px] text-black/55">{t("editorHint")}</p>
-
-      {notice === "saved" ? (
-        <p className="mt-2 text-[14px] font-semibold text-sea">{t("saved")}</p>
-      ) : null}
-      {notice === "error" ? (
-        <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">
-          {t("actionError")}
-        </p>
-      ) : null}
-      {notice === "incomplete" ? (
-        <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">
-          {missing.length > 0 ? t("publishNeeds", { items: missing.join(", ") }) : t("publishBlocked")}
-        </p>
-      ) : null}
-      {notice === "causeLocked" ? (
-        <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">{t("causeLocked")}</p>
-      ) : null}
-      {notice === "causeTaken" ? (
-        <p role="alert" className="mt-2 text-[14px] font-semibold text-red-dark">{t("causeTakenNotice")}</p>
-      ) : null}
 
       {/* the page itself — what a donor sees on /f/[slug], editable in place.
           The slide-over is one mist surface already, so no box inside it. */}
-      <div className={inPanel ? "mt-6" : "mt-4 rounded-brand bg-mist p-5 sm:p-6"}>
-        <p className="font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
+      <div className={inPanel ? "mt-5" : "mt-4 rounded-brand bg-mist p-5 sm:p-6"}>
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          disabled={busy === "photo"}
+          aria-label={photoUrl ? t("photoChange") : t("photoAdd")}
+          title={photoUrl ? t("photoChange") : t("photoAdd")}
+          className="group relative block rounded-full outline-none ring-sea/40 ring-offset-2 focus-visible:ring-2"
+        >
+          <Avatar src={photoUrl} name={title} size={104} />
+          <span
+            aria-hidden
+            className="absolute bottom-0 right-0 inline-flex h-7 w-7 items-center justify-center rounded-full bg-ink text-[13px] font-bold leading-none text-paper"
+          >
+            {busy === "photo" ? "…" : <PencilIcon />}
+          </span>
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={onPhoto}
+          className="sr-only"
+          tabIndex={-1}
+        />
+
+        <p className="mt-4 font-mono text-[12px] uppercase tracking-[0.16em] text-black/60">
           {tRunner("eyebrow")}
         </p>
 
@@ -475,7 +383,7 @@ export function PageEditor({
           onDone={() => setEditing("")}
           className="mt-1 inline-block max-w-full"
           view={
-            <h1 className="type-display text-3xl leading-tight sm:text-4xl">
+            <h1 className="type-display text-2xl leading-tight">
               {title.trim() || <span className="text-black/35">{t("namePlaceholder")}</span>}
             </h1>
           }
@@ -495,16 +403,16 @@ export function PageEditor({
                   touch();
                 }}
                 data-field="large"
-                className={`${fieldInput} type-display text-3xl leading-tight sm:text-4xl`}
+                className={`${fieldInput} type-display text-2xl leading-tight`}
               />
             </>
           }
         />
 
-        {/* context: the team, then the cause, each on a line of its own */}
-        <div className="mt-3 space-y-2 text-[14.5px] text-black/70">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
-            <label htmlFor="fTeam">{tRunner("runsWith")}</label>
+        {/* context: team and cause side by side, each under its own label */}
+        <div className="mt-3 grid grid-cols-2 gap-3 text-[14.5px] text-black/70">
+          <div className="flex min-w-0 items-center gap-2">
+            <label htmlFor="fTeam" className="shrink-0">{tRunner("team")}:</label>
             <select
               id="fTeam"
               value={teamPanel === "create" ? NEW_TEAM : teamId}
@@ -519,43 +427,30 @@ export function PageEditor({
               ))}
               <option value={NEW_TEAM}>{t("newTeamOption")}</option>
             </select>
-            {canEditTeam && teamPanel === "" ? (
-              <button
-                type="button"
-                onClick={() => setTeamPanel("edit")}
-                className="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[14px] font-semibold text-sea hover:bg-mist-2"
-              >
-                <PencilIcon className="h-3 w-3" />
-                {t("teamEdit")}
-              </button>
-            ) : null}
           </div>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+          <div className="flex min-w-0 items-center gap-2">
             {causeLocked || causes.length <= 1 ? (
               <>
-                <span>{tRunner("raisingFor")}</span>
+                <span className="shrink-0">{t("causeLabel")}:</span>
                 {/* One cause to raise for: a link to it, not a picker. */}
                 {fundraiser.causePublic && fundraiser.causeSlug ? (
                   <Link
                     href={`/kampanje/${fundraiser.causeSlug}`}
                     target="_blank"
                     title={causeLocked ? t("causeLocked") : undefined}
-                    className={linkClass}
+                    className={`${linkClass} min-w-0 truncate`}
                   >
                     {fundraiser.causeTitle}
                   </Link>
                 ) : (
-                  <span className="font-semibold text-black" title={causeLocked ? t("causeLocked") : undefined}>
+                  <span className="min-w-0 truncate font-semibold text-black" title={causeLocked ? t("causeLocked") : t("causeDraft")}>
                     {fundraiser.causeTitle}
-                    {!fundraiser.causePublic ? (
-                      <span className="ml-1.5 font-mono text-[11px] font-normal uppercase tracking-[0.12em] text-black/45">{t("causeDraft")}</span>
-                    ) : null}
                   </span>
                 )}
               </>
             ) : (
               <>
-                <label htmlFor="fCause">{tRunner("raisingFor")}</label>
+                <label htmlFor="fCause" className="shrink-0">{t("causeLabel")}:</label>
                 <select id="fCause" value={causeId} onChange={onCauseChange} className={selectClass}>
                   {causes.map((cause) => (
                     <option key={cause.id} value={cause.id}>
@@ -568,6 +463,16 @@ export function PageEditor({
             )}
           </div>
         </div>
+        {canEditTeam && teamPanel === "" ? (
+          <button
+            type="button"
+            onClick={() => setTeamPanel("edit")}
+            className="mt-2 inline-flex items-center gap-1 rounded-md py-0.5 text-[14px] font-semibold text-sea hover:underline"
+          >
+            <PencilIcon className="h-3 w-3" />
+            {t("teamEdit")}
+          </button>
+        ) : null}
 
         {teamPanel === "create" ? (
           <TeamPanel
@@ -657,6 +562,51 @@ export function PageEditor({
         />
       </div>
 
+      {children}
+
+      {/* Save and publish stay in reach at the foot of the screen */}
+      <div
+        className={`sticky z-10 mt-8 border-t-[0.5px] border-line pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 ${
+          // The slide-over pads its scroller by 20px; the bar goes through that to the edge.
+          inPanel ? "-bottom-5 -mx-5 -mb-5 bg-mist px-5 sm:-mx-6 sm:px-6" : "bottom-0 bg-paper"
+        }`}
+      >
+        {dirty && notice === "" ? <p className="mb-2 text-[14px] text-black/55">{t("unsaved")}</p> : null}
+        {notice === "saved" ? <p role="status" className="mb-2 text-[14px] font-semibold text-sea">{t("saved")}</p> : null}
+        {notice === "error" ? (
+          <p role="alert" className="mb-2 text-[14px] font-semibold text-red-dark">{t("actionError")}</p>
+        ) : null}
+        {notice === "incomplete" ? (
+          <p role="alert" className="mb-2 text-[14px] font-semibold text-red-dark">
+            {missing.length > 0 ? t("publishNeeds", { items: missing.join(", ") }) : t("publishBlocked")}
+          </p>
+        ) : null}
+        {notice === "causeLocked" ? (
+          <p role="alert" className="mb-2 text-[14px] font-semibold text-red-dark">{t("causeLocked")}</p>
+        ) : null}
+        {notice === "causeTaken" ? (
+          <p role="alert" className="mb-2 text-[14px] font-semibold text-red-dark">{t("causeTakenNotice")}</p>
+        ) : null}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            disabled={busy !== ""}
+            onClick={() => void save()}
+            className="h-11 rounded-lg border-[1.5px] border-line bg-paper text-[15px] font-semibold transition-colors hover:border-sea hover:text-sea disabled:opacity-60"
+          >
+            {t("save")}
+          </button>
+          <button
+            type="button"
+            disabled={busy !== ""}
+            onClick={togglePublish}
+            className="h-11 rounded-lg bg-red text-[15px] font-bold text-paper transition-colors hover:bg-red-dark disabled:opacity-60"
+          >
+            {isActive ? t("unpublish") : t("publish")}
+          </button>
+        </div>
+      </div>
+
       {/* the goal, in an overlay of its own; saving it saves the page */}
       <dialog
         ref={goalRef}
@@ -664,7 +614,7 @@ export function PageEditor({
         onClick={(event) => {
           if (event.target === event.currentTarget) goalRef.current?.close();
         }}
-        className="m-auto w-[calc(100%-32px)] max-w-sm rounded-lg bg-paper p-0 backdrop:bg-ink/55"
+        className="m-auto w-[calc(100%-32px)] max-w-sm rounded-lg bg-paper p-0 ring-[100vmax] ring-ink/55"
       >
         <form onSubmit={submitGoal} className="p-5">
           <h2 id="goal-title" className="text-[17px] font-bold">{t("goalEdit")}</h2>
