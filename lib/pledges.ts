@@ -42,3 +42,32 @@ export function shownFigures(
     pledgesIncluded: true,
   };
 }
+
+/** A pledge row keyed by the page's, team's or cause's slug. */
+export type PledgeRowBySlug = PledgeRow & { slug: string };
+
+/**
+ * A board in pledge mode: each row's amount (and donor count, where the row
+ * has one) becomes the view's received-plus-pledged figure, and the board
+ * is ranked again by it. Outside pledge mode the rows come back untouched:
+ * a board ranks money received.
+ */
+export function countPledges<T extends { slug: string; raised_cents: number; donor_count?: number }>(
+  rows: T[],
+  pledges: PledgeRowBySlug[] | null | undefined,
+  pledgeMode: boolean = isPledgeMode(),
+): T[] {
+  if (!pledgeMode || !pledges || pledges.length === 0) return rows;
+  const bySlug = new Map(pledges.map((row) => [row.slug, row]));
+  return rows
+    .map((row) => {
+      const pledge = bySlug.get(row.slug);
+      if (!pledge || Number(pledge.pledged_cents) <= 0) return row;
+      return {
+        ...row,
+        raised_cents: Number(pledge.total_cents),
+        ...(row.donor_count === undefined ? {} : { donor_count: Number(pledge.donor_count) }),
+      };
+    })
+    .sort((a, b) => b.raised_cents - a.raised_cents);
+}

@@ -6,6 +6,8 @@ import { FundraisersBrowser } from "@/components/FundraisersBrowser";
 import type { LeaderboardEntry } from "@/components/Leaderboard";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
+import { isPledgeMode } from "@/lib/org";
+import { PLEDGE_COLUMNS, countPledges, type PledgeRowBySlug } from "@/lib/pledges";
 import { cachedPublic } from "@/lib/public-data";
 import { Link } from "@/i18n/navigation";
 import { routing, type Locale } from "@/i18n/routing";
@@ -67,12 +69,21 @@ async function fetchBoard(causeSlug: string | undefined) {
       teamsQuery = teamsQuery.eq("campaign_id", chosen.id);
       totalsQuery = totalsQuery.eq("campaign_id", chosen.id);
     }
-    const [{ data: individuals }, { data: teams }, { data: allTotals }] = await Promise.all([
+    const [{ data: individuals }, { data: teams }, { data: allTotals }, { data: pagePledges }, { data: teamPledges }, { data: causePledges }] = await Promise.all([
       individualsQuery.order("raised_cents", { ascending: false }).limit(100),
       teamsQuery.order("raised_cents", { ascending: false }).limit(100),
       // Header aggregates over EVERY active page, not just the displayed 100.
       totalsQuery,
+      // Open pledges (migration 0090): in pledge mode they count on the board.
+      supabase.from("v_public_fundraiser_pledges").select(`slug, ${PLEDGE_COLUMNS}`).limit(2000),
+      supabase.from("v_public_team_pledges").select(`slug, ${PLEDGE_COLUMNS}`).limit(500),
+      supabase.from("v_public_campaign_pledges").select("id, pages_pledged_cents"),
     ]);
+    const pagesPledged = isPledgeMode()
+      ? ((causePledges ?? []) as { id: string; pages_pledged_cents: number }[])
+          .filter((row) => !chosen || row.id === chosen.id)
+          .reduce((sum, row) => sum + Number(row.pages_pledged_cents), 0)
+      : 0;
     const totalsRows = (allTotals ?? []) as { campaign_id: string | null }[];
     for (const row of totalsRows) {
       const option = options.find((c) => c.id === row.campaign_id);
@@ -82,11 +93,11 @@ async function fetchBoard(causeSlug: string | undefined) {
       event: chosen ? { id: chosen.id, name: chosen.name } : null,
       causeSlug: chosen?.slug ?? null,
       options,
-      individuals: (individuals ?? []) as IndividualRow[],
-      teams: (teams ?? []) as TeamRow[],
+      individuals: countPledges((individuals ?? []) as IndividualRow[], pagePledges as PledgeRowBySlug[] | null),
+      teams: countPledges((teams ?? []) as TeamRow[], teamPledges as PledgeRowBySlug[] | null),
       activeCount: totalsRows.length,
       // What the pages raised: the cause view's column (migration 0062), not a sum over the board.
-      totalRaised: (chosen ? causeList.filter((c) => c.id === chosen.id) : causeList).reduce((sum, c) => sum + c.pages_raised_cents, 0),
+      totalRaised: (chosen ? causeList.filter((c) => c.id === chosen.id) : causeList).reduce((sum, c) => sum + c.pages_raised_cents, 0) + pagesPledged,
     };
     });
   } catch {

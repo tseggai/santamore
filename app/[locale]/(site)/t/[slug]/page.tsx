@@ -7,6 +7,7 @@ import { LeaderboardList, type LeaderboardEntry } from "@/components/Leaderboard
 import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
 import { formatCents } from "@/lib/money";
+import { PLEDGE_COLUMNS, countPledges, shownFigures, type PledgeRow, type PledgeRowBySlug } from "@/lib/pledges";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
@@ -46,15 +47,21 @@ async function fetchTeam(slug: string) {
       .eq("slug", slug)
       .single();
     if (!team) return null;
-    const { data: members } = await supabase
-      .from("v_fundraiser_totals")
-      .select("slug, title, photo_path, raised_cents")
-      .eq("team_slug", slug)
-      .order("raised_cents", { ascending: false })
-      .limit(100);
+    const [{ data: members }, { data: teamPledges }, { data: pagePledges }] = await Promise.all([
+      supabase
+        .from("v_fundraiser_totals")
+        .select("id, slug, title, photo_path, raised_cents")
+        .eq("team_slug", slug)
+        .order("raised_cents", { ascending: false })
+        .limit(100),
+      // Open pledges on the members' pages (migration 0090).
+      supabase.from("v_public_team_pledges").select(PLEDGE_COLUMNS).eq("slug", slug).maybeSingle(),
+      supabase.from("v_public_fundraiser_pledges").select(`slug, ${PLEDGE_COLUMNS}`).limit(2000),
+    ]);
     return {
       team: team as TeamTotalsRow,
-      members: (members ?? []) as MemberRow[],
+      members: countPledges((members ?? []) as MemberRow[], pagePledges as PledgeRowBySlug[] | null),
+      pledges: (teamPledges ?? null) as PledgeRow | null,
     };
   } catch {
     return null;
@@ -93,7 +100,8 @@ export default async function TeamPage({
 
   const result = await fetchTeam(slug);
   if (!result) notFound();
-  const { team, members } = result;
+  const { team, members, pledges } = result;
+  const shown = shownFigures({ raisedCents: team.raised_cents, donorCount: team.donor_count }, pledges);
   const photo = fundraiserPhotoUrl(team.photo_path);
 
   return (
@@ -136,15 +144,17 @@ export default async function TeamPage({
       <div className="mt-7">
         {team.goal_cents && team.goal_cents > 0 ? (
           <Waterline
-            raisedCents={team.raised_cents}
+            raisedCents={shown.raisedCents}
             goalCents={team.goal_cents}
-            donorCount={team.donor_count}
+            donorCount={shown.donorCount}
+            pledgedCents={shown.pledgedCents}
+            pledgesIncluded={shown.pledgesIncluded}
             locale={locale as Locale}
           />
         ) : (
           <div className="rounded-brand bg-mist px-5 py-5">
             <span className="font-mono block text-4xl font-extrabold tabular-nums">
-              {formatCents(team.raised_cents, locale as Locale, { trimWholeCents: true })}
+              {formatCents(shown.raisedCents, locale as Locale, { trimWholeCents: true })}
             </span>
             <span className="mt-1 block text-[13.5px] text-black/70">
               {t("teamRaisedBy", { count: team.member_count })} ·{" "}

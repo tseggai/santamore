@@ -79,6 +79,8 @@ What a page shows is decided in one place, `lib/pledges.ts` (owner decisions of 
 - **Pledge mode** (no bank account yet): a pledger is a donor. The headline is the view's `total_cents` (received plus pledged) and the donor count is its `donor_count` (the distinct people behind both). A "Pledged" line still says how much of it is promised.
 - **Account open**: the headline is money received again, with open pledges on a "Pledged" line beside it.
 
+In pledge mode the same holds for the fundraisers board, the home leaderboard and a team's page (`v_public_team_pledges`): rows take the views' totals and are ranked by them (`countPledges`), and the donor wall lists the people who pledged (`v_public_pledge_wall`). The money page, the public ledger and the home "received" figure never count a pledge.
+
 Both totals are computed in the views; no page adds them up. A cause's state (goal reached, completed) follows money received only. When staff match a transfer the row becomes approved: it leaves the pledges and enters the ledger, so no euro is shown twice.
 
 ## Cause state
