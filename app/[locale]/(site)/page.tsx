@@ -7,6 +7,7 @@ import { HeroSlides, type HeroSlide } from "@/components/home/HeroSlides";
 import { ProposalsList, type PublicProposal } from "@/components/proposals/ProposalsList";
 import { SponsorGrid, type PublicSponsor } from "@/components/partners/SponsorGrid";
 import { landingContent } from "@/content/site/landing";
+import { PLEDGE_COLUMNS, countPledges, type PledgeRowBySlug } from "@/lib/pledges";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl, galleryImageUrl } from "@/lib/storage";
 import { cachedPublic } from "@/lib/public-data";
@@ -19,7 +20,9 @@ async function fetchLanding() {
   try {
     return await cachedPublic(["home"], async (supabase) => {
     const nowIso = new Date().toISOString();
-    const [summary, events, board, gallery, causes, proposals, sponsors, testMode, homePhoto] = await Promise.all([
+    const [pagePledges, summary, events, board, gallery, causes, proposals, sponsors, testMode, homePhoto] = await Promise.all([
+      // Open pledges (migration 0090): in pledge mode they count on the board.
+      supabase.from("v_public_fundraiser_pledges").select(`slug, ${PLEDGE_COLUMNS}`).limit(2000),
       supabase.from("v_public_ledger_summary").select("received_cents, disbursed_cents").single(),
       supabase
         .from("v_public_events")
@@ -64,7 +67,10 @@ async function fetchLanding() {
       receivedCents: summary.data?.received_cents ?? 0,
       disbursedCents: summary.data?.disbursed_cents ?? 0,
       events: (events.data ?? []) as { slug: string; name: string; starts_at: string; kind: "race" | "challenge" | "social"; venue: string | null; campaign_slug: string | null; campaign_title: string | null; cover_path: string | null }[],
-      board: (board.data ?? []) as { slug: string; title: string; raised_cents: number; donor_count: number; photo_path: string | null }[],
+      board: countPledges(
+        (board.data ?? []) as { slug: string; title: string; raised_cents: number; donor_count: number; photo_path: string | null }[],
+        pagePledges.data as PledgeRowBySlug[] | null,
+      ),
       gallery: (gallery.data ?? []) as { id: string; storage_path: string; caption: string | null; event_slug: string | null; campaign_slug: string | null }[],
       causes: (causes.data ?? []) as { slug: string; title: string; goal_cents: number | null; raised_cents: number; donor_count: number; cover_path: string | null; ends_at: string | null }[],
       proposals: (proposals.data ?? []) as PublicProposal[],

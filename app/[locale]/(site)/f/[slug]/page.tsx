@@ -7,6 +7,7 @@ import { Avatar } from "@/components/Avatar";
 import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
 import { formatCents } from "@/lib/money";
+import { isPledgeMode } from "@/lib/org";
 import { PLEDGE_COLUMNS, shownFigures, type PledgeRow } from "@/lib/pledges";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
@@ -43,7 +44,7 @@ interface WallRow {
 async function fetchPage(slug: string) {
   try {
     const supabase = await createClient();
-    const [{ data: fundraiser }, { data: wall }, { data: pledges }] = await Promise.all([
+    const [{ data: fundraiser }, { data: wall }, { data: pledges }, { data: pledgeWall }] = await Promise.all([
       supabase.from("v_fundraiser_totals").select("*").eq("slug", slug).single(),
       supabase
         .from("v_public_donor_wall")
@@ -53,10 +54,17 @@ async function fetchPage(slug: string) {
         .limit(100),
       // Open pledges: their own figure, beside the amount raised (migration 0090).
       supabase.from("v_public_fundraiser_pledges").select(PLEDGE_COLUMNS).eq("slug", slug).maybeSingle(),
+      supabase
+        .from("v_public_pledge_wall")
+        .select("id, display_name, amount_cents, message")
+        .eq("fundraiser_slug", slug)
+        .order("created_at", { ascending: false })
+        .limit(100),
     ]);
     return {
       fundraiser: fundraiser as FundraiserTotalsRow | null,
-      wall: (wall ?? []) as WallRow[],
+      // In pledge mode the people who pledged are on the wall, newest first, ahead of matched gifts.
+      wall: [...(isPledgeMode() ? ((pledgeWall ?? []) as WallRow[]) : []), ...((wall ?? []) as WallRow[])],
       pledges: (pledges ?? null) as PledgeRow | null,
     };
   } catch {
