@@ -96,10 +96,10 @@ function BottomSheet({ open, title, onClose, children }: { open: boolean; title:
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
-      className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-end justify-center bg-transparent p-0 backdrop:bg-ink/55 open:flex"
+      className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-end justify-center bg-transparent p-0 open:flex"
     >
       {open ? (
-        <div className="max-h-[88dvh] w-full max-w-[560px] overflow-y-auto overscroll-contain rounded-t-lg bg-paper px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 motion-safe:animate-[sheet-in_200ms_ease-out]">
+        <div className="max-h-[88dvh] w-full max-w-[560px] overflow-y-auto overscroll-contain rounded-t-lg bg-paper px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-4 ring-[100vmax] ring-ink/55 motion-safe:animate-[sheet-in_200ms_ease-out]">
           <div className="mb-4 flex items-center gap-3">
             <h2 className="min-w-0 flex-1 text-[17px] font-bold">{title}</h2>
             <button type="button" onClick={onClose} aria-label={t("panelClose")} className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist text-[19px] leading-none text-black/70 transition-colors hover:bg-mist-2 hover:text-sea">

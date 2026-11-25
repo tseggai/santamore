@@ -486,8 +486,8 @@ export function LegalPackApp({ pack, saved, locale, initialDoc }: Props) {
         </p>
 
         {printWarn ? (
-          <div role="alertdialog" aria-modal="true" aria-labelledby="lp-print-title" className="lp-screen fixed inset-0 z-50 flex items-center justify-center bg-ink/55 px-4">
-            <div className="w-full max-w-md rounded-brand bg-paper p-6 shadow-none">
+          <div role="alertdialog" aria-modal="true" aria-labelledby="lp-print-title" className="lp-screen fixed inset-0 z-50 flex items-center justify-center px-4">
+            <div className="w-full max-w-md rounded-brand bg-paper p-6 shadow-none ring-[100vmax] ring-ink/55">
               <h3 id="lp-print-title" className="text-[17px] font-bold">{t("printIncompleteTitle", { n: printWarn.length })}</h3>
               <p className="mt-2 text-[14px] leading-relaxed text-black/60">{t("printIncompleteHint")}</p>
               <ul className="mt-3 max-h-56 overflow-y-auto rounded-brand bg-mist px-4 py-3 text-[14px]">

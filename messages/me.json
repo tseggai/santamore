@@ -314,7 +314,6 @@
     "nextActionSelf": "Započni stranicu svojih 20 €. Stranice koje krenu od nule ostanu na nuli.",
     "nudgeShare": "Pitaj još pet ljudi. Pritisni Podijeli na svojoj stranici — poruka je spremna.",
     "editPage": "Uredi stranicu za prikupljanje",
-    "logCash": "Zabilježi prikupljeni keš",
     "viewPublic": "Pogledaj javnu stranicu",
     "editorTitle": "Uredi stranicu za prikupljanje",
     "titleLabel": "Naslov",
@@ -334,7 +333,6 @@
     "previewHeading": "Pregled uživo",
     "cashSub": "Zabilježi novac prikupljen na ruke.",
     "cashAmountLabel": "Iznos (€)",
-    "cashSubmit": "Zabilježi",
     "cashAwaiting": "Čeka potvrdu primopredaje",
     "cashConfirmed": "Potvrđeno",
     "goalInvalid": "Upiši cilj kao broj, npr. 300",
@@ -353,7 +351,6 @@
     "eventLabel": "Događaj",
     "eventSingle": "Prikupljaš za {name} · {date}.",
     "unsaved": "Nesačuvane izmjene",
-    "editorHint": "Ovo je tvoja stranica kako je vide donatori. Klikni na fotografiju, ime, cilj ili priču da ih izmijeniš.",
     "photoChange": "Promijeni fotografiju",
     "photoAdd": "Dodaj fotografiju",
     "nameEdit": "Izmijeni ime",
@@ -415,7 +412,6 @@
     "cashDonorPlaceholder": "Ime — vidi se na zidu donatora (opciono)",
     "cashNotePlaceholder": "Napomena (opciono)",
     "cashLogged": "Zabilježeno — računa se kad tim potvrdi predaju.",
-    "donateWhenPublished": "Prvo objavi stranicu — onda možeš donirati ovdje.",
     "navEvents": "Ciljevi i događaji",
     "qaSharePage": "Podijeli stranicu za prikupljanje",
     "qaGiveOwn": "Doniraj na svoju stranicu za prikupljanje",
@@ -537,7 +533,8 @@
     "meetingsOpen": "Otvori",
     "pagesHeading": "Moje stranice",
     "newTeam": "Novi tim",
-    "teamCaptainTag": "kapiten"
+    "teamCaptainTag": "kapiten",
+    "cashHeading": "Dnevnik gotovine"
   },
   "email": {
     "instructions": {

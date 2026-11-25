@@ -76,7 +76,7 @@ export function useDialog() {
       onClick={(event) => {
         if (event.target === event.currentTarget) settle(false);
       }}
-      className="m-auto w-[calc(100%-32px)] max-w-md rounded-lg border-0 bg-paper p-0 shadow-[0_24px_64px_rgba(14,58,70,0.22)] backdrop:bg-ink/55 motion-safe:open:animate-[dialog-in_160ms_ease-out]"
+      className="m-auto w-[calc(100%-32px)] max-w-md rounded-lg border-0 bg-paper p-0 shadow-[0_24px_64px_rgba(14,58,70,0.22)] ring-[100vmax] ring-ink/55 motion-safe:open:animate-[dialog-in_160ms_ease-out]"
     >
       {request ? (
         <div className="px-6 py-5">

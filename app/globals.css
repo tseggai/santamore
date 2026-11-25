@@ -302,6 +302,15 @@
   }
 }
 
+/* A modal's ::backdrop colours Safari's own bars on an iPhone: the status
+   bar and the toolbar went grey over every sheet, drawer and panel. So no
+   dialog paints its backdrop; the dimming is a ring on the box itself
+   (ring-[100vmax] ring-ink/55), which the browser does not sample. A click
+   outside the box still lands on the dialog. (2026-11-25) */
+dialog::backdrop {
+  background: transparent;
+}
+
 /* Console alert and confirm (components/console/useDialog.tsx). */
 @keyframes dialog-in {
   from {

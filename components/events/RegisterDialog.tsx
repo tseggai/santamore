@@ -103,9 +103,9 @@ export function RegisterDialog({ event, label, className }: { event: RegisterEve
         onClick={(e) => {
           if (e.target === e.currentTarget) close();
         }}
-        className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-end justify-center bg-transparent p-0 backdrop:bg-ink/55 open:flex sm:items-center sm:p-4"
+        className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none items-end justify-center bg-transparent p-0 open:flex sm:items-center sm:p-4"
       >
-        <div className="relative flex max-h-[100dvh] w-full max-w-[600px] flex-col rounded-t-lg bg-paper shadow-[0_24px_60px_rgba(14,58,70,0.25)] sm:max-h-[calc(100dvh-2rem)] sm:rounded-lg">
+        <div className="relative flex max-h-[100dvh] w-full max-w-[600px] flex-col rounded-t-lg bg-paper shadow-[0_24px_60px_rgba(14,58,70,0.25)] ring-[100vmax] ring-ink/55 sm:max-h-[calc(100dvh-2rem)] sm:rounded-lg">
           <button type="button" onClick={close} aria-label={t("close")} className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-mist text-[19px] leading-none text-black/70 transition-colors hover:bg-mist-2 hover:text-sea">
             ×
           </button>

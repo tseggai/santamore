@@ -174,8 +174,7 @@ export default async function EditPagePage({
           presetTeamId={teamParam && UUID.test(teamParam) ? teamParam : null}
           raisedCents={totals?.raised_cents ?? 0}
           donorCount={totals?.donor_count ?? 0}
-        />
-      </div>
+        >
 
       {event?.kind === "challenge" && event.challenge_metric ? (
         <ActivityLog
@@ -186,7 +185,7 @@ export default async function EditPagePage({
       ) : null}
 
       <section id="gotovina" className="mt-10 scroll-mt-6 rounded-brand bg-mist p-5">
-        <h2 className="text-[16px] font-bold">{t("logCash")}</h2>
+        <h2 className="text-[16px] font-bold">{t("cashHeading")}</h2>
         <p className="mt-1 text-[14.5px] leading-relaxed text-black/65">{t("cashSub")}</p>
         <div className="mt-4">
           <CashForm fundraiserId={mine.id} />
@@ -212,6 +211,8 @@ export default async function EditPagePage({
           </ul>
         ) : null}
       </section>
+        </PageEditor>
+      </div>
     </div>
   );
 }
