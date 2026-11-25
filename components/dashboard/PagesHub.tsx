@@ -14,7 +14,6 @@ import { CreatePageForm, type EventChoice } from "@/components/dashboard/CreateP
 import { PageEditor } from "@/components/dashboard/PageEditor";
 import { TeamsManager, type MyTeam, type TeamEventChoice } from "@/components/dashboard/TeamsManager";
 import { ExternalIcon } from "@/components/Icons";
-import { ShareButton } from "@/components/ShareButton";
 import type { ChallengeMetric } from "@/lib/metrics";
 import { formatCents } from "@/lib/money";
 import { fundraiserPhotoUrl } from "@/lib/storage";
@@ -37,9 +36,10 @@ export interface HubPage {
 }
 
 /**
- * Fundraising pages: the list on the left, teams on the right, "+ New
- * page" top right. A row opens its editor in the slide-over; the create
- * form opens in one too, and hands over to the editor when done.
+ * Fundraising: "My pages" and, below it, "My teams", each with a + beside
+ * its heading (owner decision 2026-11-25). A row opens its editor in the
+ * slide-over; the create form opens in one too, and hands over to the
+ * editor when done.
  */
 export function PagesHub({
   pages,
@@ -53,7 +53,6 @@ export function PagesHub({
   defaultEventSlug,
   joinTeamId = null,
   title,
-  lead,
 }: {
   pages: HubPage[];
   teams: MyTeam[];
@@ -69,11 +68,9 @@ export function PagesHub({
   /** "Join this team": the new page opens in the full editor with the team preselected. */
   joinTeamId?: string | null;
   title: string;
-  lead?: string;
 }) {
   const t = useTranslations("dashboard");
   const tRunner = useTranslations("runner");
-  const tDonate = useTranslations("donate");
   const locale = useLocale() as Locale;
   const router = useRouter();
   const [open, setOpen] = useState<"" | "new" | string>(openCreate ? "new" : (initialOpen ?? ""));
@@ -103,15 +100,7 @@ export function PagesHub({
 
   return (
     <div className="space-y-5">
-      <PageHeader
-        title={title}
-        lead={lead}
-        action={
-          <button type="button" onClick={() => setOpen("new")} className="rounded-lg bg-red px-4 py-2.5 text-[14.5px] font-bold text-paper transition-colors hover:bg-red-dark">
-            + {t("newPage")}
-          </button>
-        }
-      />
+      <PageHeader title={title} />
 
       <dialog
         ref={haveRef}
@@ -153,7 +142,7 @@ export function PagesHub({
         ) : null}
       </dialog>
 
-      <SidePanel open={open !== ""} title={panelTitle} onClose={() => setOpen("")} wide>
+      <SidePanel open={open !== ""} title={panelTitle} onClose={() => setOpen("")} wide bare={open !== "new"}>
         {open === "new" ? (
           <>
             <p className="text-[14.5px] leading-relaxed text-black/65">{t("createSub")}</p>
@@ -173,22 +162,6 @@ export function PagesHub({
           </>
         ) : editor ? (
           <div>
-            {editor.fundraiser.status === "active" ? (
-              <div className="mb-4 flex flex-wrap items-center gap-2">
-                <ShareButton
-                  title={editor.fundraiser.title}
-                  path={`/${locale}/f/${editor.fundraiser.slug}`}
-                  text={t("shareMessageShort", { title: editor.fundraiser.title })}
-                  label={tRunner("share")}
-                  copiedLabel={tDonate("copied")}
-                  variant="ghost"
-                  className="inline-flex items-center gap-2 rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2"
-                />
-                <Link href={`/f/${editor.fundraiser.slug}`} target="_blank" className="inline-flex items-center gap-2 rounded-lg bg-paper px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:bg-mist-2">
-                  {t("viewPublic")} <ExternalIcon />
-                </Link>
-              </div>
-            ) : null}
             <PageEditor
               key={editor.fundraiser.id}
               locale={locale}
@@ -199,9 +172,10 @@ export function PagesHub({
               presetTeamId={joinTeamId}
               raisedCents={editor.raisedCents}
               donorCount={editor.donorCount}
+              inPanel
             />
             {editor.event?.kind === "challenge" && editor.event.challenge_metric ? (
-              <ActivityLog fundraiserId={editor.fundraiser.id} metric={editor.event.challenge_metric as ChallengeMetric} activities={editor.activities} />
+              <ActivityLog fundraiserId={editor.fundraiser.id} metric={editor.event.challenge_metric as ChallengeMetric} activities={editor.activities} surface="paper" />
             ) : null}
             <section id="gotovina" className="mt-8 rounded-lg bg-paper p-5">
               <h2 className="text-[16px] font-bold">{t("logCash")}</h2>
@@ -230,6 +204,7 @@ export function PagesHub({
           </div>
         ) : (
           <div aria-busy className="space-y-3">
+            <div className="h-[68px] w-[68px] animate-pulse rounded-full bg-paper motion-reduce:animate-none" />
             <div className="h-10 w-2/3 animate-pulse rounded-lg bg-paper motion-reduce:animate-none" />
             <div className="h-40 animate-pulse rounded-lg bg-paper motion-reduce:animate-none" />
             <div className="h-24 animate-pulse rounded-lg bg-paper motion-reduce:animate-none" />
@@ -237,10 +212,25 @@ export function PagesHub({
         )}
       </SidePanel>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+      <div className="max-w-3xl space-y-10">
         <section>
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <h2 className="text-[17px] font-bold">{t("pagesHeading")}</h2>
+              <p className="mt-0.5 text-[14px] leading-relaxed text-black/60">{t("pagesSub")}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setOpen("new")}
+              aria-label={t("newPage")}
+              title={t("newPage")}
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red text-[22px] font-bold leading-none text-paper transition-colors hover:bg-red-dark"
+            >
+              +
+            </button>
+          </div>
           {pages.length === 0 ? (
-            <div className="rounded-lg bg-mist px-5 py-6">
+            <div className="mt-3 rounded-lg bg-mist px-5 py-6">
               <h2 className="text-[17px] font-bold leading-snug">{t("hubEmptyHeading")}</h2>
               <p className="mt-2 text-[15px] leading-relaxed text-black/70">{t("hubEmptySub")}</p>
               <ol className="mt-4 space-y-2">
@@ -256,7 +246,7 @@ export function PagesHub({
               </button>
             </div>
           ) : (
-            <ul className="overflow-hidden rounded-lg bg-mist">
+            <ul className="mt-3 overflow-hidden rounded-lg bg-mist">
               {pages.map((page) => {
                 const live = page.status === "active";
                 const pct = page.goalCents && page.goalCents > 0 ? Math.min(100, Math.round((page.raisedCents / page.goalCents) * 100)) : 0;
@@ -320,13 +310,7 @@ export function PagesHub({
           )}
         </section>
 
-        <aside>
-          <h2 className="text-[15px] font-bold">{t("navTeams")}</h2>
-          <p className="mt-1 text-[13.5px] leading-relaxed text-black/60">{t("teamsSub")}</p>
-          <div className="mt-3">
-            <TeamsManager teams={teams} events={teamEvents} />
-          </div>
-        </aside>
+        <TeamsManager teams={teams} events={teamEvents} />
       </div>
     </div>
   );

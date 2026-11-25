@@ -540,6 +540,7 @@ export interface PageEditorData {
     teamId: string | null;
     causeId: string;
     causeTitle: string;
+    causeSlug: string | null;
     /** Staff have published the cause; until then the page cannot go live for donors. */
     causePublic: boolean;
   };
@@ -616,6 +617,7 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
       teamId: mine.team_id,
       causeId: mine.campaign_id,
       causeTitle: cause?.title ?? "",
+      causeSlug: cause?.slug ?? null,
       causePublic: Boolean(cause?.is_public),
     },
     causes,

@@ -51,8 +51,8 @@ interface TeamRow {
 
 /**
  * The hub of the runner console: every page they hold — with its total,
- * team, share button and editor — the teams they captain, and the way to
- * start another page. `?event=` preselects an event to create for,
+ * team, share button and editor — the teams they captain or belong to, and
+ * the way to start another page or team. `?event=` preselects an event to create for,
  * `?team=` (from "Join this team") goes straight to the editor of the
  * runner's page on that team's event, or to creating one.
  */
@@ -161,8 +161,8 @@ export default async function PagesHubPage({
   );
   const causeById = new Map(causes.map((cause) => [cause.id, cause]));
 
+  // Captained teams and the ones a page of theirs has joined.
   const myTeams: MyTeam[] = ((teamRows ?? []) as TeamRow[])
-    .filter((team) => captainIds.has(team.id))
     .map((team) => ({
       id: team.id,
       slug: team.slug,
@@ -173,6 +173,7 @@ export default async function PagesHubPage({
       causeName: team.campaign_title ?? "—",
       memberCount: team.member_count,
       raisedLabel: money(team.raised_cents),
+      captain: captainIds.has(team.id),
     }));
   const pageByCause = new Map(pages.map((page) => [page.campaign_id, page.id]));
   const teamEventChoices: TeamEventChoice[] = openCauses.map((cause) => ({
@@ -205,7 +206,6 @@ export default async function PagesHubPage({
     <div className="py-8">
       <PagesHub
         title={t("navPages")}
-        lead={pages.length === 0 ? undefined : t("pagesSub")}
         pages={hubPages}
         teams={myTeams}
         teamEvents={teamEventChoices}

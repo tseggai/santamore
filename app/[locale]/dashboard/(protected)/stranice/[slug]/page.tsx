@@ -5,7 +5,6 @@ import { ActivityLog, type ActivityEntry } from "@/components/dashboard/Activity
 import { CashForm } from "@/components/dashboard/CashForm";
 import { PageEditor } from "@/components/dashboard/PageEditor";
 import type { TeamOption } from "@/components/dashboard/TeamPanel";
-import { ShareButton } from "@/components/ShareButton";
 import type { ChallengeMetric } from "@/lib/metrics";
 import { formatCents } from "@/lib/money";
 import { createServiceClient } from "@/lib/supabase/admin";
@@ -58,11 +57,7 @@ export default async function EditPagePage({
 }) {
   const [{ locale, slug }, { team: teamParam }] = await Promise.all([params, searchParams]);
   setRequestLocale(locale);
-  const [t, tDonate, tRunner] = await Promise.all([
-    getTranslations("dashboard"),
-    getTranslations("donate"),
-    getTranslations("runner"),
-  ]);
+  const [t, tRunner] = await Promise.all([getTranslations("dashboard"), getTranslations("runner")]);
 
   const supabase = await createClient();
   const {
@@ -141,27 +136,7 @@ export default async function EditPagePage({
           ← {t("navPages")}
         </Link>
       </p>
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="type-display text-2xl">{t("editorTitle")}</h1>
-        {mine.status === "active" ? (
-          <div className="flex items-center gap-2">
-            <ShareButton
-              title={mine.title}
-              path={`/${locale}/f/${mine.slug}`}
-              text={t("shareMessageShort", { title: mine.title })}
-              label={tRunner("share")}
-              copiedLabel={tDonate("copied")}
-              variant="icon"
-            />
-            <Link
-              href={`/f/${mine.slug}`}
-              className="rounded-lg border-[1.5px] border-line px-4 py-2.5 text-[14.5px] font-semibold transition-colors hover:border-sea hover:text-sea"
-            >
-              {t("viewPublic")} ↗
-            </Link>
-          </div>
-        ) : null}
-      </div>
+      <h1 className="type-display mt-2 text-2xl">{t("editorTitle")}</h1>
       <div className="mt-5">
         <PageEditor
           locale={locale as Locale}
@@ -176,6 +151,7 @@ export default async function EditPagePage({
             teamId: mine.team_id,
             causeId: mine.campaign_id,
             causeTitle: cause?.title ?? "",
+            causeSlug: cause?.slug ?? null,
             causePublic: Boolean(cause?.is_public),
           }}
           causes={causeChoices}

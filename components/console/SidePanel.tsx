@@ -29,12 +29,15 @@ export function SidePanel({
   onClose,
   children,
   wide = false,
+  bare = false,
 }: {
   open: boolean;
   title: string;
   onClose: () => void;
   children: ReactNode;
   wide?: boolean;
+  /** No title bar: one mist surface edge to edge, the × floating top right. The content keeps its first row clear of it. */
+  bare?: boolean;
 }) {
   const t = useTranslations("admin");
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -102,21 +105,32 @@ export function SidePanel({
     >
       {open ? (
         <div
-          className={`flex h-full w-full flex-col bg-paper shadow-[-16px_0_48px_rgba(14,58,70,0.18)] motion-safe:animate-[panel-in_220ms_ease-out] ${
-            wide ? "sm:max-w-[820px]" : "sm:max-w-[640px]"
-          }`}
+          className={`relative flex h-full w-full flex-col shadow-[-16px_0_48px_rgba(14,58,70,0.18)] motion-safe:animate-[panel-in_220ms_ease-out] ${
+            bare ? "bg-mist" : "bg-paper"
+          } ${wide ? "sm:max-w-[820px]" : "sm:max-w-[640px]"}`}
         >
-          <div className="flex shrink-0 items-center gap-3 border-b-[0.5px] border-line px-5 py-4 sm:px-6">
-            <h2 className="min-w-0 flex-1 truncate text-[17px] font-bold">{title}</h2>
+          {bare ? (
             <button
               type="button"
               onClick={requestClose}
               aria-label={t("panelClose")}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist text-[19px] leading-none text-black/70 transition-colors hover:bg-mist-2 hover:text-sea"
+              className="absolute right-4 top-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-paper text-[19px] leading-none text-black/70 transition-colors hover:bg-mist-2 hover:text-sea sm:right-5"
             >
               ×
             </button>
-          </div>
+          ) : (
+            <div className="flex shrink-0 items-center gap-3 border-b-[0.5px] border-line px-5 py-4 sm:px-6">
+              <h2 className="min-w-0 flex-1 truncate text-[17px] font-bold">{title}</h2>
+              <button
+                type="button"
+                onClick={requestClose}
+                aria-label={t("panelClose")}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-mist text-[19px] leading-none text-black/70 transition-colors hover:bg-mist-2 hover:text-sea"
+              >
+                ×
+              </button>
+            </div>
+          )}
           {/* Never sideways: one field wider than a phone must not make the whole panel pan. */}
           <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain bg-mist px-5 py-5 sm:px-6">
             <SidePanelContext.Provider value={context}>{children}</SidePanelContext.Provider>
