@@ -204,15 +204,11 @@ export function PageEditor({
         router.refresh();
         return;
       }
-      setDirty(false);
-      // Back to live: the page was published before the edit, so it stays
-      // published unless the edit left it incomplete.
-      const restored = await setFundraiserStatus({ fundraiserId: fundraiser.id, publish: true }).catch(
-        () => ({ ok: false as const, error: "server" as const }),
-      );
+      // And it stays a draft: that is what the button says. (It used to
+      // publish again straight after, so the page never left "published".)
       setBusy("");
-      setIsActive(restored.ok);
-      setNotice(restored.ok ? "saved" : "error" in restored && restored.error === "incomplete" ? "incomplete" : "error");
+      setDirty(false);
+      setNotice("saved");
       router.refresh();
       return;
     }
