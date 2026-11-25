@@ -28,6 +28,7 @@ interface TeamRow {
   raised_cents: number;
   member_count: number;
   campaign_id: string | null;
+  goal_cents: number | null;
 }
 interface EventRow {
   id: string;
@@ -62,8 +63,8 @@ async function fetchBoard(causeSlug: string | undefined) {
     }));
     const chosen = causeSlug ? (options.find((c) => c.slug === causeSlug) ?? null) : null;
     let individualsQuery = supabase.from("v_leaderboard").select("slug, title, photo_path, raised_cents, campaign_id");
-    let teamsQuery = supabase.from("v_leaderboard_teams").select("slug, name, photo_path, raised_cents, member_count, campaign_id");
-    let totalsQuery = supabase.from("v_fundraiser_totals").select("campaign_id");
+    let teamsQuery = supabase.from("v_leaderboard_teams").select("slug, name, photo_path, raised_cents, member_count, campaign_id, goal_cents");
+    let totalsQuery = supabase.from("v_fundraiser_totals").select("slug, campaign_id, goal_cents");
     if (chosen) {
       individualsQuery = individualsQuery.eq("campaign_id", chosen.id);
       teamsQuery = teamsQuery.eq("campaign_id", chosen.id);
@@ -84,7 +85,9 @@ async function fetchBoard(causeSlug: string | undefined) {
           .filter((row) => !chosen || row.id === chosen.id)
           .reduce((sum, row) => sum + Number(row.pages_pledged_cents), 0)
       : 0;
-    const totalsRows = (allTotals ?? []) as { campaign_id: string | null }[];
+    const totalsRows = (allTotals ?? []) as { slug: string; campaign_id: string | null; goal_cents: number | null }[];
+    // Each page's own goal: a card's bar is progress towards it, as on the page.
+    const goalBySlug = Object.fromEntries(totalsRows.map((row) => [row.slug, row.goal_cents]));
     for (const row of totalsRows) {
       const option = options.find((c) => c.id === row.campaign_id);
       if (option) option.pages += 1;
@@ -95,6 +98,7 @@ async function fetchBoard(causeSlug: string | undefined) {
       options,
       individuals: countPledges((individuals ?? []) as IndividualRow[], pagePledges as PledgeRowBySlug[] | null),
       teams: countPledges((teams ?? []) as TeamRow[], teamPledges as PledgeRowBySlug[] | null),
+      goalBySlug,
       activeCount: totalsRows.length,
       // What the pages raised: the cause view's column (migration 0062), not a sum over the board.
       totalRaised: (chosen ? causeList.filter((c) => c.id === chosen.id) : causeList).reduce((sum, c) => sum + c.pages_raised_cents, 0) + pagesPledged,
@@ -163,6 +167,7 @@ export default async function FundraisersDirectoryPage({
               title: row.title,
               photoUrl: fundraiserPhotoUrl(row.photo_path),
               raisedCents: row.raised_cents,
+              goalCents: board.goalBySlug[row.slug] ?? null,
               meta: board.event ? undefined : (board.options.find((option) => option.id === row.campaign_id)?.name ?? undefined),
               href: `/f/${row.slug}`,
             }),
@@ -175,6 +180,7 @@ export default async function FundraisersDirectoryPage({
               title: row.name,
               photoUrl: fundraiserPhotoUrl(row.photo_path),
               raisedCents: row.raised_cents,
+              goalCents: row.goal_cents ?? null,
               meta: t("memberCount", { count: row.member_count }),
               href: `/t/${row.slug}`,
             }),

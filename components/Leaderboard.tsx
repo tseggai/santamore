@@ -17,6 +17,12 @@ export interface LeaderboardEntry {
   raisedCents: Cents;
   /** Preformatted value shown instead of money (challenge leaderboards). */
   display?: string;
+  /**
+   * The page's own goal. When given (null = no goal set), the bar is progress
+   * towards it, as on the page itself; when left out, the bar compares the
+   * entry with the leader (challenge standings).
+   */
+  goalCents?: Cents | null;
   /** Trailing muted annotation, e.g. a team's member count. */
   meta?: string;
   href: string;
@@ -28,6 +34,15 @@ export interface LeaderboardEntry {
  * in red, the rest ink), mono amounts. Used with the segmented control
  * below and standalone on team pages for the internal member ranking.
  */
+/** The bar under an entry: progress to its own goal, or its share of the leader's value. */
+export function entryBar(entry: LeaderboardEntry, top: number, first: boolean): { width: string; tone: string } {
+  if (entry.goalCents !== undefined) {
+    const pct = entry.goalCents && entry.goalCents > 0 ? Math.min(100, Math.round((entry.raisedCents / entry.goalCents) * 100)) : 0;
+    return { width: `${Math.max(2, pct)}%`, tone: "bg-sea" };
+  }
+  return { width: `${Math.max(2, Math.round((entry.raisedCents / top) * 100))}%`, tone: first ? "bg-red" : "bg-ink" };
+}
+
 export function LeaderboardList({
   locale,
   entries,
@@ -73,10 +88,8 @@ export function LeaderboardList({
                 </span>
                 <span className="mt-1.5 block h-[5px] overflow-hidden rounded-[3px] bg-line-soft">
                   <span
-                    className={`block h-full rounded-[3px] ${rank === 1 ? "bg-red" : "bg-ink"}`}
-                    style={{
-                      width: `${Math.max(2, Math.round((entry.raisedCents / top) * 100))}%`,
-                    }}
+                    className={`block h-full rounded-[3px] ${entryBar(entry, top, rank === 1).tone}`}
+                    style={{ width: entryBar(entry, top, rank === 1).width }}
                   />
                 </span>
               </span>
