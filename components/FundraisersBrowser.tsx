@@ -12,19 +12,22 @@ import type { Locale } from "@/i18n/routing";
 
 /**
  * Everyone raising on one event: individuals or teams, as a grid of faces
- * or the ranked list, with a name search. Rank is by what the page raised.
+ * or a list, with a name search, ordered by what the page raised.
  */
 export function FundraisersBrowser({
   causes,
   selectedCause,
   individuals,
   teams,
+  startHref,
 }: {
   causes: { slug: string; name: string; pages: number }[];
   /** null = every cause, ranked together. */
   selectedCause: string | null;
   individuals: LeaderboardEntry[];
   teams: LeaderboardEntry[];
+  /** Where "start fundraising" leads. */
+  startHref: string;
 }) {
   const t = useTranslations("leaderboard");
   const locale = useLocale() as Locale;
@@ -38,18 +41,20 @@ export function FundraisersBrowser({
   const entries = needle ? source.filter((entry) => entry.title.toLowerCase().includes(needle)) : source;
   const top = source[0]?.raisedCents || 1;
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
-  const chip = (active: boolean) =>
-    `rounded-lg px-3.5 py-2 text-[14px] font-semibold transition-colors ${active ? "bg-ink text-paper" : "bg-mist hover:bg-mist-2"}`;
+
+  const field = "h-10 rounded-lg bg-mist px-2 text-[14px] sm:px-3 font-semibold outline-none focus:bg-mist-2";
 
   return (
     <div className="mt-6">
-      <div className="flex flex-wrap items-center gap-2">
+      {/* One line, on a phone too: cause, individuals or teams, search, then the
+          view toggle and "start fundraising" on the right (owner decision 2026-11-26). */}
+      <div className="flex items-center gap-1.5 sm:gap-2">
         <label className="sr-only" htmlFor="causePick">{t("pickCause")}</label>
         <select
           id="causePick"
           value={selectedCause ?? ""}
           onChange={(e) => router.push(`/${locale}/prikupljaci${e.target.value ? `?cilj=${encodeURIComponent(e.target.value)}` : ""}`)}
-          className="rounded-lg bg-mist px-3.5 py-2 text-[14px] font-semibold outline-none focus:bg-mist-2"
+          className={`${field} w-0 min-w-0 flex-1 sm:w-auto sm:flex-none`}
         >
           <option value="">{t("allCauses")}</option>
           {causes.map((cause) => (
@@ -58,24 +63,43 @@ export function FundraisersBrowser({
             </option>
           ))}
         </select>
-        <div role="group" aria-label={t("fundraisersTitle")} className="flex gap-1.5">
-          <button type="button" aria-pressed={tab === "individuals"} onClick={() => setTab("individuals")} className={chip(tab === "individuals")}>{t("individuals")}</button>
-          <button type="button" aria-pressed={tab === "teams"} onClick={() => setTab("teams")} className={chip(tab === "teams")}>{t("teams")}</button>
-        </div>
+        <label className="sr-only" htmlFor="kindPick">{t("fundraisersTitle")}</label>
+        <select
+          id="kindPick"
+          value={tab}
+          onChange={(e) => setTab(e.target.value === "teams" ? "teams" : "individuals")}
+          className={`${field} w-0 min-w-0 flex-1 sm:w-auto sm:flex-none`}
+        >
+          <option value="individuals">{t("individuals")}</option>
+          <option value="teams">{t("teams")}</option>
+        </select>
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("searchName")}
           aria-label={t("searchName")}
-          className="w-full rounded-lg bg-mist px-3.5 py-2 text-[14.5px] outline-none focus:bg-mist-2 sm:ml-auto sm:w-56"
+          className={`${field} w-0 min-w-0 flex-1 font-medium sm:ml-auto sm:w-56 sm:flex-none`}
         />
-        <div role="group" aria-label={t("viewLabel")} className="flex gap-1.5">
-          <button type="button" aria-pressed={view === "grid"} onClick={() => setView("grid")} className={chip(view === "grid")} aria-label={t("viewGrid")} title={t("viewGrid")}>▦</button>
-          <button type="button" aria-pressed={view === "list"} onClick={() => setView("list")} className={chip(view === "list")} aria-label={t("viewList")} title={t("viewList")}>☰</button>
-        </div>
+        {/* One button: it shows the view you would switch to. */}
+        <button
+          type="button"
+          onClick={() => setView(view === "grid" ? "list" : "grid")}
+          aria-label={view === "grid" ? t("viewList") : t("viewGrid")}
+          title={view === "grid" ? t("viewList") : t("viewGrid")}
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-mist text-[15px] font-semibold transition-colors hover:bg-mist-2"
+        >
+          <span aria-hidden>{view === "grid" ? "☰" : "▦"}</span>
+        </button>
+        <Link
+          href={startHref}
+          aria-label={t("startFundraisingCta")}
+          title={t("startFundraisingCta")}
+          className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red text-[22px] font-bold leading-none text-paper transition-colors hover:bg-red-dark"
+        >
+          <span aria-hidden>+</span>
+        </Link>
       </div>
-      <p className="mt-2 text-[13.5px] text-black/55">{tab === "individuals" ? t("individualsHint") : t("teamsHint")}</p>
 
       {entries.length === 0 ? (
         <p className="mt-5 text-[14.5px] text-black/60">{needle ? t("noMatch") : tab === "individuals" ? t("emptyIndividuals") : t("emptyTeams")}</p>
