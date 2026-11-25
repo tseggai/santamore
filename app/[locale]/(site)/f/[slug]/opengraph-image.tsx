@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { hasLocale } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 import { formatCents } from "@/lib/money";
@@ -13,7 +14,8 @@ export const alt = "Santamore";
 
 // Dynamic share card (brief §10): the runner's name, photo, current total
 // and progress — regenerated on every share, so milestones show up without
-// redeploys. Anon key + public view only.
+// redeploys. Before the first confirmed gift it leads with the goal: a card
+// that opens on "€0" asks nobody to give. Anon key + public view only.
 export default async function OpengraphImage({
   params,
 }: {
@@ -52,6 +54,8 @@ export default async function OpengraphImage({
 
   const pct =
     goalCents > 0 ? Math.min(100, Math.round((raisedCents / goalCents) * 100)) : 0;
+  const goalOnly = raisedCents <= 0 && goalCents > 0;
+  const t = await getTranslations({ locale, namespace: "runner" });
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
 
   return new ImageResponse(
@@ -102,9 +106,9 @@ export default async function OpengraphImage({
             }}
           >
             <div style={{ display: "flex", fontSize: 88, fontWeight: 700 }}>
-              {money(raisedCents)}
+              {goalOnly ? `${t("goalLabel")}: ${money(goalCents)}` : money(raisedCents)}
             </div>
-            {goalCents > 0 ? (
+            {goalCents > 0 && !goalOnly ? (
               <div
                 style={{
                   display: "flex",

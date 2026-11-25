@@ -67,7 +67,15 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const { fundraiser } = await fetchPage(slug);
-  return { title: fundraiser ? `${fundraiser.title} — Santamore` : "Santamore" };
+  if (!fundraiser) return { title: "Santamore" };
+  // The layout's template adds "· Santamore"; the story is what a shared
+  // link should say under the name, not the site's own description.
+  const story = (fundraiser.story ?? "").replace(/\s+/g, " ").trim();
+  const description = story.length > 160 ? `${story.slice(0, 157).trimEnd()}…` : story;
+  return {
+    title: fundraiser.title,
+    ...(description ? { description, openGraph: { title: fundraiser.title, description } } : {}),
+  };
 }
 
 export default async function FundraiserPage({
