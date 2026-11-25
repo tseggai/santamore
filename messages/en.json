@@ -233,7 +233,8 @@
     "wallEmpty": "No donations yet — be the first.",
     "raisingFor": "Raising funds for",
     "goalLabel": "Goal",
-    "donorsLabel": "Donors"
+    "donorsLabel": "Donors",
+    "pledgedLabel": "Pledged"
   },
   "leaderboard": {
     "title": "Leaderboard",

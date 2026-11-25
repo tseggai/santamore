@@ -62,6 +62,7 @@ export function PageEditor({
   presetTeamId,
   raisedCents,
   donorCount,
+  pledgedCents = 0,
   inPanel = false,
   children,
 }: {
@@ -76,6 +77,7 @@ export function PageEditor({
   presetTeamId: string | null;
   raisedCents: Cents;
   donorCount: number;
+  pledgedCents?: Cents;
   /** In the hub's slide-over: no box of its own, and the first row keeps clear of the ×. */
   inPanel?: boolean;
   /** What follows the page — the challenge and cash logs — above the sticky Save bar. */
@@ -495,6 +497,7 @@ export function PageEditor({
             raisedCents={raisedCents}
             goalCents={goalCents ?? 0}
             donorCount={donorCount}
+            pledgedCents={pledgedCents}
             locale={locale}
             surface="paper"
             stacked

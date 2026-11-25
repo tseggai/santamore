@@ -14,8 +14,9 @@ export const alt = "Santamore";
 
 // Dynamic share card (brief §10): the runner's name, photo, current total
 // and progress — regenerated on every share, so milestones show up without
-// redeploys. Before the first confirmed gift it leads with the goal: a card
-// that opens on "€0" asks nobody to give. Anon key + public view only.
+// redeploys. Before the first confirmed gift it leads with what is pledged,
+// or with the goal: a card that opens on "€0" asks nobody to give. Pledges
+// are named as pledges and drawn pale. Anon key + public views only.
 export default async function OpengraphImage({
   params,
 }: {
@@ -29,6 +30,7 @@ export default async function OpengraphImage({
   let title = "Santamore";
   let raisedCents = 0;
   let goalCents = 0;
+  let pledgedCents = 0;
   let photo: string | null = null;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -47,6 +49,12 @@ export default async function OpengraphImage({
         goalCents = data.goal_cents ?? 0;
         photo = fundraiserPhotoUrl(data.photo_path);
       }
+      const { data: pledges } = await supabase
+        .from("v_public_fundraiser_pledges")
+        .select("pledged_cents")
+        .eq("slug", slug)
+        .maybeSingle();
+      pledgedCents = Number(pledges?.pledged_cents ?? 0);
     } catch {
       // Fall through to the brand-only card.
     }
@@ -54,7 +62,10 @@ export default async function OpengraphImage({
 
   const pct =
     goalCents > 0 ? Math.min(100, Math.round((raisedCents / goalCents) * 100)) : 0;
-  const goalOnly = raisedCents <= 0 && goalCents > 0;
+  const pledgedOnly = raisedCents <= 0 && pledgedCents > 0;
+  const goalOnly = raisedCents <= 0 && pledgedCents <= 0 && goalCents > 0;
+  const promisedPct =
+    goalCents > 0 ? Math.min(100, Math.round(((raisedCents + pledgedCents) / goalCents) * 100)) : 0;
   const t = await getTranslations({ locale, namespace: "runner" });
   const money = (cents: number) => formatCents(cents, locale, { trimWholeCents: true });
 
@@ -106,7 +117,7 @@ export default async function OpengraphImage({
             }}
           >
             <div style={{ display: "flex", fontSize: 88, fontWeight: 700 }}>
-              {goalOnly ? `${t("goalLabel")}: ${money(goalCents)}` : money(raisedCents)}
+              {goalOnly ? `${t("goalLabel")}: ${money(goalCents)}` : pledgedOnly ? money(pledgedCents) : money(raisedCents)}
             </div>
             {goalCents > 0 && !goalOnly ? (
               <div
@@ -116,7 +127,7 @@ export default async function OpengraphImage({
                   color: "rgba(255,255,255,0.7)",
                 }}
               >
-                / {money(goalCents)}
+                {`${pledgedOnly ? `${t("pledgedLabel").toLowerCase()} ` : ""}/ ${money(goalCents)}`}
               </div>
             ) : null}
           </div>
@@ -129,17 +140,40 @@ export default async function OpengraphImage({
                 height: 18,
                 borderRadius: 9,
                 background: "rgba(255,255,255,0.22)",
+                position: "relative",
               }}
             >
+              {promisedPct > pct ? (
+                <div
+                  style={{
+                    display: "flex",
+                    position: "absolute",
+                    left: 0,
+                    top: 0,
+                    width: `${promisedPct}%`,
+                    height: 18,
+                    borderRadius: 9,
+                    background: "rgba(243,83,83,0.4)",
+                  }}
+                />
+              ) : null}
               <div
                 style={{
                   display: "flex",
+                  position: "absolute",
+                  left: 0,
+                  top: 0,
                   width: `${Math.max(2, pct)}%`,
                   height: 18,
                   borderRadius: 9,
                   background: "#F35353",
                 }}
               />
+            </div>
+          ) : null}
+          {pledgedCents > 0 && !pledgedOnly ? (
+            <div style={{ display: "flex", marginTop: 22, fontSize: 32, color: "rgba(255,255,255,0.8)" }}>
+              {`${t("pledgedLabel")}: ${money(pledgedCents)}`}
             </div>
           ) : null}
         </div>

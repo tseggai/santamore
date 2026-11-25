@@ -234,7 +234,8 @@
     "wallEmpty": "Пожертвований пока нет — будьте первым.",
     "raisingFor": "Собирает для",
     "goalLabel": "Цель",
-    "donorsLabel": "Доноры"
+    "donorsLabel": "Доноры",
+    "pledgedLabel": "Обещано"
   },
   "leaderboard": {
     "title": "Рейтинг",

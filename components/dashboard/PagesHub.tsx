@@ -33,6 +33,7 @@ export interface HubPage {
   teamSlug: string | null;
   raisedCents: number;
   donorCount: number;
+  pledgedCents: number;
 }
 
 /**
@@ -177,6 +178,7 @@ export function PagesHub({
               presetTeamId={joinTeamId}
               raisedCents={editor.raisedCents}
               donorCount={editor.donorCount}
+              pledgedCents={editor.pledgedCents}
               inPanel
             >
             {editor.event?.kind === "challenge" && editor.event.challenge_metric ? (
@@ -295,6 +297,11 @@ export function PagesHub({
                           {page.donorCount} {tRunner("donors")}
                           {page.goalCents ? ` · ${pct}%` : ""}
                         </p>
+                        {page.pledgedCents > 0 ? (
+                          <p className="text-[12.5px] text-black/55">
+                            {tRunner("pledgedLabel")}: <span className="font-mono font-semibold tabular-nums text-black/75">{money(page.pledgedCents)}</span>
+                          </p>
+                        ) : null}
                       </div>
                       {live ? (
                         <Link

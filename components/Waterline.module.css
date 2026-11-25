@@ -31,6 +31,17 @@
   transition: height 1.1s cubic-bezier(0.22, 0.9, 0.24, 1);
 }
 
+/* Open pledges: where the level would be if they all arrived. Pale and
+   still, so it never reads as money received. */
+.promised {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: color-mix(in srgb, var(--color-sea-2) 16%, transparent);
+  border-top: 1.5px dashed color-mix(in srgb, var(--color-sea-2) 45%, transparent);
+}
+
 /* 200% wide with two identical 50% SVGs so translateX(-50%) loops seamlessly */
 .wave {
   position: absolute;

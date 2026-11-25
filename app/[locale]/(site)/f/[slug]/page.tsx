@@ -42,7 +42,7 @@ interface WallRow {
 async function fetchPage(slug: string) {
   try {
     const supabase = await createClient();
-    const [{ data: fundraiser }, { data: wall }] = await Promise.all([
+    const [{ data: fundraiser }, { data: wall }, { data: pledges }] = await Promise.all([
       supabase.from("v_fundraiser_totals").select("*").eq("slug", slug).single(),
       supabase
         .from("v_public_donor_wall")
@@ -50,13 +50,16 @@ async function fetchPage(slug: string) {
         .eq("fundraiser_slug", slug)
         .order("approved_at", { ascending: false, nullsFirst: false })
         .limit(100),
+      // Open pledges: their own figure, beside the amount raised (migration 0090).
+      supabase.from("v_public_fundraiser_pledges").select("pledged_cents").eq("slug", slug).maybeSingle(),
     ]);
     return {
       fundraiser: fundraiser as FundraiserTotalsRow | null,
       wall: (wall ?? []) as WallRow[],
+      pledgedCents: Number(pledges?.pledged_cents ?? 0),
     };
   } catch {
-    return { fundraiser: null, wall: [] as WallRow[] };
+    return { fundraiser: null, wall: [] as WallRow[], pledgedCents: 0 };
   }
 }
 
@@ -91,7 +94,7 @@ export default async function FundraiserPage({
     getTranslations("donate"),
   ]);
 
-  const { fundraiser, wall } = await fetchPage(slug);
+  const { fundraiser, wall, pledgedCents } = await fetchPage(slug);
   if (!fundraiser) notFound();
 
   const photo = fundraiserPhotoUrl(fundraiser.photo_path);
@@ -167,6 +170,7 @@ export default async function FundraiserPage({
           raisedCents={fundraiser.raised_cents}
           goalCents={fundraiser.goal_cents}
           donorCount={fundraiser.donor_count}
+          pledgedCents={pledgedCents}
           locale={locale as Locale}
         />
       </div>

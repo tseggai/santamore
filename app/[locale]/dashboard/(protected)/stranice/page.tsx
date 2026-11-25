@@ -122,7 +122,7 @@ export default async function PagesHubPage({
       ...pages.flatMap((page) => (page.team_id ? [page.team_id] : [])),
     ]),
   ];
-  const [{ data: totalsRows }, { data: teamRows }] = await Promise.all([
+  const [{ data: totalsRows }, { data: teamRows }, { data: pledgeRows }] = await Promise.all([
     pages.length
       ? supabase
           .from("v_fundraiser_totals")
@@ -136,7 +136,11 @@ export default async function PagesHubPage({
           .in("id", teamIds)
           .order("name")
       : Promise.resolve({ data: [] as TeamRow[] }),
+    pages.length
+      ? supabase.from("v_public_fundraiser_pledges").select("id, pledged_cents").in("id", pages.map((page) => page.id))
+      : Promise.resolve({ data: [] as { id: string; pledged_cents: number }[] }),
   ]);
+  const pledgedById = new Map(((pledgeRows ?? []) as { id: string; pledged_cents: number }[]).map((row) => [row.id, Number(row.pledged_cents)]));
   const totalsBySlug = new Map(((totalsRows ?? []) as TotalsRow[]).map((row) => [row.slug, row]));
   const teamById = new Map(((teamRows ?? []) as TeamRow[]).map((row) => [row.id, row]));
   const captainIds = new Set((captained ?? []).map((row) => row.id));
@@ -200,6 +204,7 @@ export default async function PagesHubPage({
       teamSlug: team?.slug ?? null,
       raisedCents: totals?.raised_cents ?? 0,
       donorCount: totals?.donor_count ?? 0,
+      pledgedCents: pledgedById.get(page.id) ?? 0,
     };
   });
 
