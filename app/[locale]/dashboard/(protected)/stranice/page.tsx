@@ -5,6 +5,7 @@ import type { EventChoice } from "@/components/dashboard/CreatePageForm";
 import { PagesHub, type HubPage } from "@/components/dashboard/PagesHub";
 import type { MyTeam, TeamEventChoice } from "@/components/dashboard/TeamsManager";
 import { formatCents } from "@/lib/money";
+import { PLEDGE_COLUMNS, shownFigures, type PledgeRow } from "@/lib/pledges";
 import { createClient } from "@/lib/supabase/server";
 import { htmlLang, type Locale } from "@/i18n/routing";
 
@@ -137,10 +138,10 @@ export default async function PagesHubPage({
           .order("name")
       : Promise.resolve({ data: [] as TeamRow[] }),
     pages.length
-      ? supabase.from("v_public_fundraiser_pledges").select("id, pledged_cents").in("id", pages.map((page) => page.id))
-      : Promise.resolve({ data: [] as { id: string; pledged_cents: number }[] }),
+      ? supabase.from("v_public_fundraiser_pledges").select(`id, ${PLEDGE_COLUMNS}`).in("id", pages.map((page) => page.id))
+      : Promise.resolve({ data: [] as (PledgeRow & { id: string })[] }),
   ]);
-  const pledgedById = new Map(((pledgeRows ?? []) as { id: string; pledged_cents: number }[]).map((row) => [row.id, Number(row.pledged_cents)]));
+  const pledgesById = new Map(((pledgeRows ?? []) as unknown as (PledgeRow & { id: string })[]).map((row) => [row.id, row]));
   const totalsBySlug = new Map(((totalsRows ?? []) as TotalsRow[]).map((row) => [row.slug, row]));
   const teamById = new Map(((teamRows ?? []) as TeamRow[]).map((row) => [row.id, row]));
   const captainIds = new Set((captained ?? []).map((row) => row.id));
@@ -202,9 +203,12 @@ export default async function PagesHubPage({
       causeSlug: cause?.slug ?? null,
       teamName: team?.name ?? null,
       teamSlug: team?.slug ?? null,
-      raisedCents: totals?.raised_cents ?? 0,
-      donorCount: totals?.donor_count ?? 0,
-      pledgedCents: pledgedById.get(page.id) ?? 0,
+      ...(({ raisedCents, donorCount, pledgedCents }) => ({ raisedCents, donorCount, pledgedCents }))(
+        shownFigures(
+          { raisedCents: totals?.raised_cents ?? 0, donorCount: totals?.donor_count ?? 0 },
+          pledgesById.get(page.id),
+        ),
+      ),
     };
   });
 

@@ -1,5 +1,6 @@
 "use server";
 
+import { PLEDGE_COLUMNS, shownFigures, type PledgeRow } from "@/lib/pledges";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
@@ -552,6 +553,8 @@ export interface PageEditorData {
   donorCount: number;
   /** Open pledges on the page: promised, not received. */
   pledgedCents: number;
+  /** Pledge mode: raisedCents and donorCount already count the pledges. */
+  pledgesIncluded: boolean;
   event: { kind: string; challenge_metric: string | null } | null;
   activities: { id: string; started_at: string; distance_m: number; moving_time_s: number; source: string }[];
   cash: { id: string; amount_cents: number; status: string; created_at: string; donor_name: string | null; message: string | null }[];
@@ -605,7 +608,7 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
         .eq("rail", "cash")
         .order("created_at", { ascending: false })
         .limit(30),
-      supabase.from("v_public_fundraiser_pledges").select("pledged_cents").eq("id", mine.id).maybeSingle(),
+      supabase.from("v_public_fundraiser_pledges").select(PLEDGE_COLUMNS).eq("id", mine.id).maybeSingle(),
     ]);
 
   return {
@@ -632,9 +635,10 @@ export async function fetchPageEditor(slug: string): Promise<PageEditorData | nu
       causeId: team.campaign_id ?? undefined,
     })),
     captainOf: (captained ?? []).map((row) => row.id),
-    raisedCents: totals?.raised_cents ?? 0,
-    donorCount: totals?.donor_count ?? 0,
-    pledgedCents: Number(pledges?.pledged_cents ?? 0),
+    ...shownFigures(
+      { raisedCents: totals?.raised_cents ?? 0, donorCount: totals?.donor_count ?? 0 },
+      (pledges ?? null) as PledgeRow | null,
+    ),
     event: challenge ? { kind: challenge.kind, challenge_metric: challenge.challenge_metric } : null,
     activities: (activityRows ?? []) as PageEditorData["activities"],
     cash: (cashRows ?? []) as PageEditorData["cash"],

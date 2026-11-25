@@ -14,6 +14,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
 import { causeState } from "@/lib/cause-status";
 import { formatCents } from "@/lib/money";
+import { shownFigures, type PledgeRow } from "@/lib/pledges";
 import { Link } from "@/i18n/navigation";
 import { htmlLang, type Locale } from "@/i18n/routing";
 
@@ -32,6 +33,8 @@ export interface CampaignView {
   goal_cents: number | null;
   raised_cents: number;
   donor_count: number;
+  /** Open pledges for the cause; the cause's state still follows money received. */
+  pledges?: PledgeRow | null;
   starts_at: string | null;
   ends_at: string | null;
   chapter_name: string | null;
@@ -70,6 +73,7 @@ export function CampaignPageView({
   // money by the cause's start, so the year is the start's (a cause that
   // ran into January still belongs to the year it raised).
   const state = causeState(campaign);
+  const shown = shownFigures({ raisedCents: campaign.raised_cents, donorCount: campaign.donor_count }, campaign.pledges);
   const yearOf = campaign.starts_at ?? campaign.ends_at;
   const moneyYear = yearOf ? new Date(yearOf).getFullYear() : null;
   const secondaryButton =
@@ -99,9 +103,11 @@ export function CampaignPageView({
       <div className="mt-6">
         {campaign.goal_cents && campaign.goal_cents > 0 ? (
           <Waterline
-            raisedCents={campaign.raised_cents}
+            raisedCents={shown.raisedCents}
             goalCents={campaign.goal_cents}
-            donorCount={campaign.donor_count}
+            donorCount={shown.donorCount}
+            pledgedCents={shown.pledgedCents}
+            pledgesIncluded={shown.pledgesIncluded}
             locale={locale}
           />
         ) : (

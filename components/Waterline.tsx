@@ -34,6 +34,7 @@ export function Waterline({
   surface = "mist",
   stacked = false,
   pledgedCents = 0,
+  pledgesIncluded = false,
 }: {
   raisedCents: Cents;
   goalCents: Cents;
@@ -43,15 +44,17 @@ export function Waterline({
   surface?: "mist" | "paper";
   /** Goal and donors on lines of their own under the amount (the editor). */
   stacked?: boolean;
-  /** Open pledges: promised, not received. Shown beside the amount raised, never inside it. */
+  /** Open pledges: promised, not received. Always named on a line of their own. */
   pledgedCents?: Cents;
+  /** Pledge mode: raisedCents and donorCount already count the pledges (lib/pledges.ts). */
+  pledgesIncluded?: boolean;
 }) {
   const t = useTranslations("runner");
   const pct =
     goalCents > 0 ? Math.min(100, Math.round((raisedCents / goalCents) * 100)) : 0;
   // Where the water would stand if every pledge arrived: a pale band above the real level.
   const promisedPct =
-    goalCents > 0 && pledgedCents > 0 ? Math.min(100, Math.round(((raisedCents + pledgedCents) / goalCents) * 100)) : 0;
+    goalCents > 0 && pledgedCents > 0 && !pledgesIncluded ? Math.min(100, Math.round(((raisedCents + pledgedCents) / goalCents) * 100)) : 0;
   const [fill, setFill] = useState(0);
 
   useEffect(() => {

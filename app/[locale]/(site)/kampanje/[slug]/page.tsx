@@ -9,6 +9,7 @@ import {
   type CampaignView,
 } from "@/components/campaigns/CampaignPageView";
 import { toGalleryImages, type PublicGalleryRow } from "@/lib/gallery";
+import { PLEDGE_COLUMNS, type PledgeRow } from "@/lib/pledges";
 import { cachedPublic } from "@/lib/public-data";
 import { routing } from "@/i18n/routing";
 
@@ -17,7 +18,7 @@ export const dynamic = "force-dynamic";
 async function fetchCampaign(slug: string): Promise<CampaignView | null> {
   try {
     return await cachedPublic(["campaign", slug], async (supabase) => {
-    const [{ data: campaign }, { data: events }, { data: galleryRows }, { data: beneficiaryRows }] = await Promise.all([
+    const [{ data: campaign }, { data: events }, { data: galleryRows }, { data: beneficiaryRows }, { data: pledges }] = await Promise.all([
       supabase
         .from("v_public_campaigns")
         .select("*")
@@ -39,6 +40,8 @@ async function fetchCampaign(slug: string): Promise<CampaignView | null> {
         .select("id, slug, name, website, photo_path, story, campaign_slug, campaign_title")
         .eq("campaign_slug", slug)
         .order("sort_order"),
+      // Open pledges for the cause (migration 0090).
+      supabase.from("v_public_campaign_pledges").select(PLEDGE_COLUMNS).eq("slug", slug).maybeSingle(),
     ]);
     if (!campaign) return null;
     return {
@@ -46,6 +49,7 @@ async function fetchCampaign(slug: string): Promise<CampaignView | null> {
       events: (events ?? []) as CampaignEventItem[],
       gallery: toGalleryImages((galleryRows ?? []) as PublicGalleryRow[]),
       beneficiaries: (beneficiaryRows ?? []) as PublicBeneficiary[],
+      pledges: (pledges ?? null) as PledgeRow | null,
     };
     });
   } catch {

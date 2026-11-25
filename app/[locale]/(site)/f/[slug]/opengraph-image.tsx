@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 import { formatCents } from "@/lib/money";
+import { PLEDGE_COLUMNS, shownFigures, type PledgeRow } from "@/lib/pledges";
 import { OG_DISPLAY_FAMILY, OG_FONT_FAMILY, ogFonts } from "@/lib/og-fonts";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { routing, type Locale } from "@/i18n/routing";
@@ -30,7 +31,7 @@ export default async function OpengraphImage({
   let title = "Santamore";
   let raisedCents = 0;
   let goalCents = 0;
-  let pledgedCents = 0;
+  let pledges: PledgeRow | null = null;
   let photo: string | null = null;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -49,17 +50,21 @@ export default async function OpengraphImage({
         goalCents = data.goal_cents ?? 0;
         photo = fundraiserPhotoUrl(data.photo_path);
       }
-      const { data: pledges } = await supabase
+      const { data: pledgeRow } = await supabase
         .from("v_public_fundraiser_pledges")
-        .select("pledged_cents")
+        .select(PLEDGE_COLUMNS)
         .eq("slug", slug)
         .maybeSingle();
-      pledgedCents = Number(pledges?.pledged_cents ?? 0);
+      pledges = (pledgeRow ?? null) as PledgeRow | null;
     } catch {
       // Fall through to the brand-only card.
     }
   }
 
+  // Pledge mode: the headline is received plus pledged, as on the page.
+  const shown = shownFigures({ raisedCents, donorCount: 0 }, pledges);
+  raisedCents = shown.raisedCents;
+  const pledgedCents = shown.pledgesIncluded ? 0 : shown.pledgedCents;
   const pct =
     goalCents > 0 ? Math.min(100, Math.round((raisedCents / goalCents) * 100)) : 0;
   const pledgedOnly = raisedCents <= 0 && pledgedCents > 0;

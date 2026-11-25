@@ -7,6 +7,7 @@ import { Avatar } from "@/components/Avatar";
 import { ShareButton } from "@/components/ShareButton";
 import { Waterline } from "@/components/Waterline";
 import { formatCents } from "@/lib/money";
+import { PLEDGE_COLUMNS, shownFigures, type PledgeRow } from "@/lib/pledges";
 import { fundraiserPhotoUrl } from "@/lib/storage";
 import { createClient } from "@/lib/supabase/server";
 import { Link } from "@/i18n/navigation";
@@ -51,15 +52,15 @@ async function fetchPage(slug: string) {
         .order("approved_at", { ascending: false, nullsFirst: false })
         .limit(100),
       // Open pledges: their own figure, beside the amount raised (migration 0090).
-      supabase.from("v_public_fundraiser_pledges").select("pledged_cents").eq("slug", slug).maybeSingle(),
+      supabase.from("v_public_fundraiser_pledges").select(PLEDGE_COLUMNS).eq("slug", slug).maybeSingle(),
     ]);
     return {
       fundraiser: fundraiser as FundraiserTotalsRow | null,
       wall: (wall ?? []) as WallRow[],
-      pledgedCents: Number(pledges?.pledged_cents ?? 0),
+      pledges: (pledges ?? null) as PledgeRow | null,
     };
   } catch {
-    return { fundraiser: null, wall: [] as WallRow[], pledgedCents: 0 };
+    return { fundraiser: null, wall: [] as WallRow[], pledges: null };
   }
 }
 
@@ -94,8 +95,9 @@ export default async function FundraiserPage({
     getTranslations("donate"),
   ]);
 
-  const { fundraiser, wall, pledgedCents } = await fetchPage(slug);
+  const { fundraiser, wall, pledges } = await fetchPage(slug);
   if (!fundraiser) notFound();
+  const shown = shownFigures({ raisedCents: fundraiser.raised_cents, donorCount: fundraiser.donor_count }, pledges);
 
   const photo = fundraiserPhotoUrl(fundraiser.photo_path);
   const linkClass =
@@ -167,10 +169,11 @@ export default async function FundraiserPage({
 
       <div className="mt-7">
         <Waterline
-          raisedCents={fundraiser.raised_cents}
+          raisedCents={shown.raisedCents}
           goalCents={fundraiser.goal_cents}
-          donorCount={fundraiser.donor_count}
-          pledgedCents={pledgedCents}
+          donorCount={shown.donorCount}
+          pledgedCents={shown.pledgedCents}
+          pledgesIncluded={shown.pledgesIncluded}
           locale={locale as Locale}
         />
       </div>

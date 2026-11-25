@@ -63,6 +63,7 @@ export function PageEditor({
   raisedCents,
   donorCount,
   pledgedCents = 0,
+  pledgesIncluded = false,
   inPanel = false,
   children,
 }: {
@@ -78,6 +79,8 @@ export function PageEditor({
   raisedCents: Cents;
   donorCount: number;
   pledgedCents?: Cents;
+  /** Pledge mode: raisedCents and donorCount already count the pledges. */
+  pledgesIncluded?: boolean;
   /** In the hub's slide-over: no box of its own, and the first row keeps clear of the ×. */
   inPanel?: boolean;
   /** What follows the page — the challenge and cash logs — above the sticky Save bar. */
@@ -498,6 +501,7 @@ export function PageEditor({
             goalCents={goalCents ?? 0}
             donorCount={donorCount}
             pledgedCents={pledgedCents}
+            pledgesIncluded={pledgesIncluded}
             locale={locale}
             surface="paper"
             stacked

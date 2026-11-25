@@ -179,6 +179,7 @@ export function PagesHub({
               raisedCents={editor.raisedCents}
               donorCount={editor.donorCount}
               pledgedCents={editor.pledgedCents}
+              pledgesIncluded={editor.pledgesIncluded}
               inPanel
             >
             {editor.event?.kind === "challenge" && editor.event.challenge_metric ? (
